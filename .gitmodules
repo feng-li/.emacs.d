@@ -22,3 +22,6 @@
 [submodule "site-lisp/egg"]
 	path = site-lisp/egg
 	url = https://github.com/byplayer/egg.git
+[submodule "site-lisp/git-emacs"]
+	path = site-lisp/git-emacs
+	url = https://github.com/tsgates/git-emacs.git
