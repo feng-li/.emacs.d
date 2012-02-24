@@ -1,4 +1,6 @@
+abbrev_defs
 *.~
 *.elc
 session.*
 ac-comphist*
+*conflicted\ copy*
