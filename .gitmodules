@@ -1,3 +1,0 @@
-[submodule "site-lisp/ess"]
-	path = site-lisp/ess
-	url = git@bitbucket.org:fli/ess.git
