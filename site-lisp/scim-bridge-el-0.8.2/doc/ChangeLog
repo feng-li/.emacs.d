@@ -1,0 +1,286 @@
+2010-06-26  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.8.2
+	* Changed not to send cursor location to agent if it doesn't move
+	* Changed to show prediction window at cursor position irrespective of
+	`scim-prediction-window-position' when using in minibuffer
+	* Changed not to use unnecessary event `scim-dummy-event'
+	* Modified to redraw preedit text when switching frames showing same buffer
+	* Fixed bug: Candidate window is shown at incorrect position when using
+	text-scale-mode with header line shown
+	* Fixed bug: Prediction window might be shown in incorrect position when
+	`scim-prediction-window-position' isn't default value
+	* Fixed bug: post-command-hook becomes extremely slow when using many frames
+	* Fixed bug: X keymap might be changed incorrectly when
+	`scim-use-kana-ro-key' is non-nil
+	* Fixed bug: Keymaps are not enabled for about 1 second maximum after
+	focused in from the other applications
+2010-05-29  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.8.1
+	* Added internal option `scim-incompatible-major-modes'
+	* Changed default value of `scim-cursor-type-for-candidate' to `bar'
+	* Changed default value of `scim-put-cursor-on-candidate' to t
+	* Changed to turn off scim-mode when failing to open socket or register
+	IMContext
+	* Changed process sentinel to show message when scim-mode restarted
+	* Changed so that scim-mode restarts if config file is changed by using
+	SCIM GUI setup utility
+	* Changed to show the whole of unrecognized message in process buffer
+	* Modified not to redraw preedit when changing only cursor position
+	* Fixed bug: Japanese kana character `ろ' might not be input when using
+	kana typing method
+	* Fixed bug: post-command-hook doesn't work when passively receive signals
+	from SCIM-Bridge agent
+	* Fixed bug: `scim-callback-queue' isn't cleared when errors occur during
+	executing callbacks
+	* Fixed bug: Using with yasnippet might cause infinite loop
+	* Fixed bug: `scim-bridge-socket-alist' aren't cleared when turning off
+	scim-mode
+	* Fixed problem: scim-chewing engine returns incorrect text attribute which
+	 exceeds the end of preediting area
+	* Fixed problem: scim-skk engine returns incorrect text attribute and
+	cursor position when showing annotation
+	* Fixed problem: 'post-command-hook' is incorrectly set to nil when using
+	anything.el
+	* Fixed bug: IMContext can't be registered if the other signals are
+	received after the request for creating IMContext
+	* Fixed bug: alt + henkan doesn't work
+2010-04-23  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.8.0
+	* Added files for building deb package
+	* Added support for multi-display environment
+	* Added support for INHERIT-INPUT-METHOD arg of `read-from-minibuffer' etc.
+	* Added support for input focus redirection
+	* Changed maximum length of undo to 20 columns rather than 20 characters
+	* Modified not to override descriptions of many keybindings
+	* Modified not to override cursor color of auto-complete's fuzzy completion
+	* Modified so that scim-mode is safely turned off when errors occur
+	* Modified yasnippet support to work correctly for version 0.6
+	* Fixed bug: `query-replace! often aborts just after starting
+	* Fixed bug: Keymap is incorrectly disabled after using GUI setup utility
+	* Reimplemented functions for calculating pixel coordinates of point
+2010-03-02  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.7.5
+	* Added support for daemon mode of Emacs 23
+	* Added support for ansi-term
+	* Added support for undo-tree.el
+	* Modified not to get many warnings by byte-compile on Emacs23.1.92
+	* Changed to ask y or n in the case that `post-command-hook' is reset
+	for some reason (y means `restore hook', otherwise `quit scim-mode')
+	* Modified to use function `x-window-property' to ask the window manager
+	the properties such as `_NET_ACTIVE_WINDOW'
+	* Fixed bug: When using isearch-mode, an error "Invalid function: 1"
+	occurs if header or mode line is clicked
+	* Fixed bug (Incomplete): Conversion window may be displayed in
+	incorrect position when the faces of each character specify the height
+	[This bug can't be fixed completely unless Emacs's bug (#4426) is fixed]
+	* Fixed bug: Variable to store the timestamp of SCIM config file can be
+	out of range
+	* Fixed bug: An error occurs by loading scim-bridge.el when Emacs is
+	running on a console
+	* Deleted unnecessary internal function and variable
+2009-01-29  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.7.4
+	* Added support for table.el (which defines `table-insert')
+	* Updated support for yasnippet (ver.0.5.9)
+	* Fixed `self-insert-command' simulation not to unnecessarily delete
+	undo boundaries
+2009-01-14  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.7.3.3
+	* Fixed bug: Prompt of nonincremental-search and `isearch-edit-string'
+	incorrectly shows the string `[SCIM]'
+	* Fixed bug: Minibuffer is cleared just after nonincremental-search
+	* Fixed bug: isearch-mode often becomes busy by meaninglessly waiting for
+	the response from SCIM if the other input method is used
+	* Fixed bug: Cursor type specified by option `scim-isearch-cursor-type'
+	sometimes can't restore when quitting isearch-mode
+	* Fixed bug: Can't use in Sawfish window manager by receiving many
+	`post-command-hook' errors
+	using
+2009-01-08  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.7.3.2
+	* Fixed bug: Error occurs when doing `make-frame' on Emacs22
+	* Modified not to get warnings by byte-compile
+2009-01-03  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.7.3.1
+	* Fixed bug: Error "Selecting deleted buffer" occurs when attempting
+	to do `kill-buffer'
+	* Fixed bug: Using SCIM in yasnippet's fields leaves some garbage
+	characters and undo list might corrupt
+2008-12-28  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.7.3
+	* Enhanced option `scim-cursor-color' so that cursor color can be
+	specified for the state which SCIM is disabled
+	* Added option `scim-isearch-cursor-type' in order that cursor type can
+	be specified for isearch-mode
+	* Collaborate with vi simulation modes (vi-mode, vip-mode, viper-mode)
+	by disabling SCIM input in vi state
+	* Enhanced support for IRC clients
+		- Modified to keep undo list when starting preediting
+		- Added supported clients (rcirc, Circe)
+	* Re-implemented the support of Japanese thumb-shift input style in order
+	to detect the simultaneous typing more correctly
+	* Changed name of the option `scim-key-release-delay' to
+	`scim-simultaneous-pressing-time'
+	* Changed the format of option `scim-cursor-type-for-candidates' to the
+	same as `cursor-type'
+	* Fixed bug: Cursor color sometimes doesn't change when selecting frame
+2008-12-11  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.7.2.2
+	* Fixed bug: Garbage string is left in buffer when entering into minibuffer
+	by using prefix such as M-x during preediting
+	* Fixed bug: Garbage string is left in buffer by starting isearch-mode
+	when preediting with some IMEngine
+	* Fixed bug: Can't exit preediting correctly if we stop it in isearch-mode
+	by C-g when using some IMEngine
+2008-12-09  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.7.2.1
+	* Fixed bug: Cursor color is overwritten even if `scim-cursor-color' is nil
+	* Fixed bug: Effect of `scim-disable-keymap' isn't reset when major mode
+	is changed
+2008-12-06  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.7.2
+	* Added support for isearch-mode
+	* Changed the interval controlling of the input focus watcher so as to
+	be selected according to the situation
+	* Changed keymap so that the most suitable one is automatically selected
+	among four types
+	* Modified keymap not to handle unnecessary keys when using the Japanese
+	kana input style
+	* Modified in order that SCIM-Bridge agent doesn't stop unexpectedly and
+	is automatically restarted if it will stop
+	* Deleted Perl script which are substitutively used for connection with
+	SCIM-Bridge agent
+	* Modified so that prefix keys such as escape and C-c can be handled
+	keeping those functions of prefix keys
+	* Fixed bug: Cursor color can't change when opening files by mouse
+	drag & drop operations
+	* Fixed bug: The operation might become impossible any more if user does
+	the operation which destroys preediting area when the undoing is disabled
+	* Fixed bug: Failed to start when using Awesome window manager
+2008-10-20  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.7.1
+	* Added option `scim-imcontext-temporary-for-minibuffer' (Default is t)
+	* Fixed bug: Input status can't change if SCIM settings are changed by
+	using the GUI setup utility
+	* Fixed bug: An error occurs if the second stroke of Japanese thumb shift
+	style input is mouse event
+2008-10-08  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.7.0.1
+	* scim-bridge-zh-si.el, scim-bridge-zh-tr.el: Added Chinese translation
+	files (translated by Andy Stewart)
+	* Fixed bug: Configurations might be failed for alt- or meta- keybindings
+2008-10-04  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.7.0
+	* Added option `scim-cursor-color' in order that the cursor color can
+	indicates the input status
+	* Added option `scim-cursor-type-for-candidate' so that the cursor style
+	and position for candidate selection view are configurable
+	* Added functions `scim-set-function-doc', `scim-set-group-doc',
+	`scim-set-variable-doc', `scim-set-face-doc'
+	* scim-bridge-ja.el: Rewrote mostly
+	* scim-bridge-XX.el: Added translation template
+	* Fixed bug: `buffer-undo-list' might corrupt when the keys used for
+	modifying buffer text, such as C-m, aren't bound to any function in
+	SCIM configuration
+	* Fixed bug: Modification hooks configured by other than scim-mode
+	might not work correctly when using Japanese thumb-shift input style
+	* Fixed bug: `scim-define-key' might not work correctly if key events
+	are given as symbols (Emacs 22)
+2008-09-08  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.6.9.1
+	* Fixed bug: Unusable in the minibuffer since the previous version
+2008-09-08  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.6.9
+	* Changed the default value of option `scim-mode-local' to t
+	* Modified not to handle the key events in tree view of ebrowse
+	* Modified support for ERC (Usable)
+	* Fixed bug: An error occurs if startup splash is enabled (Emacs 22)
+	* Fixed bug: An error occurs by mouse-yank while preediting (Emacs 22)
+2008-09-05  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.6.8
+	* Added support for ERC (IRC client) (Experimental stage)
+	* Modified to handle the error which occurs by attempt to insert the
+	string before the character given the read-only attribute
+	* Modified in order that the preediting area doesn't jump to anywhere when
+	the cursor is moved by some operation such as scrolling
+	* Modified to restart SCIM-Bridge agent if it refuses the connection
+	from scim-mode
+	* Fixed bug: An error occurs by committing the string longer than 20
+	characters when undoing is enabled
+	* Fixed some unimportant bugs
+2008-07-26  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.6.7
+	* Commented out the debug codes for better performance
+	* Fixed bug: `scim-mode-on' and `scim-mode-off' aren't interactive commands
+2008-06-12  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.6.6
+	* Made usable on Xming's rootless mode
+2008-06-06  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.6.5.1
+	* Fixed bug: Unable to configure to automatically turn on SCIM just after
+	starting Emacs
+2008-06-05  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.6.5
+	* Changed the default settings in order to make the SCIM-Anthy's setting
+	`input from ten key' effectual
+	* Fixed bug: An error occurs in `post-command-hook' if Emacs loses the
+	input focus during the startup sequence
+	* Fixed bug: SCIM-bridge agent dies if Emacs is closed by clicking the
+	close button before it has never taken the input focus
+	* Fixed to display the history window of SCIM-Ruby in correct position
+	* scim-bridge-ja.el: `scim-transfer-romaji-into-preedit' can be used by
+	selecting region
+2008-06-01  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.6.4
+	* scim-bridge-ja.el: Added function `scim-anthy-reconvert-region'
+	* scim-bridge-ja.el: Added function `scim-transfer-romaji-into-preedit'
+	* Added and modified docstrings
+	* Changed to be able to replace docstrings with Japanese translations
+	even if the functions are already byte-compiled
+2008-05-28  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.6.3.1
+	* Changed the functions to interactive commands:
+	`scim-enable-keymap', `scim-disable-keymap'
+2008-05-24  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.6.3
+	* Changed so that backslashes can be input by pushing `ろ' key on
+	Japanese keyboard even if kana input system is used
+	* Fixed bug: Conversion window isn't displayed in exact position when
+	using Compiz fusion
+	* Fixed bug: Errors occur when replacing docstrings with Japanese
+	translations after byte-compiling
+2008-05-22  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.6.2.1
+	* Fixed bug: Keymap modified by xmodmap isn't restored when scim-mode is
+	turned off
+2008-05-22  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.6.2
+	* Changed so that keymap modified by xmodmap for Japanese kana-input is
+	canceled when input focus is lost
+	* Fixed bug: Switching the input focus buffer-to-buffer is failed just
+	after change the input statuses from local to global
+	* Fixed bug: `post-command-hook' error causes in read-only buffers
+2008-05-20  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.6.1
+	* Fixed bug: SCIM-Bridge agent aborts just after launching Emacs in
+	non-GNOME environment
+	* Changed default value of option `scim-key-release-delay' into the same
+	as `omelet.el' (0.1s)
+	* Added Japanese translations of docstrings
+2008-05-18  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.6.0
+	* Changed so that SCIM's keybindings which include alt key can be used
+	even if Emacs handles alt key as meta key
+	* Changed to execute SCIM-Bridge agent automatically if it hasn't run
+	* Fixed bug: ediff-mode cause error by first input
+2008-05-15  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.5.0
+	* First public release
+2008-05-12  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.4.0
+2008-05-08  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.3.0
+2008-05-06  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.2.0
+2008-04-20  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.1.0

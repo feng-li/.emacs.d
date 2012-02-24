@@ -1,0 +1,94 @@
+2010-06-26  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.8.2
+	* Added docstrings:
+		scim-mode-on
+		scim-mode-off
+2010-05-29  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.8.1
+	* Added docstring:
+		scim-incompatible-major-modes
+	* Modified docstring:
+		scim-incompatible-mode-hooks
+	* Modified custom-type:
+		scim-isearch-cursor-type
+		scim-cursor-type-for-candidate
+2010-04-23  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.8.0
+	* Added docstrings:
+		scim-bridge-x-display-substitute
+		scim-preedit-incompatible-commands
+		scim-inherit-im-functions
+	* Modified docstrings:
+		scim-undo-by-committed-string
+		scim-incompatible-mode-hooks
+	* Deleted variables and functions:
+		scim-adjust-window-y-position
+		scim-undo-command-list
+		scim-get-frame-extents
+		scim-save-frame-extents
+		scim-frame-header-height,
+		scim-real-frame-header-height
+	* Deleted translations for internal functions:
+		scim-set-group-doc
+		scim-set-variable-doc
+		scim-set-face-doc
+		scim-set-function-doc
+		scim-reset-imcontext-statuses
+		scim-compute-pixel-position
+		scim-get-gnome-font-size
+		scim-get-active-window-id
+	* Modified l10n-HowTo
+2010-03-02  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.7.5
+	* Modified docstring:
+		scim-get-frame-extents
+2009-01-27  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.7.4
+	* Modified description of installation
+2008-12-19  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.7.3
+	* Added docstrings:
+		scim-simultaneous-pressing-time (*)
+		scim-isearch-cursor-type (*)
+		scim-undo-command-list
+	* Modified docstrings:
+		scim-cursor-color (*)
+		scim-cursor-type-for-candidate (*)
+		scim-bridge-timeout
+	* Deleted docstrings:
+		scim-key-release-delay
+		scim-bridge-wait-reply
+	[ (*) indicate that custom-type is added/modified together. ]
+2008-11-28  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.7.2
+	* Added docstrings:
+		scim-use-in-isearch-window
+		scim-use-minimum-keymap
+		scim-enable-isearch
+		scim-disable-isearch
+		scim-mode (function)
+	* Modified docstrings:
+		scim-cursor-color
+		scim-focus-update-interval
+		scim-focus-update-interval-long
+	* Deleted docstrings:
+		scim-bridge-socket-use-script
+		scim-bridge-socket-script-path
+		scim-bridge-socket-script-name
+		scim-bridge-socket-script
+2008-10-14  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.7.1
+	* Added docstrings:
+		scim-imcontext-temporary-for-minibuffer
+		scim-config-file
+	* Modified docstrings:
+		scim-cursor-color
+		scim-reset-imcontext-statuses
+2008-10-08  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.7.0.1
+	* scim-bridge-zh-si.el (Simplified Chinese): newly created
+	* scim-bridge-zh-tr.el (Traditional Chinese): newly created
+2008-10-04  IRIE Shinsuke <irieshinsuke@yahoo.co.jp>
+	* Version0.7.0
+	* scim-bridge-XX.el (l10n template): newly created
+	* scim-bridge-en.el (l10n sample): newly created

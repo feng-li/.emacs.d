@@ -1,0 +1,9 @@
+scim-bridge-el for Debian
+-------------------------
+
+This is Debian package of scim-bridge.el .
+Since this program is *not* a part of SCIM-Bridge,
+Emacs Lisp files aren't put in /usr/share/emacs/site-lisp/scim-bridge,
+but in /usr/share/emacs/site-lisp/scim-bridge-el .
+
+ -- IRIE Shinsuke <irieshinsuke@yahoo.co.jp>  Wed, 03 Mar 2010 07:07:12 +0900
