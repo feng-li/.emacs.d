@@ -10,3 +10,6 @@
 [submodule "site-lisp/python.el"]
 	path = site-lisp/python.el
 	url = https://github.com/fgallina/python.el.git
+[submodule "site-lisp/yasnippet"]
+	path = site-lisp/yasnippet
+	url = https://github.com/capitaomorte/yasnippet.git
