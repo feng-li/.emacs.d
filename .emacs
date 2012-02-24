@@ -789,7 +789,9 @@
 ;; ESS
 (eval-after-load "ess-site"
   '(progn
-     (require 'ac-R) ;; auto complete for R
+     ;; auto complete for R
+     ;; (require 'ac-R) 
+     (ess-init-ac t)
      (require 'ess-rutils)
      ;; (require 'ess-tracebug) ;; ESS tracebug
      (require 'ess-eldoc)
