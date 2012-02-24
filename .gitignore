@@ -2,6 +2,7 @@ abbrev_defs
 *.~
 *.elc
 session.*
+!session.el
 ac-comphist*
 *conflicted\ copy*
 tutorial/
