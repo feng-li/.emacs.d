@@ -472,6 +472,7 @@
      (ac-flyspell-workaround)
      (setq ac-auto-start 2) ; nil of not auto start
      ;; (ac-set-trigger-key "TAB") ; unset this if auto-start
+     (setq ac-menu-height 10)
      (setq ac-delay 0.05)
      (setq ac-quick-help-delay 1.5)
      (setq ac-ignore-case 'smart)
