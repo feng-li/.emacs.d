@@ -1,6 +1,7 @@
 abbrev_defs
 *.~
 *.elc
+.session
 session.*
 !session.el
 ac-comphist*
