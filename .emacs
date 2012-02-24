@@ -473,6 +473,8 @@
      (setq ac-auto-start 2) ; nil of not auto start
      ;; (ac-set-trigger-key "TAB") ; unset this if auto-start
      (setq ac-delay 0.05)
+     (setq ac-quick-help-delay 1.5)
+     (setq ac-ignore-case 'smart)
      (setq ac-ignores (quote ("0" "1" "2" "3" "4" "5" "6" "7" "8" "9")))
 
      (dolist (hook '(emacs-lisp-mode-hook 
