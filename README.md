@@ -18,12 +18,15 @@ mv .emacs .emacs-bak
 cd ~
 git clone https://feng-li@github.com/feng-li/.emacs.d.git
 ln -sf .emacs.d/.emacs
+cd ~/.emacs.d/
+git submodule update --init --recursive
+git submodule update
 ```
 
-* Update the submodules
+# Synchronize with the remote
 
 ```
-cd .emacs.d
+cd ~/.emacs.d/
 git pull
 git submodule foreach git pull
 git submodule foreach git checkout master
