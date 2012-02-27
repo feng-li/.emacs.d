@@ -28,6 +28,7 @@ git submodule update
 ```
 cd ~/.emacs.d/
 git pull
+git submodule sync 
 git submodule update
 git submodule foreach git checkout master
 git submodule foreach git update
