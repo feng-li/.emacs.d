@@ -19,7 +19,6 @@ mv .emacs .emacs-bak
 cd ~
 git clone https://feng-li@github.com/feng-li/.emacs.d.git
 ln -sf .emacs.d/.emacs
-
 ```
 
 * Update the submodules
@@ -30,5 +29,4 @@ git pull
 git submodule foreach git pull
 git submodule foreach git checkout master
 git submodule foreach git update
-
 ```
