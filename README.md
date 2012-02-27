@@ -10,7 +10,6 @@ See each individual file.
 cd ~
 mv .emacs.d .emacs.d-bak
 mv .emacs .emacs-bak
-
 ```
 
 * Clone the repository
