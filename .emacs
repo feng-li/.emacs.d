@@ -793,8 +793,10 @@
 (eval-after-load "ess-site"
   '(progn
      ;; auto complete for R
-     ;; (require 'ac-R) 
-     (ess-init-ac t)
+
+     (setq ess-use-auto-complete t)
+     ;; (setq ess-use-auto-complete 'script-only)
+
      (require 'ess-rutils)
      ;; (require 'ess-tracebug) ;; ESS tracebug
      (require 'ess-eldoc)
