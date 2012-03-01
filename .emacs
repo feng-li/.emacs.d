@@ -57,7 +57,9 @@
 
 ;; Set home directory
 (setq default-directory "~/workspace/")
-;; (desktop-save-mode)
+
+(when window-system
+  (desktop-save-mode))
 
 ;; Default Height and width
 (setq default-frame-alist (append (list
@@ -1044,34 +1046,33 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; (custom-set-faces
-;;  ;; custom-set-faces was added by Custom.
-;;  ;; If you edit it by hand, you could mess it up, so be careful.
-;;  ;; Your init file should contain only one such instance.
-;;  ;; If there is more than one, they won't work right.
-;;  '(bold ((t (:weight normal))))
-;;  '(comint-highlight-input ((t (:slant italic :weight bold))))
-;;  '(cursor ((t (:background "red" :foreground "red"))))
-;;  '(flyspell-duplicate ((t (:underline "red" :weight normal))))
-;;  '(flyspell-incorrect ((t (:underline "red" :weight normal))))
-;;  '(font-latex-italic-face ((t (:inherit nil :foreground "dark green" :slant italic))))
-;;  '(font-latex-math-face ((t (:foreground "navy"))))
-;;  '(font-latex-sectioning-5-face ((t (:foreground "red" :weight bold))))
-;;  '(font-latex-sedate-face ((t (:foreground "green"))))
-;;  '(font-latex-string-face ((t (:foreground "green4"))))
-;;  '(font-latex-warning-face ((t (:inherit nil :foreground "red"))))
-;;  '(font-lock-comment-delimiter-face ((t (:inherit font-lock-comment-face :foreground "blue" :weight normal))))
-;;  '(font-lock-comment-face ((t (:foreground "blue" :slant italic))))
-;;  '(font-lock-constant-face ((t (:foreground "red" :weight bold))))
-;;  '(font-lock-function-name-face ((t (:foreground "blue" :slant italic :weight bold))))
-;;  '(font-lock-keyword-face ((t (:foreground "magenta" :weight bold :width normal))))
-;;  '(font-lock-string-face ((t (:foreground "dark green" :weight normal))))
-;;  '(font-lock-type-face ((t (:foreground "blue" :weight bold))))
-;;  '(font-lock-variable-name-face ((t (:foreground "blue" :weight bold))))
-;;  '(font-lock-warning-face ((t (:inherit error :background "dark magenta" :foreground "white smoke" :weight normal))))
-;;  '(success ((t (:foreground "blue" :weight bold))))
-;;  '(warning ((t (:foreground "red" :weight bold)))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(bold ((t (:weight normal))))
+ '(comint-highlight-input ((t (:slant italic :weight bold))))
+ '(cursor ((t (:background "red" :foreground "red"))))
+ '(flyspell-duplicate ((t (:underline "red" :weight normal))))
+ '(flyspell-incorrect ((t (:underline "red" :weight normal))))
+ '(font-latex-italic-face ((t (:inherit nil :foreground "dark green" :slant italic))))
+ '(font-latex-math-face ((t (:foreground "navy"))))
+ '(font-latex-sectioning-5-face ((t (:foreground "red" :weight bold))))
+ '(font-latex-sedate-face ((t (:foreground "green"))))
+ '(font-latex-string-face ((t (:foreground "green4"))))
+ '(font-latex-warning-face ((t (:inherit nil :foreground "red"))))
+ '(font-lock-comment-delimiter-face ((t (:inherit font-lock-comment-face :foreground "blue" :weight normal))))
+ '(font-lock-comment-face ((t (:foreground "blue" :slant italic))))
+ '(font-lock-constant-face ((t (:foreground "red" :weight bold))))
+ '(font-lock-function-name-face ((t (:foreground "blue" :slant italic :weight bold))))
+ '(font-lock-keyword-face ((t (:foreground "magenta" :weight bold :width normal))))
+ '(font-lock-string-face ((t (:foreground "dark green" :weight normal))))
+ '(font-lock-type-face ((t (:foreground "blue" :weight bold))))
+ '(font-lock-variable-name-face ((t (:foreground "blue" :weight bold))))
+ '(font-lock-warning-face ((t (:inherit error :background "dark magenta" :foreground "white smoke" :weight normal))))
+ '(success ((t (:foreground "blue" :weight bold))))
+ '(warning ((t (:foreground "red" :weight bold)))))
 
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
