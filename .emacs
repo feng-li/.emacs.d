@@ -10,7 +10,7 @@
  '(frame-background-mode nil)
  '(global-font-lock-mode t nil (font-lock))
  '(hl-paren-background-colors (quote ("light gray" "steel blue" "lime green" "orange1")))
- '(indicate-buffer-boundaries (quote left))
+ ;;'(indicate-buffer-boundaries (quote left))
  '(indicate-empty-lines t)
  '(org-support-shift-select t)
  '(send-mail-function (quote mailclient-send-it))
@@ -80,6 +80,12 @@
 
 ;; Suspend the compile warnings
 (setq byte-compile-warnings nil)
+
+;; Disable scroll-bar
+(scroll-bar-mode -1)
+
+;; Enable line number mode when opening new files
+(add-hook 'find-file-hook (lambda () (linum-mode 1)))
 
 ;; Let Alt key be the meta key
 (setq x-alt-keysym 'meta)
