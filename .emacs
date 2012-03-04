@@ -11,7 +11,7 @@
  '(global-font-lock-mode t nil (font-lock))
  '(hl-paren-background-colors (quote ("light gray" "steel blue" "lime green" "orange1")))
  ;;'(indicate-buffer-boundaries (quote left))
- '(indicate-empty-lines t)
+ '(indicate-empty-lines nil)
  '(org-support-shift-select t)
  '(send-mail-function (quote mailclient-send-it))
  '(show-paren-mode t nil (paren))
@@ -148,13 +148,6 @@
 (put 'dired-find-alternate-file 'disabled nil)
 
 
-;; Default Height and width
-;; (setq default-frame-alist (append (list
-;;                                    '(width  . 81)  ; Width set to 81 characters
-;;                                    '(height . 55)) ; Height set to 60 lines
-;;                                   default-frame-alist))
-
-
 ;; disable tooltips
 (tooltip-mode nil)
 
@@ -254,8 +247,9 @@
 ;; TAB settings
 (setq-default indent-tabs-mode nil)
 
-;; Control-tab to switch among buffers TODO: not working within the console   
-;; (global-set-key (kbd "C-<tab>") 'next-buffer)
+;; Control-tab to switch among buffers  
+(when window-system
+  (global-set-key (kbd "C-<tab>") 'next-buffer))
 
 ;; Keep buffer order during switch 
 ;; (require 'flobl)
@@ -1052,7 +1046,7 @@
              ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Custom set faces
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -1081,14 +1075,6 @@
  ;; '(font-lock-warning-face ((t (:inherit error :background "dark magenta" :foreground "white smoke" :weight normal))))
  ;; '(success ((t (:foreground "blue" :weight bold))))
  ;; '(warning ((t (:foreground "red" :weight bold))))
-
 )
-
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
