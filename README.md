@@ -3,8 +3,8 @@ Copyright
  
 See each individual file.
 
-Install
-=======
+Installation
+============
 
 * Back up old files
 
@@ -37,4 +37,5 @@ git submodule foreach git pull
 Bug Report
 ==========
 
-Please visit https://github.com/feng-li/.emacs.d/issues
+* For submoudles, please report bugs to the corresponding authors.
+* For other issues, please visit https://github.com/feng-li/.emacs.d/issues .
