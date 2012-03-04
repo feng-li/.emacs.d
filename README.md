@@ -6,36 +6,31 @@ See each individual file.
 Installation
 ============
 
-* Back up old files
+* Back up old files:
+  
+  cd ~
+  mv .emacs.d .emacs.d-bak
+  mv .emacs .emacs-bak
 
-```
-cd ~
-mv .emacs.d .emacs.d-bak
-mv .emacs .emacs-bak
-```
+* Clone the repository:
+  cd ~
+  git clone https://feng-li@github.com/feng-li/.emacs.d.git
+  ln -sf .emacs.d/.emacs
+  cd ~/.emacs.d/
+  git submodule update --init --recursive
 
-* Clone the repository
+* Synchronize with the remote:
 
-```
-cd ~
-git clone https://feng-li@github.com/feng-li/.emacs.d.git
-ln -sf .emacs.d/.emacs
-cd ~/.emacs.d/
-git submodule update --init --recursive
-```
+  cd ~/.emacs.d/
+  git pull
+  git submodule sync 
+  git submodule foreach git checkout master
+  git submodule foreach git pull
 
-* Synchronize with the remote
 
-```
-cd ~/.emacs.d/
-git pull
-git submodule sync 
-git submodule foreach git checkout master
-git submodule foreach git pull
-```
-
-Bug Report
+Bug report
 ==========
 
-* For submoudles, please report bugs to the corresponding authors.
+* For submodules, please report bugs to the corresponding authors.
 * For other issues, please visit https://github.com/feng-li/.emacs.d/issues .
+
