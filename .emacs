@@ -18,6 +18,14 @@
  '(text-mode-hook (quote (turn-on-auto-fill (lambda nil (flyspell-mode)) (lambda nil (turn-on-auto-fill)) text-mode-hook-identify)))
  '(tool-bar-mode nil))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Feng Li's .emacs configurations
+;;
+;; Copyright: Feng Li <http://feng.li/>
+;;
+;; Download: https://github.com/feng-li/.emacs.d
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Load all required packages 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -554,7 +562,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Spelling Check & dictionary
+;; Spelling checking & dictionaries
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Spelling Check ;; Spell checking using hunspell 
 (eval-after-load "ispell"
@@ -608,10 +616,6 @@
                'dictem-postprocess-definition-remove-header)
      (define-key dictem-mode-map [tab] 'dictem-next-link)))
 ;;(define-key dictem-mode-map [(backtab)] 'dictem-previous-link)
-
-
-
-
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -781,8 +785,6 @@
      ;; (fset 'my-smart-backspace
      ;;       "\C-@\C-p\C-e\C-w ")
      ;; (global-set-key [S-backspace] 'my-smart-backspace)
-
-
 
      (defun my-LaTeX-mode-hook ()
        "Key definitions for LaTeX mode."
