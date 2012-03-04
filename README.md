@@ -1,8 +1,10 @@
-# Copyright 
+Copyright 
+=========
  
 See each individual file.
 
-# Install
+Install
+=======
 
 * Back up old files
 
@@ -22,7 +24,7 @@ cd ~/.emacs.d/
 git submodule update --init --recursive
 ```
 
-# Synchronize with the remote
+* Synchronize with the remote
 
 ```
 cd ~/.emacs.d/
@@ -30,5 +32,9 @@ git pull
 git submodule sync 
 git submodule foreach git checkout master
 git submodule foreach git pull
-git submodule update
 ```
+
+Bug Report
+==========
+
+Please visit https://github.com/feng-li/.emacs.d/issues

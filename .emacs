@@ -32,6 +32,7 @@
             (normal-top-level-add-subdirs-to-load-path)))
          load-path)))
 
+;; Additional library loaded during start up.
 (require 'iso-transl) ;; A bug, could not recognize the tilde key in Swedish keyboard.
 (require 'htmlize-view)
 (require 'session)
@@ -53,6 +54,7 @@
 (require 'egg)
 (require 'git-emacs)
 (require 'git-blame)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Set home directory
@@ -61,16 +63,16 @@
 (when window-system
   (desktop-save-mode))
 
-;; Default Height and width
+;; Default frame height and width
 (setq default-frame-alist (append (list
-                                   '(width  . 81)  ; Width set to 81 characters
+                                   '(width  . 85)  ; Width set to 81 characters
                                    ;;'(height . 55)) ; Height set to 60 lines
                                    default-frame-alist)))
 
 ;; Personal info
 (setq frame-title-format "%b")
 (setq user-full-name "Feng Li")
-(setq user-mail-address "Feng.Li@stat.su.se")
+(setq user-mail-address "feng.li@stat.su.se")
 
 ;; Environment variables 
 (setenv "PATH" (concat (getenv "PATH") ":~/.bin"))
@@ -1057,28 +1059,30 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(bold ((t (:weight normal))))
- '(comint-highlight-input ((t (:slant italic :weight bold))))
- '(cursor ((t (:background "red" :foreground "red"))))
- '(flyspell-duplicate ((t (:underline "red" :weight normal))))
- '(flyspell-incorrect ((t (:underline "red" :weight normal))))
- '(font-latex-italic-face ((t (:inherit nil :foreground "dark green" :slant italic))))
- '(font-latex-math-face ((t (:foreground "navy"))))
- '(font-latex-sectioning-5-face ((t (:foreground "red" :weight bold))))
- '(font-latex-sedate-face ((t (:foreground "green"))))
- '(font-latex-string-face ((t (:foreground "green4"))))
- '(font-latex-warning-face ((t (:inherit nil :foreground "red"))))
- '(font-lock-comment-delimiter-face ((t (:inherit font-lock-comment-face :foreground "blue" :weight normal))))
+ ;; '(bold ((t (:weight normal))))
+ ;; '(comint-highlight-input ((t (:slant italic :weight bold))))
+ ;; '(cursor ((t (:background "red" :foreground "red"))))
+ ;; '(flyspell-duplicate ((t (:underline "red" :weight normal))))
+ ;; '(flyspell-incorrect ((t (:underline "red" :weight normal))))
+ ;; '(font-latex-italic-face ((t (:inherit nil :foreground "dark green" :slant italic))))
+ ;; '(font-latex-math-face ((t (:foreground "navy"))))
+ ;; '(font-latex-sectioning-5-face ((t (:foreground "red" :weight bold))))
+ ;; '(font-latex-sedate-face ((t (:foreground "green"))))
+ ;; '(font-latex-string-face ((t (:foreground "green4"))))
+ ;; '(font-latex-warning-face ((t (:inherit nil :foreground "red"))))
+ ;; '(font-lock-comment-delimiter-face ((t (:inherit font-lock-comment-face :foreground "blue" :weight normal))))
  '(font-lock-comment-face ((t (:foreground "blue" :slant italic))))
- '(font-lock-constant-face ((t (:foreground "red" :weight bold))))
- '(font-lock-function-name-face ((t (:foreground "blue" :slant italic :weight bold))))
- '(font-lock-keyword-face ((t (:foreground "magenta" :weight bold :width normal))))
- '(font-lock-string-face ((t (:foreground "dark green" :weight normal))))
- '(font-lock-type-face ((t (:foreground "blue" :weight bold))))
- '(font-lock-variable-name-face ((t (:foreground "blue" :weight bold))))
- '(font-lock-warning-face ((t (:inherit error :background "dark magenta" :foreground "white smoke" :weight normal))))
- '(success ((t (:foreground "blue" :weight bold))))
- '(warning ((t (:foreground "red" :weight bold)))))
+ ;; '(font-lock-constant-face ((t (:foreground "red" :weight bold))))
+ ;; '(font-lock-function-name-face ((t (:foreground "blue" :slant italic :weight bold))))
+ ;; '(font-lock-keyword-face ((t (:foreground "magenta" :weight bold :width normal))))
+ ;; '(font-lock-string-face ((t (:foreground "dark green" :weight normal))))
+ ;; '(font-lock-type-face ((t (:foreground "blue" :weight bold))))
+ ;; '(font-lock-variable-name-face ((t (:foreground "blue" :weight bold))))
+ ;; '(font-lock-warning-face ((t (:inherit error :background "dark magenta" :foreground "white smoke" :weight normal))))
+ ;; '(success ((t (:foreground "blue" :weight bold))))
+ ;; '(warning ((t (:foreground "red" :weight bold))))
+
+)
 
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
