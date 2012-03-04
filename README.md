@@ -6,13 +6,16 @@ See each individual file.
 Installation
 ============
 
-* Back up old files:
+* Back up old files
+
   ```  
   cd ~
   mv .emacs.d .emacs.d-bak
   mv .emacs .emacs-bak
   ```  
+
 * Clone the repository
+
   ```  
   cd ~
   git clone https://feng-li@github.com/feng-li/.emacs.d.git
@@ -21,6 +24,7 @@ Installation
   git submodule update --init --recursive
   ```
 * Synchronize with the remote
+
   ```
   cd ~/.emacs.d/
   git pull
