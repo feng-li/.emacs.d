@@ -50,6 +50,7 @@
 (require 'ido)
 (require 'comint)
 (require 'org-install)
+(require 'markdown-mode)
 ;; (require 'flymake)
 (require 'dictem)
 (require 'auto-complete-config)
