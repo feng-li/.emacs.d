@@ -41,7 +41,7 @@
          load-path)))
 
 ;; Additional library loaded during start up.
-(require 'iso-transl) ;; A bug, could not recognize the tilde key in Swedish keyboard.
+(require 'iso-transl) ;; Bug, could not recognize the tilde key on Swedish keyboard.
 (require 'htmlize-view)
 (require 'session)
 ;;(require 'scim-bridge)
@@ -63,7 +63,8 @@
 (require 'egg)
 (require 'git-emacs)
 (require 'git-blame)
-
+(require 'python)
+(load "auctex.el" nil t t)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Set home directory
@@ -620,74 +621,81 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Markdown mode
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(eval-after-load "markdown-mode"
+  '(progn
+     (setq auto-mode-alist
+           (cons '("\\.md" . markdown-mode) auto-mode-alist))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Org-mode 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(eval-after-load "org-install"
+  '(progn
+     (setq org-publish-project-alist
+           '(("org-notes"
+              :base-directory "~/workspace/web/org/"
+              :base-extension "org"
+              :publishing-directory "~/workspace/web/public_html/"
+              :publishing-function org-publish-org-to-html
+              :recursive t
+              :section-numbers nil
+              :table-of-contents nil
+              :auto-preamble t
+              :link-up  "../"
+              ;; :author-info t
+              ;; :author "Feng Li"
+              ;; :email "feng.li@stat.su.se"
+              ;; :email-info t
+              :auto-sitemap t
+              :sitemap-filename "sitemap.org"
+              :sitemap-title "Sitemap"
+              )
+             
+             ("org-notes-jekyll"
+              :base-directory "~/workspace/web/org/"
+              :base-extension "org"
+              :publishing-directory "~/workspace/web/feng-li.github.com/_posts"
+              :publishing-function org-publish-org-to-html
+              :recursive t
+              :headline-levels 4 
+              :html-extension "html"
+              :body-only t ;; Only export section between <body> </body>
+              :section-numbers nil
+              :table-of-contents nil
+              )
+             
+             ("org-static"
+              :base-directory "~/workspace/web/org/"
+              :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf\\|sas\\|xls"
+              :publishing-directory "~/workspace/web/public_html/"
+              :recursive t
+              :publishing-function org-publish-attachment
+              )
 
-(setq org-publish-project-alist
-      '(("org-notes"
-         :base-directory "~/workspace/web/org/"
-         :base-extension "org"
-         :publishing-directory "~/workspace/web/public_html/"
-         :publishing-function org-publish-org-to-html
-         :recursive t
-         :section-numbers nil
-         :table-of-contents nil
-         :auto-preamble t
-         :link-up  "../"
-         ;; :author-info t
-         ;; :author "Feng Li"
-         ;; :email "feng.li@stat.su.se"
-         ;; :email-info t
-         :auto-sitemap t
-         :sitemap-filename "sitemap.org"
-         :sitemap-title "Sitemap"
-         )
-        
-        ("org-notes-jekyll"
-         :base-directory "~/workspace/web/org/"
-         :base-extension "org"
-         :publishing-directory "~/workspace/web/feng-li.github.com/_posts"
-         :publishing-function org-publish-org-to-html
-         :recursive t
-         :headline-levels 4 
-         :html-extension "html"
-         :body-only t ;; Only export section between <body> </body>
-         :section-numbers nil
-         :table-of-contents nil
-         )
-        
-        ("org-static"
-         :base-directory "~/workspace/web/org/"
-         :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf\\|sas\\|xls"
-         :publishing-directory "~/workspace/web/public_html/"
-         :recursive t
-         :publishing-function org-publish-attachment
-         )
+             ("org-static-jekyll"
+              :base-directory "~/workspace/web/org/"
+              :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf\\|sas\\|xls"
+              :publishing-directory "~/workspace/web/feng-li.github.com/"
+              :recursive t
+              :publishing-function org-publish-attachment
+              )
 
-        ("org-static-jekyll"
-         :base-directory "~/workspace/web/org/"
-         :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf\\|sas\\|xls"
-         :publishing-directory "~/workspace/web/feng-li.github.com/"
-         :recursive t
-         :publishing-function org-publish-attachment
-         )
+             ("website-html" 
+              :components ("org-notes" "org-static")
+              )
+             ("website-jekyll" 
+              :components ("org-notes-jekyll" "org-static-jekyll")
+              )
 
-        ("website-html" 
-         :components ("org-notes" "org-static")
-         )
-        ("website-jekyll" 
-         :components ("org-notes-jekyll" "org-static-jekyll")
-         )
-
-        
-        ))
+             
+             ))
+     ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; LaTeX  
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; load auctex 11.86
-(load "auctex.el" nil t t)
 (eval-after-load "auctex.el"
   '(progn
      (load "preview-latex.el" nil t t)
@@ -957,96 +965,101 @@
 ;;; Python IDE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Fabian' python.el
-;; (setq python-shell-interpreter "python2.7")
-;; (setenv "PYTHONSTARTUP" "/home/fli/.pystartup")
 
-;; Enter to indent in python.el
-(add-hook 'python-mode-hook 
-          '(lambda () 
-             (setq python-python-command "python2.7")
-             
-             (define-key python-mode-map "\C-m" 'newline-and-indent)
-             
-             ;; Pythonmacs (use Python function in Elisp)
-             (autoload 'pymacs-apply "pymacs") 
-             (autoload 'pymacs-call "pymacs")
-             (autoload 'pymacs-eval "pymacs" nil t)
-             (autoload 'pymacs-exec "pymacs" nil t)
-             (autoload 'pymacs-load "pymacs" nil t)
-             (pymacs-load "ropemacs" "rope-")
-             (setq ropemacs-enable-autoimport t)
-             (setq pymacs-auto-restart t)
-             
-             ;; Flymake for Python
-             (when (load "flymake" t)
-               (defun flymake-pyflakes-init ()
-                 (let* ((temp-file (flymake-init-create-temp-buffer-copy
-                                    'flymake-create-temp-inplace))
-                        (local-file (file-relative-name
-                                     temp-file
-                                     (file-name-directory buffer-file-name))))
-                   (list "pycheckers"  (list local-file))))
-               (add-to-list 'flymake-allowed-file-name-masks
-                            '("\\.py\\'" flymake-pyflakes-init)))
-             (setq python-check-command "pyflakes") ;; check by hand
-             
-             ;; Auto complete in buffer
-             ;; (require 'ac-python) ;; using just python (faster)
-             (ac-ropemacs-initialize) ;; using rope (intensive)
-             (add-hook 'python-mode-hook
-                       (lambda ()
-                         (add-to-list 'ac-sources 'ac-source-ropemacs)))
-             
-             
-             ;; DEBUGGING: PDB setup, note the python version
-             (setq pdb-path '~/bin/pdb2.7.py
-                   gud-pdb-command-name (symbol-name pdb-path))
-             (defadvice pdb (before gud-query-cmdline activate)
-               "Provide a better default command line when called interactively."
-               (interactive
-                (list (gud-query-cmdline pdb-path
-                                         (file-name-nondirectory buffer-file-name)))))
-             
-             ;; Documentation lookup Bugfix for Python 2.7
-             (info-lookup-add-help
-              :mode 'python-mode
-              :regexp "[[:alnum:]_]+"
-              :doc-spec
-              '(("(python)Index" nil "")))
-             
-             ;; ElDoc for Python in the minor buffer
-             (add-hook 'python-mode-hook 'turn-on-eldoc-mode)
-             
-             
-             (defun python-add-breakpoint ()
-               (interactive)
-               (newline-and-indent)
-               (insert "import pdb; pdb.set_trace()"))
-             (add-hook 'python-mode-hook 
-                       '(lambda () (define-key python-mode-map (kbd "C-c C-t") 'python-add-breakpoint)))
-             
-             ;; Font-Lock
-             (make-face 'font-lock-special-macro-face)
-             (set-face-background 'font-lock-special-macro-face "magenta")
-             (set-face-foreground 'font-lock-special-macro-face "white")
-             
-             (add-hook 'python-mode-hook 
-                       (lambda () 
-                         (font-lock-add-keywords nil
-                                                 '(("\\<\\(FIXME\\):" 1 font-lock-warning-face t)
-                                                   ("\\<\\(DEPENDS\\):" 1 font-lock-warning-face t)
-                                                   ("\\<\\(TODO\\):" 1 font-lock-warning-face t)
-                                                   ("\\<\\(DATE\\):" 1 font-lock-warning-face t)
-                                                   ("\\<\\(DEBUG\\):" 1 font-lock-warning-face t)
-                                                   ("\\<\\(import pdb;[\n \t]*pdb.set_trace()\\)" . 'font-lock-special-macro-face)))))
-             
-             ;; ;; Python history and python shell TODO: how? wait for python.el
-             ;; ;; (add-hook 'inferior-python-mode-hook 
-             ;; ;;           '(lambda()
-             ;; ;;              (setq comint-input-ring-file-name "~/.pyhistory")))
-             
-             ))
+(eval-after-load "python"
+  '(progn
+
+     ;; Fabian' python.el
+     (setq python-shell-interpreter "python2.7")
+     (setenv "PYTHONSTARTUP" "/home/fli/.pystartup")
+     
+     ;; Enter to indent in python.el
+     (add-hook 'python-mode-hook 
+               '(lambda () 
+                  (setq python-python-command "python2.7")
+                  
+                  (define-key python-mode-map "\C-m" 'newline-and-indent)
+                  
+                  ;; Pythonmacs (use Python function in Elisp)
+                  (autoload 'pymacs-apply "pymacs") 
+                  (autoload 'pymacs-call "pymacs")
+                  (autoload 'pymacs-eval "pymacs" nil t)
+                  (autoload 'pymacs-exec "pymacs" nil t)
+                  (autoload 'pymacs-load "pymacs" nil t)
+                  (pymacs-load "ropemacs" "rope-")
+                  (setq ropemacs-enable-autoimport t)
+                  (setq pymacs-auto-restart t)
+                  
+                  ;; Flymake for Python
+                  (when (load "flymake" t)
+                    (defun flymake-pyflakes-init ()
+                      (let* ((temp-file (flymake-init-create-temp-buffer-copy
+                                         'flymake-create-temp-inplace))
+                             (local-file (file-relative-name
+                                          temp-file
+                                          (file-name-directory buffer-file-name))))
+                        (list "pycheckers"  (list local-file))))
+                    (add-to-list 'flymake-allowed-file-name-masks
+                                 '("\\.py\\'" flymake-pyflakes-init)))
+                  (setq python-check-command "pyflakes") ;; check by hand
+                  
+                  ;; Auto complete in buffer
+                  ;; (require 'ac-python) ;; using just python (faster)
+                  (ac-ropemacs-initialize) ;; using rope (intensive)
+                  (add-hook 'python-mode-hook
+                            (lambda ()
+                              (add-to-list 'ac-sources 'ac-source-ropemacs)))
+                  
+                  
+                  ;; DEBUGGING: PDB setup, note the python version
+                  (setq pdb-path '~/bin/pdb2.7.py
+                        gud-pdb-command-name (symbol-name pdb-path))
+                  (defadvice pdb (before gud-query-cmdline activate)
+                    "Provide a better default command line when called interactively."
+                    (interactive
+                     (list (gud-query-cmdline pdb-path
+                                              (file-name-nondirectory buffer-file-name)))))
+                  
+                  ;; Documentation lookup Bugfix for Python 2.7
+                  (info-lookup-add-help
+                   :mode 'python-mode
+                   :regexp "[[:alnum:]_]+"
+                   :doc-spec
+                   '(("(python)Index" nil "")))
+                  
+                  ;; ElDoc for Python in the minor buffer
+                  (add-hook 'python-mode-hook 'turn-on-eldoc-mode)
+                  
+                  
+                  (defun python-add-breakpoint ()
+                    (interactive)
+                    (newline-and-indent)
+                    (insert "import pdb; pdb.set_trace()"))
+                  (add-hook 'python-mode-hook 
+                            '(lambda () (define-key python-mode-map (kbd "C-c C-t") 'python-add-breakpoint)))
+                  
+                  ;; Font-Lock
+                  (make-face 'font-lock-special-macro-face)
+                  (set-face-background 'font-lock-special-macro-face "magenta")
+                  (set-face-foreground 'font-lock-special-macro-face "white")
+                  
+                  (add-hook 'python-mode-hook 
+                            (lambda () 
+                              (font-lock-add-keywords nil
+                                                      '(("\\<\\(FIXME\\):" 1 font-lock-warning-face t)
+                                                        ("\\<\\(DEPENDS\\):" 1 font-lock-warning-face t)
+                                                        ("\\<\\(TODO\\):" 1 font-lock-warning-face t)
+                                                        ("\\<\\(DATE\\):" 1 font-lock-warning-face t)
+                                                        ("\\<\\(DEBUG\\):" 1 font-lock-warning-face t)
+                                                        ("\\<\\(import pdb;[\n \t]*pdb.set_trace()\\)" . 'font-lock-special-macro-face)))))
+                  
+                  ;; ;; Python history and python shell TODO: how? wait for python.el
+                  ;; ;; (add-hook 'inferior-python-mode-hook 
+                  ;; ;;           '(lambda()
+                  ;; ;;              (setq comint-input-ring-file-name "~/.pyhistory")))
+                  
+                  ))
+     ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Custom set faces
@@ -1078,6 +1091,6 @@
  ;; '(font-lock-warning-face ((t (:inherit error :background "dark magenta" :foreground "white smoke" :weight normal))))
  ;; '(success ((t (:foreground "blue" :weight bold))))
  ;; '(warning ((t (:foreground "red" :weight bold))))
-)
+ )
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
