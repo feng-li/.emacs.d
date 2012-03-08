@@ -63,7 +63,7 @@
 (require 'info-look) 
 (require 'ess-site)
 ;;(require 'matlab-load)
-(require 'egg)
+;;(require 'egg)
 (require 'git-emacs)
 (require 'git-blame)
 (require 'python)
