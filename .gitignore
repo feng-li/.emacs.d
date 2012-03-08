@@ -6,6 +6,7 @@ session.*
 !session.el
 ac-comphist*
 *conflicted\ copy*
+server/
 tutorial/
 eshell/
 snippet/
