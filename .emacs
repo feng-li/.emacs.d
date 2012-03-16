@@ -276,27 +276,6 @@
 ;; Cursor is bar: Not clear under console
 (setq-default cursor-type 'bar)
 
-;; Color-Theme
-;; (defvar after-make-console-frame-hooks '()
-;;   "Hooks to run after creating a new TTY frame")
-;; (defvar after-make-window-system-frame-hooks '()
-;;   "Hooks to run after creating a new window-system frame")
-;; (defun run-after-make-frame-hooks (frame)
-;;   "Selectively run either `after-make-console-frame-hooks' or
-;;  `after-make-window-system-frame-hooks'"
-;;   (select-frame frame)
-;;   (run-hooks (if window-system
-;;                  'after-make-window-system-frame-hooks
-;;                'after-make-console-frame-hooks)))
-;; (add-hook 'after-make-frame-functions 'run-after-make-frame-hooks)
-;; (add-hook 'after-init-hook
-;;           (lambda ()
-;;             (run-after-make-frame-hooks (selected-frame))))
-;; (require 'color-theme)
-;; (color-theme-initialize)
-;; (add-hook 'after-make-window-system-frame-hooks 'color-theme-jonadabian-slate)
-;; (add-hook 'after-make-console-frame-hooks 'color-theme-tty-dark)
-
 ;;set visible-bell
 (setq visible-bell t)
 
@@ -376,7 +355,10 @@
   '(progn
      (ido-mode t)
      (setq ido-use-virtual-buffers nil)
-     (setq ido-ignore-files '("\\.Rc$"))     
+     (setq ido-enable-flex-matching t)
+     (setq ido-ignore-files '("\\.Rc$" "\\.dvi$" "\\.pdf$" "\\.ps$" "\\.out$"
+                              "\\.log$" "\\.ods$" "\\.eps$" "\\#$" "\\.png$" 
+                              "\\.RData$" "\\.nav$" "\\.snm$"))      
      ))
 
 ;; ElDoc mode
@@ -427,38 +409,6 @@
   (interactive)
   (insert (format-time-string "%a %b %d %H:%M:%S %Z %Y")))
 
-;; CEDET & ECB
-;; (global-ede-mode 1)
-;; ;;(semantic-load-enable-minimum-features)
-;; (semantic-load-enable-code-helpers)
-;; (global-srecode-minor-mode 1)
-
-;; (require 'ecb)
-;; (require 'ecb-autoloads)
-;; (global-set-key [(f8)] 'ecb-toggle-ecb-windows) ; hide or show ECB windows
-;; (global-set-key (kbd "ESC <f8>") 'ecb-activate)
-;; ;; (global-set-key (kbd "<f7>") 'ecb-cycle-through-compilation-buffers) 
-;; (setq ecb-tip-of-the-day nil)
-;; (setq ecb-inhibit-startup-message t)
-;; (setq ecb-information-buffer nil)
-;; (setq ecb-layout-name "leftright-analyse")
-;; (setq ecb-compile-window-width 'edit-window)
-;; (setq ecb-compile-window-height 5)
-;; (setq ecb-enlarged-compilation-window-max-height 0.68)
-;; (setq ecb-change-layout-preserves-compwin-state t)
-;; (add-hook 'ecb-activate-hook 
-;;           (lambda() 
-;;             (setq ecb-compilation-buffer-names
-;;                   (quote (("*info*") ("*shell*") ("*grep*") ("\\*R:*[0-9]*\\*" . t) ("*Find*")
-;;                           ("*Locate*") ("*help*") ("*Help*") ("*dictem buffer\\*[<0-9>]*" . t)
-;;                           ("*TeX Help*") ("\\*help\\[R:*[0-9]*\\]([.a-zA-Z0-9_]+)\\*" . t) 
-;;                           ("\\*gud-[.a-zA-Z0-9_]+\\*" . t) ("*Python*") ("*rope-pydoc*")))) 
-;;             (setq ecb-primary-secondary-mouse-buttons 
-;;                   (quote mouse-1--mouse-2))))
-;; (setq ecb-auto-activate t)  
-;;
-
-
 ;; Flymake (Python and LaTeX) 
 (eval-after-load "flymake"
   '(progn
@@ -467,22 +417,6 @@
      (global-set-key [f4] 'flymake-goto-next-error)
      (add-hook 'LaTeX-mode-hook 'flymake-mode)
      (setq flymake-gui-warnings-enabled nil)))
-
-;; TODO: Note working
-;; (when (load "flymake" t)
-;;   (defun flymake-simple-tex-init ()
-;;     (let* ((temp-file (flymake-init-create-temp-buffer-copy
-;;                        'flymake-create-temp-inplace))
-;;            (local-file (file-relative-name
-;;             temp-file
-;;             (file-name-directory buffer-file-name))))
-;;       ;;(list "pycheckers"  (list local-file))
-
-;;       (list "chktex" (list "-q" "-v0" local-file))
-;;       ))
-;;   (add-to-list 'flymake-allowed-file-name-masks
-;;                '("\\.tex\\'" flymake-simple-tex-init)))
-
 
 ;; Auto completion
 (eval-after-load "auto-complete-config"
@@ -529,7 +463,6 @@
 ;; parentheses mode 
 (show-paren-mode t) 
 (setq show-paren-style 'parentheses) ;; enable autopair insert globally 
-
 (setq skeleton-pair t) 
 (global-set-key "(" 'skeleton-pair-insert-maybe) 
 (global-set-key "[" 'skeleton-pair-insert-maybe)
@@ -552,7 +485,7 @@
       'Info-default-directory-list "~/.emacs.d/info")))
 
 
-;; Use ? to goto matched parenthesis 
+;; Goto matched parenthesis 
 (global-set-key "?" 'goto-match-paren) ;;
 (defun goto-match-paren (arg)
   "Go to the matching  if on (){}[], similar to vi style of % "
@@ -570,7 +503,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Spelling checking & dictionaries
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Spelling Check ;; Spell checking using hunspell 
+
+;; Spelling Check  
 (eval-after-load "ispell"
   '(progn
      (setq-default ispell-program-name "hunspell") 
@@ -580,10 +514,10 @@
      (defun ispell-get-coding-system () 'utf-8) 
      (global-set-key (kbd "<f9> 4") 'ispell-word)))
 
-;; Use M-m to auto correct words
+;; Auto correct spelling mistakes
 (global-set-key (kbd "<f9> c") 'flyspell-auto-correct-word)
 
-;; Performance
+;; Fly spell performance
 ;; (setq flyspell-issue-message-flag nil) 
 
 ;; Fly spell mode
@@ -637,61 +571,82 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (eval-after-load "org-install"
   '(progn
+     ;; (require 'org)
+     ;; (require 'org-html)
+     ;; (require 'htmlize)
+     (setq org-export-default-language "en"
+           org-export-html-extension "html"
+           org-export-with-timestamps t
+           org-export-with-section-numbers nil
+           org-export-with-tags 'not-in-toc
+           org-export-skip-text-before-1st-heading nil
+           org-export-with-sub-superscripts '{}
+           org-export-with-LaTeX-fragments t
+           org-export-with-archived-trees nil
+           org-export-highlight-first-table-line t
+           org-export-latex-listings-w-names nil
+           org-export-html-style-include-default nil
+           org-export-htmlize-output-type 'css
+           org-startup-folded nil
+           org-publish-list-skipped-files t
+           org-publish-use-timestamps-flag t
+           org-export-babel-evaluate nil
+           org-confirm-babel-evaluate nil)
+
      (setq org-publish-project-alist
-           '(("org-notes"
-              :base-directory "~/workspace/web/org/"
-              :base-extension "org"
-              :publishing-directory "~/workspace/web/public_html/"
+           '(("org-web"
               :publishing-function org-publish-org-to-html
+              :base-directory "~/workspace/web/org/"
+              :publishing-directory "~/workspace/web/html/"
+              :base-extension "org"
+              :html-extension "html"
               :recursive t
               :section-numbers nil
               :table-of-contents nil
-              :auto-preamble t
-              :link-up  "../"
-              ;; :author-info t
-              ;; :author "Feng Li"
-              ;; :email "feng.li@stat.su.se"
-              ;; :email-info t
+              ;;  :html-preamble ,(org-get-file-contents "~/workspace/web/html/style/preamble.html")
+              ;; :html-postamble ,(org-get-file-contents "~/workspace/web/html/style/postamble.html")
+              
+              ;; :style ,(org-get-file-contents "~/workspace/web/html/style/stylesheet.html")
               :auto-sitemap t
               :sitemap-filename "sitemap.org"
               :sitemap-title "Sitemap"
               )
              
-             ("org-notes-jekyll"
-              :base-directory "~/workspace/web/org/"
-              :base-extension "org"
-              :publishing-directory "~/workspace/web/feng-li.github.com/_posts"
-              :publishing-function org-publish-org-to-html
-              :recursive t
-              :headline-levels 4 
-              :html-extension "html"
-              :body-only t ;; Only export section between <body> </body>
-              :section-numbers nil
-              :table-of-contents nil
-              )
+             ;; ("org-notes-jekyll"
+             ;;  :base-directory "~/workspace/web/org/"
+             ;;  :base-extension "org"
+             ;;  :publishing-directory "~/workspace/web/feng-li.github.com/_posts"
+             ;;  :publishing-function org-publish-org-to-html
+             ;;  :recursive t
+             ;;  :headline-levels 4 
+             ;;  :html-extension "html"
+             ;;  :body-only t ;; Only export section between <body> </body>
+             ;;  :section-numbers nil
+             ;;  :table-of-contents nil
+             ;;  )
              
-             ("org-static"
-              :base-directory "~/workspace/web/org/"
-              :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf\\|sas\\|xls"
-              :publishing-directory "~/workspace/web/public_html/"
-              :recursive t
-              :publishing-function org-publish-attachment
-              )
+             ;; ("org-static"
+             ;;  :base-directory "~/workspace/web/org/"
+             ;;  :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf\\|sas\\|xls"
+             ;;  :publishing-directory "~/workspace/web/public_html/"
+             ;;  :recursive t
+             ;;  :publishing-function org-publish-attachment
+             ;;  )
 
-             ("org-static-jekyll"
-              :base-directory "~/workspace/web/org/"
-              :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf\\|sas\\|xls"
-              :publishing-directory "~/workspace/web/feng-li.github.com/"
-              :recursive t
-              :publishing-function org-publish-attachment
-              )
+             ;; ("org-static-jekyll"
+             ;;  :base-directory "~/workspace/web/org/"
+             ;;  :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf\\|sas\\|xls"
+             ;;  :publishing-directory "~/workspace/web/feng-li.github.com/"
+             ;;  :recursive t
+             ;;  :publishing-function org-publish-attachment
+             ;;  )
 
-             ("website-html" 
-              :components ("org-notes" "org-static")
-              )
-             ("website-jekyll" 
-              :components ("org-notes-jekyll" "org-static-jekyll")
-              )
+             ;; ("website-html" 
+             ;;  :components ("org-notes" "org-static")
+             ;;  )
+             ;; ("website-jekyll" 
+             ;;  :components ("org-notes-jekyll" "org-static-jekyll")
+             ;;  )
 
              
              ))
@@ -724,12 +679,13 @@
      ;; make auto-complete aware of {{{latex-mode}}}
      (add-to-list 'ac-modes 'latex-mode)   
 
-     ;; add ac-sources to default ac-sources
+     ;; add ac-sources to default ac-sources in LaTeX mode.
      (defun ac-latex-mode-setup ()         
        (setq ac-sources
              (append '(ac-source-math-unicode 
                        ac-source-math-latex 
-                       ac-source-latex-commands)
+                       ac-source-latex-commands
+                       ac-source-words-in-same-mode-buffers)
                      ac-sources)))
      (add-hook 'LaTeX-mode-hook 'ac-latex-mode-setup)
 
@@ -770,8 +726,6 @@
       '(lambda ()
          (local-set-key "\C-c§" 'TeX-next-error)))
 
-
-
      (add-hook 'LaTeX-mode-hook (lambda()
                                   (add-to-list 'TeX-command-list
                                                '("Encrypt-PDF" "pdftk \"%s.pdf\" output \"%s.SEC.pdf\" allow Printing owner_pw \"q13JCdG20yDTZr\"; mv \"%s.SEC.pdf\" \"%s.pdf\"" TeX-run-command nil nil))
@@ -793,12 +747,6 @@
                                   (add-to-list 'TeX-command-list
                                                '("View-PDF-via-Adobe" "acroread \"%s.pdf\"" TeX-run-command nil nil))))
 
-     ;; delete the part before the cursor to beginning of the line and jump to end
-     ;; of previous line. 
-     ;; (fset 'my-smart-backspace
-     ;;       "\C-@\C-p\C-e\C-w ")
-     ;; (global-set-key [S-backspace] 'my-smart-backspace)
-
      (defun my-LaTeX-mode-hook ()
        "Key definitions for LaTeX mode."
        (define-key LaTeX-mode-map [(f5)] 'latex-or-view)) ;;F5 works for all
@@ -812,9 +760,17 @@
 ;; ESS
 (eval-after-load "ess-site"
   '(progn
-     ;; auto complete for R
 
+     ;; auto complete for R
      (setq ess-use-auto-complete t)
+
+     (defun ac-ess-mode-setup ()         
+       (setq ac-sources
+             (append '(ac-source-words-in-same-mode-buffers)
+                     ac-sources)))
+     (add-hook 'ess-mode-hook 'ac-ess-mode-setup)
+     (add-hook 'inferior-ess-mode-hook 'ac-ess-mode-setup)
+
      ;; (setq ess-use-auto-complete 'script-only)
 
      (require 'ess-rutils)
@@ -829,29 +785,11 @@
      (global-set-key (kbd "<f9> r") 'ess-switch-to-end-of-ESS)
      (setq-default inferior-R-args "--no-save --no-restore-data -q")
 
-
      ;; Let ESS Sweave work with AUCTEX
      (setq ess-swv-plug-into-AUCTeX-p t)
 
      ;; Let evaluation not viability to nil, cause emacs hang
      (setq ess-eval-visibly-p t)
-
-     ;; Cat "\n" after evaluation R code.
-     ;; (defun inferior-ess-output-filter (proc string)
-     ;;   (let ((pbuf (process-buffer proc))
-     ;;         (pmark (process-mark proc))
-     ;;         (prompt-regexp "^>\\( [>+]\\)*\\( \\)$")
-     ;;         (prompt-replace-regexp "^>\\( [>+]\\)*\\( \\)[^>+\n]"))
-     ;;     (setq string (replace-regexp-in-string prompt-replace-regexp " \n"
-     ;;                                            string nil nil 2))
-     ;;     (with-current-buffer pbuf
-     ;;       (goto-char pmark)
-     ;;       (beginning-of-line)
-     ;;       (when (looking-at prompt-regexp)
-     ;;         (goto-char pmark)
-     ;;         (insert "\n")
-     ;;         (set-marker pmark (point)))))
-     ;;   (comint-output-filter proc (inferior-ess-strip-ctrl-g string)))
 
      ;;ESS key binding
      (setq ess-ask-for-ess-directory nil)
@@ -1087,7 +1025,7 @@
  ;; '(font-lock-comment-delimiter-face ((t (:inherit font-lock-comment-face :foreground "blue" :weight normal))))
  '(font-lock-comment-face ((t (:foreground "blue" :slant italic))))
  ;; '(font-lock-constant-face ((t (:foreground "red" :weight bold))))
- ;; '(font-lock-function-name-face ((t (:foreground "blue" :slant italic :weight bold))))
+ '(font-lock-function-name-face ((t (:foreground "darkcyan" :slant italic :weight bold))))
  ;; '(font-lock-keyword-face ((t (:foreground "magenta" :weight bold :width normal))))
  ;; '(font-lock-string-face ((t (:foreground "dark green" :weight normal))))
  ;; '(font-lock-type-face ((t (:foreground "blue" :weight bold))))
