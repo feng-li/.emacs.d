@@ -10,7 +10,6 @@
  '(frame-background-mode nil)
  '(global-font-lock-mode t nil (font-lock))
  '(hl-paren-background-colors (quote ("light gray" "steel blue" "lime green" "orange1")))
- ;;'(indicate-buffer-boundaries (quote left))
  '(indicate-empty-lines nil)
  '(org-support-shift-select t)
  '(send-mail-function (quote mailclient-send-it))
@@ -41,8 +40,8 @@
          load-path)))
 
 ;; Additional library loaded during start up.
-(require 'iso-transl) ;; Bug, could not recognize the tilde key on Swedish keyboard.
-(require 'htmlize-view)
+(require 'iso-transl) ;; keyboard input definitions for ISO 8859/1
+(require 'htmlize-view)  
 (require 'session)
 ;;(require 'scim-bridge)
 ;;(require 'ibus)
@@ -97,8 +96,11 @@
 ;; Disable scroll-bar
 (scroll-bar-mode -1)
 
-;; Enable line number mode when opening new files
-(add-hook 'find-file-hook (lambda () (linum-mode 1)))
+;; Enable line number mode and enable visual line mode
+(add-hook 'find-file-hook 
+          (lambda () 
+            (linum-mode 1)
+            (visual-line-mode 1)))
 
 ;; Let Alt key be the meta key
 (setq x-alt-keysym 'meta)
@@ -200,8 +202,8 @@
 ;;(server-start)
 
 ;; Default English fonts
-;; (add-to-list 'default-frame-alist '(font . "Liberation Mono-11"))
-(add-to-list 'default-frame-alist '(font . "Droid Sans Mono-10"))
+(add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono-10"))
+;; (add-to-list 'default-frame-alist '(font . "Droid Sans Mono-10"))
 
 ;; Chinese fonts
 (set-fontset-font "fontset-default"
@@ -316,6 +318,7 @@
 ;;   (speedbar-add-supported-extension (quote(".R" ".r" ".bib" ".org"))))
 
 ;; Ibuffer mode
+
 (eval-after-load "ibuffer"
   '(progn
      (global-set-key (kbd "C-x C-b") 'ibuffer)
@@ -336,7 +339,7 @@
                              (mode . help-mode)
                              (mode . dictem-mode)
                              (mode . ess-help-mode)
-                             (mode . Info-mode)))              
+                             (mode . Info-mode)))
                     ("Messages" (or
                                  (name . "^\\*scratch\\*$")
                                  (name . "^\\*Messages\\*$")
@@ -347,17 +350,24 @@
                (lambda ()
                  (ibuffer-switch-to-saved-filter-groups "default")))))
 
-;; ido mode
+;; Ido mode
 (eval-after-load "ido"
   '(progn
      (ido-mode t)
      (setq ido-use-virtual-buffers nil)
      (setq ido-enable-flex-matching t)
-     (setq ido-ignore-files '("\\.Rc$" "\\.dvi$" "\\.pdf$" "\\.ps$" "\\.out$"
-                              "\\.log$" "\\.ods$" "\\.eps$" "\\#$" "\\.png$" 
-                              "\\.RData$" "\\.nav$" "\\.snm$"))      
+     (setq ido-ignore-files 
+           '("\\.Rc$" "\\.dvi$" "\\.pdf$" "\\.ps$" "\\.out$"
+             "\\.log$" "\\.ods$" "\\.eps$" "\\#$" "\\.png$" 
+             "\\.RData$" "\\.nav$" "\\.snm$" "\\`\\.\\./" "\\`\\./"))
+     (setq  ido-ignore-buffers
+            '("\\` " "^\\*ESS\\*" "^\\*Messages\\*" "^\\*Help\\*" "^\\*Buffer"
+              "^\\*Ibuffer*" "^\\*ESS-errors*" "^\\*Warnings*"
+              "^\\*.*Completions\\*$" "^\\*Ediff" "^\\*tramp" "^\\*cvs-"
+              "_region_" " output\\*$" "^TAGS$" "^\*Ido"
+              "^\\*.*dictem buffer\\*$" "^\\*inferior-lisp*"))
      ))
-
+  
 ;; ElDoc mode
 (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
 (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
@@ -386,14 +396,11 @@
      ))
 
 ;; Clear buffer output
-(defun comint-clear-buffer ()
-  (interactive)
-  (goto-char (point-max))
-  (move-beginning-of-line nil)
-  (backward-char)
-  (move-beginning-of-line nil)
-  (delete-region (point-min) (point))
-  (goto-char (point-max)))
+(defun comint-clear-buffer () (interactive)
+  (save-excursion
+    (comint-goto-process-mark)
+    (forward-line 0)
+    (kill-region (point-min) (point))))
 (define-key comint-mode-map (kbd "C-l") 'comint-clear-buffer)
 
 ;; Replace ^M 
@@ -773,8 +780,7 @@
      (require 'ess-rutils)
      ;; (require 'ess-tracebug) ;; ESS tracebug
      (require 'ess-eldoc)
-     (require 'r-autoyas)
-     (require 'ess-R-object-tooltip)
+     ;; (require 'ess-R-object-tooltip)
 
      ;; R args at start up
      (global-set-key (kbd "ESC <f6>") 'R) ;; The default R
@@ -807,10 +813,10 @@
                   ;;      (r-autoyas-expand nil nil)))
                   
                   ;; ESS tooltip (C-i)
-                  (when window-system
-                    (keyboard-translate ?\C-i ?\H-i)
-                    (define-key ess-mode-map (kbd "H-i") 'ess-R-object-tooltip)
-                    (define-key inferior-ess-mode-map (kbd "H-i") 'ess-R-object-tooltip))
+                  ;; (when window-system
+                  ;;   (keyboard-translate ?\C-i ?\H-i)
+                  ;;   (define-key ess-mode-map (kbd "H-i") 'ess-R-object-tooltip)
+                  ;;   (define-key inferior-ess-mode-map (kbd "H-i") 'ess-R-object-tooltip))
 
                   
                   ;;Roxygen template
@@ -1008,28 +1014,10 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- ;; '(bold ((t (:weight normal))))
- ;; '(comint-highlight-input ((t (:slant italic :weight bold))))
- ;; '(cursor ((t (:background "red" :foreground "red"))))
  '(flyspell-duplicate ((t (:underline "red" :weight normal))))
  '(flyspell-incorrect ((t (:underline "red" :weight normal))))
- ;; '(font-latex-italic-face ((t (:inherit nil :foreground "dark green" :slant italic))))
- ;; '(font-latex-math-face ((t (:foreground "navy"))))
- ;; '(font-latex-sectioning-5-face ((t (:foreground "red" :weight bold))))
- ;; '(font-latex-sedate-face ((t (:foreground "green"))))
- ;; '(font-latex-string-face ((t (:foreground "green4"))))
- ;; '(font-latex-warning-face ((t (:inherit nil :foreground "red"))))
- ;; '(font-lock-comment-delimiter-face ((t (:inherit font-lock-comment-face :foreground "blue" :weight normal))))
+ '(font-latex-italic-face ((t (:slant italic))))
  '(font-lock-comment-face ((t (:foreground "blue" :slant italic))))
- ;; '(font-lock-constant-face ((t (:foreground "red" :weight bold))))
- '(font-lock-function-name-face ((t (:foreground "darkcyan" :slant italic :weight bold))))
- ;; '(font-lock-keyword-face ((t (:foreground "magenta" :weight bold :width normal))))
- ;; '(font-lock-string-face ((t (:foreground "dark green" :weight normal))))
- ;; '(font-lock-type-face ((t (:foreground "blue" :weight bold))))
- ;; '(font-lock-variable-name-face ((t (:foreground "blue" :weight bold))))
- ;; '(font-lock-warning-face ((t (:inherit error :background "dark magenta" :foreground "white smoke" :weight normal))))
- ;; '(success ((t (:foreground "blue" :weight bold))))
- ;; '(warning ((t (:foreground "red" :weight bold))))
- )
+ '(font-lock-function-name-face ((t (:foreground "darkcyan" :slant italic :weight bold)))))
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
