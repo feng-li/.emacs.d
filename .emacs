@@ -43,7 +43,6 @@
 (require 'iso-transl) ;; keyboard input definitions for ISO 8859/1
 (require 'htmlize-view)  
 (require 'session)
-;;(require 'scim-bridge)
 ;;(require 'ibus)
 (require 'ibuffer)
 (require 'ido)
@@ -783,8 +782,7 @@
      ;; (require 'ess-R-object-tooltip)
 
      ;; R args at start up
-     (global-set-key (kbd "ESC <f6>") 'R) ;; The default R
-     (global-set-key (kbd "<f6>") 'R-2.14.1) ;; The optimize R
+     (global-set-key (kbd "<f9> <f6>") 'R) ;; The default R
      (global-set-key (kbd "<f9> r") 'ess-switch-to-end-of-ESS)
      (setq-default inferior-R-args "--no-save --no-restore-data -q")
 
