@@ -26,7 +26,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Load all required packages 
+;; Load all required packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Add personal load path recursively in front of the default load path
@@ -34,14 +34,14 @@
   (setq load-path
         (append
          (let ((load-path (copy-sequence load-path))) ;; Shadow
-           (append 
+           (append
             (copy-sequence (normal-top-level-add-to-load-path '(".")))
             (normal-top-level-add-subdirs-to-load-path)))
          load-path)))
 
 ;; Additional library loaded during start up.
 (require 'iso-transl) ;; keyboard input definitions for ISO 8859/1
-(require 'htmlize-view)  
+(require 'htmlize-view)
 (require 'session)
 ;;(require 'ibus)
 (require 'ibuffer)
@@ -52,10 +52,10 @@
 ;; (require 'flymake)
 (require 'dictem)
 (require 'auto-complete-config)
-;;(require 'highlight-parentheses) 
-(require 'auto-highlight-symbol) 
-;;(require 'yasnippet) 
-(require 'info-look) 
+;;(require 'highlight-parentheses)
+(require 'auto-highlight-symbol)
+;;(require 'yasnippet)
+(require 'info-look)
 (require 'ess-site)
 ;;(require 'matlab-load)
 ;;(require 'egg)
@@ -83,11 +83,11 @@
 (setq user-full-name "Feng Li")
 (setq user-mail-address "feng.li@stat.su.se")
 
-;; Environment variables 
+;; Environment variables
 (setenv "PATH" (concat (getenv "PATH") ":~/.bin"))
 (setq exec-path (append exec-path '("~/.bin")))
 (setenv "OMP_NUM_THREADS" "1")
-(setq explicit-bash-args '("--init-file" "~/.bashrc")) 
+(setq explicit-bash-args '("--init-file" "~/.bashrc"))
 
 ;; Suspend the compile warnings
 (setq byte-compile-warnings nil)
@@ -96,10 +96,13 @@
 (scroll-bar-mode -1)
 
 ;; Enable line number mode and enable visual line mode
-(add-hook 'find-file-hook 
-          (lambda () 
+(add-hook 'find-file-hook
+          (lambda ()
             (linum-mode 1)
             (visual-line-mode 1)))
+
+;; Saving options
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 ;; Let Alt key be the meta key
 (setq x-alt-keysym 'meta)
@@ -138,7 +141,7 @@
      ;; Change cursor color depending on SCIM status
      (setq scim-cursor-color '("red" "#00BBBB" "limegreen"))))
 
-;; Global visual line mode 
+;; Global visual line mode
 (global-visual-line-mode -1)
 
 ;; Dired mode
@@ -171,7 +174,7 @@
 (global-set-key (kbd "<f9> q") 'fill-region-as-paragraph)
 (global-set-key (kbd "<f9> TAB") 'indent-relative)
 (global-set-key (kbd "ESC <f2>") 'next-multiframe-window) ;; Circulate among windows ESC-F2
-;; (global-set-key (kbd "M-SPC") 'set-mark-command) ;It was C-SPC 
+;; (global-set-key (kbd "M-SPC") 'set-mark-command) ;It was C-SPC
 
 ;; The scratch settings
 ;; Disable scratch information
@@ -180,7 +183,7 @@
 (setq fundamental-mode 'text-mode)
 (setq default-major-mode 'text-mode)
 (setq initial-major-mode 'text-mode) ;; text mode in scratch
-(add-hook 'text-mode-hook 
+(add-hook 'text-mode-hook
           (function (lambda () (turn-on-auto-fill)))) ;; Auto fill mode
 
 ;; Kill the current buffer, without confirmation.
@@ -232,7 +235,7 @@
   (define-key input-decode-map "\e[1;2B" [S-down])
   (define-key input-decode-map "\e[1;2D" [S-left])
   (define-key input-decode-map "\e[1;2C" [S-right])
-  
+
   (define-key input-decode-map "\e[1;5A" [C-up])
   (define-key input-decode-map "\e[1;5B" [C-down])
   (define-key input-decode-map "\e[1;5D" [C-left])
@@ -243,7 +246,7 @@
   (define-key input-decode-map "\e[1;2B" [S-down])
   (define-key input-decode-map "\e[1;2D" [S-left])
   (define-key input-decode-map "\e[1;2C" [S-right])
-  
+
   (define-key input-decode-map "\e[1;5A" [C-up])
   (define-key input-decode-map "\e[1;5B" [C-down])
   (define-key input-decode-map "\e[1;5D" [C-left])
@@ -254,16 +257,16 @@
 (setq shift-select-mode t)
 
 ;; make typing override text selection
-(delete-selection-mode 1) ; 
+(delete-selection-mode 1) ;
 
 ;; TAB settings
 (setq-default indent-tabs-mode nil)
 
-;; Control-tab to switch among buffers  
+;; Control-tab to switch among buffers
 (when window-system
   (global-set-key (kbd "C-<tab>") 'next-buffer))
 
-;; Keep buffer order during switch 
+;; Keep buffer order during switch
 ;; (require 'flobl)
 
 ;;Session(Keep section each time)
@@ -284,7 +287,7 @@
 ;; (setq column-number-mode t)
 ;; (global-linum-mode 1)
 ;; (require 'linum-off)
-;; (setq linum-disabled-modes-list 
+;; (setq linum-disabled-modes-list
 ;;       '(eshell-mode compilation-mode ess-mode))
 
 ;;auto fill mode
@@ -298,7 +301,7 @@
   (add-hook hook '(lambda () (auto-fill-mode 1))))
 
 
-;;copy with other applications 
+;;copy with other applications
 (setq x-select-enable-clipboard t)
 
 (setq ring-bell-function (lambda ()  t))
@@ -309,7 +312,7 @@
      (matlab-cedet-setup)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; General IDE settings (ElDoc, ECB, Comint...) 
+;; General IDE settings (ElDoc, ECB, Comint...)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Speed bar
 ;; (when window-system
@@ -355,9 +358,9 @@
      (ido-mode t)
      (setq ido-use-virtual-buffers nil)
      (setq ido-enable-flex-matching t)
-     (setq ido-ignore-files 
+     (setq ido-ignore-files
            '("\\.Rc$" "\\.dvi$" "\\.pdf$" "\\.ps$" "\\.out$"
-             "\\.log$" "\\.ods$" "\\.eps$" "\\#$" "\\.png$" 
+             "\\.log$" "\\.ods$" "\\.eps$" "\\#$" "\\.png$"
              "\\.RData$" "\\.nav$" "\\.snm$" "\\`\\.\\./" "\\`\\./"))
      (setq  ido-ignore-buffers
             '("\\` " "^\\*ESS\\*" "^\\*Messages\\*" "^\\*Help\\*" "^\\*Buffer"
@@ -366,7 +369,7 @@
               "_region_" " output\\*$" "^TAGS$" "^\*Ido"
               "^\\*.*dictem buffer\\*$" "^\\*inferior-lisp*"))
      ))
-  
+
 ;; ElDoc mode
 (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
 (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
@@ -377,15 +380,15 @@
   '(progn
      (define-key
        comint-mode-map (kbd "C-<up>")'comint-previous-matching-input-from-input)
-     (define-key 
+     (define-key
        comint-mode-map (kbd "C-<down>") 'comint-next-matching-input-from-input)
-     (define-key 
+     (define-key
        comint-mode-map (kbd "C-k") 'comint-kill-input)
 
      ;; Comint history length
      (setq comint-input-ring-size 5000)
      (setq comint-read-input-ring t)
-     
+
      ;; Comint scroll output
      (setq comint-scroll-to-bottom-on-output 'others)
      (setq comint-scroll-show-maximum-output t)
@@ -402,7 +405,7 @@
     (kill-region (point-min) (point))))
 (define-key comint-mode-map (kbd "C-l") 'comint-clear-buffer)
 
-;; Replace ^M 
+;; Replace ^M
 (fset 'my-replace-m
       [escape ?< escape ?% ?\C-q ?\C-m return ?  return ?! escape ?<])
 
@@ -412,11 +415,11 @@
   (interactive)
   (insert (format-time-string "%a %b %d %H:%M:%S %Z %Y")))
 
-;; Flymake (Python and LaTeX) 
+;; Flymake (Python and LaTeX)
 (eval-after-load "flymake"
   '(progn
      (add-hook 'find-file-hook 'flymake-find-file-hook) ;; auto check
-     (load-library "flymake-cursor") ;; display error in minor buffer  
+     (load-library "flymake-cursor") ;; display error in minor buffer
      (global-set-key [f4] 'flymake-goto-next-error)
      (add-hook 'LaTeX-mode-hook 'flymake-mode)
      (setq flymake-gui-warnings-enabled nil)))
@@ -434,10 +437,10 @@
      (setq ac-ignore-case 'smart)
      (setq ac-ignores (quote ("0" "1" "2" "3" "4" "5" "6" "7" "8" "9")))
 
-     (dolist (hook '(emacs-lisp-mode-hook 
-                     c-mode-hook 
-                     c++-mode-hook 
-                     ess-mode-hook 
+     (dolist (hook '(emacs-lisp-mode-hook
+                     c-mode-hook
+                     c++-mode-hook
+                     ess-mode-hook
                      inferior-ess-mode-hook
                      python-mode-hook))
        (add-hook hook 'auto-complete-mode))
@@ -445,55 +448,55 @@
 
 ;; Font lock
 (global-font-lock-mode t)
-(setq font-lock-maximum-decoration t) ;; Highlight parentheses 
+(setq font-lock-maximum-decoration t) ;; Highlight parentheses
 
 (eval-after-load "highlight-parentheses"
   '(progn
      (define-globalized-minor-mode global-highlight-parentheses-mode
        highlight-parentheses-mode (lambda () (highlight-parentheses-mode t)))
-     (global-highlight-parentheses-mode t))) ;; Highlight symbols 
+     (global-highlight-parentheses-mode t))) ;; Highlight symbols
 
 (eval-after-load "auto-highlight-symbol"
-  '(progn 
+  '(progn
      (dolist (hook
-              '(emacs-lisp-mode-hook 
-                c-mode-hook 
-                c++-mode-hook 
+              '(emacs-lisp-mode-hook
+                c-mode-hook
+                c++-mode-hook
                 ess-mode-hook
-                python-mode-hook)) 
+                python-mode-hook))
        (add-hook hook 'auto-highlight-symbol-mode))))
 
-;; parentheses mode 
-(show-paren-mode t) 
-(setq show-paren-style 'parentheses) ;; enable autopair insert globally 
-(setq skeleton-pair t) 
-(global-set-key "(" 'skeleton-pair-insert-maybe) 
+;; parentheses mode
+(show-paren-mode t)
+(setq show-paren-style 'parentheses) ;; enable autopair insert globally
+(setq skeleton-pair t)
+(global-set-key "(" 'skeleton-pair-insert-maybe)
 (global-set-key "[" 'skeleton-pair-insert-maybe)
-(global-set-key "{" 'skeleton-pair-insert-maybe) 
-;;(global-set-key "\"" 'skeleton-pair-insert-maybe) 
+(global-set-key "{" 'skeleton-pair-insert-maybe)
+;;(global-set-key "\"" 'skeleton-pair-insert-maybe)
 ;;(global-set-key "\'" 'skeleton-pair-insert-maybe)
 
-;; Commenting 
-(global-set-key "\M-3" 'comment-or-uncomment-region) ; Swedish keyboard 
+;; Commenting
+(global-set-key "\M-3" 'comment-or-uncomment-region) ; Swedish keyboard
 
 ;; (eval-after-load "yasnippet"
-;;   '(progn 
+;;   '(progn
 ;;      (yas/global-mode 1)
 ;;      ))
 
-;; Add extra info path 
+;; Add extra info path
 (eval-after-load "info-look"
-  '(progn 
+  '(progn
      (add-to-list
       'Info-default-directory-list "~/.emacs.d/info")))
 
 
-;; Goto matched parenthesis 
+;; Goto matched parenthesis
 (global-set-key "?" 'goto-match-paren) ;;
 (defun goto-match-paren (arg)
   "Go to the matching  if on (){}[], similar to vi style of % "
   (interactive "p")
-  ;; first, check for "outside of bracket" 
+  ;; first, check for "outside of bracket"
   ;; positions expected by forward-sexp, etc.
   (cond ((looking-at "[\[\(\{]") (forward-sexp))
         ((looking-back "[\]\)\}]" 1) (backward-sexp))
@@ -507,21 +510,21 @@
 ;; Spelling checking & dictionaries
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Spelling Check  
+;; Spelling Check
 (eval-after-load "ispell"
   '(progn
-     (setq-default ispell-program-name "hunspell") 
-     (setq ispell-really-hunspell t) 
-     (setq ispell-personal-dictionary "~/.hunspell") 
+     (setq-default ispell-program-name "hunspell")
+     (setq ispell-really-hunspell t)
+     (setq ispell-personal-dictionary "~/.hunspell")
      (setq ispell-extra-args '("-d" "en_US"))
-     (defun ispell-get-coding-system () 'utf-8) 
+     (defun ispell-get-coding-system () 'utf-8)
      (global-set-key (kbd "<f9> 4") 'ispell-word)))
 
 ;; Auto correct spelling mistakes
 (global-set-key (kbd "<f9> c") 'flyspell-auto-correct-word)
 
 ;; Fly spell performance
-;; (setq flyspell-issue-message-flag nil) 
+;; (setq flyspell-issue-message-flag nil)
 
 ;; Fly spell mode
 (dolist (hook '(text-mode-hook))
@@ -549,9 +552,9 @@
      (setq dictem-default-strategy "exact")
      (add-hook 'dictem-postprocess-match-hook
                'dictem-postprocess-match)
-     (add-hook 'dictem-postprocess-definition-hook 
+     (add-hook 'dictem-postprocess-definition-hook
                'dictem-postprocess-definition-separator)
-     (add-hook 'dictem-postprocess-definition-hook 
+     (add-hook 'dictem-postprocess-definition-hook
                'dictem-postprocess-definition-hyperlinks)
      (add-hook 'dictem-postprocess-show-info-hook
                'dictem-postprocess-definition-hyperlinks)
@@ -570,7 +573,7 @@
            (cons '("\\.md" . markdown-mode) auto-mode-alist))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Org-mode 
+;; Org-mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (eval-after-load "org-install"
   '(progn
@@ -608,26 +611,26 @@
               :table-of-contents nil
               ;;  :html-preamble ,(org-get-file-contents "~/workspace/web/html/style/preamble.html")
               ;; :html-postamble ,(org-get-file-contents "~/workspace/web/html/style/postamble.html")
-              
+
               ;; :style ,(org-get-file-contents "~/workspace/web/html/style/stylesheet.html")
               :auto-sitemap t
               :sitemap-filename "sitemap.org"
               :sitemap-title "Sitemap"
               )
-             
+
              ;; ("org-notes-jekyll"
              ;;  :base-directory "~/workspace/web/org/"
              ;;  :base-extension "org"
              ;;  :publishing-directory "~/workspace/web/feng-li.github.com/_posts"
              ;;  :publishing-function org-publish-org-to-html
              ;;  :recursive t
-             ;;  :headline-levels 4 
+             ;;  :headline-levels 4
              ;;  :html-extension "html"
              ;;  :body-only t ;; Only export section between <body> </body>
              ;;  :section-numbers nil
              ;;  :table-of-contents nil
              ;;  )
-             
+
              ;; ("org-static"
              ;;  :base-directory "~/workspace/web/org/"
              ;;  :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf\\|sas\\|xls"
@@ -644,19 +647,19 @@
              ;;  :publishing-function org-publish-attachment
              ;;  )
 
-             ;; ("website-html" 
+             ;; ("website-html"
              ;;  :components ("org-notes" "org-static")
              ;;  )
-             ;; ("website-jekyll" 
+             ;; ("website-jekyll"
              ;;  :components ("org-notes-jekyll" "org-static-jekyll")
              ;;  )
 
-             
+
              ))
      ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; LaTeX  
+;; LaTeX
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (eval-after-load "auctex.el"
   '(progn
@@ -667,50 +670,50 @@
      (setq LaTeX-math-menu-unicode t)
 
      ;; Translate key § to ` so both can be used as a math abbreviation
-     ;; Drawback, could mot type § anymore. Make it locally?  
-     (keyboard-translate ?§ ?`) 
+     ;; Drawback, could mot type § anymore. Make it locally?
+     (keyboard-translate ?§ ?`)
      (setq LaTeX-math-abbrev-prefix "`")
 
      (add-hook 'LaTeX-mode-hook 'turn-on-auto-fill)
      (setq TeX-source-correlate-start-server t)
      (setq TeX-source-correlate-mode  t) ; for 11.86
-     (setq TeX-source-correlate-method (quote source-specials)) 
+     (setq TeX-source-correlate-method (quote source-specials))
      (setq bibtex-maintain-sorted-entries t)
 
 
      (require 'ac-math)
      ;; make auto-complete aware of {{{latex-mode}}}
-     (add-to-list 'ac-modes 'latex-mode)   
+     (add-to-list 'ac-modes 'latex-mode)
 
      ;; add ac-sources to default ac-sources in LaTeX mode.
-     (defun ac-latex-mode-setup ()         
+     (defun ac-latex-mode-setup ()
        (setq ac-sources
-             (append '(ac-source-math-unicode 
-                       ac-source-math-latex 
+             (append '(ac-source-math-unicode
+                       ac-source-math-latex
                        ac-source-latex-commands
                        ac-source-words-in-same-mode-buffers)
                      ac-sources)))
      (add-hook 'LaTeX-mode-hook 'ac-latex-mode-setup)
 
-     ;; Add short cuts, hold Windows key 
+     ;; Add short cuts, hold Windows key
      (defun auctex-insert-special ()
        (local-set-key (kbd "<f9> (") (lambda () (interactive) (insert "\\\left( ")))
        (local-set-key (kbd "<f9> )") (lambda () (interactive) (insert "\\\ right)")))
-       
+
        (local-set-key (kbd "<f9> [") (lambda () (interactive) (insert "\\\left[ ")))
        (local-set-key (kbd "<f9> ]") (lambda () (interactive) (insert "\\\ right]")))
-       
+
        (local-set-key (kbd "<f9> {") (lambda () (interactive) (insert "\\\left\\\{ ")))
        (local-set-key (kbd "<f9> }") (lambda () (interactive) (insert "\\\right\\\}")))
-       
+
        (local-set-key (kbd "<f9> |") (lambda () (interactive) (insert "\\\left| \\\ right|")))
-       
+
        (fset 'my-insert-latex-equation
              [?\\ ?\[ ?\\ ?\] left left return return up])
        (local-set-key (kbd "<f9> \\") 'my-insert-latex-equation)
-       
+
        ;; (local-set-key (kbd "s-\\") (lambda () (interactive) (insert "\\\[\n \n\\\]")))
-       
+
        (fset 'my-insert-bold-math
              [?\C-w ?\\ ?b ?m ?\{ ?\C-y right])
        (local-set-key (kbd "C-c C-x C-b") 'my-insert-bold-math))
@@ -719,12 +722,12 @@
 
      ;; TeX view program
      ;; (setq TeX-view-program-selection (quote ((output-dvi "xdvi") (output-pdf "evince") )))
-     (add-hook 'LaTeX-mode-hook (lambda () 
+     (add-hook 'LaTeX-mode-hook (lambda ()
                                   (TeX-fold-mode 1)))
      (setq TeX-save-query  nil )
      (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
 
-     (add-hook 
+     (add-hook
       'LaTeX-mode-hook
       '(lambda ()
          (local-set-key "\C-c§" 'TeX-next-error)))
@@ -740,9 +743,9 @@
                                                '("LaTeXmk" "latexmk -pvc \"%s.tex\"" TeX-run-command nil nil))
                                   (add-to-list 'TeX-command-list
                                                '("PdfLaTeXmk" "latexmk -pvc -pdf \"%s.tex\"" TeX-run-command nil nil))
-                                  
+
                                   (add-to-list 'TeX-command-list
-                                               '("LaTex-DVI-PS-PDF-Adobe" "latex \"%s.tex\"; dvips \"%s.dvi\" -o \"%s.ps\"; ps2pdf \"%s.ps\"; acroread \"%s.pdf\"" TeX-run-command nil nil)) 
+                                               '("LaTex-DVI-PS-PDF-Adobe" "latex \"%s.tex\"; dvips \"%s.dvi\" -o \"%s.ps\"; ps2pdf \"%s.ps\"; acroread \"%s.pdf\"" TeX-run-command nil nil))
                                   (add-to-list 'TeX-command-list
                                                '("XeLaTeX-PDF-Adobe" "xelatex \"%s.tex\"; acroread \"%s.pdf\"" TeX-run-command nil nil))
                                   (add-to-list 'TeX-command-list
@@ -754,10 +757,10 @@
        "Key definitions for LaTeX mode."
        (define-key LaTeX-mode-map [(f5)] 'latex-or-view)) ;;F5 works for all
      (add-hook 'LaTeX-mode-hook 'my-LaTeX-mode-hook)
-     (fset 'latex-or-view [?\C-c ?\C-c]))) 
+     (fset 'latex-or-view [?\C-c ?\C-c])))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; ESS (Emacs speaks statistics) 
+;;; ESS (Emacs speaks statistics)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; ESS
@@ -767,7 +770,7 @@
      ;; auto complete for R
      (setq ess-use-auto-complete t)
 
-     (defun ac-ess-mode-setup ()         
+     (defun ac-ess-mode-setup ()
        (setq ac-sources
              (append '(ac-source-words-in-same-mode-buffers)
                      ac-sources)))
@@ -801,22 +804,22 @@
      ;; Let help on new frame
      (setq ess-help-own-frame 'one)
      (add-hook 'ess-mode-hook
-               '(lambda ()                  
+               '(lambda ()
                   ;; ESS expression offset
-                  (setq ess-expression-offset 8)  
-                  
+                  (setq ess-expression-offset 8)
+
                   ;; (require 'r-autoyas)
                   ;; (define-key ess-mode-map (kbd "C-M-<tab>")
                   ;;   '(lambda ()(interactive)
                   ;;      (r-autoyas-expand nil nil)))
-                  
+
                   ;; ESS tooltip (C-i)
                   ;; (when window-system
                   ;;   (keyboard-translate ?\C-i ?\H-i)
                   ;;   (define-key ess-mode-map (kbd "H-i") 'ess-R-object-tooltip)
                   ;;   (define-key inferior-ess-mode-map (kbd "H-i") 'ess-R-object-tooltip))
 
-                  
+
                   ;;Roxygen template
                   (setq ess-roxy-template-alist
                         (list
@@ -836,41 +839,41 @@
                                             ("\\<\\(DATE\\):" 1 font-lock-warning-face t)
                                             ("\\<\\(NOTE\\):" 1 font-lock-warning-face t)
                                             ("\\<\\(DEBUG\\):" 1 font-lock-warning-face t)
-                                            ;;output values high light at comments  
-                                            ("\\(\\\\item[ \t]+{[\._A-Za-z0-9]+}\\)" 1 font-lock-warning-face t) 
+                                            ;;output values high light at comments
+                                            ("\\(\\\\item[ \t]+{[\._A-Za-z0-9]+}\\)" 1 font-lock-warning-face t)
                                             ("\\<\\([\._A-Za-z0-9]+\$[\-\._A-Za-z0-9]+\\):" 1 font-lock-warning-face t)))
 
-                  
+
                   ;; Set M-§ to complete the object in the ESS editor
                   ;; The default was "C-c Tab", Not needed if ac-R enabled
-                  
+
                   ;; Hide and show mode
                   ;; (hs-minor-mode)
                   ;; (local-set-key (kbd "<C-M-insert>") 'hs-toggle-hiding)
-                  
+
                   ;; insert 8 spaces
                   (fset 'my-R-smart-indent
                         [return ?\C-u ?8 ? ])
                   (local-set-key (kbd "<C-return>") 'my-R-smart-indent)
 
                   (fset 'my-R-comment-level-1
-                        (lambda (&optional arg) "Insert level-1 R comment block" 
-                          (interactive "p") 
+                        (lambda (&optional arg) "Insert level-1 R comment block"
+                          (interactive "p")
                           (kmacro-exec-ring-item (quote ([21 55 57 35 return 21 51 35 return 21 55 57 35 up 32] 0 "%d")) arg)))
                   (local-set-key (kbd "<f9> 1") 'my-R-comment-level-1)
-                  
+
                   ;; Insert three line comments level-2
                   (fset 'my-R-comment-level-2
                         [?\C-a ?\C-u ?3 ?# ?\C-u ?7 ?6 ?- return ?\C-u ?3 ?# return ?\C-a ?\C-u ?3 ?# ?\C-u ?7 ?6 ?- up ? ])
                   (local-set-key (kbd "<f9> 2") 'my-R-comment-level-2)
-                  
+
                   ;; Smart indent
                   (make-local-variable 'adaptive-fill-regexp)
                   (setq adaptive-fill-regexp (concat ess-roxy-str adaptive-fill-regexp))
                   (make-local-variable 'adaptive-fill-first-line-regexp)
                   (setq adaptive-fill-first-line-regexp (concat ess-roxy-str
                                                                 adaptive-fill-first-line-regexp))
-                  
+
                   (make-local-variable 'paragraph-start)
                   (setq paragraph-start (concat "\\(" ess-roxy-str "\\)*" paragraph-start))
                   (make-local-variable 'paragraph-separate)
@@ -885,7 +888,7 @@
                   (define-key inferior-ess-mode-map (kbd "C-c d") 'ess-change-directory)
                   (define-key inferior-ess-mode-map (kbd "C-c l") 'ess-rutils-load-wkspc)))
 
-     ;; (add-hook 'ess-post-run-hook 'ess-tracebug t) 
+     ;; (add-hook 'ess-post-run-hook 'ess-tracebug t)
      ;; (define-key ess-mode-map "\M-]" 'next-error)
      ;; (define-key ess-mode-map "\M-[" 'previous-error)
      ;; (define-key inferior-ess-mode-map "\M-]" 'next-error-no-select)
@@ -915,16 +918,16 @@
      ;; Fabian' python.el
      (setq python-shell-interpreter "python2.7")
      (setenv "PYTHONSTARTUP" "/home/fli/.pystartup")
-     
+
      ;; Enter to indent in python.el
-     (add-hook 'python-mode-hook 
-               '(lambda () 
+     (add-hook 'python-mode-hook
+               '(lambda ()
                   (setq python-python-command "python2.7")
-                  
+
                   (define-key python-mode-map "\C-m" 'newline-and-indent)
-                  
+
                   ;; Pythonmacs (use Python function in Elisp)
-                  (autoload 'pymacs-apply "pymacs") 
+                  (autoload 'pymacs-apply "pymacs")
                   (autoload 'pymacs-call "pymacs")
                   (autoload 'pymacs-eval "pymacs" nil t)
                   (autoload 'pymacs-exec "pymacs" nil t)
@@ -932,7 +935,7 @@
                   (pymacs-load "ropemacs" "rope-")
                   (setq ropemacs-enable-autoimport t)
                   (setq pymacs-auto-restart t)
-                  
+
                   ;; Flymake for Python
                   (when (load "flymake" t)
                     (defun flymake-pyflakes-init ()
@@ -945,15 +948,15 @@
                     (add-to-list 'flymake-allowed-file-name-masks
                                  '("\\.py\\'" flymake-pyflakes-init)))
                   (setq python-check-command "pyflakes") ;; check by hand
-                  
+
                   ;; Auto complete in buffer
                   ;; (require 'ac-python) ;; using just python (faster)
                   (ac-ropemacs-initialize) ;; using rope (intensive)
                   (add-hook 'python-mode-hook
                             (lambda ()
                               (add-to-list 'ac-sources 'ac-source-ropemacs)))
-                  
-                  
+
+
                   ;; DEBUGGING: PDB setup, note the python version
                   (setq pdb-path '~/bin/pdb2.7.py
                         gud-pdb-command-name (symbol-name pdb-path))
@@ -962,32 +965,32 @@
                     (interactive
                      (list (gud-query-cmdline pdb-path
                                               (file-name-nondirectory buffer-file-name)))))
-                  
+
                   ;; Documentation lookup Bugfix for Python 2.7
                   (info-lookup-add-help
                    :mode 'python-mode
                    :regexp "[[:alnum:]_]+"
                    :doc-spec
                    '(("(python)Index" nil "")))
-                  
+
                   ;; ElDoc for Python in the minor buffer
                   (add-hook 'python-mode-hook 'turn-on-eldoc-mode)
-                  
-                  
+
+
                   (defun python-add-breakpoint ()
                     (interactive)
                     (newline-and-indent)
                     (insert "import pdb; pdb.set_trace()"))
-                  (add-hook 'python-mode-hook 
+                  (add-hook 'python-mode-hook
                             '(lambda () (define-key python-mode-map (kbd "C-c C-t") 'python-add-breakpoint)))
-                  
+
                   ;; Font-Lock
                   (make-face 'font-lock-special-macro-face)
                   (set-face-background 'font-lock-special-macro-face "magenta")
                   (set-face-foreground 'font-lock-special-macro-face "white")
-                  
-                  (add-hook 'python-mode-hook 
-                            (lambda () 
+
+                  (add-hook 'python-mode-hook
+                            (lambda ()
                               (font-lock-add-keywords nil
                                                       '(("\\<\\(FIXME\\):" 1 font-lock-warning-face t)
                                                         ("\\<\\(DEPENDS\\):" 1 font-lock-warning-face t)
@@ -995,12 +998,12 @@
                                                         ("\\<\\(DATE\\):" 1 font-lock-warning-face t)
                                                         ("\\<\\(DEBUG\\):" 1 font-lock-warning-face t)
                                                         ("\\<\\(import pdb;[\n \t]*pdb.set_trace()\\)" . 'font-lock-special-macro-face)))))
-                  
+
                   ;; ;; Python history and python shell TODO: how? wait for python.el
-                  ;; ;; (add-hook 'inferior-python-mode-hook 
+                  ;; ;; (add-hook 'inferior-python-mode-hook
                   ;; ;;           '(lambda()
                   ;; ;;              (setq comint-input-ring-file-name "~/.pyhistory")))
-                  
+
                   ))
      ))
 
