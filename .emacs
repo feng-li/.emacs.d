@@ -25,6 +25,7 @@
 ;; Download: https://github.com/feng-li/.emacs.d
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Load all required packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -102,6 +103,9 @@
             (visual-line-mode 1)))
 
 ;; Saving options
+(fset 'single-line-only
+   [?\C-x ?h ?\C-\M-\% ?^ ?\C-q ?\C-j ?\C-q ?\C-j ?+ return ?\C-q ?\C-j return])
+
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 ;; Let Alt key be the meta key
