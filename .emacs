@@ -366,10 +366,9 @@
              "\\.RData$" "\\.nav$" "\\.snm$" "\\`\\.\\./" "\\`\\./"))
      (setq  ido-ignore-buffers
             '("\\` " "^\\*ESS\\*" "^\\*Messages\\*" "^\\*Help\\*" "^\\*Buffer"
-              "^\\*Ibuffer*" "^\\*ESS-errors*" "^\\*Warnings*"
+              "^\\*Ibuffer*" "^\\*ESS-errors*" "^\\*Warnings*" " output*" "*TeX Help*"
               "^\\*.*Completions\\*$" "^\\*Ediff" "^\\*tramp" "^\\*cvs-"
-              "_region_" " output\\*$" "^TAGS$" "^\*Ido"
-              "^\\*.*dictem buffer\\*$" "^\\*inferior-lisp*"))
+              "_region_" "^TAGS$" "^\*Ido" "^\\*.*dictem buffer\\*$" "^\\*inferior-lisp*"))
      ))
 
 ;; ElDoc mode
@@ -722,6 +721,9 @@
      (add-hook 'LaTeX-mode-hook 'auctex-insert-special)
      (setq reftex-plug-into-AUCTeX t)
 
+
+     (setq LaTeX-command-style (quote (("" "%(PDF)%(latex) -file-line-error %S%(PDFout)"))))
+
      ;; TeX view program
      ;; (setq TeX-view-program-selection (quote ((output-dvi "xdvi") (output-pdf "evince") )))
      (add-hook 'LaTeX-mode-hook (lambda ()
@@ -1023,7 +1025,7 @@
  '(font-latex-italic-face ((t (:slant italic))))
  '(font-lock-comment-face ((t (:foreground "blue" :slant italic))))
  '(font-lock-function-name-face ((t (:foreground "darkcyan" :slant italic :weight bold))))
- '(font-lock-string-face ((t (:foreground "green"))))
+ '(font-lock-string-face ((t (:foreground "darkgreen"))))
  '(minibuffer-prompt ((t (:foreground "red")))))
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
