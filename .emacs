@@ -135,15 +135,6 @@
   '(progn
      (htmlize-view-add-to-files-menu)))
 
-;; SCIM bridge for Chinese input method
-(eval-after-load "scim-bridge"
-  '(progn
-     ;; Turn on scim-mode automatically after loading .emacs
-     ;; (add-hook 'after-init-hook 'scim-mode-on)
-     ;; Use M-SPC for activating SCIM
-     (scim-define-common-key ?\C-\s t)
-     ;; Change cursor color depending on SCIM status
-     (setq scim-cursor-color '("red" "#00BBBB" "limegreen"))))
 
 ;; Global visual line mode
 (global-visual-line-mode -1)
@@ -234,7 +225,10 @@
 (fset 'yes-or-no-p 'y-or-n-p)
 
 ;; Allow shift-arrow keys and control-arrow keys under different tty
-(if (equal "xterm" (tty-type))
+;; Set export TERM="xterm-256color" in .bashrc and
+;; term "screen-256color" in .screenrc.
+
+(if (equal "xterm-256color" (tty-type))
     (define-key input-decode-map "\e[1;2A" [S-up])
   (define-key input-decode-map "\e[1;2B" [S-down])
   (define-key input-decode-map "\e[1;2D" [S-left])
@@ -245,7 +239,7 @@
   (define-key input-decode-map "\e[1;5D" [C-left])
   (define-key input-decode-map "\e[1;5C" [C-right]))
 
-(if (equal "screen" (tty-type))
+(if (equal "screen-256color" (tty-type))
     (define-key input-decode-map "\e[1;2A" [S-up])
   (define-key input-decode-map "\e[1;2B" [S-down])
   (define-key input-decode-map "\e[1;2D" [S-left])
@@ -254,7 +248,11 @@
   (define-key input-decode-map "\e[1;5A" [C-up])
   (define-key input-decode-map "\e[1;5B" [C-down])
   (define-key input-decode-map "\e[1;5D" [C-left])
-  (define-key input-decode-map "\e[1;5C" [C-right]))
+  (define-key input-decode-map "\e[1;5C" [C-right])
+  (define-key global-map [select] 'end-of-buffer))
+
+;; (if (equal "screen" (tty-type))
+;;     (define-key input-decode-map "\e[1;2A" [S-up]))
 
 
 ;;shift selection
@@ -1001,7 +999,8 @@
                                                         ("\\<\\(TODO\\):" 1 font-lock-warning-face t)
                                                         ("\\<\\(DATE\\):" 1 font-lock-warning-face t)
                                                         ("\\<\\(DEBUG\\):" 1 font-lock-warning-face t)
-                                                        ("\\<\\(import pdb;[\n \t]*pdb.set_trace()\\)" . 'font-lock-special-macro-face)))))
+                                                        ("\\<\\(import pdb;[\n \t]*pdb.set_trace()\\)" .
+                                                         'font-lock-special-macro-face)))))
 
                   ;; ;; Python history and python shell TODO: how? wait for python.el
                   ;; ;; (add-hook 'inferior-python-mode-hook
@@ -1012,7 +1011,7 @@
      ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Custom set faces
+;;; Customize faces
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -1023,6 +1022,8 @@
  '(flyspell-incorrect ((t (:underline "red" :weight normal))))
  '(font-latex-italic-face ((t (:slant italic))))
  '(font-lock-comment-face ((t (:foreground "blue" :slant italic))))
- '(font-lock-function-name-face ((t (:foreground "darkcyan" :slant italic :weight bold)))))
+ '(font-lock-function-name-face ((t (:foreground "darkcyan" :slant italic :weight bold))))
+ '(font-lock-string-face ((t (:foreground "green"))))
+ '(minibuffer-prompt ((t (:foreground "red")))))
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
