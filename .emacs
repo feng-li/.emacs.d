@@ -365,10 +365,11 @@
              "\\.RData$" "\\.nav$" "\\.snm$" "\\`\\.\\./" "\\`\\./"))
      (setq  ido-ignore-buffers
             '("\\` " "^\\*ESS\\*" "^\\*Messages\\*" "^\\*Help\\*" "^\\*Buffer"
-              "^\\*Ibuffer*" "^\\*ESS-errors*" "^\\*Warnings*" " output*" "*TeX Help*"
+              "^\\*Ibuffer*" "^\\*ESS-errors*" "^\\*Warnings*" "
+              output*" "*TeX Help*" "*grep*"
               "^\\*.*Completions\\*$" "^\\*Ediff" "^\\*tramp" "^\\*cvs-"
-              "_region_" "^TAGS$" "^\*Ido" "^\\*.*dictem buffer\\*$" "^\\*inferior-lisp*"))
-     ))
+              "_region_" "^TAGS$" "^\*Ido" "^\\*.*dictem
+     buffer\\*$" "^\\*inferior-lisp*")) ))
 
 ;; ElDoc mode
 (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
