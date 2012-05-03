@@ -7,6 +7,7 @@ session.*
 ac-comphist*
 *conflicted\ copy*
 server/
+elpa/
 tutorial/
 eshell/
 snippet/
