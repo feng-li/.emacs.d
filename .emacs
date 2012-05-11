@@ -198,7 +198,7 @@
 ;;(server-start)
 
 ;; Default English fonts
-(add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono-10"))
+(add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono-11"))
 ;; (add-to-list 'default-frame-alist '(font . "Droid Sans Mono-10"))
 
 ;; Chinese fonts
