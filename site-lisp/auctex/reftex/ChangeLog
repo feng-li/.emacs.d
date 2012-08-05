@@ -1,3 +1,30 @@
+2012-08-03  Tassilo Horn  <tsdh@gnu.org>
+
+	Merge commit from emacs.
+
+	* lisp/reftex-base.el (reftex-compile-variables): Make keyvals
+	labels regex position point at the expected place.
+
+
+2012-08-02  Tassilo Horn  <tsdh@gnu.org>
+
+	Merge commit from emacs.
+
+	* lisp/reftex-vars.el (reftex-default-label-alist-entries):
+	Add listings, minted, and ctable packages.
+	(reftex-label-alist-builtin): Move listings, minted, and ctable
+	entries before LaTeX.
+
+2012-07-27  Tassilo Horn  <tsdh@gnu.org>
+
+	Merge commit from emacs.
+
+	* lisp/reftex-vars.el (reftex-label-alist-builtin): Add
+	support for the lstlisting and minted environments, and for the
+	ctable macro.
+	* lisp/reftex-base.el (reftex-compile-variables): Also recognize
+	labels written in keyvals syntax.
+
 2010-11-06  Ralf Angeli  <angeli@caeruleus.net>
 
 	* lisp/reftex-cite.el (reftex-create-bibtex-file): Make sure that

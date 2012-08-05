@@ -1,3 +1,51 @@
+2012-07-04  Tassilo Horn  <tassilo@member.fsf.org>
+
+	* doc/changes.texi: Mention Evince forward/backward search
+	changes.
+
+2012-07-03  Tassilo Horn  <tassilo@member.fsf.org>
+
+	* font-latex.el (byte-code-function-p): Reference the generated
+	functions with font-latex-match prefix.  See Emacs bug 11837.
+
+2012-06-22  Tassilo Horn  <tassilo@member.fsf.org>
+
+	* tex.el (TeX-evince-dbus-p): Add check for
+	`dbus-register-signal', which might be unavailable if emacs was
+	configured with --without-dbus.
+
+2012-04-26  Tassilo Horn  <tassilo@member.fsf.org>
+
+	* tex.el (TeX-engine-set): Fix docstring leading to a misplaced
+	interactive spec warning.
+
+2012-04-25  Tassilo Horn  <tassilo@member.fsf.org>
+
+	* tex.el (TeX-evince-dbus-p): Improve check for emacs's dbus
+	support.
+
+2012-04-11  Tassilo Horn  <tassilo@member.fsf.org>
+
+	* tex.el (TeX-evince-sync-view): Work around emacs integer limits.
+	Also provide the current column to Evince.
+	(TeX-evince-dbus-p): Also check the signature of Evince's
+	FindDocument DBUS method, which is only stable since evince 3.0.
+
+2012-04-10  Tassilo Horn  <tassilo@member.fsf.org>
+
+	* tex.el (TeX-evince-sync-view): Fix arithmetic range error.
+	(TeX-evince-dbus-p): Add parameter to extend the check depending
+	on wanted features (e.g., forward search).
+	(TeX-view-program-list-builtin): Use it.
+
+2012-04-08  Tassilo Horn  <tassilo@member.fsf.org>
+
+	* tex.el (TeX-evince-dbus-p): New function.
+	(TeX-evince-sync-view): New function.
+	(TeX-view-program-list-builtin): Use Evince's DBUS interface for
+	forward search if available.
+	(TeX-source-correlate-mode): Use TeX-evince-dbus-p.
+
 2012-01-11  Ralf Angeli  <angeli@caeruleus.net>
 
 	* style/setspace.el ("setspace"): Correct quoting.

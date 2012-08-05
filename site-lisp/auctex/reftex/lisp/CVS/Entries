@@ -2,7 +2,6 @@
 /Makefile/1.9/Mon Feb 27 16:13:27 2012//
 /lpath.el/1.1/Mon Feb 27 16:13:27 2012//
 /reftex-auc.el/1.33/Mon Feb 27 16:13:27 2012//
-/reftex-base.el/1.21/Mon Feb 27 16:13:27 2012//
 /reftex-cite.el/1.58/Mon Feb 27 16:13:27 2012//
 /reftex-dcr.el/1.33/Mon Feb 27 16:13:27 2012//
 /reftex-global.el/1.35/Mon Feb 27 16:13:27 2012//
@@ -11,6 +10,7 @@
 /reftex-ref.el/1.38/Mon Feb 27 16:13:27 2012//
 /reftex-sel.el/1.39/Mon Feb 27 16:13:27 2012//
 /reftex-toc.el/1.41/Mon Feb 27 16:13:27 2012//
-/reftex-vars.el/1.54/Mon Feb 27 16:13:27 2012//
 /reftex.el.in/1.2/Mon Feb 27 16:13:27 2012//
+/reftex-base.el/1.23/Sun Aug  5 08:47:16 2012//
+/reftex-vars.el/1.56/Sun Aug  5 08:47:16 2012//
 D

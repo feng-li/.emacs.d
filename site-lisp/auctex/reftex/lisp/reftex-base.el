@@ -1091,7 +1091,15 @@ This enforces rescanning the buffer on next use."
 ;          (wbol "\\(\\`\\|[\n\r]\\)[ \t]*")
            (wbol "\\(^\\)[ \t]*") ; Need to keep the empty group because
                                   ; because match numbers are hard coded
-           (label-re "\\\\label{\\([^}]*\\)}")
+           (label-re (concat "\\(?:"
+			     ;; Normal \label{...}
+			     "\\\\label{\\([^}]*\\)}"
+			     "\\|"
+			     ;; keyvals [..., label = {foo}, ...]
+			     ;; forms used by ctable, listings,
+			     ;; minted, ...
+			     "\\[[^]]*label[[:space:]]*=[[:space:]]*{?\\(?1:[^],}]+\\)}?"
+			     "\\)"))
            (include-re (concat wbol
                                "\\\\\\("
                                (mapconcat 'identity
@@ -1125,6 +1133,8 @@ This enforces rescanning the buffer on next use."
                     "\\)\\([[{][^]}]*[]}]\\)*[[{]\\(%s\\)[]}]"))
            (find-label-re-format
             (concat "\\("
+		    "label[[:space:]]*=[[:space:]]*"
+		    "\\|"
                     (mapconcat 'regexp-quote (append '("\\label")
                                                      macros-with-labels) "\\|")
                     "\\)\\([[{][^]}]*[]}]\\)*[[{]\\(%s\\)[]}]"))

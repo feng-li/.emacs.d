@@ -1003,6 +1003,70 @@ The following built-in predicates are available:
   :group 'TeX-view
   :type '(alist :key-type symbol :value-type (group sexp)))
 
+(defun TeX-evince-dbus-p (&rest options)
+  "Return non-nil, if evince is installed and accessible via DBUS.
+Additional OPTIONS may be given to extend the check.  If none are
+given, only the minimal requirements needed by backward search
+are checked.  If OPTIONS include `:forward', which is currently
+the only option, then additional requirements needed by forward
+search are checked, too."
+  (and (require 'dbus nil :no-error)
+       (functionp 'dbus-register-signal)
+       (getenv "DBUS_SESSION_BUS_ADDRESS")
+       (executable-find "evince")
+       (or (not (memq :forward options))
+	   (let ((spec (dbus-introspect-get-method
+			:session "org.gnome.evince.Daemon"
+			"/org/gnome/evince/Daemon"
+			"org.gnome.evince.Daemon"
+			"FindDocument")))
+	     ;; FindDocument must exist, and its signature must be (String,
+	     ;; Boolean, String).  Evince versions between 2.30 and 2.91.x
+	     ;; didn't have the Boolean spawn argument we need to start evince
+	     ;; initially.
+	     (and spec
+		  (equal '("s" "b" "s")
+			 (delq nil (mapcar (lambda (elem)
+					     (when (and (listp elem)
+							(eq (car elem) 'arg))
+					       (cdr (caar (cdr elem)))))
+					   spec))))))))
+
+(defun TeX-evince-sync-view ()
+  "Focus the focused page/paragraph in Evince with the position
+of point in emacs by using Evince's DBUS API.  Used by default
+for the Evince viewer entry in `TeX-view-program-list-builtin' if
+the requirements are met."
+  (let* ((uri (concat "file://" (expand-file-name
+				 (concat file "." (TeX-output-extension)))))
+	 (owner (dbus-call-method
+		 :session "org.gnome.evince.Daemon"
+		 "/org/gnome/evince/Daemon"
+		 "org.gnome.evince.Daemon"
+		 "FindDocument"
+		 uri
+		 t)))
+    (if owner
+	(dbus-call-method
+	 :session owner
+	 "/org/gnome/evince/Window/0"
+	 "org.gnome.evince.Window"
+	 "SyncView"
+	 (buffer-file-name)
+	 (list :struct :int32 (line-number-at-pos) :int32 (1+ (current-column)))
+	 :uint32 (let ((time (float-time)))
+		   ;; FIXME: Evince wants a timestamp as UInt32, but POSIX time
+		   ;; is too large for emacs integers on 32 bit systems.  Emacs
+		   ;; 24.2 will allow providing DBUS ints as floats, and this
+		   ;; dbus version will be identifiable by its new variables
+		   ;; `dbus-compiled-version' and `dbus-runtime-version'.  But
+		   ;; it seems providing just 1 as timestamp has no negative
+		   ;; consequences, anyway.
+		   (if (> most-positive-fixnum time)
+		       (round time)
+		     1)))
+      (error "Couldn't find the Evince instance for %s" uri))))
+
 (defvar TeX-view-program-list-builtin
   (cond
    ((eq system-type 'windows-nt)
@@ -1031,13 +1095,15 @@ The following built-in predicates are available:
       ("dvips and gv" "%(o?)dvips %d -o && gv %f")
       ("gv" "gv %o")
       ("xpdf" ("xpdf -remote %s -raise %o" (mode-io-correlate " %(outpage)")))
-      ("Evince" ("evince" (mode-io-correlate
-			   ;; With evince 3, -p N opens the page *labeled* N,
-			   ;; and -i,--page-index the physical page N.
-			   ,(if (string-match "--page-index"
-					      (shell-command-to-string "evince --help"))
-				" -i %(outpage)"
-			      " -p %(outpage)")) " %o"))
+      ("Evince" ,(if (TeX-evince-dbus-p :forward)
+		     'TeX-evince-sync-view
+		   `("evince" (mode-io-correlate
+			       ;; With evince 3, -p N opens the page *labeled* N,
+			       ;; and -i,--page-index the physical page N.
+			       ,(if (string-match "--page-index"
+						  (shell-command-to-string "evince --help"))
+				    " -i %(outpage)"
+				  " -p %(outpage)")) " %o")))
       ("Okular" ("okular --unique %o" (mode-io-correlate "#src:%n%b")))
       ("xdg-open" "xdg-open %o"))))
   "Alist of built-in viewer specifications.
@@ -1281,10 +1347,8 @@ It should be one of the following symbols:\n\n"
      (lambda (arg) (memq arg (mapcar 'car TeX-engine-alist-builtin))))
 
 (defun TeX-engine-set (type)
-  (concat "Set TeX engine to TYPE.
-TYPE can be one of the following symbols:\n"
-	  (mapconcat (lambda (x) (format "* `%s'" (car x)))
-		     (TeX-engine-alist) "\n"))
+  "Set TeX engine to TYPE.
+For available TYPEs, see variable `TeX-engine'."
   (interactive (list (completing-read "Engine: "
 				      (mapcar (lambda (x)
 						(symbol-name (car x)))
@@ -1473,11 +1537,7 @@ SyncTeX are recognized."
   (TeX-set-mode-name 'TeX-source-correlate-mode t t)
   (setq TeX-source-correlate-start-server-flag TeX-source-correlate-mode)
   ;; Register Emacs for the SyncSource DBUS signal emitted by Evince.
-  (when (and (fboundp 'dbus-register-signal)
-	     (fboundp 'dbus-call-method)
-	     (getenv "DBUS_SESSION_BUS_ADDRESS")
-	     (executable-find "evince"))
-    (require 'dbus)
+  (when (TeX-evince-dbus-p)
     (dbus-register-signal
      :session nil "/org/gnome/evince/Window/0"
      "org.gnome.evince.Window" "SyncSource"
