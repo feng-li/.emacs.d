@@ -64,6 +64,7 @@
 (require 'git-blame)
 (require 'python)
 (require 'artbollocks-mode)
+(require 'predictive)
 (load "auctex.el" nil t t)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -111,6 +112,7 @@
 ;; Let Alt key be the meta key
 (setq x-alt-keysym 'meta)
 
+;; Chinese input method ibus
 (eval-after-load "ibus"
   '(progn
      (add-hook 'after-init-hook 'ibus-mode-on)
@@ -118,7 +120,6 @@
      ;; Change cursor color depending on SCIM status
      (setq ibus-cursor-color '("red" "#00BBBB" "limegreen"))
      ))
-
 
 ;; Suspend and resume hook
 (add-hook 'suspend-hook
@@ -157,10 +158,10 @@
             (local-set-key (kbd "C-h") 'dired-omit-mode)))
 (put 'dired-find-alternate-file 'disabled nil)
 
-
 ;; disable tooltips
 (tooltip-mode nil)
 
+;; Personal global key settings
 (global-set-key (kbd "<home>") 'beginning-of-buffer)
 (global-set-key (kbd "<end>") 'end-of-buffer)
 (global-set-key (kbd "<f9> n") 'new-frame)
@@ -172,9 +173,7 @@
 ;; (global-set-key (kbd "M-SPC") 'set-mark-command) ;It was C-SPC
 
 ;; The scratch settings
-;; Disable scratch information
-(setq initial-scratch-message nil)
-
+(setq initial-scratch-message nil) ;; Disable scratch information
 (setq fundamental-mode 'text-mode)
 (setq default-major-mode 'text-mode)
 (setq initial-major-mode 'text-mode) ;; text mode in scratch
@@ -184,9 +183,9 @@
 ;; Kill the current buffer, without confirmation.
 (fset 'my-kill-current-buffer
       [?\C-x ?k return])
-(global-set-key [pause] 'my-kill-current-buffer)
+(global-set-key (kbd "<f9> k") 'my-kill-current-buffer)
 
-;; Bind undo with the use
+;; Bind undo with the common keyboard
 (global-set-key (kbd "C-z") 'undo)
 
 ;; F2 switch to previous buffer
@@ -202,7 +201,7 @@
 (add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono-11"))
 ;; (add-to-list 'default-frame-alist '(font . "Droid Sans Mono-10"))
 
-;; Chinese fonts
+;; Set Chinese fonts
 (set-fontset-font "fontset-default"
                   'han '("Adobe Heiti Std" . "unicode-bmp"))
 (set-fontset-font "fontset-default"
@@ -213,7 +212,6 @@
                   'gb18030 '("Adobe Heiti Std". "unicode-bmp"))
 (set-fontset-font "fontset-default"
                   'symbol '("Adobe Heiti Std". "unicode-bmp"))
-
 
 ;; Disable menu bar
 (menu-bar-mode t)
@@ -227,7 +225,6 @@
 ;; Allow shift-arrow keys and control-arrow keys under different tty
 ;; Set export TERM="xterm-256color" in .bashrc and
 ;; term "screen-256color" in .screenrc.
-
 (if (equal "xterm-256color" (tty-type))
     (define-key input-decode-map "\e[1;2A" [S-up])
   (define-key input-decode-map "\e[1;2B" [S-down])
@@ -446,7 +443,7 @@
                      inferior-ess-mode-hook
                      python-mode-hook))
        (add-hook hook 'auto-complete-mode))
-     (global-set-key (kbd "ESC <f7>") 'auto-complete-mode)))
+     (global-set-key (kbd "<f9> a") 'auto-complete-mode)))
 
 ;; Font lock
 (global-font-lock-mode t)
@@ -494,7 +491,7 @@
 
 
 ;; Goto matched parenthesis
-(global-set-key "?" 'goto-match-paren) ;;
+(global-set-key (kbd "C-+") 'goto-match-paren) ;;
 (defun goto-match-paren (arg)
   "Go to the matching  if on (){}[], similar to vi style of % "
   (interactive "p")
@@ -735,7 +732,7 @@
      (add-hook
       'LaTeX-mode-hook
       '(lambda ()
-         (local-set-key "\C-c§" 'TeX-next-error)))
+         (local-set-key (kbd "C-c `") 'TeX-next-error)))
 
      (add-hook 'LaTeX-mode-hook (lambda()
                                   (add-to-list 'TeX-command-list
