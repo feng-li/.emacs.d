@@ -4,7 +4,6 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(case-fold-search t)
- '(warning-suppress-types (quote ((undo discard-info))))
  '(column-number-mode t)
  '(display-time-mode nil)
  '(doc-view-continuous t)
@@ -15,7 +14,8 @@
  '(send-mail-function (quote mailclient-send-it))
  '(show-paren-mode t nil (paren))
  '(text-mode-hook (quote (turn-on-auto-fill (lambda nil (flyspell-mode)) (lambda nil (turn-on-auto-fill)) text-mode-hook-identify)))
- '(tool-bar-mode nil))
+ '(tool-bar-mode nil)
+ '(warning-suppress-types (quote ((undo discard-info)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Feng Li's .emacs configurations
@@ -64,7 +64,7 @@
 (require 'git-blame)
 (require 'python)
 (require 'artbollocks-mode)
-(require 'predictive)
+;;(require 'predictive)
 (load "auctex.el" nil t t)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -151,11 +151,13 @@
             (setq directory-free-space-args "-h")
             (define-key dired-mode-map (kbd "<return>")
               'dired-find-alternate-file) ; was dired-advertised-find-file
-            (define-key dired-mode-map (kbd "<backspace>")
+            (define-key dired-mode-map (kbd "<delete>") 'dired-do-delete)
+            (define-key dired-mode-map (kbd "<f9> DEL")
               (lambda () (interactive) (find-alternate-file "..")))
+            (define-key dired-mode-map (kbd "s") 'find-in-workspace)
             (setq cursor-type 'box)
             (dired-omit-mode 1)
-            (local-set-key (kbd "C-h") 'dired-omit-mode)))
+            (local-set-key (kbd "<f9> h") 'dired-omit-mode)))
 (put 'dired-find-alternate-file 'disabled nil)
 
 ;; disable tooltips
@@ -471,7 +473,7 @@
 (setq skeleton-pair t)
 (global-set-key "(" 'skeleton-pair-insert-maybe)
 (global-set-key "[" 'skeleton-pair-insert-maybe)
-(global-set-key "{" 'skeleton-pair-insert-maybe)
+;;(global-set-key "{" 'skeleton-pair-insert-maybe)
 ;;(global-set-key "\"" 'skeleton-pair-insert-maybe)
 ;;(global-set-key "\'" 'skeleton-pair-insert-maybe)
 
@@ -491,7 +493,7 @@
 
 
 ;; Goto matched parenthesis
-(global-set-key (kbd "C-+") 'goto-match-paren) ;;
+(global-set-key (kbd "M-6") 'goto-match-paren) ;;
 (defun goto-match-paren (arg)
   "Go to the matching  if on (){}[], similar to vi style of % "
   (interactive "p")
@@ -723,6 +725,11 @@
      (setq LaTeX-command-style (quote (("" "%(PDF)%(latex) -file-line-error %S%(PDFout)"))))
 
      ;; TeX view program
+     (setq TeX-output-view-style
+           (quote
+            (("^pdf$" "." "evince -f %o")
+             )))
+
      ;; (setq TeX-view-program-selection (quote ((output-dvi "xdvi") (output-pdf "evince") )))
      (add-hook 'LaTeX-mode-hook (lambda ()
                                   (TeX-fold-mode 1)))
@@ -808,7 +815,7 @@
      (add-hook 'ess-mode-hook
                '(lambda ()
                   ;; ESS expression offset
-                  (setq ess-expression-offset 8)
+                  (setq ess-arg-function-offset-new-line '(4))
 
                   ;; (require 'r-autoyas)
                   ;; (define-key ess-mode-map (kbd "C-M-<tab>")
@@ -1018,13 +1025,15 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ess-function-call-face ((t (:inherit font-lock-builtin-face :slant normal :weight bold :width normal))))
  '(flyspell-duplicate ((t (:underline "red" :weight normal))))
  '(flyspell-incorrect ((t (:underline "red" :weight normal))))
  '(font-latex-italic-face ((t (:slant italic))))
+ '(font-lock-builtin-face ((t (:foreground "darkcyan"))))
  '(font-lock-comment-face ((t (:foreground "blue" :slant italic))))
  '(font-lock-function-name-face ((t (:foreground "darkcyan" :slant italic :weight bold))))
  '(font-lock-string-face ((t (:foreground "darkgreen"))))
  '(match ((t (:background "yellow1" :foreground "black"))))
- '(minibuffer-prompt ((t (:foreground "red")))))
+ '(minibuffer-prompt ((t (:foreground "magenta")))))
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
