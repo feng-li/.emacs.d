@@ -44,14 +44,14 @@
 (require 'iso-transl) ;; keyboard input definitions for ISO 8859/1
 (require 'htmlize-view)
 (require 'session)
-;;(require 'ibus)
+(require 'ibus nil 'noerror)
 (require 'ibuffer)
 (require 'ido)
 (require 'comint)
 (require 'org-install)
 (require 'markdown-mode)
 ;; (require 'flymake)
-(require 'dictem)
+(require 'dictem nil 'noerror)
 (require 'auto-complete-config)
 ;;(require 'highlight-parentheses)
 (require 'auto-highlight-symbol)
@@ -112,14 +112,17 @@
 ;; Let Alt key be the meta key
 (setq x-alt-keysym 'meta)
 
-;; Chinese input method ibus
+;; Chinese input method
 (eval-after-load "ibus"
   '(progn
      (add-hook 'after-init-hook 'ibus-mode-on)
-     (ibus-define-common-key ?\M-\s t)
-     ;; Change cursor color depending on SCIM status
-     (setq ibus-cursor-color '("red" "#00BBBB" "limegreen"))
-     ))
+
+     ;; M-SPC toggle IBUS
+     (ibus-define-common-key ?\M-\s nil)
+     (global-set-key (kbd "M-SPC") 'ibus-toggle)
+
+     ;; Change cursor color depending on status
+     (setq ibus-cursor-color '("red" "black" "limegreen"))))
 
 ;; Suspend and resume hook
 (add-hook 'suspend-hook
@@ -425,7 +428,7 @@
      (add-hook 'LaTeX-mode-hook 'flymake-mode)
      (setq flymake-gui-warnings-enabled nil)))
 
-;; Auto completion
+;; Auto complete mode
 (eval-after-load "auto-complete-config"
   '(progn
      (ac-config-default)
@@ -442,6 +445,7 @@
                      c-mode-hook
                      c++-mode-hook
                      ess-mode-hook
+                     org-mode-hook
                      inferior-ess-mode-hook
                      python-mode-hook))
        (add-hook hook 'auto-complete-mode))
