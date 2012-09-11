@@ -64,7 +64,6 @@
 (require 'git-blame)
 (require 'python)
 (require 'artbollocks-mode)
-;;(require 'predictive)
 (load "auctex.el" nil t t)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
