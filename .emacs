@@ -283,19 +283,19 @@
 ;;set visible-bell
 (setq visible-bell t)
 
-;;set big kill ring
+;; set big kill ring
 (setq kill-ring-max 150)
 
-;;column and line number
-;; (setq column-number-mode t)
-;; (global-linum-mode 1)
-;; (require 'linum-off)
-;; (setq linum-disabled-modes-list
-;;       '(eshell-mode compilation-mode ess-mode))
-
-;;auto fill mode
-;;set length of character
+;; set the default fill column
 (setq default-fill-column 79)
+
+;; set the fill column in text/org mode
+(dolist (hook (list
+               'after-text-mode-hook
+               'org-mode-hook))
+  (add-hook hook '(lambda () (setq fill-column 69))))
+
+;; auto fill mode
 (dolist (hook (list
                'after-text-mode-hook
                'message-mode-hook
@@ -304,7 +304,7 @@
   (add-hook hook '(lambda () (auto-fill-mode 1))))
 
 
-;;copy with other applications
+;; copy with other applications
 (setq x-select-enable-clipboard t)
 
 (setq ring-bell-function (lambda ()  t))
