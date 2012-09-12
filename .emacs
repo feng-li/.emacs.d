@@ -1029,8 +1029,6 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(ess-function-call-face ((t (:inherit font-lock-builtin-face :slant normal :weight bold :width normal))))
- '(flyspell-duplicate ((t (:underline "red" :weight normal))))
- '(flyspell-incorrect ((t (:underline "red" :weight normal))))
  '(font-latex-italic-face ((t (:slant italic))))
  '(font-lock-builtin-face ((t (:foreground "darkcyan"))))
  '(font-lock-comment-face ((t (:foreground "blue" :slant italic))))

@@ -1,16 +1,17 @@
 ;;; session.el --- use variables, registers and buffer places across sessions
 
-;; Copyright 1996-1999, 2001-2003 Free Software Foundation, Inc.
+;; Copyright 1996, 1997, 1998, 1999, 2001, 2002, 2003, 2010, 2011
+;; Free Software Foundation, Inc.
 ;;
 ;; Author: Christoph Wedler <wedler@users.sourceforge.net>
-;; Version: 2.3 (see also `session-version' below)
+;; Version: 2.3a (see also `session-version' below)
 ;; Keywords: session, session management, desktop, data, tools
 ;; X-URL: http://emacs-session.sourceforge.net/
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation; either version 2, or (at your option)
-;; any later version.
+;; the Free Software Foundation; either version 3 of the Licence, or
+;; (at your option) any later version.
 ;;
 ;; This program is distributed in the hope that it will be useful,
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,8 +19,7 @@
 ;; GNU General Public License for more details.
 ;;
 ;; You should have received a copy of the GNU General Public License
-;; along with this program; if not, write to the Free Software
-;; Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+;; along with this program.  If not, see <http://gnu.org/licences/>.
 
 ;;; Commentary:
 
@@ -54,10 +54,10 @@
 ;;     value of `load-path'.
 ;;  3. Byte-compile this file.
 ;;  4. Load this package by M-x load-library RET session RET
-;;  5. Start customization with M-x customize-group RET session RET' or the
+;;  5. Start customization with M-x customize-group RET session RET or the
 ;;     menu [Options][Customize...]...[Data][Session].
-;;  6. Toggle the [Session Use Package] option to "in use"
-;;  7. Save your customization via [Save for future sessions]
+;;  6. Toggle the [Session Use Package] option to "in use".
+;;  7. Save your customization via [Save for future sessions].
 ;;  8. If you use both this package and desktop.el, customize the variable
 ;;     `desktop-globals-to-save' to include only the symbol
 ;;     `desktop-missing-file-warning'.
@@ -70,18 +70,20 @@
 ;; The idea here should be to offer new defaults to your users (like using this
 ;; package), while allowing them to choose otherwise.  This is probably best
 ;; done by defining a custom theme (you probably add other customizations to
-;; the custom theme file as well):
+;; the custom theme file as well, custom themes might only work with newer
+;; Emacsen):
 
 ;;  1. Like 1-3 in the private installation instruction.
 ;;  2. Create the autoloads and custom-loads for session.el and make sure that
 ;;     they are loaded at Emacs startup.  You can do it manually by adding the
 ;;     code below to your site.start.el.
-;;  3. Define a custom theme `our-custom' by adding a file called
+;;  3. Define a custom theme like `our-custom' by adding a file called
 ;;     "our-custom-theme.el" with the code below to a directory in the
 ;;     load-path.
 ;;  4. Enable your custom theme by adding the code below to your default.el.
 ;;  5. Tell your users that they can disable this package by customizing the
-;;     user option according to 5-7 in the private installation instruction.
+;;     user option according to 5-7 in the private installation instruction or
+;;     by setting `inhibit-default-init' to t.
 
 ;; ;; site-start.el, Emacs:
 ;; (autoload 'session-jump-to-last-change "session" nil t)
@@ -97,7 +99,7 @@
 ;; (custom-add-load 'session 'session)
 
 ;; ;; our-custom-theme.el, Emacs and XEmacs:
-;; (deftheme our-custom "Created 2011-01-08.")
+;; (deftheme our-custom "Created 2011-01-15.")
 ;; (custom-theme-set-variables
 ;;   'our-custom
 ;;   '(session-use-package t nil (session)))
@@ -108,6 +110,14 @@
 
 ;; ;; default.el, XEmacs:
 ;; (require-theme 'our-custom)
+
+;;; Installation, integration of other packages
+
+;;(defun my-org-reveal-session-jump ()
+;;  (when (and (eq major-mode 'org-mode)
+;;             (outline-invisible-p))
+;;    (org-reveal)))
+;;(add-hook 'session-after-jump-to-last-change-hook 'my-org-reveal-session-jump)
 
 ;;; Code:
 
@@ -194,7 +204,7 @@
 ;;;;##########################################################################
 
 
-(defconst session-version "2.3"
+(defconst session-version "2.3a"
   "Current version of package session.
 Check <http://emacs-session.sourceforge.net/> for the newest.")
 
@@ -376,11 +386,15 @@ ring variables.  See \\[session-save-session] for details."
   :group 'session-globals
   :type 'file)
 
-(defvar session-old-save-file (expand-file-name ".session" "~"))
+(defvar session-old-save-file (expand-file-name ".session" "~")
+  "Value of `session-save-file' before Version 2.3 of this package.")
 
 (defvar session-save-print-spec '(t 2 1024)
   ;; only for advanced users -> no custom
-  "*values for")
+  "*Print specification for the values of global variables to save.
+The value looks like (CIRCLE LEVEL LENGTH) and is used to bind variables
+`print-circle', `print-circle' and `print-circle' when evaluating
+`session-save-session'.")
 
 (defcustom session-save-file-modes 384
   "Mode bits of session save file, as an integer, or nil.
@@ -411,7 +425,7 @@ Variables in `session-globals-exclude' are not saved, but variables in
 
 (defcustom session-globals-exclude
   '(load-history
-    register-alist vc-comment-ring flyspell-auto-correct-ring
+    register-alist vc-comment-ring flyspell-auto-correct-ring org-mark-ring
     planner-browser-file-display-rule-ring)
   "Global variables not to be saved between sessions.
 It affects `session-globals-regexp' and `session-globals-include'."
@@ -525,6 +539,10 @@ change positions, see `session-jump-undo-remember'."
 See `session-jump-undo-threshold' and `session-jump-to-last-change'."
   :group 'session-places
   :type 'integer)
+
+(defvar session-after-jump-to-last-change-hook nil
+  "Hook to be after `session-jump-to-last-change' has been executed.
+The functions are called if `point' has been moved.")
 
 ;; Problem if homedir is a symlink (/bar/home -> /net/bar.home) & tmp-mounted
 ;;   (file-truename "~/foo") => "/tmp_mnt/net/bar.home/foo"
@@ -848,7 +866,8 @@ to it due to intermediate insert/delete elements in the
 	     (cond ((null session-jump-to-last-change-counter)
 		    (message "Jumped to stored last-change position"))
 		   ((null arg)
-		    (setq this-command 'session-jump-to-last-change-seq))))))))
+		    (setq this-command 'session-jump-to-last-change-seq)))
+             (run-hooks 'session-after-jump-to-last-change-hook))))))
 
 
 ;;;===========================================================================
@@ -958,14 +977,17 @@ Unless optional argument INPLACE is non-nil, return a new string."
 
 
 ;;;===========================================================================
-;;;  Menu filters (XEmacs only)
+;;;  Menu filters
 ;;;===========================================================================
 
 (defun session-file-opened-recompute ()
+  "Move file name of all live buffers to top of the menu of visited files."
   (interactive)
   (session-file-changed-recompute t))
 
 (defun session-file-changed-recompute (&optional for-opened)
+  "Store buffer places for all live buffers.
+Works like \\[session-file-opened-recompute] if FOR-OPENED is non-nil."
   (interactive)
   (let ((session-use-package t))	;#dynamic
     (save-excursion
@@ -1021,7 +1043,7 @@ a file in the menu."
 	  (push (vector (or (session-file-prune-name name max-string) name)
 			(list find-fn name)
 			:keys (concat (and (sixth desc) "p")
-				      (let ((buf (get-file-buffer name))) 
+				      (let ((buf (get-file-buffer name)))
 					(when buf
 					  (with-current-buffer buf
 					    (if (consp buffer-undo-list)
@@ -1033,6 +1055,7 @@ a file in the menu."
     (session-menu-maybe-accelerator menu-items (nreverse menu))))
 
 (defun session-file-prune-name (elem max-string)
+  "Prune name íf menu entry ELEM to use a miximum string length MAX-STRING."
   (when (> (length elem) max-string)
     (let* ((sep-string (char-to-string session-directory-sep-char))
 	   (components (split-string elem (regexp-quote sep-string))))
@@ -1085,6 +1108,7 @@ home directory."
 ;;;===========================================================================
 
 (defun session-find-file (filename)
+  "Call \\[find-file] and add FILENAME to `file-name-history'."
   ;; also sets history when just switching to existing buffer
   (interactive "FFind file: ")
   (find-file filename)
@@ -1092,6 +1116,7 @@ home directory."
     (session-set-file-name-history)))
 
 (defun session-set-file-name-history ()
+  ;; TODO later: test `this-command' matching regexo "find-file" or similar
   "Add file-name of current buffer to `file-name-history'.
 Don't add the file name if it matches
 `session-set-file-name-exclude-regexp', or if it is already at the front
@@ -1242,6 +1267,8 @@ An entry for the current buffer and its places is added to the front of
 mentioned in the list below.  ARG is the prefix argument to a command in
 `session-kill-buffer-commands' or 1 for any other command.
 
+ARG=-2: delete current buffer from `session-file-alist' (implemented
+  in `session-kill-buffer-hook')
 ARG=-1: delete PERMANENT flag for buffer,
 ARG=0: do nothing,
 ARG=1: store buffer places, if the PERMANENT flag is set or the buffer
@@ -1337,7 +1364,7 @@ Argument BUFFER should be the current buffer."
 ;;;  Save session file
 ;;;===========================================================================
 
-(defun session-save-session ()
+(defun session-save-session (&optional force)
   "Save session: file places, *-ring, *-history, registers.
 Save some global variables and registers into file `session-save-file'
 with coding system `session-save-file-coding-system'.  Run functions in
@@ -1346,10 +1373,13 @@ with coding system `session-save-file-coding-system'.  Run functions in
 See also `session-globals-regexp', `session-globals-include' and
 `session-registers'.
 
-This command is executed when using \\[save-buffers-kill-emacs] without
-prefix argument 0.  See `kill-emacs-hook'."
-  (interactive)
-  (and session-use-package
+This function does not save the session if `session-use-package' is nil
+and FORCE is nil.  When called interactively, FORCE is non-nil.
+
+This command is automatically executed when exiting Emacs, except when
+using \\[save-buffers-kill-emacs] with prefix argument 0."
+  (interactive "p")
+  (and (or force session-use-package)
        session-save-file
        (not (and (eq this-command 'save-buffers-kill-emacs)
 		 (equal current-prefix-arg 0)))
@@ -1412,13 +1442,17 @@ prefix argument 0.  See `kill-emacs-hook'."
 	   (kill-buffer (current-buffer))))))
 
 (defun session-save-insert-variable (symbol val spec)
-  ;; we don't print at all:
-  ;;  - level-1 recursive lists
-  ;;  - non true-list-p lists
-  ;; we don't print the following elements:
-  ;;  - non-cons for assoc lists
-  ;;  - string which are too long
-  ;;  - non-readable elements (includes level-n recursions)
+  "Print SYMBOL and its value VAL into the current buffer.
+Argument SPEC looks like (MAX-SIZE ASSOC-P), see variable
+`session-globals-include' for details.
+
+Only true lists are printed which do not have a level-1 recursion.
+Elements in the list are not printed if one of the following is true:
+ - the element is no cons if ASSO-P is non-nil,
+ - strings which are too long, see `session-globals-max-string',
+ - non-readable elements, or
+ - elements which are not fully represented according to the
+   specification in `session-save-print-spec'."
   (when (consp val)
     (let ((print-circle (car session-save-print-spec)) ;#dynamic
 	  (print-level  (cadr session-save-print-spec)) ;#dynamic
@@ -1459,6 +1493,7 @@ prefix argument 0.  See `kill-emacs-hook'."
 (defunx session-next-range-char (char)
   ;; XEmacs register functions should handle integers as chars better...
   :emacs-only  1+
+  "Return the next char after CHAR."
   (int-to-char (1+ char)))
 
 (defun session-save-registers ()
@@ -1567,6 +1602,7 @@ If the \"File\" menu does not exist, no submenu is added.  See
 			      ((consp first) (car first))))))))
 
 (defunx session-initialize-keys ()
+  "Define some key bindings for package session."
   (define-key ctl-x-map [(undo)] 'session-jump-to-last-change)
   (define-key ctl-x-map [(control ?\/)] 'session-jump-to-last-change)
   (define-key minibuffer-local-map [(meta ?\?)]
@@ -1584,6 +1620,7 @@ If the \"File\" menu does not exist, no submenu is added.  See
     'session-minibuffer-history-help))
 
 (defunx session-initialize-menus ()
+  "Add some submenus for package session."
   (session-add-submenu '("Open...Recently Visited"
 			 :included file-name-history
 			 :filter session-file-opened-menu-filter
@@ -1675,6 +1712,9 @@ this function to `after-init-hook'."
     (put 'session-initialize :initilized-with session-initialize)))
 
 (defun session-initialize-and-set (symbol value)
+  "Custom :set function for `session-use-package'.
+It sets the default value of SYMBOL to VALUE and initializes this
+package."
   (set-default symbol value)     ; symbol should be `session-use-package'
   (when value
     (if (cond-emacs-xemacs
@@ -1685,12 +1725,15 @@ this function to `after-init-hook'."
 	(add-hook 'after-init-hook 'session-initialize-do)
       (session-initialize-do))))
 
-;; I could imagine that a future version of package custom could make this
-;; `PACKAGE-initialize' stuff easier
+;; This must be late in this file as set function is called during loading.
 (defcustom session-use-package nil
-  "Pseudo variable.  Used to initialize session in custom buffer.
-Put `(session-initialize)' into your ~/.emacs to initialize package
-session in future sessions.  See variable `session-initialize'."
+  "Non-nil if package session is in use.
+If in use,
+ - the file name history is updated when visiting a file,
+ - buffer places are stored when killing a buffer,
+ - the session file is saved when exiting Emacs, and
+ - keybindings are menus are added the first time the package is put
+   into use, see variable `session-initialize'."
   :group 'session
   :type '(boolean :on "in use" :off "not yet initialized or turned off"
 		  :help-echo "Use package Session, initialize if necessary.")

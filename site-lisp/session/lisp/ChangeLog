@@ -1,3 +1,14 @@
+2011-04-12  Christoph Wedler  <Christoph.Wedler@sap.com>
+
+	* session.el 2.3a: 
+
+2011-04-12  Christoph Wedler  <Christoph.Wedler@sap.com>
+
+	* session.el: Make session better interact with org-mode.
+	Suggested by Le Wang <l26wang@gmail.com>.
+	(session-after-jump-to-last-change-hook): New variable.
+	(session-jump-to-last-change): Use it.
+
 2011-01-15  Christoph Wedler  <wedler@users.sourceforge.net>
 
 	* session.el 2.3 is released.
