@@ -116,8 +116,10 @@
   '(progn
      (add-hook 'after-init-hook 'ibus-mode-on)
 
+     ;; Reserve C-space used for mark set
+     (ibus-define-common-key ?\C-\s nil)
+
      ;; M-SPC toggle IBUS
-     (ibus-define-common-key ?\M-\s nil)
      (global-set-key (kbd "M-SPC") 'ibus-toggle)
 
      ;; Change cursor color depending on status
