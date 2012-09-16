@@ -295,7 +295,7 @@
 (dolist (hook (list
                'after-text-mode-hook
                'org-mode-hook))
-  (add-hook hook '(lambda () (setq fill-column 69))))
+  (add-hook hook '(lambda () (setq fill-column 60))))
 
 ;; auto fill mode
 (dolist (hook (list
@@ -720,8 +720,9 @@
 
        ;; (local-set-key (kbd "s-\\") (lambda () (interactive) (insert "\\\[\n \n\\\]")))
 
+       ;; Use \bm{} to repace \mathbf{}
        (fset 'my-insert-bold-math
-             [?\C-w ?\\ ?b ?m ?\{ ?\C-y right])
+             [?\C-w ?\\ ?b ?m ?\{ ?\C-y ?\} right])
        (local-set-key (kbd "C-c C-x C-b") 'my-insert-bold-math))
      (add-hook 'LaTeX-mode-hook 'auctex-insert-special)
      (setq reftex-plug-into-AUCTeX t)
