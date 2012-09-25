@@ -44,7 +44,6 @@
 (require 'iso-transl) ;; keyboard input definitions for ISO 8859/1
 (require 'htmlize-view)
 (require 'session)
-(require 'ibus nil 'noerror)
 (require 'ibuffer)
 (require 'ido)
 (require 'comint)
@@ -65,6 +64,9 @@
 (require 'python)
 (require 'artbollocks-mode)
 (load "auctex.el" nil t t)
+(when window-system
+  (require 'ibus nil 'noerror))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Set home directory
