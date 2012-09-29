@@ -152,7 +152,15 @@
 (add-hook 'dired-mode-hook
           (lambda ()
             (setq dired-omit-files "^\\.[a-z|A-Z]+\\|^\\.?#\\|^\\.$")
-            (setq dired-omit-extensions '(".pyc" "CVS/" "~" ".o" ".bin" ".bak" ".obj" ".map" ".a" ".ln" ".blg" ".bbl" ".elc" ".lof" ".glo" ".idx" ".lot" ".dvi" ".fmt" ".tfm" ".class" ".fas" ".lib" ".x86f" ".sparcf" ".lo" ".la" ".toc" ".aux" ".cp" ".fn" ".ky" ".pg" ".tp" ".vr" ".cps" ".fns" ".kys" ".pgs" ".tps" ".vrs" ".idx" ".lof" ".lot" ".glo" ".blg" ".cp" ".cps" ".fn" ".fns" ".ky" ".kys" ".pg" ".pgs" ".tp" ".tps" ".vr" ".vrs" ".Rc"))
+            (setq dired-omit-extensions
+                  '(".pyc" "CVS/" "~" ".o" ".bin" ".bak" ".obj" ".map" ".a"
+                    ".ln" ".blg" ".bbl" ".elc" ".lof" ".glo" ".idx" ".lot"
+                    ".dvi" ".fmt" ".tfm" ".class" ".fas" ".lib" ".x86f"
+                    ".sparcf" ".lo" ".la" ".toc" ".aux" ".cp" ".fn" ".ky"
+                    ".pg" ".tp" ".vr" ".cps" ".fns" ".kys" ".pgs" ".tps"
+                    ".vrs" ".idx" ".lof" ".lot" ".glo" ".blg" ".cp" ".cps"
+                    ".fn" ".fns" ".ky" ".kys" ".pg" ".pgs" ".tp" ".tps"
+                    ".vr" ".vrs" ".Rc"))
             (setq dired-listing-switches "-hla")
             (setq directory-free-space-args "-h")
             (define-key dired-mode-map (kbd "<return>")
