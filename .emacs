@@ -12,6 +12,7 @@
  '(indicate-empty-lines nil)
  '(org-support-shift-select t)
  '(send-mail-function (quote mailclient-send-it))
+;; '(session-use-package t nil (session))
  '(show-paren-mode t nil (paren))
  '(text-mode-hook (quote (turn-on-auto-fill (lambda nil (flyspell-mode)) (lambda nil (turn-on-auto-fill)) text-mode-hook-identify)))
  '(tool-bar-mode nil)
@@ -1041,7 +1042,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ess-function-call-face ((t (:inherit font-lock-builtin-face :slant normal :weight bold :width normal))))
+ '(ess-function-call-face ((t (:foreground "cyan"))))
  '(font-latex-italic-face ((t (:slant italic))))
  '(font-lock-builtin-face ((t (:foreground "darkcyan"))))
  '(font-lock-comment-face ((t (:foreground "blue" :slant italic))))
