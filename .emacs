@@ -212,7 +212,11 @@
 (global-set-key (kbd "<f2>") 'switch-to-previous-buffer)
 
 ;;;set server-start
-;;(server-start)
+(if (and (fboundp 'server-running-p)
+         (not (server-running-p)))
+   (server-start))
+
+;;(unless (server-running-p) (server-start))
 
 ;; Default English fonts
 (add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono-11"))
@@ -240,34 +244,11 @@
 (fset 'yes-or-no-p 'y-or-n-p)
 
 ;; Allow shift-arrow keys and control-arrow keys under different tty
-;; Set export TERM="xterm-256color" in .bashrc and
-;; term "screen-256color" in .screenrc.
-(if (equal "xterm-256color" (tty-type))
-    (define-key input-decode-map "\e[1;2A" [S-up])
-  (define-key input-decode-map "\e[1;2B" [S-down])
-  (define-key input-decode-map "\e[1;2D" [S-left])
-  (define-key input-decode-map "\e[1;2C" [S-right])
+;; Set export TERM="xterm" in .bashrc and
+;; term "xterm" in .screenrc.
 
-  (define-key input-decode-map "\e[1;5A" [C-up])
-  (define-key input-decode-map "\e[1;5B" [C-down])
-  (define-key input-decode-map "\e[1;5D" [C-left])
-  (define-key input-decode-map "\e[1;5C" [C-right]))
-
-(if (equal "screen-256color" (tty-type))
-    (define-key input-decode-map "\e[1;2A" [S-up])
-  (define-key input-decode-map "\e[1;2B" [S-down])
-  (define-key input-decode-map "\e[1;2D" [S-left])
-  (define-key input-decode-map "\e[1;2C" [S-right])
-
-  (define-key input-decode-map "\e[1;5A" [C-up])
-  (define-key input-decode-map "\e[1;5B" [C-down])
-  (define-key input-decode-map "\e[1;5D" [C-left])
-  (define-key input-decode-map "\e[1;5C" [C-right])
-  (define-key global-map [select] 'end-of-buffer))
-
-;; (if (equal "screen" (tty-type))
-;;     (define-key input-decode-map "\e[1;2A" [S-up]))
-
+(defadvice terminal-init-xterm (after select-shift-up activate)
+  (define-key input-decode-map "\e[1;2A" [S-up]))
 
 ;;shift selection
 (setq shift-select-mode t)
