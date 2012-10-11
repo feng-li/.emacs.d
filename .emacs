@@ -161,7 +161,7 @@
                     ".pg" ".tp" ".vr" ".cps" ".fns" ".kys" ".pgs" ".tps"
                     ".vrs" ".idx" ".lof" ".lot" ".glo" ".blg" ".cp" ".cps"
                     ".fn" ".fns" ".ky" ".kys" ".pg" ".pgs" ".tp" ".tps"
-                    ".vr" ".vrs" ".Rc"))
+                    ".vr" ".vrs" ".Rc" ))
             (setq dired-listing-switches "-hla")
             (setq directory-free-space-args "-h")
             (define-key dired-mode-map (kbd "<return>")
@@ -357,15 +357,15 @@
      (setq ido-enable-flex-matching t)
      (setq ido-ignore-files
            '("\\.Rc$" "\\.dvi$" "\\.pdf$" "\\.ps$" "\\.out$"
-             "\\.log$" "\\.ods$" "\\.eps$" "\\#$" "\\.png$"
+             "\\.log$" "\\.ods$" "\\.eps$" "\\#$" "\\.png$" "\\~$"
              "\\.RData$" "\\.nav$" "\\.snm$" "\\`\\.\\./" "\\`\\./"))
      (setq  ido-ignore-buffers
             '("\\` " "^\\*ESS\\*" "^\\*Messages\\*" "^\\*Help\\*" "^\\*Buffer"
               "^\\*Ibuffer*" "^\\*ESS-errors*" "^\\*Warnings*" "
               output*" "*TeX Help*" "*grep*"
               "^\\*.*Completions\\*$" "^\\*Ediff" "^\\*tramp" "^\\*cvs-"
-              "_region_" "^TAGS$" "^\*Ido" "^\\*.*dictem
-     buffer\\*$" "^\\*inferior-lisp*")) ))
+              "_region_" "^TAGS$" "^\*Ido" "^\\*.*dictem buffer\\*$"
+              "^\\*inferior-lisp*")) ))
 
 ;; ElDoc mode
 (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
