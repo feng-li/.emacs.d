@@ -65,8 +65,7 @@
 (require 'python)
 (require 'artbollocks-mode)
 (load "auctex.el" nil t t)
-(when window-system
-  (require 'ibus nil 'noerror))
+(require 'ibus nil 'noerror)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
