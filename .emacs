@@ -65,7 +65,7 @@
 (require 'python)
 (require 'artbollocks-mode)
 (load "auctex.el" nil t t)
-(require 'ibus nil 'noerror)
+;; (require 'ibus nil 'noerror)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -211,11 +211,11 @@
 (global-set-key (kbd "<f2>") 'switch-to-previous-buffer)
 
 ;;;set server-start
-(if (and (fboundp 'server-running-p)
-         (not (server-running-p)))
-   (server-start))
+;; (if (and (fboundp 'server-running-p)
+;;          (not (server-running-p)))
+;;   (server-start)
+;; )
 
-;;(unless (server-running-p) (server-start))
 
 ;; Default English fonts
 (add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono-11"))
