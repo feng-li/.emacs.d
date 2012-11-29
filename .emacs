@@ -667,12 +667,12 @@
      (setq LaTeX-math-menu-unicode t)
 
      ;; Translate key § to ` so both can be used as a math abbreviation
-     ;; Drawback, could mot type § anymore. Make it locally?
+     ;; Drawback, could not type § anymore. Make it locally?
      (keyboard-translate ?§ ?`)
      (setq LaTeX-math-abbrev-prefix "`")
 
      (add-hook 'LaTeX-mode-hook 'turn-on-auto-fill)
-     (setq TeX-source-correlate-start-server t)
+     ;; (setq TeX-source-correlate-start-server t)
      (setq TeX-source-correlate-mode  t) ; for 11.86
      (setq TeX-source-correlate-method (quote source-specials))
      (setq bibtex-maintain-sorted-entries t)
