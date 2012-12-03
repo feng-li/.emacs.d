@@ -48,7 +48,7 @@
 (require 'ibuffer)
 (require 'ido)
 (require 'comint)
-(require 'org-install)
+(require 'org)
 (require 'markdown-mode)
 ;; (require 'flymake)
 (require 'dictem nil 'noerror)
