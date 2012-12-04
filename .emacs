@@ -12,10 +12,8 @@
  '(indicate-empty-lines nil)
  '(org-support-shift-select t)
  '(send-mail-function (quote mailclient-send-it))
-;; '(session-use-package t nil (session))
  '(show-paren-mode t nil (paren))
  '(text-mode-hook (quote (turn-on-auto-fill (lambda nil (flyspell-mode)) (lambda nil (turn-on-auto-fill)) text-mode-hook-identify)))
- '(tool-bar-mode nil)
  '(warning-suppress-types (quote ((undo discard-info)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -70,10 +68,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Set home directory
-(setq default-directory "~/workspace/")
-
-(when window-system
-  (desktop-save-mode))
+;; (setq default-directory "~/workspace/")
 
 ;; Default frame height and width
 (setq default-frame-alist (append (list
@@ -95,8 +90,51 @@
 ;; Suspend the compile warnings
 (setq byte-compile-warnings nil)
 
-;; Disable scroll-bar
-(scroll-bar-mode -1)
+
+;; Settings for window-system available only
+(when window-system
+
+  ;; Desktop save mode
+  (desktop-save-mode)
+
+  ;; Disable scroll-bar
+  (scroll-bar-mode -1)
+
+  ;; Disable tool-bar
+  (tool-bar-mode -1)
+
+
+  ;; Default English fonts
+  (add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono-11"))
+
+  ;; Set Chinese fonts
+  (set-fontset-font "fontset-default"
+                    'han '("Adobe Heiti Std" . "unicode-bmp"))
+  (set-fontset-font "fontset-default"
+                    'cjk-misc '("Adobe Heiti Std" . "unicode-bmp"))
+  (set-fontset-font "fontset-default"
+                    'bopomofo '("Adobe Heiti Std" . "unicode-bmp"))
+  (set-fontset-font "fontset-default"
+                    'gb18030 '("Adobe Heiti Std". "unicode-bmp"))
+  (set-fontset-font "fontset-default"
+                    'symbol '("Adobe Heiti Std". "unicode-bmp"))
+
+  ;; Disable menu bar
+  (menu-bar-mode t)
+
+  ;; Disable tooltip
+  (tooltip-mode nil)
+
+  ;; Control-tab to switch among buffers
+  (global-set-key (kbd "C-<tab>") 'next-buffer)
+
+
+  ;; Speed bar
+  ;; (speedbar t)
+  ;; (speedbar-add-supported-extension (quote(".R" ".r" ".bib" ".org")))
+
+)
+
 
 ;; Enable line number mode and enable visual line mode
 (add-hook 'find-file-hook
@@ -174,9 +212,6 @@
             (local-set-key (kbd "<f9> h") 'dired-omit-mode)))
 (put 'dired-find-alternate-file 'disabled nil)
 
-;; disable tooltips
-(tooltip-mode nil)
-
 ;; Personal global key settings
 (global-set-key (kbd "<home>") 'beginning-of-buffer)
 (global-set-key (kbd "<end>") 'end-of-buffer)
@@ -217,25 +252,6 @@
 ;; )
 
 
-;; Default English fonts
-(add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono-11"))
-;; (add-to-list 'default-frame-alist '(font . "Droid Sans Mono-10"))
-
-;; Set Chinese fonts
-(set-fontset-font "fontset-default"
-                  'han '("Adobe Heiti Std" . "unicode-bmp"))
-(set-fontset-font "fontset-default"
-                  'cjk-misc '("Adobe Heiti Std" . "unicode-bmp"))
-(set-fontset-font "fontset-default"
-                  'bopomofo '("Adobe Heiti Std" . "unicode-bmp"))
-(set-fontset-font "fontset-default"
-                  'gb18030 '("Adobe Heiti Std". "unicode-bmp"))
-(set-fontset-font "fontset-default"
-                  'symbol '("Adobe Heiti Std". "unicode-bmp"))
-
-;; Disable menu bar
-(menu-bar-mode t)
-
 ;;stop start up message
 (setq inhibit-startup-message t)
 
@@ -258,9 +274,6 @@
 ;; TAB settings
 (setq-default indent-tabs-mode nil)
 
-;; Control-tab to switch among buffers
-(when window-system
-  (global-set-key (kbd "C-<tab>") 'next-buffer))
 
 ;; Keep buffer order during switch
 ;; (require 'flobl)
@@ -310,10 +323,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; General IDE settings (ElDoc, ECB, Comint...)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Speed bar
-;; (when window-system
-;;   (speedbar t)
-;;   (speedbar-add-supported-extension (quote(".R" ".r" ".bib" ".org"))))
 
 ;; Ibuffer mode
 
