@@ -1,17 +1,16 @@
 ;;; reftex-cite.el --- creating citations with RefTeX
 
-;; Copyright (C) 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-;;   2006, 2007, 2008 Free Software Foundation, Inc.
+;; Copyright (C) 1997-2012 Free Software Foundation, Inc.
 
 ;; Author: Carsten Dominik <dominik@science.uva.nl>
 ;; Maintainer: auctex-devel@gnu.org
 
 ;; This file is part of GNU Emacs.
 
-;; GNU Emacs is free software; you can redistribute it and/or modify
+;; GNU Emacs is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation; either version 3, or (at your option)
-;; any later version.
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
 
 ;; GNU Emacs is distributed in the hope that it will be useful,
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,9 +18,7 @@
 ;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
-;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-;; Boston, MA 02110-1301, USA.
+;; along with GNU Emacs.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
@@ -77,7 +74,7 @@
   (get 'reftex-default-bibliography :reftex-expanded))
 
 (defun reftex-bib-or-thebib ()
-  ;; Tests if BibTeX or \begin{tehbibliography} should be used for the
+  ;; Tests if BibTeX or \begin{thebibliography} should be used for the
   ;; citation
   ;; Find the bof of the current file
   (let* ((docstruct (symbol-value reftex-docstruct-symbol))
@@ -566,10 +563,7 @@
          (t ""))))
     (setq authors (reftex-truncate authors 30 t t))
     (when (reftex-use-fonts)
-      (put-text-property 0 (length key)     'face
-                         (reftex-verified-face reftex-label-face
-                                               'font-lock-constant-face
-                                               'font-lock-reference-face)
+      (put-text-property 0 (length key)     'face reftex-label-face
                          key)
       (put-text-property 0 (length authors) 'face reftex-bib-author-face
                          authors)
@@ -677,7 +671,7 @@ While entering the regexp, completion on knows citation keys is possible.
 
     (when (eq (car selected-entries) 'concat)
       ;; All keys go into a single command - we need to trick a little
-      ;; FIXME: Unfortunately, this meens that commenting does not work right.
+      ;; FIXME: Unfortunately, this means that commenting does not work right.
       (pop selected-entries)
       (let ((concat-keys (mapconcat 'car selected-entries
 				    reftex-cite-key-separator)))
@@ -734,8 +728,8 @@ While entering the regexp, completion on knows citation keys is possible.
       ;; Produce the cite-view strings
       (when (and reftex-mode reftex-cache-cite-echo cite-view)
         (mapc (lambda (entry)
-		(reftex-make-cite-echo-string entry docstruct-symbol))
-	      selected-entries))
+                (reftex-make-cite-echo-string entry docstruct-symbol))
+              selected-entries))
 
       (message ""))
 
@@ -851,14 +845,13 @@ While entering the regexp, completion on knows citation keys is possible.
           ;; Offer selection
           (save-window-excursion
             (delete-other-windows)
-            (let ((default-major-mode 'reftex-select-bib-mode))
-              (reftex-kill-buffer "*RefTeX Select*")
-              (switch-to-buffer-other-window "*RefTeX Select*")
-              (unless (eq major-mode 'reftex-select-bib-mode)
-                (reftex-select-bib-mode))
-              (let ((buffer-read-only nil))
-                (erase-buffer)
-                (reftex-insert-bib-matches found-list)))
+            (reftex-kill-buffer "*RefTeX Select*")
+            (switch-to-buffer-other-window "*RefTeX Select*")
+            (unless (eq major-mode 'reftex-select-bib-mode)
+              (reftex-select-bib-mode))
+            (let ((buffer-read-only nil))
+              (erase-buffer)
+              (reftex-insert-bib-matches found-list))
             (setq buffer-read-only t)
             (if (= 0 (buffer-size))
                 (error "No matches found"))
@@ -1107,8 +1100,7 @@ While entering the regexp, completion on knows citation keys is possible.
         bibfile-list item bibtype)
 
     (catch 'exit
-      (save-excursion
-        (set-buffer reftex-call-back-to-this-buffer)
+      (with-current-buffer reftex-call-back-to-this-buffer
         (setq bibtype (reftex-bib-or-thebib))
         (cond
          ((eq bibtype 'bib)
@@ -1140,7 +1132,7 @@ While entering the regexp, completion on knows citation keys is possible.
 (defun reftex-all-used-citation-keys ()
   (reftex-access-scan-info)
   (let ((files (reftex-all-document-files)) file keys kk k)
-    (save-excursion
+    (save-current-buffer
       (while (setq file (pop files))
         (set-buffer (reftex-get-file-buffer-force file 'mark))
         (save-excursion
@@ -1185,7 +1177,7 @@ created files in the variables `reftex-create-bibtex-header' or
   (let ((keys (reftex-all-used-citation-keys))
         (files (reftex-get-bibfile-list))
         file key entries beg end entry string-keys string-entries)
-    (save-excursion
+    (save-current-buffer
       (dolist (file files)
         (set-buffer (reftex-get-file-buffer-force file 'mark))
         (reftex-with-special-syntax-for-bib
@@ -1220,7 +1212,7 @@ created files in the variables `reftex-create-bibtex-header' or
                        (push skey string-keys)))))))))))
     ;; second pass: grab @string references
     (if string-keys
-        (save-excursion
+        (save-current-buffer
           (dolist (file files)
             (set-buffer (reftex-get-file-buffer-force file 'mark))
             (reftex-with-special-syntax-for-bib
@@ -1260,5 +1252,4 @@ created files in the variables `reftex-create-bibtex-header' or
              (length entries))))
 
 
-;;; arch-tag: d53d0a5a-ab32-4b52-a846-2a7c3527cd89
 ;;; reftex-cite.el ends here

@@ -106,7 +106,7 @@ maintainer-clean:
 
 # Call `make dist' either with `TAG=X.Y' or `TAG=YYYYMMDD'.  (You can
 # use `TAG=`date +%Y%m%d`' for automatic creation of the current
-# date.)  It is assumed that there is a `release_XY' tag in CVS if
+# date.)  It is assumed that there is a `release_X_Y' tag in CVS if
 # `TAG=X.Y' is used.
 #
 # Calling the `dist' target will create a subdirectory `reftex-$(TAG)'

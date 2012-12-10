@@ -1,8 +1,7 @@
 ;;; tex.el --- Support for TeX documents.
 
-;; Copyright (C) 1985, 1986, 1987, 1991, 1993, 1994, 1996, 1997, 1999,
-;;   2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
-;;   2011 Free Software Foundation, Inc.
+;; Copyright (C) 1985-1987, 1991, 1993, 1994, 1996, 1997, 1999-2012
+;;   Free Software Foundation, Inc.
 
 ;; Maintainer: auctex-devel@gnu.org
 ;; Keywords: tex
@@ -135,6 +134,7 @@ If nil, none is specified."
      TeX-run-TeX nil
      (context-mode) :help "Run ConTeXt until completion")
     ("BibTeX" "bibtex %s" TeX-run-BibTeX nil t :help "Run BibTeX")
+    ("Biber" "biber %s" TeX-run-Biber nil t :help "Run Biber")
     ,(if (or window-system (getenv "DISPLAY"))
 	'("View" "%V" TeX-run-discard-or-function t t :help "Run Viewer")
        '("View" "dvi2tty -q -w 132 %s" TeX-run-command t t
@@ -178,6 +178,8 @@ TeX-run-TeX: For TeX output.
 TeX-run-interactive: Run TeX or LaTeX interactively.
 
 TeX-run-BibTeX: For BibTeX output.
+
+TeX-run-Biber: For Biber output.
 
 TeX-run-compile: Use `compile' to run the process.
 
@@ -227,6 +229,7 @@ Any additional elements get just transferred to the respective menu entries."
 				(function-item TeX-run-TeX)
 				(function-item TeX-run-interactive)
 				(function-item TeX-run-BibTeX)
+				(function-item TeX-run-Biber)
 				(function-item TeX-run-compile)
 				(function-item TeX-run-shell)
 				(function-item TeX-run-discard)
@@ -1010,7 +1013,9 @@ given, only the minimal requirements needed by backward search
 are checked.  If OPTIONS include `:forward', which is currently
 the only option, then additional requirements needed by forward
 search are checked, too."
-  (and (require 'dbus nil :no-error)
+  (and (not (featurep 'xemacs)) ; XEmacs 21.4 has no `require' with
+			        ; arity 3, and no dbus support anyway.
+       (require 'dbus nil :no-error)
        (functionp 'dbus-register-signal)
        (getenv "DBUS_SESSION_BUS_ADDRESS")
        (executable-find "evince")
@@ -1455,7 +1460,7 @@ This is the case if `TeX-source-correlate-start-server-flag' is non-nil."
 		    (call-process LaTeX-command
 				  nil (list standard-output nil) nil "--help"))
 		(error ""))))
-    (if (string-match "^[ ]*-synctex" help)
+    (if (string-match "^[ ]*-?-synctex" help)
 	'synctex
       'source-specials)))
 
@@ -1781,6 +1786,12 @@ already established, don't do anything."
   :type 'string)
   (make-variable-buffer-local 'TeX-command-BibTeX)
 
+(defcustom TeX-command-Biber "Biber"
+  "*The name of the Biber entry in `TeX-command-list'."
+  :group 'TeX-command-name
+  :type 'string)
+  (make-variable-buffer-local 'TeX-command-Biber)
+
 (defcustom TeX-command-Show "View"
   "*The default command to show (view or print) a TeX file.
 Must be the car of an entry in `TeX-command-list'."
@@ -1819,7 +1830,8 @@ Must be the car of an entry in `TeX-command-list'."
   '("\\.aux" "\\.bbl" "\\.blg" "\\.brf" "\\.fot"
     "\\.glo" "\\.gls" "\\.idx" "\\.ilg" "\\.ind"
     "\\.lof" "\\.log" "\\.lot" "\\.nav" "\\.out"
-    "\\.snm" "\\.toc" "\\.url" "\\.synctex\\.gz")
+    "\\.snm" "\\.toc" "\\.url" "\\.synctex\\.gz"
+    "\\.bcf" "\\.run\\.xml")
   "List of regexps matching suffixes of files to be cleaned.
 Used as a default in TeX, LaTeX and docTeX mode.")
 
@@ -3292,8 +3304,10 @@ If TEX is a directory, generate style files for all files in the directory."
 	       (concat (file-name-as-directory auto)
 		       (TeX-strip-extension tex TeX-all-extensions t)
 		       ".el"))))
-	((TeX-match-extension tex (append TeX-file-extensions
-					  BibTeX-file-extensions))
+	((TeX-match-extension tex (TeX-delete-duplicate-strings
+				   (append TeX-file-extensions
+					   BibTeX-file-extensions
+					   TeX-Biber-file-extensions)))
 	 (save-excursion
 	   (set-buffer (let (enable-local-eval)
 			 (find-file-noselect tex)))
@@ -3313,7 +3327,8 @@ If TEX is a directory, generate style files for all files in the directory."
   (unless (file-directory-p TeX-auto-global)
     (make-directory TeX-auto-global))
   (let ((TeX-file-extensions '("cls" "sty"))
-	(BibTeX-file-extensions nil))
+	(BibTeX-file-extensions nil)
+	(TeX-Biber-file-extensions nil))
     (mapc (lambda (macro) (TeX-auto-generate macro TeX-auto-global))
 	  TeX-macro-global))
   (byte-recompile-directory TeX-auto-global 0))
@@ -3610,7 +3625,7 @@ Check for potential LaTeX environments."
 
   (make-variable-buffer-local 'TeX-default-extension)
 
-(defvar TeX-doc-extenstions
+(defvar TeX-doc-extensions
   '("dvi" "pdf" "ps" "txt" "html" "dvi.gz" "pdf.gz" "ps.gz" "txt.gz" "html.gz"
     "dvi.bz2" "pdf.bz2" "ps.bz2" "txt.bz2" "html.bz2")
   "File extensions of documentation files.")
@@ -3627,6 +3642,11 @@ a string as element.  Its value is obtained from `TeX-command-output-list'.
 Access to the value should be through the function `TeX-output-extension'.")
 
   (make-variable-buffer-local 'TeX-output-extension)
+
+(defcustom TeX-Biber-file-extensions '("bib" "ris" "xml")
+  "Valid file extensions for Biber files."
+  :group 'TeX-file-extension
+  :type '(repeat (string :format "%v")))
 
 (defcustom BibTeX-file-extensions '("bib")
   "Valid file extensions for BibTeX files."
@@ -5162,6 +5182,7 @@ With optional argument ARG, also reload the style hooks."
       (setq TeX-style-hook-list nil
 	    BibTeX-global-style-files nil
 	    BibTeX-global-files nil
+	    TeX-Biber-global-files nil
 	    TeX-global-input-files nil))
   (let ((TeX-auto-save t))
     (if (buffer-modified-p)

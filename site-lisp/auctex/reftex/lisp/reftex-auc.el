@@ -1,17 +1,16 @@
 ;;; reftex-auc.el --- RefTeX's interface to AUCTeX
 
-;; Copyright (C) 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-;;   2006, 2007 Free Software Foundation, Inc.
+;; Copyright (C) 1997-2012 Free Software Foundation, Inc.
 
 ;; Author: Carsten Dominik <dominik@science.uva.nl>
 ;; Maintainer: auctex-devel@gnu.org
 
 ;; This file is part of GNU Emacs.
 
-;; GNU Emacs is free software; you can redistribute it and/or modify
+;; GNU Emacs is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation; either version 3, or (at your option)
-;; any later version.
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
 
 ;; GNU Emacs is distributed in the hope that it will be useful,
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,32 +18,30 @@
 ;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
-;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-;; Boston, MA 02110-1301, USA.
+;; along with GNU Emacs.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
 ;;; Code:
 
-;; All glory to the byte compiler.
 (eval-when-compile (require 'cl))
+
+(require 'reftex-base)
+
 (eval-and-compile
   (unless (fboundp 'declare-function) (defmacro declare-function (&rest r))))
 (declare-function TeX-argument-prompt "ext:tex"
 		  (optional prompt default &optional complete))
 (declare-function TeX-argument-insert "ext:tex"
 		  (name optional &optional prefix))
-(declare-function LaTeX-add-labels "ext:tex" (&rest entries))
-(declare-function LaTeX-add-index-entries "ext:tex" (&rest entries))
-(declare-function LaTeX-bibitem-list "ext:tex" ())
-(declare-function LaTeX-index-entry-list "ext:tex" ())
-(declare-function LaTeX-label-list "ext:tex" ())
+(declare-function LaTeX-add-labels "ext:tex" (&rest entries) t)
+(declare-function LaTeX-add-index-entries "ext:tex" (&rest entries) t)
+(declare-function LaTeX-bibitem-list "ext:tex" () t)
+(declare-function LaTeX-index-entry-list "ext:tex" () t)
+(declare-function LaTeX-label-list "ext:tex" () t)
 (declare-function multi-prompt "ext:multi-prompt"
 		  (separator unique prompt table &optional
 			     mp-predicate require-match initial history))
-
-(require 'reftex-base)
 
 (defun reftex-plug-flag (which)
   ;; Tell if a certain flag is set in reftex-plug-into-AUCTeX
@@ -61,7 +58,7 @@ What is being used depends upon `reftex-plug-into-AUCTeX'."
       ;; Create a new label, with a temporary brace for `reftex-what-macro'
       (unwind-protect
           (progn (insert "{") (setq label (or (reftex-label nil t) "")))
-        (delete-backward-char 1)))
+        (delete-char -1)))
      ((and (not definition) (reftex-plug-flag 2))
       ;; Reference a label with RefTeX
       (setq label (reftex-reference nil t)))
@@ -231,5 +228,4 @@ of ENTRY-LIST is a list of cons cells (\"MACRONAME\" . LEVEL).  See
 
 (provide 'reftex-auc)
 
-;;; arch-tag: 4a798e68-3405-421c-a09b-0269aac64ab4
 ;;; reftex-auc.el ends here

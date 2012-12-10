@@ -1,33 +1,29 @@
 ;;; reftex-vars.el --- configuration variables for RefTeX
 
-;; Copyright (C) 1997, 1998, 1999, 2001, 2002, 2003, 2004, 2005,
-;;   2006, 2007, 2008 Free Software Foundation, Inc.
+;; Copyright (C) 1997-1999, 2001-2012 Free Software Foundation, Inc.
 
 ;; Author: Carsten Dominik <dominik@science.uva.nl>
 ;; Maintainer: auctex-devel@gnu.org
 
 ;; This file is part of GNU Emacs.
 
-;; GNU Emacs is free software; you can redistribute it and/or modify
+;; GNU Emacs is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation; either version 3, or (at your option)
-;; any later version.
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
 
 ;; GNU Emacs is distributed in the hope that it will be useful,
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE   See the
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
-;; along with GNU Emacs; see the file COPYING  If not, write to the
-;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-;; Boston, MA 02110-1301, USA.
+;; along with GNU Emacs.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
 ;;; Code:
-
-(eval-when-compile (defvar reftex-tables-dirty))
+(defvar reftex-tables-dirty)
 (eval-when-compile (require 'cl))
 (eval-and-compile
   (defun reftex-set-dirty (symbol value)
@@ -235,7 +231,7 @@ The following conventions are valid for all alist entries:
         ("\\index*[]{*}" 1 ?I "" nil nil)
         ("^[]{*}" 1 ?^ "" texmathp t)
         ("_[]{*}" 1 ?_ "" texmathp nil))))
-  "Builtin stuff for reftex-index-macros.
+  "Builtin stuff for `reftex-index-macros'.
 Lower-case symbols correspond to a style file of the same name in the LaTeX
 distribution.  Mixed-case symbols are convenience aliases.")
 )
@@ -308,7 +304,7 @@ select the nearest entry with the correct new level."
                  (symbol :tag "function        " my-level-func)))))
 
 (defcustom reftex-toc-max-level 100
-  "*The maximum level of toc entries which will be included in the TOC.
+  "The maximum level of toc entries which will be included in the TOC.
 Section headings with a bigger level will be ignored.  In RefTeX, chapters
 are level 1, sections are level 2 etc.
 This variable can be changed from within the *toc* buffer with the `t' key."
@@ -316,7 +312,7 @@ This variable can be changed from within the *toc* buffer with the `t' key."
   :type 'integer)
 
 (defcustom reftex-part-resets-chapter nil
-  "*Non-nil means, \\part is like any other sectioning command.
+  "Non-nil means, \\part is like any other sectioning command.
 This means, part numbers will be included in the numbering of chapters, and
 chapter counters will be reset for each part.
 When nil (the default), parts are special, do not reset the chapter counter
@@ -326,13 +322,13 @@ and also do not show up in chapter numbers."
 
 
 (defcustom reftex-auto-recenter-toc 'frame
-  "*Non-nil means, turn automatic recentering of *TOC* window on.
+  "Non-nil means, turn automatic recentering of *TOC* window on.
 When active, the *TOC* window will always show the section you
 are currently working in.  Recentering happens whenever Emacs is idle for
 more than `reftex-idle-time' seconds.
 
 Value t means, turn on immediately when RefTeX gets started.  Then,
-recentering will work for any toc window created during the session.
+recentering will work for any TOC window created during the session.
 
 Value 'frame (the default) means, turn automatic recentering on only while the
 dedicated TOC frame does exist, and do the recentering only in that frame.  So
@@ -349,12 +345,12 @@ This feature can be turned on and off from the menu
           (const :tag "in dedicated frame only" frame)))
 
 (defcustom reftex-toc-split-windows-horizontally nil
-  "*Non-nil means, create TOC window by splitting window horizontally."
+  "Non-nil means, create TOC window by splitting window horizontally."
   :group 'reftex-table-of-contents-browser
   :type 'boolean)
 
 (defcustom reftex-toc-split-windows-fraction .3
-  "*Fraction of the width or height of the frame to be used for TOC window.
+  "Fraction of the width or height of the frame to be used for TOC window.
 See also `reftex-toc-split-windows-horizontally'."
   :group 'reftex-table-of-contents-browser
   :type 'number)
@@ -363,7 +359,7 @@ See also `reftex-toc-split-windows-horizontally'."
   "This variable is obsolete, use `reftex-toc-split-windows-fraction' instead.")
 
 (defcustom reftex-toc-keep-other-windows t
-  "*Non-nil means, split the selected window to display the *toc* buffer.
+  "Non-nil means, split the selected window to display the *toc* buffer.
 This helps to keep the window configuration, but makes the *toc* small.
 When nil, all other windows except the selected one will be deleted, so
 that the *toc* window fills half the frame."
@@ -371,25 +367,25 @@ that the *toc* window fills half the frame."
   :type 'boolean)
 
 (defcustom reftex-toc-include-file-boundaries nil
-  "*Non-nil means, include file boundaries in *toc* buffer.
+  "Non-nil means, include file boundaries in *toc* buffer.
 This flag can be toggled from within the *toc* buffer with the `F' key."
   :group 'reftex-table-of-contents-browser
   :type 'boolean)
 
 (defcustom reftex-toc-include-labels nil
-  "*Non-nil means, include labels in *toc* buffer.
+  "Non-nil means, include labels in *toc* buffer.
 This flag can be toggled from within the *toc* buffer with the `l' key."
   :group 'reftex-table-of-contents-browser
   :type 'boolean)
 
 (defcustom reftex-toc-include-index-entries nil
-  "*Non-nil means, include index entries in *toc* buffer.
+  "Non-nil means, include index entries in *toc* buffer.
 This flag can be toggled from within the *toc* buffer with the `i' key."
   :group 'reftex-table-of-contents-browser
   :type 'boolean)
 
 (defcustom reftex-toc-confirm-promotion 2
-  "*Non-nil means, promotion/demotion commands first prompt for confirmation.
+  "Non-nil means, promotion/demotion commands first prompt for confirmation.
 If nil, the command is executed immediately.  If this is an integer N,
 ask for confirmation only if N or more section commands are going to be
 changed."
@@ -400,21 +396,21 @@ changed."
           (number :tag "When more than N sections" :value 2)))
 
 (defcustom reftex-toc-include-context nil
-  "*Non-nil means, include context with labels in the *toc* buffer.
+  "Non-nil means, include context with labels in the *toc* buffer.
 Context will only be shown when labels are visible as well.
 This flag can be toggled from within the *toc* buffer with the `c' key."
   :group 'reftex-table-of-contents-browser
   :type 'boolean)
 
 (defcustom reftex-toc-follow-mode nil
-  "*Non-nil means, point in *toc* buffer will cause other window to follow.
+  "Non-nil means, point in *toc* buffer will cause other window to follow.
 The other window will show the corresponding part of the document.
 This flag can be toggled from within the *toc* buffer with the `f' key."
   :group 'reftex-table-of-contents-browser
   :type 'boolean)
 
 (defcustom reftex-revisit-to-follow nil
-  "*Non-nil means, follow-mode will revisit files if necessary.
+  "Non-nil means, follow-mode will revisit files if necessary.
 If nil, follow-mode will be suspended for stuff in unvisited files."
   :group 'reftex-table-of-contents-browser
   :group 'reftex-referencing-labels
@@ -1028,13 +1024,13 @@ used in the variable `reftex-ref-style-alist'."
   (add-to-list 'reftex-ref-style-default-list "Fancyref"))
 
 (defcustom reftex-level-indent 2
-  "*Number of spaces to be used for indentation per section level."
+  "Number of spaces to be used for indentation per section level."
   :group 'reftex-referencing-labels
   :type 'integer)
 ;;;###autoload(put 'reftex-level-indent 'safe-local-variable 'integerp)
 
 (defcustom reftex-guess-label-type t
-  "*Non-nil means, `reftex-reference' will try to guess the label type.
+  "Non-nil means, `reftex-reference' will try to guess the label type.
 To do that, RefTeX will look at the word before the cursor and compare it with
 the words given in `reftex-label-alist'.  When it finds a match, RefTeX will
 immediately offer the correct label menu - otherwise it will prompt you for
@@ -1079,7 +1075,7 @@ buffer."
 
 (defvar reftex-bibfile-ignore-list nil) ; compatibility
 (defcustom reftex-bibfile-ignore-regexps nil
-  "*List of regular expressions to exclude files in \\bibliography{..}.
+  "List of regular expressions to exclude files in \\bibliography{..}.
 File names matched by these regexps will not be parsed by RefTeX.
 Intended for files which contain only `@string' macro definitions and the
 like, which are ignored by RefTeX anyway."
@@ -1088,7 +1084,7 @@ like, which are ignored by RefTeX anyway."
   :type '(repeat (regexp)))
 
 (defcustom reftex-default-bibliography nil
-  "*List of BibTeX database files which should be used if none are specified.
+  "List of BibTeX database files which should be used if none are specified.
 When `reftex-citation' is called from a document which has neither a
 `\\bibliography{..}' statement nor a `thebibliography' environment,
 RefTeX will scan these files instead.  Intended for using `reftex-citation'
@@ -1098,7 +1094,7 @@ path."
   :type '(repeat (file)))
 
 (defcustom reftex-sort-bibtex-matches 'reverse-year
-  "*Sorting of the entries found in BibTeX databases by `reftex-citation'.
+  "Sorting of the entries found in BibTeX databases by reftex-citation.
 Possible values:
 nil            Do not sort entries.
 'author        Sort entries by author name.
@@ -1111,7 +1107,7 @@ nil            Do not sort entries.
                  (const :tag "by year, reversed" reverse-year)))
 
 (defcustom reftex-cite-format 'default
-  "*The format of citations to be inserted into the buffer.
+  "The format of citations to be inserted into the buffer.
 It can be a string or an alist or a symbol.  In the simplest case this
 is just the string \"\\cite{%l}\", which is also the default.  See the
 definition of `reftex-cite-format-builtin' for more complex examples.
@@ -1175,7 +1171,7 @@ E.g.: (setq reftex-cite-format 'natbib)"
                   (string    :tag "Format string" "")))))
 
 (defcustom reftex-cite-prompt-optional-args 'maybe
-  "*Non-nil means, prompt for empty optional arguments in cite macros.
+  "Non-nil means, prompt for empty optional arguments in cite macros.
 When an entry in `reftex-cite-format' is given with square brackets to
 indicate optional arguments (for example \\cite[][]{%l}), RefTeX can
 prompt for values.  Possible values are:
@@ -1193,7 +1189,7 @@ the buffer.  See `reftex-cite-cleanup-optional-args'."
           (const :tag "Never" nil)))
 
 (defcustom reftex-cite-cleanup-optional-args t
-  "*Non-nil means, remove unnecessary empty optional arguments in cite macros.
+  "Non-nil means, remove unnecessary empty optional arguments in cite macros.
 The cite macros provided by some packages (for example
 natbib) allow specifying two optional arguments, one for a prefix to
 the citation, and a second for a postfix.  When only one optional
@@ -1211,7 +1207,7 @@ can be turned off."
   :type 'boolean)
 
 (defcustom reftex-comment-citations nil
-  "*Non-nil means add a comment for each citation describing the full entry.
+  "Non-nil means add a comment for each citation describing the full entry.
 The comment is formatted according to `reftex-cite-comment-format'."
   :group 'reftex-citation-support
   :type 'boolean)
@@ -1234,8 +1230,8 @@ possible percent escapes."
 (defcustom reftex-cite-punctuation '(", " " \\& " " {\\it et al.}")
   "Punctuation for formatting of name lists in citations.
 This is a list of 3 strings.
-1. normal names separator, like \", \"     in Jones, Brown and Miller
-2. final names separator,  like \" and \"  in Jones, Brown and Miller
+1. Normal names separator, like \", \"     in Jones, Brown and Miller
+2. Final names separator,  like \" and \"  in Jones, Brown and Miller
 3. The \"et al\" string,   like \" {\\it et al.}\" in Jones {\\it et al.}"
   :group 'reftex-citation-support
   :type '(list
@@ -1280,7 +1276,7 @@ should return the string to insert into the buffer."
   :group 'reftex)
 
 (defcustom reftex-support-index t
-  "*Non-nil means, index entries are parsed as well.
+  "Non-nil means, index entries are parsed as well.
 Index support is resource intensive and the internal structure holding the
 parsed information can become quite big.  Therefore it can be turned off.
 When this is nil and you execute a command which requires index support,
@@ -1441,7 +1437,7 @@ has higher priority than this logical `or'."
   :type 'regexp)
 
 (defcustom reftex-index-phrases-search-whole-words t
-  "*Non-nil means phrases search will look for whole words, not subwords.
+  "Non-nil means phrases search will look for whole words, not subwords.
 This works by requiring word boundaries at the beginning and end of
 the search string.  When the search phrase already has a non-word-char
 at one of these points, no word boundary is required there."
@@ -1449,7 +1445,7 @@ at one of these points, no word boundary is required there."
   :type 'boolean)
 
 (defcustom reftex-index-phrases-case-fold-search t
-  "*Non-nil means, searching for index phrases will ignore case."
+  "Non-nil means, searching for index phrases will ignore case."
   :group 'reftex-index-support
   :type 'boolean)
 
@@ -1462,7 +1458,7 @@ If the function returns nil, the current match is skipped."
           (function)))
 
 (defcustom reftex-index-phrases-skip-indexed-matches nil
-  "*Non-nil means, skip matches which appear to be indexed already.
+  "Non-nil means, skip matches which appear to be indexed already.
 When doing global indexing from the phrases buffer, searches for some
 phrases may match at places where that phrase was already indexed.  In
 particular when indexing an already processed document again, this
@@ -1474,7 +1470,7 @@ be ignored."
   :type 'boolean)
 
 (defcustom reftex-index-phrases-wrap-long-lines nil
-  "*Non-nil means, when indexing from the phrases buffer, wrap lines.
+  "Non-nil means, when indexing from the phrases buffer, wrap lines.
 Inserting indexing commands in a line makes the line longer - often
 so long that it does not fit onto the screen.  When this variable is
 non-nil, newlines will be added as necessary before and/or after the
@@ -1484,7 +1480,7 @@ phrase and its index command will always end up on a single line."
   :type 'boolean)
 
 (defcustom reftex-index-phrases-sort-prefers-entry nil
-  "*Non-nil means when sorting phrase lines, the explicit index entry is used.
+  "Non-nil means when sorting phrase lines, the explicit index entry is used.
 Phrase lines in the phrases buffer contain a search phrase, and
 sorting is normally based on these.  Some phrase lines also have
 an explicit index argument specified.  When this variable is non-nil,
@@ -1493,7 +1489,7 @@ the index argument will be used for sorting."
   :type 'boolean)
 
 (defcustom reftex-index-phrases-sort-in-blocks t
-  "*Non-nil means, empty and comment lines separate phrase buffer into blocks.
+  "Non-nil means, empty and comment lines separate phrase buffer into blocks.
 Sorting will then preserve blocks, so that lines are re-arranged only
 within blocks."
   :group 'reftex-index-support
@@ -1512,13 +1508,13 @@ to that section."
   :type '(string :tag "Capital letters"))
 
 (defcustom reftex-index-include-context nil
-  "*Non-nil means, display the index definition context in the index buffer.
+  "Non-nil means, display the index definition context in the index buffer.
 This flag may also be toggled from the index buffer with the `c' key."
   :group 'reftex-index-support
   :type 'boolean)
 
 (defcustom reftex-index-follow-mode nil
-  "*Non-nil means, point in *Index* buffer will cause other window to follow.
+  "Non-nil means, point in *Index* buffer will cause other window to follow.
 The other window will show the corresponding part of the document.
 This flag can be toggled from within the *Index* buffer with the `f' key."
   :group 'reftex-table-of-contents-browser
@@ -1550,7 +1546,7 @@ which subgroup of the match should be highlighted."
                         (integer :tag "Highlight Group"))))
 
 (defcustom reftex-auto-view-crossref t
-  "*Non-nil means, initially turn automatic viewing of crossref info on.
+  "Non-nil means, initially turn automatic viewing of crossref info on.
 Automatic viewing of crossref info normally uses the echo area.
 Whenever point is idle for more than `reftex-idle-time' seconds on the
 argument of a \\ref or \\cite macro, and no other message is being
@@ -1565,20 +1561,20 @@ This feature can be turned on and off from the menu
                  (const :tag "in Other Window" window)))
 
 (defcustom reftex-idle-time 1.2
-  "*Time (secs) Emacs has to be idle before automatic crossref display is done.
+  "Time (secs) Emacs has to be idle before automatic crossref display is done.
 Applies also to toc recentering."
   :group 'reftex-viewing-cross-references
   :type 'number)
 
 (defcustom reftex-revisit-to-echo nil
-  "*Non-nil means, automatic citation display will revisit files if necessary.
+  "Non-nil means, automatic citation display will revisit files if necessary.
 When nil, citation display in echo area will only be active for cached
 entries and for BibTeX database files with live associated buffers."
   :group 'reftex-viewing-cross-references
   :type 'boolean)
 
 (defcustom reftex-cache-cite-echo t
-  "*Non-nil means, echoed information for cite macros is cached.
+  "Non-nil means, echoed information for cite macros is cached.
 The information displayed in the echo area for cite macros is
 cached and even saved along with the parsing information.  The
 cache survives document scans.  In order to clear it, use M-x
@@ -1600,7 +1596,7 @@ Designed for X-Symbol, but may have other uses as well."
   :group 'reftex)
 
 (defcustom reftex-texpath-environment-variables '("TEXINPUTS")
-  "*List of specifications how to retrieve the search path for TeX files.
+  "List of specifications how to retrieve the search path for TeX files.
 Several entries are possible.
 - If an element is the name of an environment variable, its content is used.
 - If an element starts with an exclamation mark, it is used as a command
@@ -1615,7 +1611,7 @@ See also `reftex-use-external-file-finders'."
   :type '(repeat (string :tag "Specification")))
 
 (defcustom reftex-bibpath-environment-variables '("BIBINPUTS" "TEXBIB")
-  "*List of specifications how to retrieve search path for .bib database files.
+  "List of specifications how to retrieve search path for .bib database files.
 Several entries are possible.
 - If an element is the name of an environment variable, its content is used.
 - If an element starts with an exclamation mark, it is used as a command
@@ -1632,7 +1628,7 @@ See also `reftex-use-external-file-finders'."
 
 (defcustom reftex-file-extensions '(("tex" . (".tex" ".ltx"))
                                     ("bib" . (".bib")))
-  "*Association list with file extensions for different file types.
+  "Association list with file extensions for different file types.
 This is a list of items, each item is like: (TYPE . (DEF-EXT OTHER-EXT ...))
 
 TYPE:       File type like \"bib\" or \"tex\".
@@ -1661,10 +1657,10 @@ Note that if you are using external file finders, this option has no effect."
   :type 'boolean)
 
 (defcustom reftex-search-unrecursed-path-first t
-  "*Non-nil means, search all specified directories before trying recursion.
+  "Non-nil means, search all specified directories before trying recursion.
 Thus, in a path \".//:/tex/\", search first \"./\", then \"/tex/\" and then
 all subdirectories of \"./\".  If this option is nil, the subdirectories of
-\"./\" are searched before \"/tex/\". This is mainly for speed - most of the
+\"./\" are searched before \"/tex/\".  This is mainly for speed - most of the
 time the recursive path is for the system files and not for the user files.
 Set this to nil if the default makes RefTeX finding files with equal names
 in wrong sequence."
@@ -1672,7 +1668,7 @@ in wrong sequence."
   :type 'boolean)
 
 (defcustom reftex-use-external-file-finders nil
-  "*Non-nil means, use external programs to find files.
+  "Non-nil means, use external programs to find files.
 Normally, RefTeX searches the paths given in the environment variables
 TEXINPUTS and BIBINPUTS to find TeX files and BibTeX database files.
 With this option turned on, it calls an external program specified in the
@@ -1684,7 +1680,7 @@ the variables `reftex-texpath-environment-variables' and
 
 (defcustom reftex-external-file-finders '(("tex" . "kpsewhich -format=.tex %f")
                                           ("bib" . "kpsewhich -format=.bib %f"))
-  "*Association list with external programs to call for finding files.
+  "Association list with external programs to call for finding files.
 Each entry is a cons cell (TYPE . PROGRAM).
 TYPE is either \"tex\" or \"bib\".  PROGRAM is the external program to use with
 any arguments.  %f will be replaced by the name of the file to be found.
@@ -1701,7 +1697,7 @@ Only relevant when `reftex-use-external-file-finders' is non-nil."
   :group 'reftex)
 
 (defcustom reftex-keep-temporary-buffers 1
-  "*Non-nil means, keep buffers created for parsing and lookup.
+  "Non-nil means, keep buffers created for parsing and lookup.
 RefTeX sometimes needs to visit files related to the current document.
 We distinguish files visited for
 PARSING: Parts of a multifile document loaded when (re)-parsing the document.
@@ -1726,7 +1722,7 @@ upon the variable `reftex-initialize-temporary-buffers'."
           (const :tag "Keep lookup buffers only" 1)))
 
 (defcustom reftex-initialize-temporary-buffers nil
-  "*Non-nil means do initializations even when visiting file temporarily.
+  "Non-nil means do initializations even when visiting file temporarily.
 When nil, RefTeX may turn off find-file hooks and other stuff to briefly
 visit a file.
 When t, the full default initializations are done (find-file-hook etc.).
@@ -1740,14 +1736,14 @@ do a minimal initialization."
            (function-item))))
 
 (defcustom reftex-no-include-regexps '("\\.pstex_t\\'")
-  "*List of regular expressions to exclude certain input files from parsing.
+  "List of regular expressions to exclude certain input files from parsing.
 If the name of a file included via \\include or \\input is matched by any
 of the regular expressions in this list, that file is not parsed by RefTeX."
   :group 'reftex-optimizations-for-large-documents
   :type '(repeat (regexp)))
 
 (defcustom reftex-enable-partial-scans nil
-  "*Non-nil means, re-parse only 1 file when asked to re-parse.
+  "Non-nil means, re-parse only 1 file when asked to re-parse.
 Re-parsing is normally requested with a `C-u' prefix to many RefTeX commands,
 or with the `r' key in menus.  When this option is t in a multifile document,
 we will only parse the current buffer, or the file associated with the label
@@ -1758,7 +1754,7 @@ in menus."
   :type 'boolean)
 
 (defcustom reftex-allow-automatic-rescan t
-  "*Non-nil means, RefTeX may rescan the document when this seems necessary.
+  "Non-nil means, RefTeX may rescan the document when this seems necessary.
 Currently this applies only to rescanning after label insertion, when
 the new label cannot be inserted correctly into the internal label
 list."
@@ -1766,7 +1762,7 @@ list."
   :type 'boolean)
 
 (defcustom reftex-save-parse-info nil
-  "*Non-nil means, save information gathered with parsing in a file.
+  "Non-nil means, save information gathered with parsing in a file.
 The file MASTER.rel in the same directory as MASTER.tex is used to save the
 information.  When this variable is t,
 - accessing the parsing information for the first time in an editing session
@@ -1777,13 +1773,13 @@ information.  When this variable is t,
   :type 'boolean)
 
 (defcustom reftex-parse-file-extension ".rel"
-  "*File extension for the file in which parser information is stored.
+  "File extension for the file in which parser information is stored.
 This extension is added to the base name of the master file."
   :group 'reftex-optimizations-for-large-documents
   :type 'string)
 
 (defcustom reftex-use-multiple-selection-buffers nil
-  "*Non-nil means use a separate selection buffer for each label type.
+  "Non-nil means use a separate selection buffer for each label type.
 These buffers are kept from one selection to the next and need not to be
 created for each use - so the menu generally comes up faster.  The
 selection buffers will be erased (and therefore updated) automatically
@@ -1794,7 +1790,7 @@ when new labels in its category are added.  See the variable
   :type 'boolean)
 
 (defcustom reftex-auto-update-selection-buffers t
-  "*Non-nil means, selection buffers will be updated automatically.
+  "Non-nil means, selection buffers will be updated automatically.
 When a new label is defined with `reftex-label', all selection buffers
 associated with that label category are emptied, in order to force an
 update upon next use.  When nil, the buffers are left alone and have to be
@@ -1813,14 +1809,14 @@ The value of this variable will only have any effect when
   :group 'reftex)
 
 (defcustom reftex-use-fonts t
-  "*Non-nil means, use fonts in *toc* and selection buffers.
+  "Non-nil means, use fonts in *toc* and selection buffers.
 Font-lock must be loaded as well to actually get fontified display.
 When changing this option, a rescan may be necessary to activate the change."
   :group 'reftex-fontification-configurations
   :type 'boolean)
 
 (defcustom reftex-refontify-context 1
-  "*Non-nil means, re-fontify the context in the label menu with font-lock.
+  "Non-nil means, re-fontify the context in the label menu with font-lock.
 This slightly slows down the creation of the label menu.  It is only necessary
 when you definitely want the context fontified.
 
@@ -1837,7 +1833,7 @@ The option is ignored when `reftex-use-fonts' is nil."
           (const :tag "When necessary" 1)))
 
 (defcustom reftex-highlight-selection 'cursor
-  "*Non-nil mean, highlight selected text in selection and *toc* buffers.
+  "Non-nil mean, highlight selected text in selection and *toc* buffers.
 Normally, the text near the cursor is the selected text, and it is
 highlighted.  This is the entry most keys in the selection and *toc*
 buffers act on.  However, if you mainly use the mouse to select an
@@ -1941,7 +1937,7 @@ These extra bindings are located in the users `C-c letter' map."
   :type 'boolean)
 
 (defcustom reftex-plug-into-AUCTeX nil
-  "*Plug-in flags for AUCTeX interface.
+  "Plug-in flags for AUCTeX interface.
 This variable is a list of 5 boolean flags.  When a flag is non-nil,
 RefTeX will
 
@@ -1975,7 +1971,7 @@ may require a restart of Emacs in order to become effective."
            (boolean :tag "supply argument for macros like `\\index'     "))))
 
 (defcustom reftex-allow-detached-macro-args nil
-  "*Non-nil means, allow arguments of macros to be detached by whitespace.
+  "Non-nil means, allow arguments of macros to be detached by whitespace.
 When this is t, `aaa' will be considered as argument of \\bb in the following
 construct:  \\bbb [xxx] {aaa}."
   :group 'reftex-miscellaneous-configurations
@@ -1995,5 +1991,4 @@ construct:  \\bbb [xxx] {aaa}."
 
 (provide 'reftex-vars)
 
-;;; arch-tag: 9591ea34-ef39-4431-90b7-c115eaf5e16f
 ;;; reftex-vars.el ends here

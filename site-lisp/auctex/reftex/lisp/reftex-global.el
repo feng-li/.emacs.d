@@ -1,17 +1,16 @@
 ;;; reftex-global.el --- operations on entire documents with RefTeX
 
-;; Copyright (C) 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-;;   2006, 2007, 2009 Free Software Foundation, Inc.
+;; Copyright (C) 1997-2012 Free Software Foundation, Inc.
 
 ;; Author: Carsten Dominik <dominik@science.uva.nl>
 ;; Maintainer: auctex-devel@gnu.org
 
 ;; This file is part of GNU Emacs.
 
-;; GNU Emacs is free software; you can redistribute it and/or modify
+;; GNU Emacs is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation; either version 3, or (at your option)
-;; any later version.
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
 
 ;; GNU Emacs is distributed in the hope that it will be useful,
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,9 +18,7 @@
 ;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
-;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-;; Boston, MA 02110-1301, USA.
+;; along with GNU Emacs.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
@@ -41,8 +38,7 @@ The TAGS file is also immediately visited with `visit-tags-table'."
          (files  (reftex-all-document-files))
          (cmd    (format "etags %s" (mapconcat 'shell-quote-argument
 					       files " "))))
-    (save-excursion
-      (set-buffer (reftex-get-file-buffer-force master))
+    (with-current-buffer (reftex-get-file-buffer-force master)
       (message "Running etags to create TAGS file...")
       (shell-command cmd)
       (visit-tags-table "TAGS"))))
@@ -101,9 +97,8 @@ No active TAGS table is required."
     (tags-query-replace from to (or delimited current-prefix-arg)
                         (list 'reftex-all-document-files))))
 
-(eval-when-compile
-  (defvar TeX-master)
-  (defvar isearch-next-buffer-function))
+(defvar TeX-master)
+(defvar isearch-next-buffer-function)
 
 (defun reftex-find-duplicate-labels ()
   "Produce a list of all duplicate labels in the document."
@@ -142,7 +137,7 @@ No active TAGS table is required."
     (set (make-local-variable 'TeX-master) master)
     (erase-buffer)
     (insert "                MULTIPLE LABELS IN CURRENT DOCUMENT:\n")
-    (insert 
+    (insert
      " Move point to label and type `r' to run a query-replace on the label\n"
      " and its references.  Type `q' to exit this buffer.\n\n")
     (insert " LABEL               FILE\n")
@@ -193,15 +188,15 @@ This command should be used with care, in particular in multifile
 documents.  You should not use it if another document refers to this
 one with the `xr' package."
   (interactive)
-  ;; Resan the entire document
+  ;; Rescan the entire document
   (reftex-access-scan-info 1)
   ;; Get some insurance
   (if (and (reftex-is-multi)
            (not (yes-or-no-p "Replacing all simple labels in multiple files is risky.  Continue? ")))
       (error "Abort"))
   ;; Make the translation list
-  (let* ((re-core (concat "\\(" 
-                          (mapconcat 'cdr reftex-typekey-to-prefix-alist "\\|") 
+  (let* ((re-core (concat "\\("
+                          (mapconcat 'cdr reftex-typekey-to-prefix-alist "\\|")
                           "\\)"))
          (label-re (concat "\\`" re-core "\\([0-9]+\\)\\'"))
          (search-re (concat "[{,]\\(" re-core "\\([0-9]+\\)\\)[,}]"))
@@ -233,12 +228,12 @@ one with the `xr' package."
     ;; Save all document buffers before this operation
     (reftex-save-all-document-buffers)
 
-    ;; First test to check for erros
-    (setq n (reftex-translate 
+    ;; First test to check for errors.
+    (setq n (reftex-translate
              files search-re translate-alist error-fmt 'test))
 
     ;; Now the real thing.
-    (if (yes-or-no-p 
+    (if (yes-or-no-p
          (format "Replace %d items at %d places in %d files? "
                  (length translate-alist) n (length files)))
         (progn
@@ -256,9 +251,9 @@ one with the `xr' package."
 
 (defun reftex-translate (files search-re translate-alist error-fmt test)
   ;; In FILES, look for SEARCH-RE and replace match 1 of it with
-  ;; its association in TRANSLATE-ALSIT.  
+  ;; its association in TRANSLATE-ALIST.
   ;; If we do not find an association and TEST is non-nil, query
-  ;; to ignore the problematic string.  
+  ;; to ignore the problematic string.
   ;; If TEST is nil, it is ignored without query.
   ;; Return the number of replacements.
   (let ((n 0) file label match-data buf macro pos cell)
@@ -284,7 +279,7 @@ one with the `xr' package."
                          (or (looking-at "\\\\ref")
                              (looking-at "\\\\[a-zA-Z]*ref\\(range\\)?[^a-zA-Z]")
                              (looking-at "\\\\ref[a-zA-Z]*[^a-zA-Z]")
-                             (looking-at (format 
+                             (looking-at (format
                                           reftex-find-label-regexp-format
                                           (regexp-quote label)))))
                 ;; OK, we should replace it.
@@ -316,7 +311,7 @@ labels."
   (interactive)
   (let ((files (reftex-all-document-files))
         file buffer)
-    (save-excursion
+    (save-current-buffer
       (while (setq file (pop files))
         (setq buffer (reftex-get-buffer-visiting file))
         (when buffer
@@ -337,8 +332,7 @@ Also checks if buffers visiting the files are in read-only mode."
         (or (y-or-n-p (format "No write access to %s. Continue? " file))
             (error "Abort")))
       (when (and (setq buf (reftex-get-buffer-visiting file))
-                 (save-excursion
-                   (set-buffer buf)
+                 (with-current-buffer buf
                    buffer-read-only))
         (ding)
         (or (y-or-n-p (format "Buffer %s is read-only. Continue? "
@@ -347,16 +341,15 @@ Also checks if buffers visiting the files are in read-only mode."
 
 ;;; Multi-file RefTeX Isearch
 
-;;; `reftex-isearch-wrap-function', `reftex-isearch-push-state-function',
-;;; `reftex-isearch-pop-state-function', `reftex-isearch-isearch-search'
-;;; functions remain here only for backward-compatibility with Emacs 22
-;;; and are obsolete since Emacs 23 that supports a single function
-;;; variable `multi-isearch-next-buffer-function'.
+;; `reftex-isearch-wrap-function', `reftex-isearch-push-state-function',
+;; `reftex-isearch-pop-state-function', `reftex-isearch-isearch-search'
+;; functions remain here only for backward-compatibility with Emacs 22
+;; and are obsolete since Emacs 23 that supports a single function
+;; variable `multi-isearch-next-buffer-function'.
 
 (defun reftex-isearch-wrap-function ()
-  (if (not isearch-word)
-      (switch-to-buffer 
-       (funcall isearch-next-buffer-function (current-buffer) t)))
+  (switch-to-buffer
+   (funcall isearch-next-buffer-function (current-buffer) t))
   (goto-char (if isearch-forward (point-min) (point-max))))
 
 (defun reftex-isearch-push-state-function ()
@@ -368,14 +361,7 @@ Also checks if buffers visiting the files are in read-only mode."
 
 (defun reftex-isearch-isearch-search (string bound noerror)
   (let ((nxt-buff nil)
-	(search-fun
-	 (cond
-	  (isearch-word
-	   (if isearch-forward 'word-search-forward 'word-search-backward))
-	  (isearch-regexp
-	   (if isearch-forward 're-search-forward 're-search-backward))
-	  (t
-	   (if isearch-forward 'search-forward 'search-backward)))))
+	(search-fun (isearch-search-fun-default)))
     (or
      (funcall search-fun string bound noerror)
      (unless bound
@@ -404,18 +390,18 @@ Also checks if buffers visiting the files are in read-only mode."
 	     (point))
 	 (error nil))))))
 
-;;; This function is called when isearch reaches the end of a
-;;; buffer. For reftex what we want to do is not wrap to the
-;;; beginning, but switch to the next buffer in the logical order of
-;;; the document.  This function looks through list of files in the
-;;; document (reftex-all-document-files), searches for the current
-;;; buffer and switches to the next/previous one in the logical order
-;;; of the document.  If WRAPP is true then wrap the search to the
-;;; beginning/end of the file list, depending of the search direction.
+;; This function is called when isearch reaches the end of a
+;; buffer. For reftex what we want to do is not wrap to the
+;; beginning, but switch to the next buffer in the logical order of
+;; the document.  This function looks through list of files in the
+;; document (reftex-all-document-files), searches for the current
+;; buffer and switches to the next/previous one in the logical order
+;; of the document.  If WRAPP is true then wrap the search to the
+;; beginning/end of the file list, depending of the search direction.
 (defun reftex-isearch-switch-to-next-file (crt-buf &optional wrapp)
   (reftex-access-scan-info)
-  (let* ((cb (buffer-file-name crt-buf))
-	 (flist (reftex-all-document-files)))
+  (let ((cb (buffer-file-name crt-buf))
+	(flist (reftex-all-document-files)))
     (when flist
       (if wrapp
 	  (unless isearch-forward
@@ -436,10 +422,10 @@ the current TeX document.
 
 With no argument, this command toggles
 `reftex-isearch-minor-mode'.  With a prefix argument ARG, turn
-`reftex-isearch-minor-mode' on iff ARG is positive."
+`reftex-isearch-minor-mode' on if ARG is positive, otherwise turn it off."
   (interactive "P")
   (let ((old-reftex-isearch-minor-mode reftex-isearch-minor-mode))
-    (setq reftex-isearch-minor-mode 
+    (setq reftex-isearch-minor-mode
 	  (not (or (and (null arg) reftex-isearch-minor-mode)
 		   (<= (prefix-numeric-value arg) 0))))
     (unless (eq reftex-isearch-minor-mode old-reftex-isearch-minor-mode)
@@ -473,11 +459,10 @@ With no argument, this command toggles
 		(kill-local-variable 'isearch-next-buffer-function))
 	      (setq reftex-isearch-minor-mode nil))))
 	(remove-hook 'reftex-mode-hook 'reftex-isearch-minor-mode)))
-    ;; Force modeline redisplay.
+    ;; Force mode line redisplay.
     (set-buffer-modified-p (buffer-modified-p))))
 
-(add-minor-mode 'reftex-isearch-minor-mode "/I" nil nil 
+(add-minor-mode 'reftex-isearch-minor-mode "/I" nil nil
 		'reftex-isearch-minor-mode)
 
-;;; arch-tag: 2dbf7633-92c8-4340-8656-7aa019d0f80d
 ;;; reftex-global.el ends here

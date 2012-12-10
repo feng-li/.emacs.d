@@ -1,3 +1,76 @@
+2012-10-04  Ralf Angeli  <angeli@caeruleus.net>
+
+	Merge from Emacs.
+
+	* lisp/reftex-vars.el: Do not precede doc strings with "*".
+
+	* lisp/reftex-toc.el: Use *toc* and TOC consistently.
+	(reftex-toc-mode): Define with
+	`define-derived-mode'.
+	(reftex-toc): Do not use `default-major-mode'.  Do not use
+	`goto-line'.
+	(reftex-toc-next): Hide XEmacs stuff with `(featurep 'xemacs)'.
+	(reftex-toc-promote-prepare): Pass `delta' as an explicit
+	argument.
+	(reftex-toc-promote-prepare, reftex-toc-promote-action): Use
+	`with-current-buffer'.
+	(reftex-toc-do-promote, reftex-toc-visit-location)
+	(reftex-toc-find-section): Use `message' with "%s".
+
+	* lisp/reftex-sel.el (reftex-select-label-mode)
+	(reftex-select-bib-mode): Define with `define-derived-mode'.
+	(reftex-get-offset, reftex-insert-docstruct, reftex-select-item):
+	Use `with-current-buffer'.
+	(reftex-insert-docstruct): Use only `reftex-label-face'.
+	(reftex-find-start-point): Do not use `goto-line'.
+	(reftex-select-item): Give local variables
+	`prompt', `data' a prefix.
+	(reftex-select-post-command-hook, reftex-select-callback)
+	(reftex-select-mouse-accept, reftex-select-read-cite):
+	Update for above name changes.
+
+	* lisp/reftex-ref.el (reftex-label-info-update)
+	(reftex-offer-label-menu): Use `with-current-buffer'.
+	(reftex-reference, reftex-offer-label-menu): Use `reftex-refstyle'
+	instead of `refstyle'.
+	(reftex-goto-label): Use content of \ref or \pageref as default
+	for prompt.
+
+	* lisp/reftex-parse.el (reftex-what-macro)
+	(reftex-context-substring): Set `forward-sexp-function' to nil.
+
+	* lisp/reftex-index.el (reftex-index-mode)
+	(reftex-index-phrases-mode): Define with `define-derived-mode'.
+	(reftex-index-phrases-info): Use `save-current-buffer'.
+
+	* lisp/reftex-global.el (reftex-create-tags-file)
+	(reftex-ensure-write-access): Use `with-current-buffer'.
+	(reftex-save-all-document-buffers): Use `save-current-buffer'.
+	(reftex-isearch-isearch-search): Use `isearch-search-fun-default'.
+
+	* lisp/reftex-dcr.el (reftex-echo-ref, reftex-echo-cite): Use
+	`with-current-buffer'.
+	(reftex-view-crossref-from-bibtex): Use `save-current-buffer'.
+
+	* lisp/reftex-cite.el (reftex-format-bib-entry): Use only
+	`reftex-label-face'.
+	(reftex-bibtex-selection-callback): Use `with-current-buffer'.
+	(reftex-all-used-citation-keys): Use `save-current-buffer'.
+
+	* lisp/reftex-base.el (reftex-mode): Define with
+	`define-minor-mode'.
+	(reftex-erase-buffer, reftex-get-file-buffer-force)
+	(reftex-kill-temporary-buffers): Use `with-current-buffer'.
+
+	* lisp/reftex-auc.el (reftex-arg-label): Use `delete-char' instead
+	of `delete-backward-char'.
+
+	* doc/reftex.texi: Update maintainer site.  Change @dircategory.
+	Move @summarycontents and @contents to top.
+	(AUCTeX-RefTeX Interface): Use @AUCTeX{} and @RefTeX{}.
+
+	* Makefile: Doc fix.
+
 2012-08-03  Tassilo Horn  <tsdh@gnu.org>
 
 	Merge commit from emacs.

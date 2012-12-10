@@ -1,17 +1,16 @@
 ;;; reftex-dcr.el --- viewing cross references and citations with RefTeX
 
-;; Copyright (C) 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-;;   2006, 2007 Free Software Foundation, Inc.
+;; Copyright (C) 1997-2012 Free Software Foundation, Inc.
 
 ;; Author: Carsten Dominik <dominik@science.uva.nl>
 ;; Maintainer: auctex-devel@gnu.org
 
 ;; This file is part of GNU Emacs.
 
-;; GNU Emacs is free software; you can redistribute it and/or modify
+;; GNU Emacs is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation; either version 3, or (at your option)
-;; any later version.
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
 
 ;; GNU Emacs is distributed in the hope that it will be useful,
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,15 +18,12 @@
 ;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
-;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-;; Boston, MA 02110-1301, USA.
+;; along with GNU Emacs.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
 ;;; Code:
 
-;; All glory to the byte compiler.
 (eval-when-compile (require 'cl))
 (eval-and-compile
   (unless (fboundp 'declare-function) (defmacro declare-function (&rest r))))
@@ -37,7 +33,7 @@
 
 (defun reftex-view-crossref (&optional arg auto-how fail-quietly)
   "View cross reference of macro at point.  Point must be on the KEY
-argument.  When at at `\\ref' macro, show corresponding `\\label'
+argument.  When at a `\\ref' macro, show corresponding `\\label'
 definition, also in external documents (`xr').  When on a label, show
 a locations where KEY is referenced.  Subsequent calls find additional
 locations.  When on a `\\cite', show the associated `\\bibitem' macro or
@@ -62,7 +58,7 @@ to the functions `reftex-view-cr-cite' and `reftex-view-cr-ref'."
 	    (error "Not on a crossref macro argument"))
 
       (setq reftex-call-back-to-this-buffer (current-buffer))
-      
+
       (cond
        ((string-match "\\`\\\\cite\\|cite\\*?\\'\\|bibentry" macro)
 	;; A citation macro: search for bibitems or BibTeX entries
@@ -90,7 +86,7 @@ to the functions `reftex-view-cr-cite' and `reftex-view-cr-ref'."
 		  (format reftex-find-index-entry-regexp-format
 			  (regexp-quote key))
 		  3 nil nil)))
-       (t 
+       (t
 	(reftex-access-scan-info arg)
 	(catch 'exit
 	  (let ((list reftex-view-crossref-extra)
@@ -100,14 +96,14 @@ to the functions `reftex-view-cr-cite' and `reftex-view-cr-ref'."
 		    action (nth 1 entry)
 		    group (nth 2 entry))
 	      (when (string-match mre macro)
-		(setq dw (reftex-view-regexp-match 
+		(setq dw (reftex-view-regexp-match
 			  (format action key) group nil nil))
 		(throw 'exit t))))
 	  (error "Not on a crossref macro argument"))))
       (if (and (eq arg 2) (windowp dw)) (select-window dw)))))
-     
+
 (defun reftex-view-cr-cite (arg key how)
-  ;; View crossreference of a ref cite.  HOW can have the values 
+  ;; View crossreference of a ref cite.  HOW can have the values
   ;; nil:         Show in another window.
   ;; echo:        Show one-line info in echo area.
   ;; tmp-window:  Show in small window and arrange for window to disappear.
@@ -117,7 +113,7 @@ to the functions `reftex-view-cr-cite' and `reftex-view-cr-ref'."
 
   (if (eq how 'tmp-window)
       ;; Remember the window configuration
-      (put 'reftex-auto-view-crossref 'last-window-conf 
+      (put 'reftex-auto-view-crossref 'last-window-conf
            (current-window-configuration)))
 
   (let (files size item (pos (point)) (win (selected-window)) pop-win
@@ -133,7 +129,7 @@ to the functions `reftex-view-cr-cite' and `reftex-view-cr-ref'."
       (setq item t
             files (reftex-uniquify
                    (mapcar 'cdr
-                           (reftex-all-assq 
+                           (reftex-all-assq
                             'thebib (symbol-value reftex-docstruct-symbol))))))
      (reftex-default-bibliography
       (setq item nil
@@ -172,17 +168,17 @@ to the functions `reftex-view-cr-cite' and `reftex-view-cr-ref'."
         (select-window pop-win)))))
 
 (defun reftex-view-cr-ref (arg label how)
-  ;; View crossreference of a ref macro.  HOW can have the values 
+  ;; View crossreference of a ref macro.  HOW can have the values
   ;; nil:         Show in another window.
   ;; echo:        Show one-line info in echo area.
   ;; tmp-window:  Show in small window and arrange for window to disappear.
 
   ;; Ensure access to scanning info
   (reftex-access-scan-info (or arg current-prefix-arg))
-  
+
   (if (eq how 'tmp-window)
       ;; Remember the window configuration
-      (put 'reftex-auto-view-crossref 'last-window-conf 
+      (put 'reftex-auto-view-crossref 'last-window-conf
            (current-window-configuration)))
 
   (let* ((xr-data (assoc 'xr (symbol-value reftex-docstruct-symbol)))
@@ -194,14 +190,14 @@ to the functions `reftex-view-cr-cite' and `reftex-view-cr-ref'."
         ;; Label is defined in external document
         (save-excursion
           (save-match-data
-            (set-buffer 
+            (set-buffer
              (or (reftex-get-file-buffer-force
                   (cdr (assoc (match-string 1 label) (nth 1
                                                           xr-data))))
                  (error "Problem with external label %s" label))))
           (setq label (substring label (match-end 1)))
           (reftex-access-scan-info)
-          (setq entry 
+          (setq entry
                 (assoc label (symbol-value reftex-docstruct-symbol)))))
     (if (eq how 'echo)
         ;; Display in echo area
@@ -215,7 +211,7 @@ to the functions `reftex-view-cr-cite' and `reftex-view-cr-ref'."
       (add-hook 'pre-command-hook 'reftex-highlight-shall-die)
 
       (when (eq how 'tmp-window)
-        ;; Resize window and arrange restauration
+        ;; Resize window and arrange restoration
         (shrink-window (1- (- (window-height) 9)))
         (recenter '(4))
         (add-hook 'pre-command-hook 'reftex-restore-window-conf))
@@ -238,7 +234,7 @@ With argument, actually select the window showing the cross reference."
 
 (defun reftex-view-crossref-when-idle ()
   ;; Display info about crossref at point in echo area or a window.
-  ;; This function was desigend to work with an idle timer.
+  ;; This function was designed to work with an idle timer.
   ;; We try to get out of here as quickly as possible if the call is useless.
   (and reftex-mode
        ;; Make sure message area is free if we need it.
@@ -248,7 +244,7 @@ With argument, actually select the window showing the cross reference."
                                  reftex-mouse-view-crossref)))
        ;; Quick precheck if this might be a relevant spot
        ;; `reftex-view-crossref' will do a more thorough check.
-       (save-excursion  
+       (save-excursion
          (search-backward "\\" nil t)
          (looking-at "\\\\[a-zA-Z]*\\(cite\\|ref\\|bibentry\\)"))
 
@@ -266,12 +262,12 @@ With argument, actually select the window showing the cross reference."
   (set-window-configuration (get 'reftex-auto-view-crossref 'last-window-conf))
   (put 'reftex-auto-view-crossref 'last-window-conf nil)
   (remove-hook 'pre-command-hook 'reftex-restore-window-conf))
-                  
+
 (defun reftex-echo-ref (label entry docstruct)
   ;; Display crossref info in echo area.
   (cond
    ((null docstruct)
-    (message "%s" 
+    (message "%s"
 	     (substitute-command-keys (format reftex-no-info-message "ref"))))
    ((null entry)
     (message "ref: unknown label: %s" label))
@@ -280,8 +276,7 @@ With argument, actually select the window showing the cross reference."
       (message "ref(%s): %s" (nth 1 entry) (nth 2 entry)))
     (let ((buf (get-buffer " *Echo Area*")))
       (when buf
-        (save-excursion
-          (set-buffer buf)
+        (with-current-buffer buf
           (run-hooks 'reftex-display-copied-context-hook)))))))
 
 (defun reftex-echo-cite (key files item)
@@ -298,14 +293,14 @@ With argument, actually select the window showing the cross reference."
       (unless reftex-revisit-to-echo
         (setq files (reftex-visited-files files)))
 
-      (setq entry 
+      (setq entry
             (condition-case nil
                 (save-excursion
                   (reftex-pop-to-bibtex-entry key files nil nil item t))
               (error
                (if (and files (= (length all-files) (length files)))
                    (message "cite: no such database entry: %s" key)
-                 (message "%s" (substitute-command-keys 
+                 (message "%s" (substitute-command-keys
 				(format reftex-no-info-message "cite"))))
                nil)))
       (when entry
@@ -317,12 +312,11 @@ With argument, actually select the window showing the cross reference."
     (unless (or (null string) (equal string ""))
       (message "cite: %s" string))
     (when (setq buf (get-buffer " *Echo Area*"))
-      (save-excursion
-        (set-buffer buf)
+      (with-current-buffer buf
         (run-hooks 'reftex-display-copied-context-hook)))))
 
 (defvar reftex-use-itimer-in-xemacs nil
-  "*Non-nil means use the idle timers in XEmacs for crossref display.
+  "Non-nil means use the idle timers in XEmacs for crossref display.
 Currently, idle timer restart is broken and we use the post-command-hook.")
 
 (defun reftex-toggle-auto-view-crossref ()
@@ -343,7 +337,7 @@ will display info in the echo area."
           (if (featurep 'xemacs)
               (if reftex-use-itimer-in-xemacs
                   (start-itimer "RefTeX Idle Timer"
-                                'reftex-view-crossref-when-idle 
+                                'reftex-view-crossref-when-idle
                                 reftex-idle-time reftex-idle-time t)
                 (add-hook 'post-command-hook 'reftex-start-itimer-once)
                 t)
@@ -359,28 +353,28 @@ will display info in the echo area."
         (not (itimer-live-p reftex-auto-view-crossref-timer))
         (setq reftex-auto-view-crossref-timer
               (start-itimer "RefTeX Idle Timer"
-                            'reftex-view-crossref-when-idle 
+                            'reftex-view-crossref-when-idle
                             reftex-idle-time nil t))))
 
 (defun reftex-view-crossref-from-bibtex (&optional arg)
   "View location in a LaTeX document which cites the BibTeX entry at point.
 Since BibTeX files can be used by many LaTeX documents, this function
 prompts upon first use for a buffer in RefTeX mode.  To reset this
-link to a document, call the function with with a prefix arg.
+link to a document, call the function with a prefix arg.
 Calling this function several times find successive citation locations."
   (interactive "P")
-  (when arg 
+  (when arg
     ;; Break connection to reference buffer
     (put 'reftex-bibtex-view-cite-locations :ref-buffer nil))
   (let ((ref-buffer (get 'reftex-bibtex-view-cite-locations :ref-buffer)))
     ;; Establish connection to reference buffer
     (unless ref-buffer
       (setq ref-buffer
-            (save-excursion
-              (completing-read 
+            (save-current-buffer
+              (completing-read
                "Reference buffer: "
                (delq nil
-                     (mapcar 
+                     (mapcar
                       (lambda (b)
                         (set-buffer b)
                         (if reftex-mode (list (buffer-name b)) nil))
@@ -488,5 +482,4 @@ Calling this function several times find successive citation locations."
 
 (provide 'reftex-dcr)
 
-;;; arch-tag: d2f52b56-744e-44ad-830d-1fc193b90eda
 ;;; reftex-dcr.el ends here

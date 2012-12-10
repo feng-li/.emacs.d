@@ -1,8 +1,7 @@
 ;;; latex.el --- Support for LaTeX documents.
 
-;; Copyright (C) 1991, 1993, 1994, 1995, 1996, 1997, 1999, 2000, 2003,
-;;   2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 Free Software
-;;   Foundation, Inc.
+;; Copyright (C) 1991, 1993-1997, 1999, 2000, 2003-2012
+;;   Free Software Foundation, Inc.
 
 ;; Maintainer: auctex-devel@gnu.org
 ;; Keywords: tex
@@ -1198,26 +1197,47 @@ This is necessary since index entries may contain commands and stuff.")
 	(1 2 3) LaTeX-auto-optional)
        (,(concat "\\\\\\(?:new\\|provide\\)command\\*?{?\\\\\\(" token "+\\)}?\\[\\([0-9]+\\)\\]")
 	(1 2) LaTeX-auto-arguments)
-       (,(concat "\\\\\\(?:new\\|provide\\)command\\*?{?\\\\\\(" token "+\\)}?") 1 TeX-auto-symbol)
+       (,(concat "\\\\\\(?:new\\|provide\\)command\\*?{?\\\\\\(" token "+\\)}?")
+	1 TeX-auto-symbol)
        (,(concat "\\\\newenvironment\\*?{?\\(" token "+\\)}?\\[\\([0-9]+\\)\\]\\[")
 	1 LaTeX-auto-environment)
        (,(concat "\\\\newenvironment\\*?{?\\(" token "+\\)}?\\[\\([0-9]+\\)\\]")
 	(1 2) LaTeX-auto-env-args)
-       (,(concat "\\\\newenvironment\\*?{?\\(" token "+\\)}?") 1 LaTeX-auto-environment)
+       (,(concat "\\\\newenvironment\\*?{?\\(" token "+\\)}?")
+	1 LaTeX-auto-environment)
        (,(concat "\\\\newtheorem{\\(" token "+\\)}") 1 LaTeX-auto-environment)
        ("\\\\input{\\(\\.*[^#}%\\\\\\.\n\r]+\\)\\(\\.[^#}%\\\\\\.\n\r]+\\)?}"
 	1 TeX-auto-file)
        ("\\\\include{\\(\\.*[^#}%\\\\\\.\n\r]+\\)\\(\\.[^#}%\\\\\\.\n\r]+\\)?}"
 	1 TeX-auto-file)
-       (, (concat "\\\\bibitem{\\(" token "[^, \n\r\t%\"#'()={}]*\\)}") 1 LaTeX-auto-bibitem)
+       (, (concat "\\\\bibitem{\\(" token "[^, \n\r\t%\"#'()={}]*\\)}")
+	  1 LaTeX-auto-bibitem)
        (, (concat "\\\\bibitem\\[[^][\n\r]+\\]{\\(" token "[^, \n\r\t%\"#'()={}]*\\)}")
 	  1 LaTeX-auto-bibitem)
-       ("\\\\bibliography{\\([^#}\\\\\n\r]+\\)}" 1 LaTeX-auto-bibliography)))
+       ("\\\\bibliography{\\([^#}\\\\\n\r]+\\)}" 1 LaTeX-auto-bibliography)
+       ("\\\\addbibresource\\(?:\\[[^]]+\\]\\)?{\\([^#}\\\\\n\r\.]+\\)\\..+}"
+	1 LaTeX-auto-bibliography)
+       ("\\\\add\\(?:global\\|section\\)bib\\(?:\\[[^]]+\\]\\)?{\\([^#}\\\\\n\r\.]+\\)\\(?:\\..+\\)?}" 1 LaTeX-auto-bibliography)
+       ("\\\\newrefsection\\[\\([^]]+\\)\\]" 1 LaTeX-split-bibs)
+       ("\\\\begin{refsection}\\[\\([^]]+\\)\\]" 1 LaTeX-split-bibs)))
    LaTeX-auto-class-regexp-list
    LaTeX-auto-label-regexp-list
    LaTeX-auto-index-regexp-list
    LaTeX-auto-minimal-regexp-list)
   "List of regular expression matching common LaTeX macro definitions.")
+
+(defun LaTeX-split-bibs (match)
+  "Extract bibliography resources from MATCH.
+Split the string at commas and remove Biber file extensions."
+  (let ((bibs (TeX-split-string " *, *" (TeX-match-buffer match))))
+    (dolist (bib bibs)
+      (LaTeX-add-bibliographies (replace-regexp-in-string 
+				 (concat "\\(?:\\."
+					 (mapconcat 'regexp-quote
+						    TeX-Biber-file-extensions
+						    "\\|\\.")
+					 "\\)")
+				 "" bib)))))
 
 (defun LaTeX-auto-prepare ()
   "Prepare for LaTeX parsing."
@@ -1232,23 +1252,47 @@ This is necessary since index entries may contain commands and stuff.")
 (defun LaTeX-listify-package-options (options)
   "Return a list from a comma-separated string of package OPTIONS.
 The input string may include LaTeX comments and newlines."
-  ;; FIXME: Parse key=value options like "pdftitle={A Perfect
-  ;; Day},colorlinks=false" correctly.  When this works, the check for
-  ;; "=" can be removed again.
-  (let (opts)
-    (dolist (elt (TeX-split-string "\\(,\\|%[^\n\r]*[\n\r]\\)+"
-				   options))
-      (unless (string-match "=" elt)
-	;; Strip whitespace.
-	(dolist (item (TeX-split-string "[ \t\r\n]+" elt))
-	  (unless (string= item "")
-	    (add-to-list 'opts item)))))
+  ;; We jump through all those hoops and don't just use `split-string'
+  ;; or the like in order to be able to deal with key=value package
+  ;; options which can look like this: "pdftitle={A Perfect Day},
+  ;; colorlinks=false"
+  (let (opts match start)
+    (with-temp-buffer
+      (set-syntax-table LaTeX-mode-syntax-table)
+      (insert options)
+      (newline) ; So that the last entry can be found.
+      (goto-char (point-min))
+      (setq start (point))
+      (while (re-search-forward "[{ ,%\n\r]" nil t)
+	(setq match (match-string 0))
+	(cond
+	 ;; Step over groups.  (Let's hope nobody uses escaped braces.)
+	 ((string= match "{")
+	  (up-list))
+	 ;; Get rid of whitespace.
+	 ((string= match " ")
+	  (delete-region (1- (point))
+			 (save-excursion
+			   (skip-chars-forward " ")
+			   (point))))
+	 ;; Add entry to output.
+	 ((or (string= match ",") (= (point) (point-max)))
+	  (add-to-list 'opts (buffer-substring-no-properties
+			      start (1- (point))) t)
+	  (setq start (point)))
+	 ;; Get rid of comments.
+	 ((string= match "%")
+	  (delete-region (1- (point))
+			 (line-beginning-position 2)))
+	 ;; Get rid of newlines.
+	 ((or (string= match "\n") (string= match "\r"))
+	  (delete-backward-char 1)))))
     opts))
 
 (defun LaTeX-auto-cleanup ()
   "Cleanup after LaTeX parsing."
 
-  ;; Cleanup BibTeX files
+  ;; Cleanup BibTeX/Biber files
   (setq LaTeX-auto-bibliography
 	(apply 'append (mapcar (lambda (arg)
 				 (TeX-split-string "," arg))
@@ -1383,6 +1427,12 @@ regenerated by the respective menu filter."
   (apply 'LaTeX-add-environments-auto environments)
   (setq LaTeX-environment-menu nil)
   (setq LaTeX-environment-modify-menu nil))
+
+;;; Biber support
+
+(defvar LaTeX-using-Biber nil
+  "Used to track whether Biber is in use.")
+(make-variable-buffer-local 'LaTeX-using-Biber)
 
 ;;; BibTeX
 
@@ -1680,7 +1730,8 @@ OPTIONAL is ignored."
     (docs "${TEXDOCS}" ("doc/") TeX-doc-extensions)
     (graphics "${TEXINPUTS}" ("tex/") LaTeX-includegraphics-extensions)
     (bibinputs "${BIBINPUTS}" ("bibtex/bib/") BibTeX-file-extensions)
-    (bstinputs "${BSTINPUTS}" ("bibtex/bst/") BibTeX-style-extensions))
+    (bstinputs "${BSTINPUTS}" ("bibtex/bst/") BibTeX-style-extensions)
+    (biberinputs "${BIBINPUTS}" ("bibtex/bib/") TeX-Biber-file-extensions))
   "Alist of filetypes with locations and file extensions.
 Each element of the alist consists of a symbol expressing the
 filetype, a variable which can be expanded on kpathsea-based
@@ -1780,24 +1831,39 @@ string."
 (defvar BibTeX-global-files nil
   "Association list of BibTeX files.
 
-Initialized once at the first time you prompt for an BibTeX file.
+Initialized once at the first time you prompt for a BibTeX file.
+May be reset with `\\[universal-argument] \\[TeX-normal-mode]'.")
+
+(defvar TeX-Biber-global-files nil
+  "Association list of Biber files.
+
+Initialized once at the first time you prompt for an Biber file.
 May be reset with `\\[universal-argument] \\[TeX-normal-mode]'.")
 
 (defun TeX-arg-bibliography (optional &optional prompt)
-  "Prompt for a BibTeX database file.
+  "Prompt for a BibTeX or Biber database file.
 If OPTIONAL is non-nil, insert the resulting value as an optional
 argument, otherwise as a mandatory one.  Use PROMPT as the prompt
 string."
-  (message "Searching for BibTeX files...")
-  (or BibTeX-global-files
-      (setq BibTeX-global-files
-	    (mapcar 'list (TeX-search-files-by-type 'bibinputs 'global t t))))
-  (let ((styles (multi-prompt
-		 "," t
-		 (TeX-argument-prompt optional prompt "BibTeX files")
-		 (append (mapcar 'list (TeX-search-files-by-type
-					'bibinputs 'local t t))
-			 BibTeX-global-files))))
+  (let (name files inputs styles)
+    (if LaTeX-using-Biber
+	(progn
+	  (setq name "Biber"
+		files 'TeX-Biber-global-files
+		inputs 'biberinputs))
+      (setq name "BibTeX"
+	    files 'BibTeX-global-files
+	    inputs 'bibinputs))
+    (message "Searching for %s files..." name)
+    (or (symbol-value files)
+	(set files (mapcar 'list (TeX-search-files-by-type
+				  'biberinputs 'global t t))))
+    (setq styles (multi-prompt
+		  "," t
+		  (TeX-argument-prompt optional prompt (concat name " files"))
+		  (append (mapcar 'list (TeX-search-files-by-type
+					 inputs 'local t t))
+			  (symbol-value files))))
     (apply 'LaTeX-add-bibliographies styles)
     (TeX-argument-insert (mapconcat 'identity styles ",") optional)))
 
@@ -5260,6 +5326,7 @@ i.e. you do _not_ have to cater for this yourself by adding \\\\' or $."
    '("nocite" TeX-arg-cite)
    '("bibliographystyle" TeX-arg-bibstyle)
    '("bibliography" TeX-arg-bibliography)
+   '("addbibresource" TeX-arg-bibliography)
    '("footnote"
      (TeX-arg-conditional TeX-arg-footnote-number-p ([ "Number" ]) nil)
      t)
