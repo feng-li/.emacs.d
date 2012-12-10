@@ -728,15 +728,16 @@
      (setq reftex-plug-into-AUCTeX t)
 
 
-     (setq LaTeX-command-style (quote (("" "%(PDF)%(latex) -file-line-error %S%(PDFout)"))))
+     ;; (setq LaTeX-command-style (quote (("" "%(PDF)%(latex) -file-line-error %S%(PDFout)"))))
 
      ;; TeX view program
-     (setq TeX-output-view-style
-           (quote
-            (("^pdf$" "." "evince -f %o")
-             )))
-
+     ;; (setq TeX-output-view-style
+     ;;       (quote
+     ;;        (("^pdf$" "." "evince -f %o")
+     ;;         )))
      ;; (setq TeX-view-program-selection (quote ((output-dvi "xdvi") (output-pdf "evince") )))
+
+
      (add-hook 'LaTeX-mode-hook (lambda ()
                                   (TeX-fold-mode 1)))
      (setq TeX-save-query  nil )
