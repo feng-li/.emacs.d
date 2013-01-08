@@ -215,6 +215,7 @@
 ;; Personal global key settings
 (global-set-key (kbd "<home>") 'beginning-of-buffer)
 (global-set-key (kbd "<end>") 'end-of-buffer)
+(global-set-key (kbd "<select>") 'end-of-buffer)
 (global-set-key (kbd "<f9> n") 'new-frame)
 (global-set-key (kbd "<f9> s") 'rgrep)
 (global-set-key (kbd "<f9> l") 'find-name-dired)
@@ -853,12 +854,11 @@
                   ;;Roxygen template
                   (setq ess-roxy-template-alist
                         (list
-                         (cons "description" "<description>")
-                         (cons "details" "<details>")
-                         (cons "title" "<short tile>")
+                         (cons "description" "<title>")
+                         (cons "details" "<description>")
                          (cons "param" "")
-                         (cons "return" "")
-                         (cons "references" "")
+                         (cons "return" "NA")
+                         (cons "references" "NA")
                          (cons "author" "Feng Li, Department of Statistics, Stockholm University, Sweden.")
                          (cons "note" "Created: ; Current: .")))
 
