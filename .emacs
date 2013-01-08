@@ -221,7 +221,7 @@
 (global-set-key (kbd "<f9> l") 'find-name-dired)
 (global-set-key (kbd "<f9> q") 'fill-region-as-paragraph)
 (global-set-key (kbd "<f9> TAB") 'indent-relative)
-(global-set-key (kbd "ESC <f2>") 'next-multiframe-window) ;; Circulate among windows ESC-F2
+(global-set-key (kbd "<f2>") 'next-multiframe-window) ;; Circulate among windows
 ;; (global-set-key (kbd "M-SPC") 'set-mark-command) ;It was C-SPC
 
 ;; The scratch settings
@@ -240,11 +240,11 @@
 ;; Bind undo with the common keyboard
 (global-set-key (kbd "C-z") 'undo)
 
-;; F2 switch to previous buffer
+;; Switch to previous buffer
 (defun switch-to-previous-buffer ()
   (interactive)
   (switch-to-buffer (other-buffer)))
-(global-set-key (kbd "<f2>") 'switch-to-previous-buffer)
+(global-set-key (kbd "ESC <f2>") 'switch-to-previous-buffer)
 
 ;;;set server-start
 ;; (if (and (fboundp 'server-running-p)
