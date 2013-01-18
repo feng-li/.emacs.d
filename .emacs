@@ -457,7 +457,7 @@
      (setq ac-delay 0.05)
      (setq ac-quick-help-delay 1.5)
      (setq ac-ignore-case 'smart)
-     (setq ac-ignores (quote ("0" "1" "2" "3" "4" "5" "6" "7" "8" "9")))
+     (setq ac-ignores (quote ("0" "1" "2" "3" "4" "5" "6" "7" "8" "9" ".")))
 
      (dolist (hook '(emacs-lisp-mode-hook
                      c-mode-hook
