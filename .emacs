@@ -698,11 +698,12 @@
      (setq LaTeX-math-abbrev-prefix "`")
 
      (add-hook 'LaTeX-mode-hook 'turn-on-auto-fill)
-     ;; (setq TeX-source-correlate-start-server t)
-     (setq TeX-source-correlate-mode  t) ; for 11.86
-     (setq TeX-source-correlate-method (quote source-specials))
+     (setq TeX-source-correlate-start-server t)
+     (setq TeX-source-correlate-mode  t)
+     (setq TeX-PDF-mode t) ;; use pdflatex by default
+     ;(setq TeX-source-correlate-method (quote source-specials)) ; only for dvi
+     (setq TeX-source-correlate-method (quote synctex))
      (setq bibtex-maintain-sorted-entries t)
-
 
      (require 'ac-math)
      ;; make auto-complete aware of {{{latex-mode}}}
