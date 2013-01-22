@@ -382,13 +382,15 @@
            '("\\.Rc$" "\\.dvi$" "\\.pdf$" "\\.ps$" "\\.out$"
              "\\.log$" "\\.ods$" "\\.eps$" "\\#$" "\\.png$" "\\~$"
              "\\.RData$" "\\.nav$" "\\.snm$" "\\`\\.\\./" "\\`\\./"))
-     (setq  ido-ignore-buffers
+
+     (setq ido-ignore-buffers
             '("\\` " "^\\*ESS\\*" "^\\*Messages\\*" "^\\*Help\\*" "^\\*Buffer"
-              "^\\*Ibuffer*" "^\\*ESS-errors*" "^\\*Warnings*" "
-              output*" "*TeX Help*" "*grep*"
+              "^\\*Ibuffer*" "^\\*ESS-errors*" "^\\*Warnings*" "output*" "*TeX Help*" "*grep*"
               "^\\*.*Completions\\*$" "^\\*Ediff" "^\\*tramp" "^\\*cvs-"
               "_region_" "^TAGS$" "^\*Ido" "^\\*.*dictem buffer\\*$"
-              "^\\*inferior-lisp*")) ))
+              "^\\*inferior-lisp*"))
+
+     ))
 
 ;; ElDoc mode
 (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
@@ -743,10 +745,9 @@
              [?\C-w ?\\ ?b ?m ?\{ ?\C-y ?\} right])
        (local-set-key (kbd "C-c C-x C-b") 'my-insert-bold-math))
      (add-hook 'LaTeX-mode-hook 'auctex-insert-special)
-     (setq reftex-plug-into-AUCTeX t)
 
-
-     ;; (setq LaTeX-command-style (quote (("" "%(PDF)%(latex) -file-line-error %S%(PDFout)"))))
+     ;; Enable file-line-error to avoid error message "Error occured after last TeX file closed"
+     (setq LaTeX-command-style (quote (("" "%(PDF)%(latex) -file-line-error %S%(PDFout)"))))
 
      ;; TeX view program
      ;; (setq TeX-output-view-style
@@ -759,8 +760,14 @@
      (add-hook 'LaTeX-mode-hook (lambda ()
                                   (TeX-fold-mode 1)))
      (setq TeX-save-query  nil )
-     (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
 
+     ;; RefTeX
+     (setq reftex-plug-into-AUCTeX t)
+     (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+     (setq reftex-cite-format 'natbib)
+
+
+     ;; LaTeX Command list
      (add-hook
       'LaTeX-mode-hook
       '(lambda ()

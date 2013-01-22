@@ -41,8 +41,8 @@ autodir = ${localstatedir}/auctex$(null)
 preview_enabled=yes
 subdirs= preview
 styledir = $(packagedatadir)/style
-AUCTEXDATE = 2012-01-11
-AUCTEXVERSION = 2012-01-11
+AUCTEXDATE = 2012-12-04
+AUCTEXVERSION = 2012-12-04
 
 INSTALL = /usr/bin/install -c
 INSTALL_DATA = ${INSTALL} -m 644
@@ -121,7 +121,7 @@ STYLESRC = style/prosper.el \
 	   style/pst-plot.el  style/pst-slpe.el  style/shortvrb.el \
 	   style/austrian.el  style/naustrian.el style/french.el \
 	   style/lettrine.el  style/multicol.el  style/xspace.el \
-	   style/setspace.el
+	   style/setspace.el  style/biblatex.el
 STYLEELC = $(STYLESRC:.el=.elc)
 
 CLEANFILES = $(AUCELC) $(STYLEELC) $(MULEELC)

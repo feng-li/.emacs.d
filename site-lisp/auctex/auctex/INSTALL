@@ -1,6 +1,15 @@
 Installing AUCTeX
 *****************
 
+   The simplest way of installing AUCTeX is by using the Emacs package
+manager integrated in Emacs 24 and greater (ELPA).  Simply do `M-x
+package-list-packages RET', mark the auctex package for installation
+with `i', and hit `x' to execute the installation procedure.  That's
+all.
+
+   The remainder of this section is about installing AUCTeX from a
+release tarball or from a checkout of the AUCTeX repository.
+
    Installing AUCTeX should be simple: merely `./configure', `make',
 and `make install' for a standard site-wide installation (most other
 installations can be done by specifying a `--prefix=...' option).
@@ -21,7 +30,7 @@ MS Windows are asked to consult the file `INSTALL.windows'.
      version of `xemacs-base' older than 1.84 (released in sumo from
      02/02/2004).  Using preview-latex requires a version of Emacs
      compiled with image support.  While the X11 version of Emacs 21
-     will likely work, Emacs 22 and later is the preferred platform.
+     will likely work, Emacs 22 and later is preferred.
 
     Windows
           Precompiled versions are available from
@@ -33,8 +42,8 @@ MS Windows are asked to consult the file `INSTALL.windows'.
           `http://www.emacswiki.org/cgi-bin/wiki/EmacsForMacOS'.
 
     GNU/Linux
-          Most GNU/Linux distributions nowadays provide a variant of
-          Emacs 22 or later via their package repositories.
+          Most GNU/Linux distributions nowadays provide a recent
+          variant of Emacs via their package repositories.
 
     Self-compiled
           Compiling Emacs yourself requires a C compiler and a number
