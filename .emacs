@@ -700,7 +700,7 @@
      (setq LaTeX-math-abbrev-prefix "`")
 
      (add-hook 'LaTeX-mode-hook 'turn-on-auto-fill)
-     (setq TeX-source-correlate-start-server t)
+     ;; (setq TeX-source-correlate-start-server t)
      (setq TeX-source-correlate-mode  t)
      (setq TeX-PDF-mode t) ;; use pdflatex by default
      ;(setq TeX-source-correlate-method (quote source-specials)) ; only for dvi
