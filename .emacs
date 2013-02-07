@@ -82,8 +82,8 @@
 (setq user-mail-address "feng.li@stat.su.se")
 
 ;; Environment variables
-(setenv "PATH" (concat (getenv "PATH") ":~/.bin"))
-(setq exec-path (append exec-path '("~/.bin")))
+;; (setenv "PATH" (concat (getenv "PATH") ":~/.bin"))
+;; (setq exec-path (append exec-path '("~/.bin")))
 (setenv "OMP_NUM_THREADS" "1")
 (setq explicit-bash-args '("--init-file" "~/.bashrc"))
 
@@ -316,6 +316,10 @@
 
 (setq ring-bell-function (lambda ()  t))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Diary mode
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(setq diary-file "~/workspace/diary")
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -765,6 +769,11 @@
      (setq reftex-plug-into-AUCTeX t)
      (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
      (setq reftex-cite-format 'natbib)
+
+     ;; (setq reftex-use-external-file-finders t)
+     ;; (setq reftex-external-file-finders
+     ;;       '(("tex" . "!kpsewhich -format=.tex %f")
+     ;;         ("bib" . "!kpsewhich -format=.bib %f")))
 
 
      ;; LaTeX Command list
