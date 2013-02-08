@@ -85,6 +85,7 @@
 ;; (setenv "PATH" (concat (getenv "PATH") ":~/.bin"))
 ;; (setq exec-path (append exec-path '("~/.bin")))
 (setenv "OMP_NUM_THREADS" "1")
+(setenv "BIBINPUTS" "~/.texmf/bibtex/bib//")
 (setq explicit-bash-args '("--init-file" "~/.bashrc"))
 
 ;; Suspend the compile warnings
