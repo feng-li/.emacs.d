@@ -38,6 +38,9 @@
             (copy-sequence (normal-top-level-add-to-load-path '(".")))
             (normal-top-level-add-subdirs-to-load-path)))
          load-path)))
+;; Byte compile directory when files are changed
+(setq byte-compile-warnings nil)
+(byte-recompile-directory (expand-file-name "~/.emacs.d/site-lisp/") 0)
 
 ;; Additional library loaded during start up.
 (require 'iso-transl) ;; keyboard input definitions for ISO 8859/1
@@ -76,21 +79,17 @@
                                    ;;'(height . 55)) ; Height set to 60 lines
                                    default-frame-alist)))
 
-;; Personal info
+;; Personal information
 (setq frame-title-format "%b")
 (setq user-full-name "Feng Li")
 (setq user-mail-address "feng.li@stat.su.se")
 
 ;; Environment variables
-;; (setenv "PATH" (concat (getenv "PATH") ":~/.bin"))
-;; (setq exec-path (append exec-path '("~/.bin")))
+(setenv "PATH" (concat (getenv "PATH") ":~/.bin"))
+(setq exec-path (append exec-path '("~/.bin")))
 (setenv "OMP_NUM_THREADS" "1")
 (setenv "BIBINPUTS" "~/.texmf/bibtex/bib//")
 (setq explicit-bash-args '("--init-file" "~/.bashrc"))
-
-;; Suspend the compile warnings
-(setq byte-compile-warnings nil)
-
 
 ;; Settings for window-system available only
 ;; (when window-system
@@ -386,14 +385,18 @@
      (setq ido-ignore-files
            '("\\.Rc$" "\\.dvi$" "\\.pdf$" "\\.ps$" "\\.out$"
              "\\.log$" "\\.ods$" "\\.eps$" "\\#$" "\\.png$" "\\~$"
-             "\\.RData$" "\\.nav$" "\\.snm$" "\\`\\.\\./" "\\`\\./"))
+             "\\.RData$" "\\.nav$" "\\.snm$" "\\`\\.\\./" "\\`\\./"
+             "\\.synctex.gz$" "\\.fdb_latexmk$"))
+
+     (setq  ido-ignore-directories
+            '("\\.prv"))
 
      (setq ido-ignore-buffers
             '("\\` " "^\\*ESS\\*" "^\\*Messages\\*" "^\\*Help\\*" "^\\*Buffer"
               "^\\*Ibuffer*" "^\\*ESS-errors*" "^\\*Warnings*" "output*" "*TeX Help*" "*grep*"
               "^\\*.*Completions\\*$" "^\\*Ediff" "^\\*tramp" "^\\*cvs-"
               "_region_" "^TAGS$" "^\*Ido" "^\\*.*dictem buffer\\*$"
-              "^\\*inferior-lisp*"))
+              "^\\*inferior-lisp*" "^\\*Compile-Log\\*"))
 
      ))
 
@@ -705,11 +708,13 @@
      (setq LaTeX-math-abbrev-prefix "`")
 
      (add-hook 'LaTeX-mode-hook 'turn-on-auto-fill)
-     ;; (setq TeX-source-correlate-start-server t)
+
      (setq TeX-source-correlate-mode  t)
+     (setq TeX-source-correlate-start-server nil)
+
      (setq TeX-PDF-mode t) ;; use pdflatex by default
      ;(setq TeX-source-correlate-method (quote source-specials)) ; only for dvi
-     (setq TeX-source-correlate-method (quote synctex))
+     (setq TeX-source-correlate-method (quote synctex)) ; only for evince
      (setq bibtex-maintain-sorted-entries t)
 
      (require 'ac-math)
