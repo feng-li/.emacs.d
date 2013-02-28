@@ -837,6 +837,10 @@
 
      ;; (setq ess-use-auto-complete 'script-only)
 
+
+     ;; ESS tracebug
+     (setq ess-use-tracebug nil)
+
      (require 'ess-rutils)
      ;; (require 'ess-tracebug) ;; ESS tracebug
      (require 'ess-eldoc)
