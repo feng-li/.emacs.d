@@ -85,10 +85,10 @@
 (setq user-mail-address "feng.li@stat.su.se")
 
 ;; Environment variables
-(setenv "PATH" (concat (getenv "PATH") ":~/.bin"))
+(setenv "PATH" (concat "~/.bin:" (getenv "PATH")))
 (setq exec-path (append exec-path '("~/.bin")))
 (setenv "OMP_NUM_THREADS" "1")
-(setenv "BIBINPUTS" "~/.texmf/bibtex/bib//")
+(setenv "BIBINPUTS" (concat ".//:~/.texmf/bibtex/bib//" (getenv "BIBINPUTS")))
 (setq explicit-bash-args '("--init-file" "~/.bashrc"))
 
 ;; Settings for window-system available only
