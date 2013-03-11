@@ -1,33 +1,12 @@
-[submodule "site-lisp/ess"]
-	path = site-lisp/ess
-	url = git://github.com/emacs-ess/ESS.git
 [submodule "site-lisp/auto-complete"]
 	path = site-lisp/auto-complete
 	url = git://github.com/auto-complete/auto-complete.git
-[submodule "site-lisp/org-mode"]
-	path = site-lisp/org-mode
-	url = git://orgmode.org/org-mode.git
-[submodule "site-lisp/python.el"]
-	path = site-lisp/python.el
-	url = https://github.com/fgallina/python.el.git
-[submodule "site-lisp/yasnippet"]
-	path = site-lisp/yasnippet
-	url = https://github.com/capitaomorte/yasnippet.git
-[submodule "site-lisp/markdown-mode"]
-	path = site-lisp/markdown-mode
-	url = git://jblevins.org/git/markdown-mode.git
-[submodule "site-lisp/undo-tree"]
-	path = site-lisp/undo-tree
-	url = http://www.dr-qubit.org/git/undo-tree.git
-[submodule "site-lisp/egg"]
-	path = site-lisp/egg
-	url = https://github.com/byplayer/egg.git
-[submodule "site-lisp/git-emacs"]
-	path = site-lisp/git-emacs
-	url = https://github.com/tsgates/git-emacs.git
-[submodule "site-lisp/predictive"]
-	path = site-lisp/predictive
-	url = http://www.dr-qubit.org/git/predictive.git
 [submodule "site-lisp/popup-el"]
 	path = site-lisp/popup-el
 	url = git://github.com/auto-complete/popup-el.git
+[submodule "site-lisp/python.el"]
+	path = site-lisp/python.el
+	url = https://github.com/fgallina/python.el.git
+[submodule "site-lisp/markdown-mode"]
+	path = site-lisp/markdown-mode
+	url = git://jblevins.org/git/markdown-mode.git
