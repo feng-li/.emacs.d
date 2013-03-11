@@ -40,7 +40,7 @@
          load-path)))
 ;; Byte compile directory when files are changed
 (setq byte-compile-warnings nil)
-(byte-recompile-directory (expand-file-name "~/.emacs.d/site-lisp/") 0)
+;; (byte-recompile-directory (expand-file-name "~/.emacs.d/site-lisp/") 0)
 
 ;; Additional library loaded during start up.
 (require 'iso-transl) ;; keyboard input definitions for ISO 8859/1
@@ -61,8 +61,8 @@
 (require 'ess-site)
 ;;(require 'matlab-load)
 ;;(require 'egg)
-(require 'git-emacs)
-(require 'git-blame)
+;(require 'git-emacs)
+;(require 'git-blame)
 (require 'python)
 (require 'artbollocks-mode)
 (load "auctex.el" nil t t)
