@@ -1,3 +1,4 @@
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -11,7 +12,6 @@
  '(indicate-empty-lines nil)
  '(org-support-shift-select t)
  '(send-mail-function (quote mailclient-send-it))
- '(session-use-package t nil (session))
  '(show-paren-mode t nil (paren))
  '(text-mode-hook (quote (turn-on-auto-fill (lambda nil (flyspell-mode)) (lambda nil (turn-on-auto-fill)) text-mode-hook-identify)))
  '(tool-bar-mode nil)
@@ -286,6 +286,7 @@
 ;;Session(Keep section each time)
 (eval-after-load "session"
   '(progn
+     (setq session-use-package nil)
      (add-hook 'after-init-hook 'session-initialize)))
 
 ;; Cursor is bar: Not clear under console
