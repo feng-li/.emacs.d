@@ -131,7 +131,7 @@
 (global-set-key (kbd "C-<tab>") 'next-buffer)
 
 ;; Global auto revert mode
-(global-auto-revert-mode t)
+(global-auto-revert-mode nil)
 
 ;; Speed bar
 ;; (speedbar t)
