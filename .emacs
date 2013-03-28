@@ -30,6 +30,10 @@
 ;; Load all required packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; Byte compile directory when files are changed
+(setq byte-compile-warnings nil)
+(byte-recompile-directory (expand-file-name "~/.emacs.d/site-lisp/") 0)
+
 ;; Add personal load path recursively in front of the default load path
 (let ((default-directory "~/.emacs.d/site-lisp/"))
   (setq load-path
@@ -39,10 +43,6 @@
             (copy-sequence (normal-top-level-add-to-load-path '(".")))
             (normal-top-level-add-subdirs-to-load-path)))
          load-path)))
-
-;; Byte compile directory when files are changed
-(setq byte-compile-warnings nil)
-(byte-recompile-directory (expand-file-name "~/.emacs.d/site-lisp/") 0)
 
 ;; Additional library loaded during start up.
 (require 'iso-transl) ;; keyboard input definitions for ISO 8859/1
