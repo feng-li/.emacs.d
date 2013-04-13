@@ -91,6 +91,8 @@
 (setenv "PATH" (concat "~/.bin:" (getenv "PATH")))
 (setq exec-path (append exec-path '("~/.bin")))
 (setenv "OMP_NUM_THREADS" "1")
+
+(setenv "TEXMFHOME" (concat ".//:~/.texmf//" (getenv "TEXMFHOME")))
 (setenv "BIBINPUTS" (concat ".//:~/.texmf/bibtex/bib//" (getenv "BIBINPUTS")))
 (setq explicit-bash-args '("--init-file" "~/.bashrc"))
 
