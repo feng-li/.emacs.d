@@ -41,8 +41,8 @@
          load-path)))
 
 ;; Byte compile directory when files are changed
-(setq byte-compile-warnings nil)
-(byte-recompile-directory (expand-file-name "~/.emacs.d/site-lisp/") 0)
+;; (setq byte-compile-warnings nil)
+;; (byte-recompile-directory (expand-file-name "~/.emacs.d/site-lisp/") 0)
 
 
 ;; Additional library loaded during start up.
@@ -69,6 +69,8 @@
 (require 'python)
 (require 'artbollocks-mode)
 (load "auctex.el" nil t t)
+(load "preview-latex.el" nil t t)
+
 (require 'ibus nil 'noerror)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -78,22 +80,22 @@
 
 ;; Default frame height and width
 (setq default-frame-alist (append (list
-                                   '(width  . 85)  ; Width set to 81 characters
-                                   ;;'(height . 55)) ; Height set to 60 lines
-                                   default-frame-alist)))
+                                   '(width  . 90)  ; Width set (characters)
+                                   '(height . 55)) ; Height set (lines)
+                                   default-frame-alist))
 
 ;; Personal information
 (setq frame-title-format "%b")
 (setq user-full-name "Feng Li")
-(setq user-mail-address "feng.li@stat.su.se")
+(setq user-mail-address "m@feng.li")
 
 ;; Environment variables
 (setenv "PATH" (concat "~/.bin:" (getenv "PATH")))
 (setq exec-path (append exec-path '("~/.bin")))
 (setenv "OMP_NUM_THREADS" "1")
 
-(setenv "TEXMFHOME" (concat ".//:~/.texmf//" (getenv "TEXMFHOME")))
-(setenv "BIBINPUTS" (concat ".//:~/.texmf/bibtex/bib//" (getenv "BIBINPUTS")))
+(setenv "TEXMFHOME" (concat "./:~/.texmf//" (getenv "TEXMFHOME")))
+(setenv "BIBINPUTS" (concat "./:~/.texmf/bibtex/bib//" (getenv "BIBINPUTS")))
 (setq explicit-bash-args '("--init-file" "~/.bashrc"))
 
 ;; Settings for window-system available only
@@ -110,7 +112,7 @@
 
 
 ;; Default English fonts
-(add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono-11"))
+(add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono-10"))
 
 ;; Set Chinese fonts
 (set-fontset-font "fontset-default"
@@ -870,7 +872,9 @@
      (setq ess-history-file "~/.Rhistory")
 
      ;; Let help on new frame
-     (setq ess-help-own-frame 'one)
+     ;; (setq ess-help-own-frame t)
+
+
      (add-hook 'ess-mode-hook
                '(lambda ()
                   ;; ESS expression offset
