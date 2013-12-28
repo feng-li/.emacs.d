@@ -70,7 +70,6 @@
 (require 'artbollocks-mode)
 (load "auctex.el" nil t t)
 (load "preview-latex.el" nil t t)
-
 (require 'ibus nil 'noerror)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -96,6 +95,7 @@
 
 (setenv "TEXMFHOME" (concat "./:~/.texmf//" (getenv "TEXMFHOME")))
 (setenv "BIBINPUTS" (concat "./:~/.texmf/bibtex/bib//" (getenv "BIBINPUTS")))
+(setenv "BSTINPUTS" (concat "./:~/.texmf/bibtex/bst//" (getenv "BSTINPUTS")))
 (setq explicit-bash-args '("--init-file" "~/.bashrc"))
 
 ;; Settings for window-system available only
@@ -137,6 +137,10 @@
 
 ;; Global auto revert mode
 ;; (global-auto-revert-mode t)
+
+;; Key bind to increase and decrease text size
+(global-set-key (kbd "C-+") 'text-scale-increase)
+(global-set-key (kbd "C--") 'text-scale-decrease)
 
 ;; Speed bar
 ;; (speedbar t)
