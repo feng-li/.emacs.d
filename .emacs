@@ -89,13 +89,8 @@
 (setq user-mail-address "m@feng.li")
 
 ;; Environment variables
-(setenv "PATH" (concat "~/.bin:" (getenv "PATH")))
-(setq exec-path (append exec-path '("~/.bin")))
 (setenv "OMP_NUM_THREADS" "1")
 
-(setenv "TEXMFHOME" (concat "./:~/.texmf//" (getenv "TEXMFHOME")))
-(setenv "BIBINPUTS" (concat "./:~/.texmf/bibtex/bib//" (getenv "BIBINPUTS")))
-(setenv "BSTINPUTS" (concat "./:~/.texmf/bibtex/bst//" (getenv "BSTINPUTS")))
 (setq explicit-bash-args '("--init-file" "~/.bashrc"))
 
 ;; Settings for window-system available only
@@ -758,11 +753,6 @@
 
        (local-set-key (kbd "<f9> |") (lambda () (interactive) (insert "\\\left| \\\ right|")))
 
-       (fset 'my-insert-latex-equation
-             [?\\ ?\[ ?\\ ?\] left left return return up])
-       (local-set-key (kbd "<f9> \\") 'my-insert-latex-equation)
-
-       ;; (local-set-key (kbd "s-\\") (lambda () (interactive) (insert "\\\[\n \n\\\]")))
 
        ;; Use \bm{} to repace \mathbf{}
        (fset 'my-insert-bold-math
@@ -789,12 +779,11 @@
      (setq reftex-plug-into-AUCTeX t)
      (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
      (setq reftex-cite-format 'natbib)
-
-     ;; (setq reftex-use-external-file-finders t)
-     ;; (setq reftex-external-file-finders
-     ;;       '(("tex" . "!kpsewhich -format=.tex %f")
-     ;;         ("bib" . "!kpsewhich -format=.bib %f")))
-
+     (setq reftex-use-external-file-finders t)
+     (setq reftex-external-file-finders
+           '(("tex" . "kpsewhich -format=.tex %f")
+             ("bib" . "kpsewhich -format=.bib %f")
+	     ("bst" . "kpsewhich -format=.bst %f")))
 
      ;; LaTeX Command list
      (add-hook
