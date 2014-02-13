@@ -103,7 +103,7 @@
 (scroll-bar-mode -1)
 
 ;; Disable tool-bar
-(tool-bar-mode -1)
+;; (tool-bar-mode -1)
 
 
 ;; Default English fonts
@@ -467,10 +467,11 @@
 (eval-after-load "auto-complete-config"
   '(progn
      (ac-config-default)
-     (ac-flyspell-workaround)
+     (ac-flyspell-workaround) ; prevent AutoComplete striking as soon as I enable Flymake
      (setq ac-auto-start 2) ; nil of not auto start
      ;; (ac-set-trigger-key "TAB") ; unset this if auto-start
      (setq ac-menu-height 10)
+     (setq ac-use-comphist nil) ;slow when exit Emacs
      (define-key ac-completing-map [tab] 'ac-complete)
      (define-key ac-completing-map [return] nil)
      (setq ac-delay 0.05)
@@ -793,24 +794,24 @@
 
      (add-hook 'LaTeX-mode-hook (lambda()
                                   (add-to-list 'TeX-command-list
-                                               '("Encrypt-PDF" "pdftk \"%s.pdf\" output \"%s.SEC.pdf\" allow Printing owner_pw \"q13JCdG20yDTZr\"; mv \"%s.SEC.pdf\" \"%s.pdf\"" TeX-run-command nil nil))
+                                               '("Encrypt-PDF" "pdftk %s.pdf output %s.SEC.pdf allow Printing owner_pw q13JCdG20yDTZr; mv %s.SEC.pdf %s.pdf" TeX-run-command nil nil))
                                   (add-to-list 'TeX-command-list
-                                               '("Embed-Fonts-to-PDF" "gs -dSAFER -dNOPLATFONTS -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -dPDFSETTINGS=/prepress -dMaxSubsetPct=100 -dSubsetFonts=true -dEmbedAllFonts=true -sOutputFile=\"%s.embed.pdf\" -f  \"%s.pdf\";  mv \"%s.embed.pdf\" \"%s.pdf\" " TeX-run-command nil nil))
+                                               '("Embed-Fonts-to-PDF" "gs -dSAFER -dNOPLATFONTS -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -dPDFSETTINGS=/prepress -dMaxSubsetPct=100 -dSubsetFonts=true -dEmbedAllFonts=true -sOutputFile=%s.embed.pdf -f  %s.pdf;  mv %s.embed.pdf %s.pdf " TeX-run-command nil nil))
                                   (add-to-list 'TeX-command-list
-                                               '("TeX2LyX" "tex2lyx -f \"%s.tex\" \"../%s.lyx\" " TeX-run-command nil nil))
+                                               '("TeX2LyX" "tex2lyx -f %s.tex ../%s.lyx " TeX-run-command nil nil))
                                   (add-to-list 'TeX-command-list
-                                               '("LaTeXmk" "latexmk -pvc \"%s.tex\"" TeX-run-command nil nil))
+                                               '("LaTeXmk" "latexmk -pvc %s.tex" TeX-run-command nil nil))
                                   (add-to-list 'TeX-command-list
-                                               '("PdfLaTeXmk" "latexmk -pvc -pdf \"%s.tex\"" TeX-run-command nil nil))
+                                               '("PdfLaTeXmk" "latexmk -pvc -pdf %s.tex" TeX-run-command nil nil))
 
                                   (add-to-list 'TeX-command-list
-                                               '("LaTex-DVI-PS-PDF-Adobe" "latex \"%s.tex\"; dvips \"%s.dvi\" -o \"%s.ps\"; ps2pdf \"%s.ps\"; acroread \"%s.pdf\"" TeX-run-command nil nil))
+                                               '("LaTex-DVI-PS-PDF-Adobe" "latex %s.tex; dvips %s.dvi -o %s.ps; ps2pdf %s.ps; acroread %s.pdf" TeX-run-command nil nil))
                                   (add-to-list 'TeX-command-list
-                                               '("XeLaTeX-PDF-Adobe" "xelatex \"%s.tex\"; acroread \"%s.pdf\"" TeX-run-command nil nil))
+                                               '("XeLaTeX-PDF-Adobe" "xelatex %s.tex; acroread %s.pdf" TeX-run-command nil nil))
                                   (add-to-list 'TeX-command-list
-                                               '("LaTeX-DVIPDFMx-PDF-Adobe" "dvipdfmx %d; acroread \"%s.pdf\"" TeX-run-command nil nil))
+                                               '("LaTeX-DVIPDFMx-PDF-Adobe" "dvipdfmx %d; acroread %s.pdf" TeX-run-command nil nil))
                                   (add-to-list 'TeX-command-list
-                                               '("View-PDF-via-Adobe" "acroread \"%s.pdf\"" TeX-run-command nil nil))))
+                                               '("View-PDF-via-Adobe" "acroread %s.pdf" TeX-run-command nil nil))))
 
      (defun my-LaTeX-mode-hook ()
        "Key definitions for LaTeX mode."
