@@ -69,8 +69,9 @@
 (require 'python)
 (require 'artbollocks-mode)
 (load "auctex.el" nil t t)
-(load "preview-latex.el" nil t t)
 (require 'ibus nil 'noerror)
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -182,6 +183,9 @@
 (add-hook 'suspend-resume-hook
           (function (lambda () (message "Emacs resumed!"))))
 
+
+;;Mutt
+(add-to-list 'auto-mode-alist '("/mutt" . mail-mode))
 
 ;; HTML Print
 (eval-after-load "htmlize-view"
@@ -316,6 +320,7 @@
                'after-text-mode-hook
                'message-mode-hook
                'org-mode-hook
+	       'mail-mode-hook
                'ess-mode-hook))
   (add-hook hook '(lambda () (auto-fill-mode 1))))
 
@@ -792,26 +797,28 @@
       '(lambda ()
          (local-set-key (kbd "C-c `") 'TeX-next-error)))
 
-     (add-hook 'LaTeX-mode-hook (lambda()
-                                  (add-to-list 'TeX-command-list
-                                               '("Encrypt-PDF" "pdftk %s.pdf output %s.SEC.pdf allow Printing owner_pw q13JCdG20yDTZr; mv %s.SEC.pdf %s.pdf" TeX-run-command nil nil))
-                                  (add-to-list 'TeX-command-list
-                                               '("Embed-Fonts-to-PDF" "gs -dSAFER -dNOPLATFONTS -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -dPDFSETTINGS=/prepress -dMaxSubsetPct=100 -dSubsetFonts=true -dEmbedAllFonts=true -sOutputFile=%s.embed.pdf -f  %s.pdf;  mv %s.embed.pdf %s.pdf " TeX-run-command nil nil))
-                                  (add-to-list 'TeX-command-list
-                                               '("TeX2LyX" "tex2lyx -f %s.tex ../%s.lyx " TeX-run-command nil nil))
-                                  (add-to-list 'TeX-command-list
-                                               '("LaTeXmk" "latexmk -pvc %s.tex" TeX-run-command nil nil))
-                                  (add-to-list 'TeX-command-list
-                                               '("PdfLaTeXmk" "latexmk -pvc -pdf %s.tex" TeX-run-command nil nil))
-
-                                  (add-to-list 'TeX-command-list
-                                               '("LaTex-DVI-PS-PDF-Adobe" "latex %s.tex; dvips %s.dvi -o %s.ps; ps2pdf %s.ps; acroread %s.pdf" TeX-run-command nil nil))
-                                  (add-to-list 'TeX-command-list
-                                               '("XeLaTeX-PDF-Adobe" "xelatex %s.tex; acroread %s.pdf" TeX-run-command nil nil))
-                                  (add-to-list 'TeX-command-list
-                                               '("LaTeX-DVIPDFMx-PDF-Adobe" "dvipdfmx %d; acroread %s.pdf" TeX-run-command nil nil))
-                                  (add-to-list 'TeX-command-list
-                                               '("View-PDF-via-Adobe" "acroread %s.pdf" TeX-run-command nil nil))))
+     (add-hook 'LaTeX-mode-hook
+               (lambda()
+                 (add-to-list 'TeX-command-list
+                              '("Encrypt-PDF" "pdftk %s.pdf output \%s.SEC.pdf allow Printing owner_pw q13JCdG20yDTZr; mv %s.SEC.pdf %s.pdf"
+                                TeX-run-command nil (latex-mode)))
+                 (add-to-list 'TeX-command-list
+                              '("Embed-Fonts-to-PDF" "gs -dSAFER -dNOPLATFONTS -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -dPDFSETTINGS=/prepress -dMaxSubsetPct=100 -dSubsetFonts=true -dEmbedAllFonts=true -sOutputFile=%s.embed.pdf -f  %s.pdf;  mv %s.embed.pdf %s.pdf "
+                                TeX-run-command nil (latex-mode)))
+                 (add-to-list 'TeX-command-list
+                              '("TeX2LyX" "tex2lyx -f %s.tex ../%s.lyx "
+                                TeX-run-command nil (latex-mode)))
+                 (add-to-list 'TeX-command-list
+                              '("View-PDF-via-Adobe" "acroread %s.pdf"
+                                TeX-run-command nil (latex-mode)))
+                 (add-to-list 'TeX-command-list
+                              '("LaTeXMk-XeLaTeX"
+                                "latexmk -r ~/.latexmk/xelatex %t"
+                                TeX-run-TeX nil (latex-mode)))
+                 (add-to-list 'TeX-command-list
+                              '("LaTeXMk-PdfLaTeX"
+                                "latexmk -r ~/.latexmk/pdflatex %t"
+                                TeX-run-TeX nil (latex-mode)))))
 
      (defun my-LaTeX-mode-hook ()
        "Key definitions for LaTeX mode."
