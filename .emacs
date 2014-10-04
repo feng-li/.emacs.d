@@ -11,23 +11,24 @@
  '(indicate-empty-lines nil)
  '(org-support-shift-select t)
  '(send-mail-function (quote mailclient-send-it))
+                                        ;'(session-use-package t nil (session))
  '(show-paren-mode t nil (paren))
  '(text-mode-hook (quote (turn-on-auto-fill (lambda nil (flyspell-mode)) (lambda nil (turn-on-auto-fill)) text-mode-hook-identify)))
  '(tool-bar-mode nil)
  '(warning-suppress-types (quote ((undo discard-info)))))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Feng Li's .emacs configurations
 ;;
 ;; Copyright: Feng Li <http://feng.li/>
 ;;
 ;; Download: https://github.com/feng-li/.emacs.d
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Load all required packages
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 ;; Add personal load path recursively in front of the default load path
@@ -44,7 +45,6 @@
 ;; (setq byte-compile-warnings nil)
 ;; (byte-recompile-directory (expand-file-name "~/.emacs.d/site-lisp/") 0)
 
-
 ;; Additional library loaded during start up.
 (require 'iso-transl) ;; keyboard input definitions for ISO 8859/1
 (require 'htmlize-view)
@@ -57,19 +57,19 @@
 ;; (require 'flymake)
 (require 'dictem nil 'noerror)
 (require 'auto-complete-config)
-;;(require 'highlight-parentheses)
+;; (require 'highlight-parentheses)
 (require 'auto-highlight-symbol)
-;;(require 'yasnippet)
+;; (require 'yasnippet)
 (require 'info-look)
 (require 'ess-site)
-;;(require 'matlab-load)
-;;(require 'egg)
-;(require 'git-emacs)
-;(require 'git-blame)
+;; (require 'matlab-load)
+;; (require 'egg)
+;; (require 'git-emacs)
+;; (require 'git-blame)
 (require 'python)
 (require 'artbollocks-mode)
 (load "auctex.el" nil t t)
-(require 'ibus nil 'noerror)
+;; (require 'ibus nil 'noerror)
 
 
 
@@ -80,9 +80,9 @@
 
 ;; Default frame height and width
 (setq default-frame-alist (append (list
-                                   '(width  . 90)  ; Width set (characters)
+                                   '(width  . 95)  ; Width set (characters)
                                    '(height . 55)) ; Height set (lines)
-                                   default-frame-alist))
+                                  default-frame-alist))
 
 ;; Personal information
 (setq frame-title-format "%b")
@@ -106,21 +106,25 @@
 ;; Disable tool-bar
 ;; (tool-bar-mode -1)
 
-
 ;; Default English fonts
-(add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono-10"))
+(add-to-list 'default-frame-alist '(font . "Inconsolata-12"))
 
 ;; Set Chinese fonts
+;; Rescale fonts to match English fonts
+(when window-system
+  (setq face-font-rescale-alist (list (cons "Microsoft YaHei" 1.0))))
+
+;; The Chinese fonts mapping list
 (set-fontset-font "fontset-default"
-                  'han '("Adobe Heiti Std" . "unicode-bmp"))
+                  'han '("Microsoft YaHei" . "unicode-bmp"))
 (set-fontset-font "fontset-default"
-                  'cjk-misc '("Adobe Heiti Std" . "unicode-bmp"))
+                  'cjk-misc '("Microsoft YaHei" . "unicode-bmp"))
 (set-fontset-font "fontset-default"
-                  'bopomofo '("Adobe Heiti Std" . "unicode-bmp"))
+                  'bopomofo '("Microsoft YaHei" . "unicode-bmp"))
 (set-fontset-font "fontset-default"
-                  'gb18030 '("Adobe Heiti Std". "unicode-bmp"))
+                  'gb18030 '("Microsoft YaHei". "unicode-bmp"))
 (set-fontset-font "fontset-default"
-                  'symbol '("Adobe Heiti Std". "unicode-bmp"))
+                  'symbol '("Microsoft YaHei". "unicode-bmp"))
 
 ;; Disable menu bar
 (menu-bar-mode t)
@@ -153,7 +157,7 @@
 
 ;; Saving options
 (fset 'single-line-only
-   [?\C-x ?h ?\C-\M-\% ?^ ?\C-q ?\C-j ?\C-q ?\C-j ?+ return ?\C-q ?\C-j return])
+      [?\C-x ?h ?\C-\M-\% ?^ ?\C-q ?\C-j ?\C-q ?\C-j ?+ return ?\C-q ?\C-j return])
 
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
@@ -307,13 +311,15 @@
 (setq kill-ring-max 150)
 
 ;; set the default fill column
-(setq default-fill-column 79)
+(setq default-fill-column 90)
 
 ;; set the fill column in text/org mode
 (dolist (hook (list
                'after-text-mode-hook
-               'org-mode-hook))
-  (add-hook hook '(lambda () (setq fill-column 60))))
+               'org-mode-hook
+               'TeX-mode-hook
+               'mail-mode-hook))
+  (add-hook hook '(lambda () (setq fill-column 70))))
 
 ;; auto fill mode
 (dolist (hook (list
@@ -330,15 +336,15 @@
 
 (setq ring-bell-function (lambda ()  t))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Diary mode
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (setq diary-file "~/workspace/diary")
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Matlab, Octave mode
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 ;; Matlab support
@@ -353,9 +359,9 @@
 
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; General IDE settings (ElDoc, ECB, Comint...)
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Ibuffer mode
 
@@ -406,12 +412,12 @@
             '("\\.prv"))
 
      (setq ido-ignore-buffers
-            '("\\` " "^\\*ESS\\*" "^\\*Messages\\*" "^\\*Help\\*" "^\\*Buffer"
-              "^\\*Ibuffer*" "^\\*ESS-errors*" "^\\*Warnings*" "output*" "*TeX Help*" "*grep*"
-              "^\\*.*Completions\\*$" "^\\*Ediff" "^\\*tramp" "^\\*cvs-"
-              "_region_" "^TAGS$" "^\*Ido" "^\\*.*dictem buffer\\*$"
-              "^\\*inferior-lisp*" "^\\*Compile-Log\\*"))
-
+           '("\\` " "^\\*ESS\\*" "^\\*Messages\\*" "^\\*Help\\*"
+             "^\\*Buffer" "^\\*Ibuffer*" "^\\*ESS-errors*"
+             "^\\*Warnings*" "output*" "*TeX Help*" "*grep*"
+             "^\\*.*Completions\\*$" "^\\*Ediff" "^\\*tramp" "^\\*cvs-"
+             "_region_" "^TAGS$" "^\*Ido" "^\\*.*dictem buffer\\*$"
+             "^\\*inferior-lisp*" "^\\*Compile-Log\\*"))
      ))
 
 ;; ElDoc mode
@@ -525,7 +531,7 @@
 ;;(global-set-key "\'" 'skeleton-pair-insert-maybe)
 
 ;; Commenting
-(global-set-key "\M-3" 'comment-or-uncomment-region) ; Swedish keyboard
+(global-set-key (kbd "M-#") 'comment-or-uncomment-region)
 
 ;; (eval-after-load "yasnippet"
 ;;   '(progn
@@ -540,7 +546,7 @@
 
 
 ;; Goto matched parenthesis
-(global-set-key (kbd "M-6") 'goto-match-paren) ;;
+(global-set-key (kbd "?") 'goto-match-paren) ;;
 (defun goto-match-paren (arg)
   "Go to the matching  if on (){}[], similar to vi style of % "
   (interactive "p")
@@ -572,7 +578,8 @@
 (global-set-key (kbd "<f9> c") 'flyspell-auto-correct-word)
 
 ;; Fly spell performance
-;; (setq flyspell-issue-message-flag nil)
+(setq flyspell-issue-welcome-flag nil)
+(setq flyspell-issue-message-flag nil)
 
 ;; Fly spell mode
 (dolist (hook '(text-mode-hook))
@@ -612,17 +619,91 @@
 ;;(define-key dictem-mode-map [(backtab)] 'dictem-previous-link)
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Markdown mode
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (eval-after-load "markdown-mode"
   '(progn
      (setq auto-mode-alist
            (cons '("\\.md" . markdown-mode) auto-mode-alist))))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Org-mode
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(require 'org-latex)
+(setq org-export-latex-listings t)
+
+;; Originally taken from Bruno Tavernier:
+;; http://thread.gmane.org/gmane.emacs.orgmode/31150/focus=31432
+;; but adapted to use latexmk 4.20 or higher.
+(defun my-auto-tex-cmd ()
+  "When exporting from .org with latex, automatically run latex,
+     pdflatex, or xelatex as appropriate, using latexmk."
+  (let ((texcmd)))
+  ;; default command: oldstyle latex via dvi
+  (setq texcmd "latexmk -dvi -pdfps -quiet %f")
+  ;; pdflatex -> .pdf
+  (if (string-match "LATEX_CMD: pdflatex" (buffer-string))
+      (setq texcmd "latexmk -pdf -quiet %f"))
+  ;; xelatex -> .pdf
+  (if (string-match "LATEX_CMD: xelatex" (buffer-string))
+      (setq texcmd "latexmk -pdflatex=xelatex -pdf -quiet %f"))
+  ;; LaTeX compilation command
+  (setq org-latex-to-pdf-process (list texcmd)))
+
+(add-hook 'org-export-latex-after-initial-vars-hook 'my-auto-tex-cmd)
+
+
+;; Specify default packages to be included in every tex file, whether pdflatex or xelatex
+(setq org-export-latex-packages-alist
+      '(("" "graphicx" t)
+        ("" "longtable" nil)
+        ("" "float" nil)))
+
+(defun my-auto-tex-parameters ()
+  "Automatically select the tex packages to include."
+  ;; default packages for ordinary latex or pdflatex export
+  (setq org-export-latex-default-packages-alist
+        '(("AUTO" "inputenc" t)
+          ("T1"   "fontenc"   t)
+          (""     "fixltx2e"  nil)
+          (""     "wrapfig"   nil)
+          (""     "soul"      t)
+          (""     "textcomp"  t)
+          (""     "marvosym"  t)
+          (""     "wasysym"   t)
+          (""     "latexsym"  t)
+          (""     "amssymb"   t)
+          (""     "hyperref"  nil)))
+
+  ;; Packages to include when xelatex is used
+  (if (string-match "LATEX_CMD: xelatex" (buffer-string))
+      (setq org-export-latex-default-packages-alist
+            '(("" "fontspec" t)
+              ("" "xunicode" t)
+              ("" "url" t)
+              ("adobefonts,nocap" "ctex" t) ;; CTEX support
+              ("" "rotating" t)
+              ("american" "babel" t)
+              ("babel" "csquotes" t)
+              ("" "soul" t)
+              ("xetex" "hyperref" nil)
+              )))
+
+  (if (string-match "LATEX_CMD: xelatex" (buffer-string))
+      (setq org-export-latex-classes
+            (cons '("article"
+                    "\\documentclass[11pt,article,oneside]{memoir}"
+                    ("\\section{%s}" . "\\section*{%s}")
+                    ("\\subsection{%s}" . "\\subsection*{%s}")
+                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                    ("\\paragraph{%s}" . "\\paragraph*{%s}")
+                    ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))
+                  org-export-latex-classes))))
+
+(add-hook 'org-export-latex-after-initial-vars-hook 'my-auto-tex-parameters)
+
 (eval-after-load "org-install"
   '(progn
      ;; (require 'org)
@@ -666,49 +747,12 @@
               :sitemap-title "Sitemap"
               )
 
-             ;; ("org-notes-jekyll"
-             ;;  :base-directory "~/workspace/web/org/"
-             ;;  :base-extension "org"
-             ;;  :publishing-directory "~/workspace/web/feng-li.github.com/_posts"
-             ;;  :publishing-function org-publish-org-to-html
-             ;;  :recursive t
-             ;;  :headline-levels 4
-             ;;  :html-extension "html"
-             ;;  :body-only t ;; Only export section between <body> </body>
-             ;;  :section-numbers nil
-             ;;  :table-of-contents nil
-             ;;  )
-
-             ;; ("org-static"
-             ;;  :base-directory "~/workspace/web/org/"
-             ;;  :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf\\|sas\\|xls"
-             ;;  :publishing-directory "~/workspace/web/public_html/"
-             ;;  :recursive t
-             ;;  :publishing-function org-publish-attachment
-             ;;  )
-
-             ;; ("org-static-jekyll"
-             ;;  :base-directory "~/workspace/web/org/"
-             ;;  :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf\\|sas\\|xls"
-             ;;  :publishing-directory "~/workspace/web/feng-li.github.com/"
-             ;;  :recursive t
-             ;;  :publishing-function org-publish-attachment
-             ;;  )
-
-             ;; ("website-html"
-             ;;  :components ("org-notes" "org-static")
-             ;;  )
-             ;; ("website-jekyll"
-             ;;  :components ("org-notes-jekyll" "org-static-jekyll")
-             ;;  )
-
-
              ))
      ))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; LaTeX
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (eval-after-load "auctex.el"
   '(progn
      (load "preview-latex.el" nil t t)
@@ -728,7 +772,7 @@
      (setq TeX-source-correlate-start-server nil)
 
      (setq TeX-PDF-mode t) ;; use pdflatex by default
-     ;(setq TeX-source-correlate-method (quote source-specials)) ; only for dvi
+                                        ;(setq TeX-source-correlate-method (quote source-specials)) ; only for dvi
      (setq TeX-source-correlate-method (quote synctex)) ; only for evince
      (setq bibtex-maintain-sorted-entries t)
 
@@ -745,6 +789,7 @@
                        ac-source-words-in-same-mode-buffers)
                      ac-sources)))
      (add-hook 'LaTeX-mode-hook 'ac-latex-mode-setup)
+     (setq ac-math-unicode-in-math-p nil)
 
      ;; Add short cuts, hold Windows key
      (defun auctex-insert-special ()
@@ -759,6 +804,10 @@
 
        (local-set-key (kbd "<f9> |") (lambda () (interactive) (insert "\\\left| \\\ right|")))
 
+       (local-set-key (kbd "<f9> |") (lambda () (interactive) (insert "\\\left| \\\ right|")))
+
+
+       (local-set-key (kbd "C-\\") (lambda () (interactive) (insert "\\")))
 
        ;; Use \bm{} to repace \mathbf{}
        (fset 'my-insert-bold-math
@@ -826,9 +875,9 @@
      (add-hook 'LaTeX-mode-hook 'my-LaTeX-mode-hook)
      (fset 'latex-or-view [?\C-c ?\C-c])))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; ESS (Emacs speaks statistics)
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; ESS
 (eval-after-load "ess-site"
@@ -901,8 +950,7 @@
                          (cons "param" "")
                          (cons "return" "NA")
                          (cons "references" "NA")
-                         (cons "author" "Feng Li, Department of Statistics, Stockholm University, Sweden.")
-                         (cons "note" "Created: ; Current: .")))
+                         (cons "author" "Feng Li, Central University of Finance and Economics.")))
 
                   (font-lock-add-keywords nil
                                           '(("\\<\\(FIXME\\):" 1 font-lock-warning-face t)
@@ -979,9 +1027,9 @@
      (add-hook 'ess-mode-hook 'ess-code-style)
      (add-hook 'inferior-ess-mode-hook 'ess-code-style)))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Python IDE
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 (eval-after-load "python"
@@ -1080,20 +1128,23 @@
                   ))
      ))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customize faces
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:family "lucidatypewriter" :foundry "b&h" :slant normal :weight normal :height 128 :width normal))))
  '(ess-function-call-face ((t (:foreground "cyan"))))
+ '(flyspell-duplicate ((t (:underline (:color "orange" :style wave)))))
+ '(flyspell-incorrect ((t (:underline (:color "red" :style wave)))))
  '(font-latex-italic-face ((t (:slant italic))))
+ '(font-latex-verbatim-face ((t (:foreground "SaddleBrown"))))
  '(font-lock-builtin-face ((t (:foreground "darkcyan"))))
- '(font-lock-comment-face ((t (:foreground "blue" :slant italic))))
- '(font-lock-function-name-face ((t (:foreground "darkcyan" :slant italic :weight bold))))
+ '(font-lock-comment-face ((t (:foreground "blue"))))
+ '(font-lock-function-name-face ((t (:foreground "blue" :underline t))))
+ '(font-lock-keyword-face ((t (:foreground "magenta"))))
  '(font-lock-string-face ((t (:foreground "darkgreen"))))
  '(match ((t (:background "yellow1" :foreground "black"))))
  '(minibuffer-prompt ((t (:foreground "magenta")))))
