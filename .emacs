@@ -11,7 +11,7 @@
  '(indicate-empty-lines nil)
  '(org-support-shift-select t)
  '(send-mail-function (quote mailclient-send-it))
-                                        ;'(session-use-package t nil (session))
+ ;;'(session-use-package t nil (session))
  '(show-paren-mode t nil (paren))
  '(text-mode-hook (quote (turn-on-auto-fill (lambda nil (flyspell-mode)) (lambda nil (turn-on-auto-fill)) text-mode-hook-identify)))
  '(tool-bar-mode nil)
@@ -302,7 +302,7 @@
      (add-hook 'after-init-hook 'session-initialize)))
 
 ;; Cursor is bar: Not clear under console
-(setq-default cursor-type 'bar)
+(setq-default cursor-type 'box)
 
 ;;set visible-bell
 (setq visible-bell t)
