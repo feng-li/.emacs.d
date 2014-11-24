@@ -13,3 +13,6 @@
 [submodule "site-lisp/ESS"]
 	path = site-lisp/ESS
 	url = git@github.com:emacs-ess/ESS.git
+[submodule "site-lisp/math-symbol-lists"]
+	path = site-lisp/math-symbol-lists
+	url = git@github.com:vspinu/math-symbol-lists.git
