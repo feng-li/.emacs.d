@@ -631,7 +631,7 @@
 ;; Org-mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(require 'org-latex)
+;; (require 'org-latex)
 (setq org-export-latex-listings t)
 
 ;; Originally taken from Bruno Tavernier:
