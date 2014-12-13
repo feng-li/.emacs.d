@@ -11,9 +11,16 @@
  '(indicate-empty-lines nil)
  '(org-support-shift-select t)
  '(send-mail-function (quote mailclient-send-it))
- ;;'(session-use-package t nil (session))
+;; '(session-use-package t nil (session))
  '(show-paren-mode t nil (paren))
- '(text-mode-hook (quote (turn-on-auto-fill (lambda nil (flyspell-mode)) (lambda nil (turn-on-auto-fill)) text-mode-hook-identify)))
+ '(text-mode-hook
+   (quote
+    (turn-on-auto-fill
+     (lambda nil
+       (flyspell-mode))
+     (lambda nil
+       (turn-on-auto-fill))
+     text-mode-hook-identify)))
  '(tool-bar-mode nil)
  '(warning-suppress-types (quote ((undo discard-info)))))
 
@@ -530,7 +537,7 @@
 ;;(global-set-key "\'" 'skeleton-pair-insert-maybe)
 
 ;; Commenting
-(global-set-key (kbd "M-#") 'comment-or-uncomment-region)
+(global-set-key (kbd "M-3") 'comment-or-uncomment-region)
 
 ;; (eval-after-load "yasnippet"
 ;;   '(progn
@@ -630,124 +637,13 @@
 ;; Org-mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; (require 'org-latex)
-(setq org-export-latex-listings t)
-
-;; Originally taken from Bruno Tavernier:
-;; http://thread.gmane.org/gmane.emacs.orgmode/31150/focus=31432
-;; but adapted to use latexmk 4.20 or higher.
-(defun my-auto-tex-cmd ()
-  "When exporting from .org with latex, automatically run latex,
-     pdflatex, or xelatex as appropriate, using latexmk."
-  (let ((texcmd)))
-  ;; default command: oldstyle latex via dvi
-  (setq texcmd "latexmk -dvi -pdfps -quiet %f")
-  ;; pdflatex -> .pdf
-  (if (string-match "LATEX_CMD: pdflatex" (buffer-string))
-      (setq texcmd "latexmk -pdf -quiet %f"))
-  ;; xelatex -> .pdf
-  (if (string-match "LATEX_CMD: xelatex" (buffer-string))
-      (setq texcmd "latexmk -pdflatex=xelatex -pdf -quiet %f"))
-  ;; LaTeX compilation command
-  (setq org-latex-to-pdf-process (list texcmd)))
-
-(add-hook 'org-export-latex-after-initial-vars-hook 'my-auto-tex-cmd)
-
-
-;; Specify default packages to be included in every tex file, whether pdflatex or xelatex
-(setq org-export-latex-packages-alist
-      '(("" "graphicx" t)
-        ("" "longtable" nil)
-        ("" "float" nil)))
-
-(defun my-auto-tex-parameters ()
-  "Automatically select the tex packages to include."
-  ;; default packages for ordinary latex or pdflatex export
-  (setq org-export-latex-default-packages-alist
-        '(("AUTO" "inputenc" t)
-          ("T1"   "fontenc"   t)
-          (""     "fixltx2e"  nil)
-          (""     "wrapfig"   nil)
-          (""     "soul"      t)
-          (""     "textcomp"  t)
-          (""     "marvosym"  t)
-          (""     "wasysym"   t)
-          (""     "latexsym"  t)
-          (""     "amssymb"   t)
-          (""     "hyperref"  nil)))
-
-  ;; Packages to include when xelatex is used
-  (if (string-match "LATEX_CMD: xelatex" (buffer-string))
-      (setq org-export-latex-default-packages-alist
-            '(("" "fontspec" t)
-              ("" "xunicode" t)
-              ("" "url" t)
-              ("adobefonts,nocap" "ctex" t) ;; CTEX support
-              ("" "rotating" t)
-              ("american" "babel" t)
-              ("babel" "csquotes" t)
-              ("" "soul" t)
-              ("xetex" "hyperref" nil)
-              )))
-
-  (if (string-match "LATEX_CMD: xelatex" (buffer-string))
-      (setq org-export-latex-classes
-            (cons '("article"
-                    "\\documentclass[11pt,article,oneside]{memoir}"
-                    ("\\section{%s}" . "\\section*{%s}")
-                    ("\\subsection{%s}" . "\\subsection*{%s}")
-                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                    ("\\paragraph{%s}" . "\\paragraph*{%s}")
-                    ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))
-                  org-export-latex-classes))))
-
-(add-hook 'org-export-latex-after-initial-vars-hook 'my-auto-tex-parameters)
-
-(eval-after-load "org-install"
-  '(progn
-     ;; (require 'org)
-     ;; (require 'org-html)
-     ;; (require 'htmlize)
-     (setq org-export-default-language "en"
-           org-export-html-extension "html"
-           org-export-with-timestamps t
-           org-export-with-section-numbers nil
-           org-export-with-tags 'not-in-toc
-           org-export-skip-text-before-1st-heading nil
-           org-export-with-sub-superscripts '{}
-           org-export-with-LaTeX-fragments t
-           org-export-with-archived-trees nil
-           org-export-highlight-first-table-line t
-           org-export-latex-listings-w-names nil
-           org-export-html-style-include-default nil
-           org-export-htmlize-output-type 'css
-           org-startup-folded nil
-           org-publish-list-skipped-files t
-           org-publish-use-timestamps-flag t
-           org-export-babel-evaluate nil
-           org-confirm-babel-evaluate nil)
-
-     (setq org-publish-project-alist
-           '(("org-web"
-              :publishing-function org-publish-org-to-html
-              :base-directory "~/workspace/web/org/"
-              :publishing-directory "~/workspace/web/html/"
-              :base-extension "org"
-              :html-extension "html"
-              :recursive t
-              :section-numbers nil
-              :table-of-contents nil
-              ;;  :html-preamble ,(org-get-file-contents "~/workspace/web/html/style/preamble.html")
-              ;; :html-postamble ,(org-get-file-contents "~/workspace/web/html/style/postamble.html")
-
-              ;; :style ,(org-get-file-contents "~/workspace/web/html/style/stylesheet.html")
-              :auto-sitemap t
-              :sitemap-filename "sitemap.org"
-              :sitemap-title "Sitemap"
-              )
-
-             ))
-     ))
+(add-hook 'org-mode-hook
+      '(lambda ()
+         (setq org-file-apps
+               (quote
+                ((auto-mode . emacs)
+                 ("\\.x?html?\\'" . default)
+                 ("\\.pdf\\'" . "evince %s"))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; LaTeX
@@ -816,13 +712,6 @@
 
      ;; Enable file-line-error to avoid error message "Error occured after last TeX file closed"
      (setq LaTeX-command-style (quote (("" "%(PDF)%(latex) -file-line-error %S%(PDFout)"))))
-
-     ;; TeX view program
-     ;; (setq TeX-output-view-style
-     ;;       (quote
-     ;;        (("^pdf$" "." "evince -f %o")
-     ;;         )))
-     ;; (setq TeX-view-program-selection (quote ((output-dvi "xdvi") (output-pdf "evince") )))
 
 
      (add-hook 'LaTeX-mode-hook (lambda ()
@@ -928,18 +817,6 @@
                '(lambda ()
                   ;; ESS expression offset
                   (setq ess-arg-function-offset-new-line '(4))
-
-                  ;; (require 'r-autoyas)
-                  ;; (define-key ess-mode-map (kbd "C-M-<tab>")
-                  ;;   '(lambda ()(interactive)
-                  ;;      (r-autoyas-expand nil nil)))
-
-                  ;; ESS tooltip (C-i)
-                  ;; (when window-system
-                  ;;   (keyboard-translate ?\C-i ?\H-i)
-                  ;;   (define-key ess-mode-map (kbd "H-i") 'ess-R-object-tooltip)
-                  ;;   (define-key inferior-ess-mode-map (kbd "H-i") 'ess-R-object-tooltip))
-
 
                   ;;Roxygen template
                   (setq ess-roxy-template-alist
@@ -1142,7 +1019,7 @@
  '(font-latex-verbatim-face ((t (:foreground "SaddleBrown"))))
  '(font-lock-builtin-face ((t (:foreground "darkcyan"))))
  '(font-lock-comment-face ((t (:foreground "blue"))))
- '(font-lock-function-name-face ((t (:foreground "blue" :underline t))))
+ '(font-lock-function-name-face ((t (:foreground "blue" :weight bold))))
  '(font-lock-keyword-face ((t (:foreground "magenta"))))
  '(font-lock-string-face ((t (:foreground "darkgreen"))))
  '(match ((t (:background "yellow1" :foreground "black"))))
