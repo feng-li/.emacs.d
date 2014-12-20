@@ -11,7 +11,7 @@
  '(indicate-empty-lines nil)
  '(org-support-shift-select t)
  '(send-mail-function (quote mailclient-send-it))
-;; '(session-use-package t nil (session))
+ ;; '(session-use-package t nil (session))
  '(show-paren-mode t nil (paren))
  '(text-mode-hook
    (quote
@@ -85,57 +85,51 @@
 ;; (setq default-directory "~/workspace/")
 
 ;; Default frame height and width
-(setq default-frame-alist (append (list
-                                   '(width  . 95)  ; Width set (characters)
-                                   '(height . 55)) ; Height set (lines)
-                                  default-frame-alist))
+(setq default-frame-alist
+      (append (list '(width  . 95)  ; Width set (characters)
+                    '(height . 55)) ; Height set (lines)
+              default-frame-alist))
+;; set the default fill column
+(setq default-fill-column 90)
 
 ;; Personal information
 (setq frame-title-format "%b")
 (setq user-full-name "Feng Li")
 (setq user-mail-address "m@feng.li")
 
+;; Desktop save mode
+(desktop-save-mode 1)
+
 ;; Environment variables
 (setenv "OMP_NUM_THREADS" "1")
 
 (setq explicit-bash-args '("--init-file" "~/.bashrc"))
 
-;; Settings for window-system available only
-;; (when window-system
-
-;; Desktop save mode
-;; (desktop-save-mode)
 
 ;; Disable scroll-bar
 (scroll-bar-mode -1)
 
-;; Disable tool-bar
+;; tool-bar mode
 ;; (tool-bar-mode -1)
 
-;; Default English fonts
-(add-to-list 'default-frame-alist '(font . "Inconsolata-12"))
 
-;; Set Chinese fonts
-;; Rescale fonts to match English fonts
-(when window-system
-  (setq face-font-rescale-alist (list (cons "Microsoft YaHei" 1.0))))
+;; Set Fonts
+(defun my-default-font()
+  (interactive)
+  (set-default-font "Inconsolata-12")
+  (setq face-font-rescale-alist (list (cons "Microsoft YaHei" 1.0)))
+  (set-fontset-font "fontset-default"
+		    'unicode '("Microsoft YaHei" . "unicode-bmp")))
+(add-to-list 'after-make-frame-functions
+             (lambda (new-frame)
+               (select-frame new-frame)
+               (my-default-font)))
 
-;; The Chinese fonts mapping list
-(set-fontset-font "fontset-default"
-                  'han '("Microsoft YaHei" . "unicode-bmp"))
-(set-fontset-font "fontset-default"
-                  'cjk-misc '("Microsoft YaHei" . "unicode-bmp"))
-(set-fontset-font "fontset-default"
-                  'bopomofo '("Microsoft YaHei" . "unicode-bmp"))
-(set-fontset-font "fontset-default"
-                  'gb18030 '("Microsoft YaHei". "unicode-bmp"))
-(set-fontset-font "fontset-default"
-                  'symbol '("Microsoft YaHei". "unicode-bmp"))
 
-;; Disable menu bar
+;; Menu bar
 (menu-bar-mode t)
 
-;; Disable tooltip
+;; Tooltip mode
 (tooltip-mode nil)
 
 ;; Control-tab to switch among buffers
@@ -268,12 +262,18 @@
   (switch-to-buffer (other-buffer)))
 (global-set-key (kbd "ESC <f2>") 'switch-to-previous-buffer)
 
-;;;set server-start
-;; (if (and (fboundp 'server-running-p)
-;;          (not (server-running-p)))
-;;   (server-start)
-;; )
-
+;; set server-start
+(if (and (fboundp 'server-running-p)
+         (not (server-running-p)))
+  (server-start)
+  )
+(add-hook 'server-switch-hook
+          (lambda ()
+            (when (current-local-map)
+              (use-local-map (copy-keymap (current-local-map))))
+            (when server-buffer-clients
+              (local-set-key (kbd "C-x k") 'server-edit))))
+(add-hook 'server-done-hook 'delete-frame)
 
 ;;stop start up message
 (setq inhibit-startup-message t)
@@ -316,16 +316,14 @@
 ;; set big kill ring
 (setq kill-ring-max 150)
 
-;; set the default fill column
-(setq default-fill-column 90)
 
 ;; set the fill column in text/org mode
-(dolist (hook (list
-               'after-text-mode-hook
-               'org-mode-hook
-               'TeX-mode-hook
-               'mail-mode-hook))
-  (add-hook hook '(lambda () (setq fill-column 70))))
+;; (dolist (hook (list
+;;                'after-text-mode-hook
+;;                'org-mode-hook
+;;                'TeX-mode-hook
+;;                'mail-mode-hook))
+;;   (add-hook hook '(lambda () (setq fill-column 70))))
 
 ;; auto fill mode
 (dolist (hook (list
@@ -377,27 +375,28 @@
      (global-set-key (kbd "<f9> i") 'ibuffer)
 
      (setq ibuffer-saved-filter-groups
-           (quote (("default"
-                    ("Scripts" (or
-                                (mode . ess-mode)
-                                (mode . emacs-lisp-mode)))
-                    ("Files" (or
-                              (mode . LaTeX-mode)
-                              (mode . latex-mode)
-                              (mode . org-mode)))
-                    ("Proc" (or
-                             (mode . inferior-ess-mode)))
-                    ("Help" (or
-                             (mode . help-mode)
-                             (mode . dictem-mode)
-                             (mode . ess-help-mode)
-                             (mode . Info-mode)))
-                    ("Messages" (or
-                                 (name . "^\\*scratch\\*$")
-                                 (name . "^\\*Messages\\*$")
-                                 (name . "^\\*Completions\\*$")
-                                 (mode . fundamental-mode)))
-                    ))))
+           (quote
+            (("default"
+              ("Scripts" (or
+                          (mode . ess-mode)
+                          (mode . emacs-lisp-mode)))
+              ("Files" (or
+                        (mode . LaTeX-mode)
+                        (mode . latex-mode)
+                        (mode . org-mode)))
+              ("Proc" (or
+                       (mode . inferior-ess-mode)))
+              ("Help" (or
+                       (mode . help-mode)
+                       (mode . dictem-mode)
+                       (mode . ess-help-mode)
+                       (mode . Info-mode)))
+              ("Messages" (or
+                           (name . "^\\*scratch\\*$")
+                           (name . "^\\*Messages\\*$")
+                           (name . "^\\*Completions\\*$")
+                           (mode . fundamental-mode)))
+              ))))
      (add-hook 'ibuffer-mode-hook
                (lambda ()
                  (ibuffer-switch-to-saved-filter-groups "default")))))
@@ -734,28 +733,29 @@
       '(lambda ()
          (local-set-key (kbd "C-c `") 'TeX-next-error)))
 
-     (add-hook 'LaTeX-mode-hook
-               (lambda()
-                 (add-to-list 'TeX-command-list
-                              '("Encrypt-PDF" "pdftk %s.pdf output \%s.SEC.pdf allow Printing owner_pw q13JCdG20yDTZr; mv %s.SEC.pdf %s.pdf"
-                                TeX-run-command nil (latex-mode)))
-                 (add-to-list 'TeX-command-list
-                              '("Embed-Fonts-to-PDF" "gs -dSAFER -dNOPLATFONTS -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -dPDFSETTINGS=/prepress -dMaxSubsetPct=100 -dSubsetFonts=true -dEmbedAllFonts=true -sOutputFile=%s.embed.pdf -f  %s.pdf;  mv %s.embed.pdf %s.pdf "
-                                TeX-run-command nil (latex-mode)))
-                 (add-to-list 'TeX-command-list
-                              '("TeX2LyX" "tex2lyx -f %s.tex ../%s.lyx "
-                                TeX-run-command nil (latex-mode)))
-                 (add-to-list 'TeX-command-list
-                              '("View-PDF-via-Adobe" "acroread %s.pdf"
-                                TeX-run-command nil (latex-mode)))
-                 (add-to-list 'TeX-command-list
-                              '("LaTeXMk-XeLaTeX"
-                                "latexmk -r ~/.latexmk/xelatex %t"
-                                TeX-run-TeX nil (latex-mode)))
-                 (add-to-list 'TeX-command-list
-                              '("LaTeXMk-PdfLaTeX"
-                                "latexmk -r ~/.latexmk/pdflatex %t"
-                                TeX-run-TeX nil (latex-mode)))))
+     (add-hook
+      'LaTeX-mode-hook
+      (lambda()
+        (add-to-list 'TeX-command-list
+                     '("Encrypt-PDF" "pdftk %s.pdf output \%s.SEC.pdf allow Printing owner_pw q13JCdG20yDTZr; mv %s.SEC.pdf %s.pdf"
+                       TeX-run-command nil (latex-mode)))
+        (add-to-list 'TeX-command-list
+                     '("Embed-Fonts-to-PDF" "gs -dSAFER -dNOPLATFONTS -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -dPDFSETTINGS=/prepress -dMaxSubsetPct=100 -dSubsetFonts=true -dEmbedAllFonts=true -sOutputFile=%s.embed.pdf -f  %s.pdf;  mv %s.embed.pdf %s.pdf "
+                       TeX-run-command nil (latex-mode)))
+        (add-to-list 'TeX-command-list
+                     '("TeX2LyX" "tex2lyx -f %s.tex ../%s.lyx "
+                       TeX-run-command nil (latex-mode)))
+        (add-to-list 'TeX-command-list
+                     '("View-PDF-via-Adobe" "acroread %s.pdf"
+                       TeX-run-command nil (latex-mode)))
+        (add-to-list 'TeX-command-list
+                     '("LaTeXMk-XeLaTeX"
+                       "latexmk -r ~/.latexmk/xelatex %t"
+                       TeX-run-TeX nil (latex-mode)))
+        (add-to-list 'TeX-command-list
+                     '("LaTeXMk-PdfLaTeX"
+                       "latexmk -r ~/.latexmk/pdflatex %t"
+                       TeX-run-TeX nil (latex-mode)))))
 
      (defun my-LaTeX-mode-hook ()
        "Key definitions for LaTeX mode."
@@ -828,16 +828,19 @@
                          (cons "references" "NA")
                          (cons "author" "Feng Li, Central University of Finance and Economics.")))
 
-                  (font-lock-add-keywords nil
-                                          '(("\\<\\(FIXME\\):" 1 font-lock-warning-face t)
-                                            ("\\<\\(DEPENDS\\):" 1 font-lock-warning-face t)
-                                            ("\\<\\(TODO\\):" 1 font-lock-warning-face t)
-                                            ("\\<\\(DATE\\):" 1 font-lock-warning-face t)
-                                            ("\\<\\(NOTE\\):" 1 font-lock-warning-face t)
-                                            ("\\<\\(DEBUG\\):" 1 font-lock-warning-face t)
-                                            ;;output values high light at comments
-                                            ("\\(\\\\item[ \t]+{[\._A-Za-z0-9]+}\\)" 1 font-lock-warning-face t)
-                                            ("\\<\\([\._A-Za-z0-9]+\$[\-\._A-Za-z0-9]+\\):" 1 font-lock-warning-face t)))
+                  (font-lock-add-keywords
+                   nil
+                   '(("\\<\\(FIXME\\):" 1 font-lock-warning-face t)
+                     ("\\<\\(DEPENDS\\):" 1 font-lock-warning-face t)
+                     ("\\<\\(TODO\\):" 1 font-lock-warning-face t)
+                     ("\\<\\(DATE\\):" 1 font-lock-warning-face t)
+                     ("\\<\\(NOTE\\):" 1 font-lock-warning-face t)
+                     ("\\<\\(DEBUG\\):" 1 font-lock-warning-face t)
+                     ;;output values high light at comments
+                     ("\\(\\\\item[ \t]+{[\._A-Za-z0-9]+}\\)" 1
+                      font-lock-warning-face t)
+                     ("\\<\\([\._A-Za-z0-9]+\$[\-\._A-Za-z0-9]+\\):" 1
+                      font-lock-warning-face t)))
 
 
                   ;; Set M-§ to complete the object in the ESS editor
@@ -855,25 +858,30 @@
                   (fset 'my-R-comment-level-1
                         (lambda (&optional arg) "Insert level-1 R comment block"
                           (interactive "p")
-                          (kmacro-exec-ring-item (quote ([21 55 57 35 return 21 51 35 return 21 55 57 35 up 32] 0 "%d")) arg)))
+                          (kmacro-exec-ring-item
+                           (quote ([21 55 57 35 return 21 51 35
+                                       return 21 55 57 35 up 32] 0 "%d")) arg)))
                   (local-set-key (kbd "<f9> 1") 'my-R-comment-level-1)
 
                   ;; Insert three line comments level-2
                   (fset 'my-R-comment-level-2
-                        [?\C-a ?\C-u ?3 ?# ?\C-u ?7 ?6 ?- return ?\C-u ?3 ?# return ?\C-a ?\C-u ?3 ?# ?\C-u ?7 ?6 ?- up ? ])
+                        [?\C-a ?\C-u ?3 ?# ?\C-u ?7 ?6 ?- return
+                               ?\C-u ?3 ?# return ?\C-a ?\C-u ?3 ?# ?\C-u ?7 ?6 ?- up ? ])
                   (local-set-key (kbd "<f9> 2") 'my-R-comment-level-2)
 
                   ;; Smart indent
                   (make-local-variable 'adaptive-fill-regexp)
                   (setq adaptive-fill-regexp (concat ess-roxy-str adaptive-fill-regexp))
                   (make-local-variable 'adaptive-fill-first-line-regexp)
-                  (setq adaptive-fill-first-line-regexp (concat ess-roxy-str
-                                                                adaptive-fill-first-line-regexp))
+                  (setq adaptive-fill-first-line-regexp
+                        (concat ess-roxy-str
+                                adaptive-fill-first-line-regexp))
 
                   (make-local-variable 'paragraph-start)
                   (setq paragraph-start (concat "\\(" ess-roxy-str "\\)*" paragraph-start))
                   (make-local-variable 'paragraph-separate)
-                  (setq paragraph-separate (concat "\\(" ess-roxy-str "\\)*" paragraph-separate))
+                  (setq paragraph-separate
+                        (concat "\\(" ess-roxy-str "\\)*" paragraph-separate))
                   (auto-fill-mode)
                   ))
 
@@ -977,24 +985,29 @@
                     (interactive)
                     (newline-and-indent)
                     (insert "import pdb; pdb.set_trace()"))
-                  (add-hook 'python-mode-hook
-                            '(lambda () (define-key python-mode-map (kbd "C-c C-t") 'python-add-breakpoint)))
+                  (add-hook
+                   'python-mode-hook
+                   '(lambda ()
+                      (define-key python-mode-map
+                        (kbd "C-c C-t") 'python-add-breakpoint)))
 
                   ;; Font-Lock
                   (make-face 'font-lock-special-macro-face)
                   (set-face-background 'font-lock-special-macro-face "magenta")
                   (set-face-foreground 'font-lock-special-macro-face "white")
 
-                  (add-hook 'python-mode-hook
-                            (lambda ()
-                              (font-lock-add-keywords nil
-                                                      '(("\\<\\(FIXME\\):" 1 font-lock-warning-face t)
-                                                        ("\\<\\(DEPENDS\\):" 1 font-lock-warning-face t)
-                                                        ("\\<\\(TODO\\):" 1 font-lock-warning-face t)
-                                                        ("\\<\\(DATE\\):" 1 font-lock-warning-face t)
-                                                        ("\\<\\(DEBUG\\):" 1 font-lock-warning-face t)
-                                                        ("\\<\\(import pdb;[\n \t]*pdb.set_trace()\\)" .
-                                                         'font-lock-special-macro-face)))))
+                  (add-hook
+                   'python-mode-hook
+                   (lambda ()
+                     (font-lock-add-keywords
+                      nil
+                      '(("\\<\\(FIXME\\):" 1 font-lock-warning-face t)
+                        ("\\<\\(DEPENDS\\):" 1 font-lock-warning-face t)
+                        ("\\<\\(TODO\\):" 1 font-lock-warning-face t)
+                        ("\\<\\(DATE\\):" 1 font-lock-warning-face t)
+                        ("\\<\\(DEBUG\\):" 1 font-lock-warning-face t)
+                        ("\\<\\(import pdb;[\n \t]*pdb.set_trace()\\)" .
+                         'font-lock-special-macro-face)))))
 
                   ;; ;; Python history and python shell TODO: how? wait for python.el
                   ;; ;; (add-hook 'inferior-python-mode-hook
@@ -1016,6 +1029,8 @@
  '(flyspell-duplicate ((t (:underline (:color "orange" :style wave)))))
  '(flyspell-incorrect ((t (:underline (:color "red" :style wave)))))
  '(font-latex-italic-face ((t (:slant italic))))
+ '(font-latex-sectioning-5-face ((t (:foreground "black" :background "orange" :weight bold))))
+ '(font-latex-sedate-face ((t (:foreground "magenta"))))
  '(font-latex-verbatim-face ((t (:foreground "SaddleBrown"))))
  '(font-lock-builtin-face ((t (:foreground "darkcyan"))))
  '(font-lock-comment-face ((t (:foreground "blue"))))
