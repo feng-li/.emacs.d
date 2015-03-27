@@ -113,6 +113,10 @@
 ;; (tool-bar-mode -1)
 
 
+;; Disable vc-git
+(setq vc-handled-backends ())
+(vc-mode -1)
+
 ;; Set Fonts
 (defun my-default-font()
   (interactive)
@@ -163,6 +167,11 @@
 
 ;; Let Alt key be the meta key
 (setq x-alt-keysym 'meta)
+
+
+;; Follow mode (dual pages display)
+(global-set-key (kbd "C-<f2>")  'follow-delete-other-windows-and-split)
+
 
 ;; Chinese input method
 (eval-after-load "ibus"
@@ -222,7 +231,6 @@
             (define-key dired-mode-map (kbd "<delete>") 'dired-do-delete)
             (define-key dired-mode-map (kbd "<f9> DEL")
               (lambda () (interactive) (find-alternate-file "..")))
-            (define-key dired-mode-map (kbd "s") 'find-in-workspace)
             (setq cursor-type 'box)
             (dired-omit-mode 1)
             (local-set-key (kbd "<f9> h") 'dired-omit-mode)))
@@ -233,8 +241,8 @@
 (global-set-key (kbd "<end>") 'end-of-buffer)
 (global-set-key (kbd "<select>") 'end-of-buffer)
 (global-set-key (kbd "<f9> n") 'new-frame)
-(global-set-key (kbd "<f9> s") 'rgrep)
-(global-set-key (kbd "<f9> l") 'find-name-dired)
+(global-set-key (kbd "<f9> g") 'rgrep)
+(global-set-key (kbd "<f9> f") 'find-name-dired)
 (global-set-key (kbd "<f9> q") 'fill-region-as-paragraph)
 (global-set-key (kbd "<f9> TAB") 'indent-relative)
 (global-set-key (kbd "<f2>") 'next-multiframe-window) ;; Circulate among windows
@@ -471,13 +479,13 @@
   (insert (format-time-string "%a %b %d %H:%M:%S %Z %Y")))
 
 ;; Flymake (Python and LaTeX)
-(eval-after-load "flymake"
-  '(progn
-     (add-hook 'find-file-hook 'flymake-find-file-hook) ;; auto check
-     (load-library "flymake-cursor") ;; display error in minor buffer
-     (global-set-key [f4] 'flymake-goto-next-error)
-     (add-hook 'LaTeX-mode-hook 'flymake-mode)
-     (setq flymake-gui-warnings-enabled nil)))
+;; (eval-after-load "flymake"
+  ;; '(progn
+  ;;    (add-hook 'find-file-hook 'flymake-find-file-hook) ;; auto check
+  ;;    (load-library "flymake-cursor") ;; display error in minor buffer
+  ;;    (global-set-key [f4] 'flymake-goto-next-error)
+  ;;    (add-hook 'LaTeX-mode-hook 'flymake-mode)
+  ;;    (setq flymake-gui-warnings-enabled nil)))
 
 ;; Auto complete mode
 (eval-after-load "auto-complete-config"
@@ -783,6 +791,53 @@
 
      ;; (setq ess-use-auto-complete 'script-only)
 
+     (add-to-list 'ess-style-alist
+                  '(my-style
+                    (ess-indent-level . 2)
+                    (ess-first-continued-statement-offset . 0)
+                    (ess-continued-statement-offset . 0)
+                    (ess-brace-offset . 0)
+                    (ess-expression-offset . 4)
+                    (ess-else-offset . 0)
+                    (ess-close-brace-offset . 0)
+                    (ess-brace-imaginary-offset . 0)
+                    (ess-continued-brace-offset . 0)
+                    (ess-arg-function-offset . 4)
+                    (ess-arg-function-offset-new-line . '(8))
+                    ))
+     (setq ess-default-style 'my-style)
+
+     ;; Smart indent
+     ;; (setq ess-default-style 'DEFAULT)
+     ;; (defun myindent-ess-hook ()
+
+     ;;   (setq ess-indent-level 2) ; indenting
+     ;;   (setq ess-arg-function-offset-new-line '(8))
+     ;;   (setq ess-first-continued-statement-offset 0)
+     ;;   (setq ess-continued-statement-offset 0)
+     ;;   (setq ess-arg-function-offset nil)
+     ;;   )
+     ;; (add-hook 'ess-mode-hook 'myindent-ess-hook)
+
+
+
+
+;; (add-to-list 'ess-style-alist
+;;              '(my-style
+;;                (ess-indent-level . 4)
+;;                (ess-first-continued-statement-offset . 2)
+;;                (ess-continued-statement-offset . 0)
+;;                (ess-brace-offset . -4)
+;;                (ess-expression-offset . 4)
+;;                (ess-else-offset . 0)
+;;                (ess-close-brace-offset . 0)
+;;                (ess-brace-imaginary-offset . 0)
+;;                (ess-continued-brace-offset . 0)
+;;                (ess-arg-function-offset . 4)
+;;            (ess-arg-function-offset-new-line . '(4))
+;;                ))
+
+
 
      ;; ESS tracebug
      (setq ess-use-tracebug nil)
@@ -815,8 +870,6 @@
 
      (add-hook 'ess-mode-hook
                '(lambda ()
-                  ;; ESS expression offset
-                  (setq ess-arg-function-offset-new-line '(4))
 
                   ;;Roxygen template
                   (setq ess-roxy-template-alist
@@ -869,7 +922,7 @@
                                ?\C-u ?3 ?# return ?\C-a ?\C-u ?3 ?# ?\C-u ?7 ?6 ?- up ? ])
                   (local-set-key (kbd "<f9> 2") 'my-R-comment-level-2)
 
-                  ;; Smart indent
+
                   (make-local-variable 'adaptive-fill-regexp)
                   (setq adaptive-fill-regexp (concat ess-roxy-str adaptive-fill-regexp))
                   (make-local-variable 'adaptive-fill-first-line-regexp)
@@ -890,6 +943,7 @@
                '(lambda ()
                   (define-key inferior-ess-mode-map (kbd "C-c `") 'ess-parse-errors)
                   (define-key inferior-ess-mode-map (kbd "C-c d") 'ess-change-directory)
+                  (define-key inferior-ess-mode-map (kbd "C-k")   'kill-whole-line)
                   (define-key inferior-ess-mode-map (kbd "C-c l") 'ess-rutils-load-wkspc)))
 
      ;; (add-hook 'ess-post-run-hook 'ess-tracebug t)
