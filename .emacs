@@ -492,6 +492,7 @@
   '(progn
      (ac-config-default)
      (ac-flyspell-workaround) ; prevent AutoComplete striking as soon as I enable Flymake
+     (ac-linum-workaround)
      (setq ac-auto-start 2) ; nil of not auto start
      ;; (ac-set-trigger-key "TAB") ; unset this if auto-start
      (setq ac-menu-height 10)
@@ -580,7 +581,7 @@
 ;; Spelling Check
 (eval-after-load "ispell"
   '(progn
-     (setq-default ispell-program-name "hunspell")
+     (setq ispell-program-name (executable-find "hunspell"))
      (setq ispell-really-hunspell t)
      (setq ispell-personal-dictionary "~/.hunspell")
      (setq ispell-extra-args '("-d" "en_US"))
