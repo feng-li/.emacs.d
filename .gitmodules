@@ -16,3 +16,6 @@
 [submodule "site-lisp/math-symbol-lists"]
 	path = site-lisp/math-symbol-lists
 	url = git@github.com:vspinu/math-symbol-lists.git
+[submodule "org-mode"]
+	path = site=lisp/org-mode
+	url = git://orgmode.org/org-mode.git
