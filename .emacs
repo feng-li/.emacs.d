@@ -924,18 +924,18 @@
                   (local-set-key (kbd "<f9> 2") 'my-R-comment-level-2)
 
 
-                  (make-local-variable 'adaptive-fill-regexp)
-                  (setq adaptive-fill-regexp (concat ess-roxy-str adaptive-fill-regexp))
-                  (make-local-variable 'adaptive-fill-first-line-regexp)
-                  (setq adaptive-fill-first-line-regexp
-                        (concat ess-roxy-str
-                                adaptive-fill-first-line-regexp))
+                  ;; (make-local-variable 'adaptive-fill-regexp)
+                  ;; (setq adaptive-fill-regexp (concat ess-roxy-str adaptive-fill-regexp))
+                  ;; (make-local-variable 'adaptive-fill-first-line-regexp)
+                  ;; (setq adaptive-fill-first-line-regexp
+                  ;;       (concat ess-roxy-str
+                  ;;               adaptive-fill-first-line-regexp))
 
-                  (make-local-variable 'paragraph-start)
-                  (setq paragraph-start (concat "\\(" ess-roxy-str "\\)*" paragraph-start))
-                  (make-local-variable 'paragraph-separate)
-                  (setq paragraph-separate
-                        (concat "\\(" ess-roxy-str "\\)*" paragraph-separate))
+                  ;; (make-local-variable 'paragraph-start)
+                  ;; (setq paragraph-start (concat "\\(" ess-roxy-str "\\)*" paragraph-start))
+                  ;; (make-local-variable 'paragraph-separate)
+                  ;; (setq paragraph-separate
+                  ;;       (concat "\\(" ess-roxy-str "\\)*" paragraph-separate))
                   (auto-fill-mode)
                   ))
 
@@ -974,14 +974,14 @@
 (eval-after-load "python"
   '(progn
 
-     ;; Fabian' python.el
+     ;; Fabian' python.el (Now default in Emacs)
      (setq python-shell-interpreter "python2.7")
-     (setenv "PYTHONSTARTUP" "/home/fli/.pystartup")
+     ;; (setenv "PYTHONSTARTUP" "/home/fli/.pystartup")
 
      ;; Enter to indent in python.el
      (add-hook 'python-mode-hook
                '(lambda ()
-                  (setq python-python-command "python2.7")
+                  (setq python-python-command "python")
 
                   (define-key python-mode-map "\C-m" 'newline-and-indent)
 

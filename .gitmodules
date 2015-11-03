@@ -7,9 +7,6 @@
 [submodule "site-lisp/markdown-mode"]
 	path = site-lisp/markdown-mode
 	url = git://jblevins.org/git/markdown-mode.git
-[submodule "site-lisp/ac-math"]
-	path = site-lisp/ac-math
-	url = https://github.com/vitoshka/ac-math
 [submodule "site-lisp/ESS"]
 	path = site-lisp/ESS
 	url = git@github.com:emacs-ess/ESS.git
@@ -22,3 +19,6 @@
 [submodule "site-lisp/org-mode"]
 	path = site-lisp/org-mode
 	url = git://orgmode.org/org-mode.git
+[submodule "site-lisp/company-math"]
+	path = site-lisp/company-math
+	url = git@github.com:vspinu/company-math.git
