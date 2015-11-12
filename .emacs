@@ -299,6 +299,9 @@
 ;;shift selection
 (setq shift-select-mode t)
 
+;; allow mouse to select
+(setq xterm-mouse-mode t)
+
 ;; make typing override text selection
 (delete-selection-mode 1) ;
 
@@ -679,20 +682,20 @@
      (setq TeX-source-correlate-method (quote synctex)) ; only for evince
      (setq bibtex-maintain-sorted-entries t)
 
-     (require 'ac-math)
+     ;; (require 'ac-math)
      ;; make auto-complete aware of {{{latex-mode}}}
-     (add-to-list 'ac-modes 'latex-mode)
+     ;; (add-to-list 'ac-modes 'latex-mode)
 
      ;; add ac-sources to default ac-sources in LaTeX mode.
-     (defun ac-latex-mode-setup ()
-       (setq ac-sources
-             (append '(ac-source-math-unicode
-                       ac-source-math-latex
-                       ac-source-latex-commands
-                       ac-source-words-in-same-mode-buffers)
-                     ac-sources)))
-     (add-hook 'LaTeX-mode-hook 'ac-latex-mode-setup)
-     (setq ac-math-unicode-in-math-p nil)
+     ;; (defun ac-latex-mode-setup ()
+     ;;   (setq ac-sources
+     ;;         (append '(ac-source-math-unicode
+     ;;                   ac-source-math-latex
+     ;;                   ac-source-latex-commands
+     ;;                   ac-source-words-in-same-mode-buffers)
+     ;;                 ac-sources)))
+     ;; (add-hook 'LaTeX-mode-hook 'ac-latex-mode-setup)
+     ;; (setq ac-math-unicode-in-math-p nil)
 
      ;; Add short cuts, hold Windows key
      (defun auctex-insert-special ()
@@ -857,7 +860,7 @@
      (setq ess-swv-plug-into-AUCTeX-p t)
 
      ;; Let evaluation not viability to nil, cause emacs hang
-     (setq ess-eval-visibly-p t)
+     (setq ess-eval-visibly-p nil)
 
      ;;ESS key binding
      (setq ess-ask-for-ess-directory nil)
