@@ -22,3 +22,6 @@
 [submodule "site-lisp/company-math"]
 	path = site-lisp/company-math
 	url = git@github.com:vspinu/company-math.git
+[submodule "site-lisp/Emacs-langtool"]
+	path = site-lisp/Emacs-langtool
+	url = git@github.com:mhayashi1120/Emacs-langtool.git

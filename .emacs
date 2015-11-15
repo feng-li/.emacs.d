@@ -76,7 +76,7 @@
 (require 'python)
 (require 'artbollocks-mode)
 (load "auctex.el" nil t t)
-
+(require 'langtool)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -373,6 +373,33 @@
       (cons '("\\.m$" . octave-mode) auto-mode-alist))
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; LanguageTool
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(eval-after-load "langtool"
+  '(progn
+     (setq langtool-language-tool-jar "~/.APP/LanguageTool/languagetool-commandline.jar")
+     (setq langtool-default-language "en-US")
+
+
+     (global-set-key "\C-x4w" 'langtool-check)
+     (global-set-key "\C-x4W" 'langtool-check-done)
+     (global-set-key "\C-x4l" 'langtool-switch-default-language)
+     (global-set-key "\C-x44" 'langtool-show-message-at-point)
+     (global-set-key "\C-x4c" 'langtool-correct-buffer)
+
+
+     ;; Show LanguageTool report automatically by popup
+     (defun langtool-autoshow-detail-popup (overlays)
+       (when (require 'popup nil t)
+         ;; Do not interrupt current popup
+         (unless (or popup-instances
+                     ;; suppress popup after type `C-g` .
+                     (memq last-command '(keyboard-quit)))
+           (let ((msg (langtool-details-error-message overlays)))
+             (popup-tip msg)))))
+     (setq langtool-autoshow-message-function
+           'langtool-autoshow-detail-popup)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; General IDE settings (ElDoc, ECB, Comint...)
