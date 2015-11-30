@@ -54,7 +54,6 @@
 
 ;; Additional library loaded during start up.
 (require 'iso-transl) ;; keyboard input definitions for ISO 8859/1
-(require 'htmlize-view)
 (require 'session)
 (require 'ibuffer)
 (require 'ido)
@@ -64,15 +63,8 @@
 ;; (require 'flymake)
 (require 'dictem nil 'noerror)
 (require 'auto-complete-config)
-;; (require 'highlight-parentheses)
-(require 'highlight-symbol)
-;; (require 'yasnippet)
 (require 'info-look)
 (require 'ess-site)
-;; (require 'matlab-load)
-;; (require 'egg)
-;; (require 'git-emacs)
-;; (require 'git-blame)
 (require 'python)
 (load "auctex.el" nil t t)
 (require 'langtool)
@@ -538,16 +530,6 @@
      (define-globalized-minor-mode global-highlight-parentheses-mode
        highlight-parentheses-mode (lambda () (highlight-parentheses-mode t)))
      (global-highlight-parentheses-mode t))) ;; Highlight symbols
-
-(eval-after-load "highlight-symbol"
-  '(progn
-     (dolist (hook
-              '(emacs-lisp-mode-hook
-                c-mode-hook
-                c++-mode-hook
-                ess-mode-hook
-                python-mode-hook))
-       (add-hook hook 'highlight-symbol-mode))))
 
 ;; parentheses mode
 (show-paren-mode t)
