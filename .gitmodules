@@ -31,3 +31,9 @@
 [submodule "site-lisp/highlight-symbol.el"]
 	path = site-lisp/highlight-symbol.el
 	url = git@github.com:nschum/highlight-symbol.el.git
+[submodule "site-lisp/auctex"]
+	path = site-lisp/auctex
+	url = http://git.savannah.gnu.org/r/auctex.git
+[submodule "site-lisp/dictem"]
+	path = site-lisp/dictem
+	url = git@github.com:cheusov/dictem.git

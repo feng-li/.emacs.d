@@ -65,7 +65,7 @@
 (require 'dictem nil 'noerror)
 (require 'auto-complete-config)
 ;; (require 'highlight-parentheses)
-(require 'auto-highlight-symbol)
+(require 'highlight-symbol)
 ;; (require 'yasnippet)
 (require 'info-look)
 (require 'ess-site)
@@ -74,7 +74,6 @@
 ;; (require 'git-emacs)
 ;; (require 'git-blame)
 (require 'python)
-(require 'artbollocks-mode)
 (load "auctex.el" nil t t)
 (require 'langtool)
 
@@ -172,20 +171,6 @@
 ;; Follow mode (dual pages display)
 (global-set-key (kbd "C-<f2>")  'follow-delete-other-windows-and-split)
 
-
-;; Chinese input method
-(eval-after-load "ibus"
-  '(progn
-     (add-hook 'after-init-hook 'ibus-mode-on)
-
-     ;; Reserve C-space used for mark set
-     (ibus-define-common-key ?\C-\s nil)
-
-     ;; M-SPC toggle IBUS
-     (global-set-key (kbd "M-SPC") 'ibus-toggle)
-
-     ;; Change cursor color depending on status
-     (setq ibus-cursor-color '("red" "black" "limegreen"))))
 
 ;; Suspend and resume hook
 (add-hook 'suspend-hook
@@ -554,7 +539,7 @@
        highlight-parentheses-mode (lambda () (highlight-parentheses-mode t)))
      (global-highlight-parentheses-mode t))) ;; Highlight symbols
 
-(eval-after-load "auto-highlight-symbol"
+(eval-after-load "highlight-symbol"
   '(progn
      (dolist (hook
               '(emacs-lisp-mode-hook
@@ -562,7 +547,7 @@
                 c++-mode-hook
                 ess-mode-hook
                 python-mode-hook))
-       (add-hook hook 'auto-highlight-symbol-mode))))
+       (add-hook hook 'highlight-symbol-mode))))
 
 ;; parentheses mode
 (show-paren-mode t)
