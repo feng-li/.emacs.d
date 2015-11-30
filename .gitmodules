@@ -25,3 +25,9 @@
 [submodule "site-lisp/Emacs-langtool"]
 	path = site-lisp/Emacs-langtool
 	url = git@github.com:mhayashi1120/Emacs-langtool.git
+[submodule "site-lisp/writegood-mode"]
+	path = site-lisp/writegood-mode
+	url = git@github.com:bnbeckwith/writegood-mode.git
+[submodule "site-lisp/highlight-symbol.el"]
+	path = site-lisp/highlight-symbol.el
+	url = git@github.com:nschum/highlight-symbol.el.git

@@ -98,7 +98,7 @@
 (setq user-mail-address "m@feng.li")
 
 ;; Desktop save mode
-(desktop-save-mode 1)
+;; (desktop-save-mode 1)
 
 ;; Environment variables
 (setenv "OMP_NUM_THREADS" "1")
@@ -457,7 +457,7 @@
      (setq ido-ignore-buffers
            '("\\` " "^\\*ESS\\*" "^\\*Messages\\*" "^\\*Help\\*"
              "^\\*Buffer" "^\\*Ibuffer*" "^\\*ESS-errors*"
-             "^\\*Warnings*" "output*" "*TeX Help*" "*grep*"
+             "^\\*Warnings*" "output*" "*TeX Help*"
              "^\\*.*Completions\\*$" "^\\*Ediff" "^\\*tramp" "^\\*cvs-"
              "_region_" "^TAGS$" "^\*Ido" "^\\*.*dictem buffer\\*$"
              "^\\*inferior-lisp*" "^\\*Compile-Log\\*"))
@@ -615,6 +615,9 @@
      (setq ispell-really-hunspell t)
      (setq ispell-personal-dictionary "~/.hunspell")
      (setq ispell-extra-args '("-d" "en_US"))
+     (setq ispell-local-dictionary "en_US")
+     (setq ispell-local-dictionary-alist
+           '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil nil nil utf-8)))
      (defun ispell-get-coding-system () 'utf-8)
      (global-set-key (kbd "<f9> 4") 'ispell-word)))
 
