@@ -583,8 +583,8 @@
      (setq ispell-personal-dictionary "~/.hunspell")
      (setq ispell-extra-args '("-d" "en_US"))
      (setq ispell-local-dictionary "en_US")
-     (setq ispell-local-dictionary-alist
-           '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil nil nil utf-8)))
+     ;; (setq ispell-local-dictionary-alist
+     ;;       '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil nil nil utf-8)))
      (defun ispell-get-coding-system () 'utf-8)
      (global-set-key (kbd "<f9> 4") 'ispell-word)))
 
@@ -792,21 +792,21 @@
 
      ;; (setq ess-use-auto-complete 'script-only)
 
-     (add-to-list 'ess-style-alist
-                  '(my-style
-                    (ess-indent-level . 2)
-                    (ess-first-continued-statement-offset . 0)
-                    (ess-continued-statement-offset . 0)
-                    (ess-brace-offset . 0)
-                    (ess-expression-offset . 4)
-                    (ess-else-offset . 0)
-                    (ess-close-brace-offset . 0)
-                    (ess-brace-imaginary-offset . 0)
-                    (ess-continued-brace-offset . 0)
-                    (ess-arg-function-offset . 4)
-                    (ess-arg-function-offset-new-line . '(8))
-                    ))
-     (setq ess-default-style 'my-style)
+     ;; (add-to-list 'ess-style-alist
+     ;;              '(my-style
+     ;;                (ess-indent-level . 2)
+     ;;                (ess-first-continued-statement-offset . 0)
+     ;;                (ess-continued-statement-offset . 0)
+     ;;                (ess-brace-offset . 0)
+     ;;                (ess-expression-offset . 4)
+     ;;                (ess-else-offset . 0)
+     ;;                (ess-close-brace-offset . 0)
+     ;;                (ess-brace-imaginary-offset . 0)
+     ;;                (ess-continued-brace-offset . 0)
+     ;;                (ess-arg-function-offset . 4)
+     ;;                (ess-arg-function-offset-new-line . '(8))
+     ;;                ))
+     ;; (setq ess-default-style 'my-style)
 
      ;; Smart indent
      ;; (setq ess-default-style 'DEFAULT)
