@@ -11,7 +11,7 @@
  '(indicate-empty-lines nil)
  '(org-support-shift-select t)
  '(send-mail-function (quote mailclient-send-it))
- ;; '(session-use-package t nil (session))
+; '(session-use-package t nil (session))
  '(show-paren-mode t nil (paren))
  '(text-mode-hook
    (quote
@@ -109,17 +109,12 @@
 (vc-mode -1)
 
 ;; Set Fonts
-(defun my-default-font()
-  (interactive)
-  (set-default-font "Inconsolata-12")
-  (setq face-font-rescale-alist (list (cons "Microsoft YaHei" 1.0)))
-  (set-fontset-font "fontset-default"
-		    'unicode '("Microsoft YaHei" . "unicode-bmp")))
-(add-to-list 'after-make-frame-functions
-             (lambda (new-frame)
-               (select-frame new-frame)
-               (my-default-font)))
-
+(add-to-list 'default-frame-alist
+             '(font . "Droid Sans Mono-10.5"))
+(setq face-font-rescale-alist
+      '(("Microsoft YaHei". 1.2)))
+(set-fontset-font "fontset-default"
+                  'unicode '("Microsoft YaHei" . "unicode-bmp"))
 
 ;; Menu bar
 (menu-bar-mode t)
@@ -177,10 +172,6 @@
 ;;Mutt
 (add-to-list 'auto-mode-alist '("/mutt" . mail-mode))
 
-;; HTML Print
-(eval-after-load "htmlize-view"
-  '(progn
-     (htmlize-view-add-to-files-menu)))
 
 
 ;; Global visual line mode
@@ -250,7 +241,7 @@
 ;; set server-start
 (if (and (fboundp 'server-running-p)
          (not (server-running-p)))
-  (server-start)
+    (server-start)
   )
 (add-hook 'server-switch-hook
           (lambda ()
@@ -286,9 +277,6 @@
 (setq-default indent-tabs-mode nil)
 
 
-;; Keep buffer order during switch
-;; (require 'flobl)
-
 ;;Session(Keep section each time)
 (eval-after-load "session"
   '(progn
@@ -303,15 +291,6 @@
 
 ;; set big kill ring
 (setq kill-ring-max 150)
-
-
-;; set the fill column in text/org mode
-;; (dolist (hook (list
-;;                'after-text-mode-hook
-;;                'org-mode-hook
-;;                'TeX-mode-hook
-;;                'mail-mode-hook))
-;;   (add-hook hook '(lambda () (setq fill-column 70))))
 
 ;; auto fill mode
 (dolist (hook (list
@@ -337,13 +316,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Matlab, Octave mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-;; Matlab support
-(eval-after-load "matlab-load"
-  '(progn
-     (matlab-cedet-setup)))
-
 
 ;; Let m-file connected with octave mode.
 (setq auto-mode-alist
@@ -381,6 +353,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; General IDE settings (ElDoc, ECB, Comint...)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; TAGS
+(setq tags-file-name "~/code/TAGS")
+;; (setq tags-table-list
+;;       '("~/.emacs.d/tags" "~/code/"))
+;; (visit-tags-table-buffer t)
 
 ;; Ibuffer mode
 
@@ -469,10 +447,10 @@
 
 ;; Clear buffer output
 (defun comint-clear-buffer () (interactive)
-  (save-excursion
-    (comint-goto-process-mark)
-    (forward-line 0)
-    (kill-region (point-min) (point))))
+       (save-excursion
+         (comint-goto-process-mark)
+         (forward-line 0)
+         (kill-region (point-min) (point))))
 (define-key comint-mode-map (kbd "C-l") 'comint-clear-buffer)
 
 ;; Replace ^M
@@ -485,14 +463,6 @@
   (interactive)
   (insert (format-time-string "%a %b %d %H:%M:%S %Z %Y")))
 
-;; Flymake (Python and LaTeX)
-;; (eval-after-load "flymake"
-  ;; '(progn
-  ;;    (add-hook 'find-file-hook 'flymake-find-file-hook) ;; auto check
-  ;;    (load-library "flymake-cursor") ;; display error in minor buffer
-  ;;    (global-set-key [f4] 'flymake-goto-next-error)
-  ;;    (add-hook 'LaTeX-mode-hook 'flymake-mode)
-  ;;    (setq flymake-gui-warnings-enabled nil)))
 
 ;; Auto complete mode
 (eval-after-load "auto-complete-config"
@@ -509,17 +479,17 @@
      (setq ac-delay 0.05)
      (setq ac-quick-help-delay 1.5)
      (setq ac-ignore-case 'smart)
-     (setq ac-ignores (quote ("0" "1" "2" "3" "4" "5" "6" "7" "8" "9" ".")))
+     ))
 
-     (dolist (hook '(emacs-lisp-mode-hook
-                     c-mode-hook
-                     c++-mode-hook
-                     ess-mode-hook
-                     org-mode-hook
-                     inferior-ess-mode-hook
-                     python-mode-hook))
-       (add-hook hook 'auto-complete-mode))
-     (global-set-key (kbd "<f9> a") 'auto-complete-mode)))
+(dolist (hook '(emacs-lisp-mode-hook
+                c-mode-hook
+                c++-mode-hook
+                ess-mode-hook
+                org-mode-hook
+                inferior-ess-mode-hook
+                python-mode-hook))
+  (add-hook hook 'auto-complete-mode))
+(global-set-key (kbd "<f9> a") 'auto-complete-mode)
 
 ;; Font lock
 (global-font-lock-mode t)
@@ -544,10 +514,6 @@
 ;; Commenting
 (global-set-key (kbd "M-3") 'comment-or-uncomment-region)
 
-;; (eval-after-load "yasnippet"
-;;   '(progn
-;;      (yas/global-mode 1)
-;;      ))
 
 ;; Add extra info path
 (eval-after-load "info-look"
@@ -583,8 +549,6 @@
      (setq ispell-personal-dictionary "~/.hunspell")
      (setq ispell-extra-args '("-d" "en_US"))
      (setq ispell-local-dictionary "en_US")
-     ;; (setq ispell-local-dictionary-alist
-     ;;       '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil nil nil utf-8)))
      (defun ispell-get-coding-system () 'utf-8)
      (global-set-key (kbd "<f9> 4") 'ispell-word)))
 
@@ -646,12 +610,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (add-hook 'org-mode-hook
-      '(lambda ()
-         (setq org-file-apps
-               (quote
-                ((auto-mode . emacs)
-                 ("\\.x?html?\\'" . default)
-                 ("\\.pdf\\'" . "evince %s"))))))
+          '(lambda ()
+             (setq org-file-apps
+                   (quote
+                    ((auto-mode . emacs)
+                     ("\\.x?html?\\'" . default)
+                     ("\\.pdf\\'" . "evince %s"))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; LaTeX
@@ -660,7 +624,7 @@
   '(progn
      (load "preview-latex.el" nil t t)
 
-     ;;LaTex AUCTex features
+     ;; LaTeX AUCTex features
      (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
      (setq LaTeX-math-menu-unicode t)
 
@@ -674,25 +638,15 @@
      (setq TeX-source-correlate-mode  t)
      (setq TeX-source-correlate-start-server nil)
 
-     (setq TeX-PDF-mode t) ;; use pdflatex by default
-                                        ;(setq TeX-source-correlate-method (quote source-specials)) ; only for dvi
-     (setq TeX-source-correlate-method (quote synctex)) ; only for evince
+     (setq-default TeX-master "master") ; All master files called "master".
+
+     ;; Set default TeX engine
+     (setq TeX-PDF-mode t)
+     ;; (setq-default TeX-engine 'xetex) ;this can be set locally
+
+     (setq TeX-source-correlate-method (quote source-specials)) ; only for dvi
+     (setq TeX-source-correlate-method (quote synctex)) ;only for evince
      (setq bibtex-maintain-sorted-entries t)
-
-     ;; (require 'ac-math)
-     ;; make auto-complete aware of {{{latex-mode}}}
-     ;; (add-to-list 'ac-modes 'latex-mode)
-
-     ;; add ac-sources to default ac-sources in LaTeX mode.
-     ;; (defun ac-latex-mode-setup ()
-     ;;   (setq ac-sources
-     ;;         (append '(ac-source-math-unicode
-     ;;                   ac-source-math-latex
-     ;;                   ac-source-latex-commands
-     ;;                   ac-source-words-in-same-mode-buffers)
-     ;;                 ac-sources)))
-     ;; (add-hook 'LaTeX-mode-hook 'ac-latex-mode-setup)
-     ;; (setq ac-math-unicode-in-math-p nil)
 
      ;; Add short cuts, hold Windows key
      (defun auctex-insert-special ()
@@ -722,8 +676,7 @@
      (setq LaTeX-command-style (quote (("" "%(PDF)%(latex) -file-line-error %S%(PDFout)"))))
 
 
-     (add-hook 'LaTeX-mode-hook (lambda ()
-                                  (TeX-fold-mode 1)))
+     (add-hook 'LaTeX-mode-hook (lambda () (TeX-fold-mode 1)))
      (setq TeX-save-query  nil )
 
      ;; RefTeX
@@ -737,40 +690,23 @@
 	     ("bst" . "kpsewhich -format=.bst %f")))
 
      ;; LaTeX Command list
-     (add-hook
-      'LaTeX-mode-hook
-      '(lambda ()
-         (local-set-key (kbd "C-c `") 'TeX-next-error)))
+     (add-hook 'LaTeX-mode-hook
+               '(lambda ()
+                  (local-set-key (kbd "C-c `") 'TeX-next-error)
+                  (local-set-key (kbd "<f5>") 'TeX-command-run-all)
+                  ))
 
      (add-hook
       'LaTeX-mode-hook
       (lambda()
-        (add-to-list 'TeX-command-list
-                     '("Encrypt-PDF" "pdftk %s.pdf output \%s.SEC.pdf allow Printing owner_pw q13JCdG20yDTZr; mv %s.SEC.pdf %s.pdf"
-                       TeX-run-command nil (latex-mode)))
-        (add-to-list 'TeX-command-list
-                     '("Embed-Fonts-to-PDF" "gs -dSAFER -dNOPLATFONTS -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -dPDFSETTINGS=/prepress -dMaxSubsetPct=100 -dSubsetFonts=true -dEmbedAllFonts=true -sOutputFile=%s.embed.pdf -f  %s.pdf;  mv %s.embed.pdf %s.pdf "
-                       TeX-run-command nil (latex-mode)))
         (add-to-list 'TeX-command-list
                      '("TeX2LyX" "tex2lyx -f %s.tex ../%s.lyx "
                        TeX-run-command nil (latex-mode)))
         (add-to-list 'TeX-command-list
                      '("View-PDF-via-Adobe" "acroread %s.pdf"
                        TeX-run-command nil (latex-mode)))
-        (add-to-list 'TeX-command-list
-                     '("LaTeXMk-XeLaTeX"
-                       "latexmk -r ~/.latexmk/xelatex %t"
-                       TeX-run-TeX nil (latex-mode)))
-        (add-to-list 'TeX-command-list
-                     '("LaTeXMk-PdfLaTeX"
-                       "latexmk -r ~/.latexmk/pdflatex %t"
-                       TeX-run-TeX nil (latex-mode)))))
-
-     (defun my-LaTeX-mode-hook ()
-       "Key definitions for LaTeX mode."
-       (define-key LaTeX-mode-map [(f5)] 'latex-or-view)) ;;F5 works for all
-     (add-hook 'LaTeX-mode-hook 'my-LaTeX-mode-hook)
-     (fset 'latex-or-view [?\C-c ?\C-c])))
+        ))
+     ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; ESS (Emacs speaks statistics)
@@ -789,56 +725,6 @@
                      ac-sources)))
      (add-hook 'ess-mode-hook 'ac-ess-mode-setup)
      (add-hook 'inferior-ess-mode-hook 'ac-ess-mode-setup)
-
-     ;; (setq ess-use-auto-complete 'script-only)
-
-     ;; (add-to-list 'ess-style-alist
-     ;;              '(my-style
-     ;;                (ess-indent-level . 2)
-     ;;                (ess-first-continued-statement-offset . 0)
-     ;;                (ess-continued-statement-offset . 0)
-     ;;                (ess-brace-offset . 0)
-     ;;                (ess-expression-offset . 4)
-     ;;                (ess-else-offset . 0)
-     ;;                (ess-close-brace-offset . 0)
-     ;;                (ess-brace-imaginary-offset . 0)
-     ;;                (ess-continued-brace-offset . 0)
-     ;;                (ess-arg-function-offset . 4)
-     ;;                (ess-arg-function-offset-new-line . '(8))
-     ;;                ))
-     ;; (setq ess-default-style 'my-style)
-
-     ;; Smart indent
-     ;; (setq ess-default-style 'DEFAULT)
-     ;; (defun myindent-ess-hook ()
-
-     ;;   (setq ess-indent-level 2) ; indenting
-     ;;   (setq ess-arg-function-offset-new-line '(8))
-     ;;   (setq ess-first-continued-statement-offset 0)
-     ;;   (setq ess-continued-statement-offset 0)
-     ;;   (setq ess-arg-function-offset nil)
-     ;;   )
-     ;; (add-hook 'ess-mode-hook 'myindent-ess-hook)
-
-
-
-
-;; (add-to-list 'ess-style-alist
-;;              '(my-style
-;;                (ess-indent-level . 4)
-;;                (ess-first-continued-statement-offset . 2)
-;;                (ess-continued-statement-offset . 0)
-;;                (ess-brace-offset . -4)
-;;                (ess-expression-offset . 4)
-;;                (ess-else-offset . 0)
-;;                (ess-close-brace-offset . 0)
-;;                (ess-brace-imaginary-offset . 0)
-;;                (ess-continued-brace-offset . 0)
-;;                (ess-arg-function-offset . 4)
-;;            (ess-arg-function-offset-new-line . '(4))
-;;                ))
-
-
 
      ;; ESS tracebug
      (setq ess-use-tracebug nil)
@@ -946,14 +832,6 @@
                   (define-key inferior-ess-mode-map (kbd "C-c d") 'ess-change-directory)
                   (define-key inferior-ess-mode-map (kbd "C-k")   'kill-whole-line)
                   (define-key inferior-ess-mode-map (kbd "C-c l") 'ess-rutils-load-wkspc)))
-
-     ;; (add-hook 'ess-post-run-hook 'ess-tracebug t)
-     ;; (define-key ess-mode-map "\M-]" 'next-error)
-     ;; (define-key ess-mode-map "\M-[" 'previous-error)
-     ;; (define-key inferior-ess-mode-map "\M-]" 'next-error-no-select)
-     ;; (define-key inferior-ess-mode-map "\M-[" 'previous-error-no-select)
-     ;; (define-key compilation-minor-mode-map [(?n)] 'next-error-no-select)
-     ;; (define-key compilation-minor-mode-map [(?p)] 'previous-error-no-select)
 
      ;; ESS Code styles
      (defun ess-code-style ()
@@ -1064,10 +942,6 @@
                         ("\\<\\(import pdb;[\n \t]*pdb.set_trace()\\)" .
                          'font-lock-special-macro-face)))))
 
-                  ;; ;; Python history and python shell TODO: how? wait for python.el
-                  ;; ;; (add-hook 'inferior-python-mode-hook
-                  ;; ;;           '(lambda()
-                  ;; ;;              (setq comint-input-ring-file-name "~/.pyhistory")))
 
                   ))
      ))
