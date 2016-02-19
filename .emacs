@@ -13,14 +13,6 @@
  '(send-mail-function (quote mailclient-send-it))
 ; '(session-use-package t nil (session))
  '(show-paren-mode t nil (paren))
- '(text-mode-hook
-   (quote
-    (turn-on-auto-fill
-     (lambda nil
-       (flyspell-mode))
-     (lambda nil
-       (turn-on-auto-fill))
-     text-mode-hook-identify)))
  '(tool-bar-mode nil)
  '(warning-suppress-types (quote ((undo discard-info)))))
 
@@ -68,7 +60,6 @@
 (require 'python)
 (load "auctex.el" nil t t)
 (require 'langtool)
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -546,9 +537,11 @@
   '(progn
      (setq ispell-program-name (executable-find "hunspell"))
      (setq ispell-really-hunspell t)
-     (setq ispell-personal-dictionary "~/.hunspell")
-     (setq ispell-extra-args '("-d" "en_US"))
-     (setq ispell-local-dictionary "en_US")
+     (setq ispell-personal-dictionary "~/.emacs.d/hunspell/")
+     (add-to-list 'ispell-local-dictionary-alist
+                  '("english-hunspell" "[[:alpha:]]" "[^[:alpha:]]" "[']"
+                    t ("-d" "en_US") nil utf-8))
+
      (defun ispell-get-coding-system () 'utf-8)
      (global-set-key (kbd "<f9> 4") 'ispell-word)))
 
@@ -638,11 +631,12 @@
      (setq TeX-source-correlate-mode  t)
      (setq TeX-source-correlate-start-server nil)
 
-     (setq-default TeX-master "master") ; All master files called "master".
-
      ;; Set default TeX engine
      (setq TeX-PDF-mode t)
      ;; (setq-default TeX-engine 'xetex) ;this can be set locally
+
+     (setq TeX-parse-self t) ; Enable parse on load.
+     (setq TeX-auto-save t) ; Enable parse on save.
 
      (setq TeX-source-correlate-method (quote source-specials)) ; only for dvi
      (setq TeX-source-correlate-method (quote synctex)) ;only for evince
