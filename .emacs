@@ -638,6 +638,12 @@
      (setq TeX-parse-self t) ; Enable parse on load.
      (setq TeX-auto-save t) ; Enable parse on save.
 
+
+     ;; Add listings to verbatim environments
+     (eval-after-load 'latex
+       '(add-to-list 'LaTeX-verbatim-environments "lstlisting"))
+
+
      (setq TeX-source-correlate-method (quote source-specials)) ; only for dvi
      (setq TeX-source-correlate-method (quote synctex)) ;only for evince
      (setq bibtex-maintain-sorted-entries t)
