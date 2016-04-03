@@ -100,13 +100,14 @@
 (vc-mode -1)
 
 ;; Set Fonts
-(add-to-list 'default-frame-alist
-             '(font . "Droid Sans Mono-10.5"))
-(setq face-font-rescale-alist
-      '(("Microsoft YaHei". 1.2)))
-(set-fontset-font "fontset-default"
-                  'unicode '("Microsoft YaHei" . "unicode-bmp"))
-
+(when (display-graphic-p)
+  (add-to-list 'default-frame-alist
+               '(font . "Droid Sans Mono-10.5"))
+  (setq face-font-rescale-alist
+        '(("Microsoft YaHei". 1.2)))
+  (set-fontset-font "fontset-default"
+                    'unicode '("Microsoft YaHei" . "unicode-bmp"))
+  )
 ;; Menu bar
 (menu-bar-mode t)
 
