@@ -94,6 +94,8 @@
 ;; tool-bar mode
 ;; (tool-bar-mode -1)
 
+;; Disable backup files (*~)
+(setq make-backup-files nil)
 
 ;; Disable vc-git
 (setq vc-handled-backends ())
