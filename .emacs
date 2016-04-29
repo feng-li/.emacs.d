@@ -13,7 +13,6 @@
  '(send-mail-function (quote mailclient-send-it))
 ; '(session-use-package t nil (session))
  '(show-paren-mode t nil (paren))
- '(tool-bar-mode nil)
  '(warning-suppress-types (quote ((undo discard-info)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -91,8 +90,11 @@
 ;; Disable scroll-bar
 (scroll-bar-mode -1)
 
+
+
 ;; tool-bar mode
-;; (tool-bar-mode -1)
+(when (display-graphic-p)
+  (tool-bar-mode -1))
 
 
 ;; Disable vc-git
