@@ -39,6 +39,7 @@
             (copy-sequence (normal-top-level-add-to-load-path '(".")))
             (normal-top-level-add-subdirs-to-load-path)))
          load-path)))
+(add-to-list 'custom-theme-load-path "~/.emacs.d/site-lisp/emacs-color-theme-solarized")
 
 ;; Byte compile directory when files are changed
 ;; (setq byte-compile-warnings nil)
@@ -60,7 +61,7 @@
 (require 'python)
 (load "auctex.el" nil t t)
 (require 'langtool)
-
+(load-theme 'solarized t)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Set home directory
@@ -957,19 +958,20 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ess-function-call-face ((t (:foreground "cyan"))))
- '(flyspell-duplicate ((t (:underline (:color "orange" :style wave)))))
- '(flyspell-incorrect ((t (:underline (:color "red" :style wave)))))
- '(font-latex-italic-face ((t (:slant italic))))
- '(font-latex-sectioning-5-face ((t (:foreground "black" :background "orange" :weight bold))))
- '(font-latex-sedate-face ((t (:foreground "magenta"))))
- '(font-latex-verbatim-face ((t (:foreground "SaddleBrown"))))
- '(font-lock-builtin-face ((t (:foreground "darkcyan"))))
- '(font-lock-comment-face ((t (:foreground "blue"))))
- '(font-lock-function-name-face ((t (:foreground "blue" :weight bold))))
- '(font-lock-keyword-face ((t (:foreground "magenta"))))
- '(font-lock-string-face ((t (:foreground "darkgreen"))))
- '(match ((t (:background "yellow1" :foreground "black"))))
- '(minibuffer-prompt ((t (:foreground "magenta")))))
+ ;; '(ess-function-call-face ((t (:foreground "cyan"))))
+ ;; '(flyspell-duplicate ((t (:underline (:color "orange" :style wave)))))
+ ;; '(flyspell-incorrect ((t (:underline (:color "red" :style wave)))))
+ ;; '(font-latex-italic-face ((t (:slant italic))))
+ ;; '(font-latex-sectioning-5-face ((t (:foreground "black" :background "orange" :weight bold))))
+ ;; '(font-latex-sedate-face ((t (:foreground "magenta"))))
+ ;; '(font-latex-verbatim-face ((t (:foreground "SaddleBrown"))))
+ ;; '(font-lock-builtin-face ((t (:foreground "darkcyan"))))
+ ;; '(font-lock-comment-face ((t (:foreground "blue"))))
+ ;; '(font-lock-function-name-face ((t (:foreground "blue" :weight bold))))
+ ;; '(font-lock-keyword-face ((t (:foreground "magenta"))))
+ ;; '(font-lock-string-face ((t (:foreground "darkgreen"))))
+ ;; '(match ((t (:background "yellow1" :foreground "black"))))
+ ;; '(minibuffer-prompt ((t (:foreground "magenta"))))
+ )
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
