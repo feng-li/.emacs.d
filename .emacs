@@ -88,14 +88,15 @@
 (setq explicit-bash-args '("--init-file" "~/.bashrc"))
 
 
-;; Disable scroll-bar
-(scroll-bar-mode -1)
 
-
-
-;; tool-bar mode
 (when (display-graphic-p)
-  (tool-bar-mode -1))
+
+  ;; tool-bar mode
+  (tool-bar-mode -1)
+
+  ;; Disable scroll-bar
+  (scroll-bar-mode -1)
+  )
 
 ;; Disable backup files (*~)
 (setq make-backup-files nil)
