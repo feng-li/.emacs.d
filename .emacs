@@ -444,15 +444,16 @@
      (setq comint-scroll-to-bottom-on-input 'this)
      (setq comint-scroll-to-bottom-on-input t)
      (setq comint-move-point-for-output t)
-     ))
 
-;; Clear buffer output
-(defun comint-clear-buffer () (interactive)
-       (save-excursion
-         (comint-goto-process-mark)
-         (forward-line 0)
-         (kill-region (point-min) (point))))
-(define-key comint-mode-map (kbd "C-l") 'comint-clear-buffer)
+     ;; Clear buffer output
+     (defun comint-clear-buffer () (interactive)
+            (save-excursion
+              (comint-goto-process-mark)
+              (forward-line 0)
+              (kill-region (point-min) (point))))
+     (define-key comint-mode-map (kbd "C-l") 'comint-clear-buffer)
+
+     ))
 
 ;; Replace ^M
 (fset 'my-replace-m
