@@ -6,7 +6,6 @@
  '(case-fold-search t)
  '(column-number-mode t)
  '(doc-view-continuous t)
- '(frame-background-mode (quote dark))
  '(global-font-lock-mode t nil (font-lock))
  '(hl-paren-background-colors (quote ("light gray" "steel blue" "lime green" "orange1")))
  '(indicate-empty-lines nil)
@@ -965,13 +964,13 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
-  '(ess-function-call-face ((t (:foreground "cyan"))))
+ '(ess-function-call-face ((t (:foreground "cyan"))))
  '(flyspell-duplicate ((t (:underline (:color "orange" :style wave)))))
  '(flyspell-incorrect ((t (:underline (:color "red" :style wave)))))
- '(font-latex-italic-face ((t (:slant italic))))
+ ;; '(font-latex-italic-face ((t (:slant italic))))
  '(font-latex-sectioning-5-face ((t (:foreground "black" :background "orange" :weight bold))))
- '(font-latex-sedate-face ((t (:foreground "magenta"))))
- '(font-latex-verbatim-face ((t (:foreground "SaddleBrown"))))
+ ;; '(font-latex-sedate-face ((t (:foreground "magenta"))))
+ ;; '(font-latex-verbatim-face ((t (:foreground "SaddleBrown"))))
  '(font-lock-builtin-face ((t (:foreground "darkcyan"))))
  '(font-lock-comment-face ((t (:foreground "blue"))))
  '(font-lock-function-name-face ((t (:foreground "blue" :weight bold))))
