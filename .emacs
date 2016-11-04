@@ -805,6 +805,11 @@
                         [return ?\C-u ?8 ? ])
                   (local-set-key (kbd "<C-return>") 'my-R-smart-indent)
 
+
+
+                  (fset 'my-R-comment-level-1
+   "\C-u80#\C-m\C-u3#\C-[OD\C-[OD\C-[OD\C-?\C-?\C-?\C-?\C-[OC\C-[OC\C-[OC\C-m\C-?\C-?\C-?\C-?\C-u80#\C-[OA ")
+
                   (fset 'my-R-comment-level-1
                         (lambda (&optional arg) "Insert level-1 R comment block"
                           (interactive "p")
