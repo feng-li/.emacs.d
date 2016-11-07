@@ -682,8 +682,8 @@
        (local-set-key (kbd "C-c C-x C-b") 'my-insert-bold-math))
      (add-hook 'LaTeX-mode-hook 'auctex-insert-special)
 
-     ;; Enable file-line-error to avoid error message "Error occured after last TeX file closed"
-     (setq LaTeX-command-style (quote (("" "%(PDF)%(latex) -file-line-error %S%(PDFout)"))))
+     ;; Enable file-line-error to avoid error message "Error occured after last TeX file closed" ; now is default for 11.89
+     ;; (setq LaTeX-command-style (quote (("" "%(PDF)%(latex) -file-line-error %S%(PDFout)"))))
 
 
      (add-hook 'LaTeX-mode-hook (lambda () (TeX-fold-mode 1)))
