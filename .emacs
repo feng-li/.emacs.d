@@ -110,7 +110,7 @@
 ;; Set Fonts
 (when (display-graphic-p)
   (add-to-list 'default-frame-alist
-               '(font . "Droid Sans Mono-10.5"))
+               '(font . "Source Code Pro-10.5")) ; https://github.com/adobe-fonts/source-code-pro
   (setq face-font-rescale-alist
         '(("Microsoft YaHei". 1.2)))
   (set-fontset-font "fontset-default"
