@@ -59,7 +59,11 @@
 (require 'python)
 (load "auctex.el" nil t t)
 (require 'langtool)
+(require 'writegood-mode)
+(require 'yasnippet)
+(yas-global-mode 1)
 
+(require 'iedit)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Set home directory
@@ -350,12 +354,25 @@
      (setq langtool-autoshow-message-function
            'langtool-autoshow-detail-popup)))
 
+(eval-after-load "writegood-mode"
+'(progn
+   (global-set-key "\C-cg" 'writegood-mode)))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; General IDE settings (ElDoc, ECB, Comint...)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; iedit mode
+(eval-after-load "iedit"
+  '(progn
+     (global-set-key "\C-c;" 'iedit-mode)
+     ))
+
+
 ;; TAGS
-(setq tags-file-name "~/code/TAGS")
+(setq tags-table-list
+      '("~/code/TAGS/R/"
+        "~/code/TAGS/C/"))
+
 ;; (setq tags-table-list
 ;;       '("~/.emacs.d/tags" "~/code/"))
 ;; (visit-tags-table-buffer t)
