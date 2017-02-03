@@ -16,9 +16,6 @@
 [submodule "org-mode"]
 	path = site=lisp/org-mode
 	url = https://orgmode.org/org-mode.git
-[submodule "site-lisp/org-mode"]
-	path = site-lisp/org-mode
-	url = git://orgmode.org/org-mode.git
 [submodule "site-lisp/company-math"]
 	path = site-lisp/company-math
 	url = git@github.com:vspinu/company-math.git

@@ -1,3 +1,17 @@
+2016-06-17  Christoph Wedler  <wedler@users.sourceforge.net>
+
+	* session.el 2.4b.
+
+	* session.el: Emacs would sometimes try to open a remote
+	connection when using the menus.
+	(session-abbrev-file-name): New optional argument.
+	(session-file-changed-menu-filter): Use it instead calling
+	`directory-file-name' directly.
+	(session-abbrev-inhibit-function): New function.
+	(session-default-buffer-check-p): Use it.
+	(session-file-changed-menu-filter): Use it = do not show buffer
+	info for remote files.
+
 2015-03-04  Christoph Wedler  <wedler@users.sourceforge.net>
 
 	* session.el 2.4a.
@@ -5,7 +19,8 @@
 	* session.el: With Emacs before 24.4, (eval-after-load 'session
 	FORM) would have FORM evaluated before package session has been
 	loaded.
-	(session): Move provide from beginning to end of file.
+	Reported by Steve Purcell <purcell@users.sourceforge.net>.
+	(session): Move `provide' from beginning to end of file.
 
 2015-02-16  Christoph Wedler  <wedler@users.sourceforge.net>
 
