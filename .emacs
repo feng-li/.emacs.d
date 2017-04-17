@@ -44,17 +44,18 @@
 ;; (byte-recompile-directory (expand-file-name "~/.emacs.d/site-lisp/") 0)
 
 ;; Additional library loaded during start up.
+;; (setq tramp-ssh-controlmaster-options nil)
 (require 'iso-transl) ;; keyboard input definitions for ISO 8859/1
 (require 'session)
+(require 'ispell)
 (require 'ibuffer)
 (require 'ido)
 (require 'comint)
 (require 'org)
 (require 'markdown-mode)
-;; (require 'flymake)
+(require 'flymake)
 (require 'dictem nil 'noerror)
 (require 'auto-complete-config)
-(require 'info-look)
 (require 'ess-site)
 (require 'python)
 (load "auctex.el" nil t t)
@@ -64,6 +65,9 @@
 (yas-global-mode 1)
 
 (require 'iedit)
+
+(require 'benchmark-init-loaddefs)
+(benchmark-init/activate)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Set home directory
@@ -371,7 +375,8 @@
 ;; TAGS
 (setq tags-table-list
       '("~/code/TAGS/R/"
-        "~/code/TAGS/C/"))
+        "~/code/TAGS/C/"
+        "~/code/TAGS/FORTRAN/"))
 
 ;; (setq tags-table-list
 ;;       '("~/.emacs.d/tags" "~/code/"))
@@ -880,18 +885,26 @@
 ;;; Python IDE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
 (eval-after-load "python"
   '(progn
 
-     ;; Fabian' python.el (Now default in Emacs)
-     (setq python-shell-interpreter "python2.7")
+     (setq python-shell-interpreter "python3")
      ;; (setenv "PYTHONSTARTUP" "/home/fli/.pystartup")
+
+     ;; Bug fix for Python warning in Emacs 25.1
+     (defun python-shell-completion-native-try ()
+       "Return non-nil if can trigger native completion."
+       (let ((python-shell-completion-native-enable t)
+             (python-shell-completion-native-output-timeout
+              python-shell-completion-native-try-output-timeout))
+         (python-shell-completion-native-get-completions
+          (get-buffer-process (current-buffer))
+          nil "_")))
 
      ;; Enter to indent in python.el
      (add-hook 'python-mode-hook
                '(lambda ()
-                  (setq python-python-command "python")
+                  (setq python-python-command "python3")
 
                   (define-key python-mode-map "\C-m" 'newline-and-indent)
 
@@ -925,26 +938,8 @@
                             (lambda ()
                               (add-to-list 'ac-sources 'ac-source-ropemacs)))
 
-
-                  ;; DEBUGGING: PDB setup, note the python version
-                  (setq pdb-path '~/bin/pdb2.7.py
-                        gud-pdb-command-name (symbol-name pdb-path))
-                  (defadvice pdb (before gud-query-cmdline activate)
-                    "Provide a better default command line when called interactively."
-                    (interactive
-                     (list (gud-query-cmdline pdb-path
-                                              (file-name-nondirectory buffer-file-name)))))
-
-                  ;; Documentation lookup Bugfix for Python 2.7
-                  (info-lookup-add-help
-                   :mode 'python-mode
-                   :regexp "[[:alnum:]_]+"
-                   :doc-spec
-                   '(("(python)Index" nil "")))
-
                   ;; ElDoc for Python in the minor buffer
                   (add-hook 'python-mode-hook 'turn-on-eldoc-mode)
-
 
                   (defun python-add-breakpoint ()
                     (interactive)
@@ -976,7 +971,8 @@
 
 
                   ))
-     ))
+     )
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customize faces
