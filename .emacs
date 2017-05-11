@@ -55,7 +55,7 @@
 (require 'markdown-mode)
 (require 'flymake)
 (require 'dictem nil 'noerror)
-(require 'auto-complete-config)
+;(require 'auto-complete-config)
 (require 'ess-site)
 (require 'python)
 (load "auctex.el" nil t t)
@@ -64,6 +64,7 @@
 (require 'yasnippet)
 (yas-global-mode 1)
 
+(require 'company)
 (require 'iedit)
 
 (require 'benchmark-init-loaddefs)
@@ -488,6 +489,10 @@
 
 
 ;; Auto complete mode
+(eval-after-load "company"
+  '(progn
+    (add-hook 'after-init-hook 'global-company-mode)
+    ))
 (eval-after-load "auto-complete-config"
   '(progn
      (ac-config-default)
@@ -504,15 +509,15 @@
      (setq ac-ignore-case 'smart)
      ))
 
-(dolist (hook '(emacs-lisp-mode-hook
-                c-mode-hook
-                c++-mode-hook
-                ess-mode-hook
-                org-mode-hook
-                inferior-ess-mode-hook
-                python-mode-hook))
-  (add-hook hook 'auto-complete-mode))
-(global-set-key (kbd "<f9> a") 'auto-complete-mode)
+;; (dolist (hook '(emacs-lisp-mode-hook
+;;                 c-mode-hook
+;;                 c++-mode-hook
+;;                 ess-mode-hook
+;;                 org-mode-hook
+;;                 inferior-ess-mode-hook
+;;                 python-mode-hook))
+;;   (add-hook hook 'auto-complete-mode))
+;; (global-set-key (kbd "<f9> a") 'auto-complete-mode)
 
 ;; Font lock
 (global-font-lock-mode t)
@@ -749,14 +754,14 @@
   '(progn
 
      ;; auto complete for R
-     (setq ess-use-auto-complete t)
+     ;; (setq ess-use-auto-complete t)
 
-     (defun ac-ess-mode-setup ()
-       (setq ac-sources
-             (append '(ac-source-words-in-same-mode-buffers)
-                     ac-sources)))
-     (add-hook 'ess-mode-hook 'ac-ess-mode-setup)
-     (add-hook 'inferior-ess-mode-hook 'ac-ess-mode-setup)
+     ;; (defun ac-ess-mode-setup ()
+     ;;   (setq ac-sources
+     ;;         (append '(ac-source-words-in-same-mode-buffers)
+     ;;                 ac-sources)))
+     ;; (add-hook 'ess-mode-hook 'ac-ess-mode-setup)
+     ;; (add-hook 'inferior-ess-mode-hook 'ac-ess-mode-setup)
 
      ;; ESS tracebug
      (setq ess-use-tracebug nil)
@@ -933,10 +938,10 @@
 
                   ;; Auto complete in buffer
                   ;; (require 'ac-python) ;; using just python (faster)
-                  (ac-ropemacs-initialize) ;; using rope (intensive)
-                  (add-hook 'python-mode-hook
-                            (lambda ()
-                              (add-to-list 'ac-sources 'ac-source-ropemacs)))
+                  ;; (ac-ropemacs-initialize) ;; using rope (intensive)
+                  ;; (add-hook 'python-mode-hook
+                  ;;           (lambda ()
+                  ;;             (add-to-list 'ac-sources 'ac-source-ropemacs)))
 
                   ;; ElDoc for Python in the minor buffer
                   (add-hook 'python-mode-hook 'turn-on-eldoc-mode)

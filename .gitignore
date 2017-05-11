@@ -5,11 +5,14 @@ abbrev_defs
 session.*
 !session.el
 ac-comphist*
+ede-projects.el
 *conflicted\ copy*
 server/
 elpa/
 tutorial/
 eshell/
+url/
 snippet/
 auto-save-list/
 site-lisp/local/
+.cask/
