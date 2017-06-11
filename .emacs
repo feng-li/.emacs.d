@@ -67,8 +67,8 @@
 (require 'company)
 (require 'iedit)
 
-(require 'benchmark-init-loaddefs)
-(benchmark-init/activate)
+;(require 'benchmark-init-loaddefs)
+;(benchmark-init/activate)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Set home directory
@@ -94,7 +94,6 @@
 (setenv "OMP_NUM_THREADS" "1")
 
 (setq explicit-bash-args '("--init-file" "~/.bashrc"))
-
 
 ;; Theme
 ;; (load-theme 'solarized t)
@@ -277,7 +276,13 @@
 (setq shift-select-mode t)
 
 ;; allow mouse to select
-(setq xterm-mouse-mode t)
+;; (require 'un-define)
+(require 'xt-mouse)
+(xterm-mouse-mode)
+(require 'mouse)
+(xterm-mouse-mode t)
+(defun track-mouse (e))
+(setq mouse-wheel-follow-mouse 't)
 
 ;; make typing override text selection
 (delete-selection-mode 1) ;
@@ -369,7 +374,7 @@
 ;; iedit mode
 (eval-after-load "iedit"
   '(progn
-     (global-set-key "\C-c;" 'iedit-mode)
+     (global-set-key "\C-ci" 'iedit-mode)
      ))
 
 
@@ -572,13 +577,13 @@
 ;; Spelling Check
 (eval-after-load "ispell"
   '(progn
-     (setq ispell-program-name (executable-find "hunspell"))
+     (setq ispell-program-name "hunspell")
      (setq ispell-really-hunspell t)
-     (setq ispell-personal-dictionary "~/.emacs.d/hunspell/")
-     (add-to-list 'ispell-local-dictionary-alist
-                  '("english-hunspell" "[[:alpha:]]" "[^[:alpha:]]" "[']"
-                    t ("-d" "en_US") nil utf-8))
-
+     (setenv "DICPATH" (concat (getenv "HOME") "/.emacs.d/hunspell/"))
+     (setq ispell-dictionary "en_US")
+     (setq ispell-local-dictionary-alist
+           '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil
+              ("-d" "en_US,en_GB") nil utf-8)))
      (defun ispell-get-coding-system () 'utf-8)
      (global-set-key (kbd "<f9> 4") 'ispell-word)))
 
@@ -733,16 +738,16 @@
                   (local-set-key (kbd "<f5>") 'TeX-command-run-all)
                   ))
 
-     (add-hook
-      'LaTeX-mode-hook
-      (lambda()
-        (add-to-list 'TeX-command-list
-                     '("TeX2LyX" "tex2lyx -f %s.tex ../%s.lyx "
-                       TeX-run-command nil (latex-mode)))
-        (add-to-list 'TeX-command-list
-                     '("View-PDF-via-Adobe" "acroread %s.pdf"
-                       TeX-run-command nil (latex-mode)))
-        ))
+     ;; (add-hook
+     ;;  'LaTeX-mode-hook
+     ;;  (lambda()
+     ;;    (add-to-list 'TeX-command-list
+     ;;                 '("TeX2LyX" "tex2lyx -f %s.tex ../%s.lyx "
+     ;;                   TeX-run-command nil (latex-mode)))
+     ;;    (add-to-list 'TeX-command-list
+     ;;                 '("View-PDF-via-Adobe" "acroread %s.pdf"
+     ;;                   TeX-run-command nil (latex-mode)))
+     ;;    ))
      ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
