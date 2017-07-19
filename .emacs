@@ -37,7 +37,7 @@
             (copy-sequence (normal-top-level-add-to-load-path '(".")))
             (normal-top-level-add-subdirs-to-load-path)))
          load-path)))
-;; (add-to-list 'custom-theme-load-path "~/.emacs.d/site-lisp/emacs-color-theme-solarized")
+(add-to-list 'custom-theme-load-path "~/.emacs.d/site-lisp/emacs-color-theme-solarized")
 
 ;; Byte compile directory when files are changed
 ;; (setq byte-compile-warnings nil)
@@ -55,7 +55,6 @@
 (require 'markdown-mode)
 (require 'flymake)
 (require 'dictem nil 'noerror)
-;(require 'auto-complete-config)
 (require 'ess-site)
 (require 'python)
 (load "auctex.el" nil t t)
@@ -96,10 +95,18 @@
 (setq explicit-bash-args '("--init-file" "~/.bashrc"))
 
 ;; Theme
-;; (load-theme 'solarized t)
+(if (display-graphic-p)
+    (progn
+      (set-frame-parameter nil 'background-mode 'light))
+  (set-frame-parameter nil 'background-mode 'dark)
+  (set-terminal-parameter nil 'background-mode 'dark)
+  )
+(load-theme 'solarized t)
 
 
 (when (display-graphic-p)
+
+
 
   ;; tool-bar mode
   (tool-bar-mode -1)
@@ -118,7 +125,7 @@
 ;; Set Fonts
 (when (display-graphic-p)
   (add-to-list 'default-frame-alist
-               '(font . "Source Code Pro-10.5")) ; https://github.com/adobe-fonts/source-code-pro
+               '(font . "Source Code Pro Medium-10.5")) ; https://github.com/adobe-fonts/source-code-pro
   (setq face-font-rescale-alist
         '(("Microsoft YaHei". 1.2)))
   (set-fontset-font "fontset-default"
@@ -272,7 +279,7 @@
 (defadvice terminal-init-xterm (after select-shift-up activate)
   (define-key input-decode-map "\e[1;2A" [S-up]))
 
-;;shift selection
+;; shift selection
 (setq shift-select-mode t)
 
 ;; allow mouse to select
@@ -993,19 +1000,15 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(ess-function-call-face ((t (:foreground "cyan"))))
- '(flyspell-duplicate ((t (:underline (:color "orange" :style wave)))))
- '(flyspell-incorrect ((t (:underline (:color "red" :style wave)))))
- ;; '(font-latex-italic-face ((t (:slant italic))))
- '(font-latex-sectioning-5-face ((t (:foreground "black" :background "orange" :weight bold))))
- ;; '(font-latex-sedate-face ((t (:foreground "magenta"))))
- ;; '(font-latex-verbatim-face ((t (:foreground "SaddleBrown"))))
- '(font-lock-builtin-face ((t (:foreground "darkcyan"))))
- '(font-lock-comment-face ((t (:foreground "blue"))))
- '(font-lock-function-name-face ((t (:foreground "blue" :weight bold))))
+ '(flyspell-duplicate ((t (:underline (:style wave)))))
+ '(flyspell-incorrect ((t (:underline (:style wave)))))
+ '(font-latex-sectioning-5-face ((t (:weight bold))))
+ '(font-latex-sedate-face ((t (:foreground "blue"))))
+ '(font-lock-comment-delimiter-face ((t (:foreground "royal blue" :slant italic))))
+ '(font-lock-comment-face ((t (:foreground "royal blue"))))
+ '(font-lock-function-name-face ((t (:weight bold))))
  '(font-lock-keyword-face ((t (:foreground "magenta"))))
- '(font-lock-string-face ((t (:foreground "darkgreen"))))
  '(match ((t (:background "yellow1" :foreground "black"))))
- '(minibuffer-prompt ((t (:foreground "magenta"))))
- )
+ '(minibuffer-prompt ((t (:foreground "magenta")))))
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
