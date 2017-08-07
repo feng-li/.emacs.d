@@ -92,16 +92,18 @@
 ;; Environment variables
 (setenv "OMP_NUM_THREADS" "1")
 
-(setq explicit-bash-args '("--init-file" "~/.bashrc"))
+;; (setq explicit-bash-args '("--init-file" "~/.bashrc"))
 
 ;; Theme
 (if (display-graphic-p)
     (progn
-      (set-frame-parameter nil 'background-mode 'light))
+      (set-frame-parameter nil 'background-mode 'light)
+      )
   (set-frame-parameter nil 'background-mode 'dark)
   (set-terminal-parameter nil 'background-mode 'dark)
   )
 (load-theme 'solarized t)
+
 
 
 (when (display-graphic-p)
@@ -1005,10 +1007,11 @@
  '(font-latex-sectioning-5-face ((t (:weight bold))))
  '(font-latex-sedate-face ((t (:foreground "blue"))))
  '(font-lock-comment-delimiter-face ((t (:foreground "royal blue" :slant italic))))
- '(font-lock-comment-face ((t (:foreground "royal blue"))))
+ '(font-lock-comment-face ((t (:foreground "royal blue" :slant italic))))
  '(font-lock-function-name-face ((t (:weight bold))))
  '(font-lock-keyword-face ((t (:foreground "magenta"))))
  '(match ((t (:background "yellow1" :foreground "black"))))
- '(minibuffer-prompt ((t (:foreground "magenta")))))
+ '(minibuffer-prompt ((t (:foreground "magenta"))))
+ )
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
