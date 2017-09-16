@@ -102,13 +102,12 @@
   (set-frame-parameter nil 'background-mode 'dark)
   (set-terminal-parameter nil 'background-mode 'dark)
   )
+;; (setq solarized-termcolors 256)
 (load-theme 'solarized t)
 
 
 
 (when (display-graphic-p)
-
-
 
   ;; tool-bar mode
   (tool-bar-mode -1)
@@ -817,7 +816,9 @@
                          (cons "param" "")
                          (cons "return" "NA")
                          (cons "references" "NA")
-                         (cons "author" "Feng Li, Central University of Finance and Economics.")))
+                         (cons "author" "Feng Li, Central University of Finance and Economics.")
+                         (cons "export" "")
+                         ))
 
                   (font-lock-add-keywords
                    nil
