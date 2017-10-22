@@ -68,8 +68,7 @@
 
 ;(require 'benchmark-init-loaddefs)
 ;(benchmark-init/activate)
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Set home directory
 ;; (setq default-directory "~/workspace/")
 
@@ -126,7 +125,7 @@
 ;; Set Fonts
 (when (display-graphic-p)
   (add-to-list 'default-frame-alist
-               '(font . "Source Code Pro Medium-10.5")) ; https://github.com/adobe-fonts/source-code-pro
+               '(font . "Source Code Pro Medium-9")) ; https://github.com/adobe-fonts/source-code-pro
   (setq face-font-rescale-alist
         '(("Microsoft YaHei". 1.2)))
   (set-fontset-font "fontset-default"
@@ -285,12 +284,12 @@
 
 ;; allow mouse to select
 ;; (require 'un-define)
-(require 'xt-mouse)
-(xterm-mouse-mode)
-(require 'mouse)
-(xterm-mouse-mode t)
-(defun track-mouse (e))
-(setq mouse-wheel-follow-mouse 't)
+;; (require 'xt-mouse)
+;; (xterm-mouse-mode)
+;; (require 'mouse)
+;; (xterm-mouse-mode t)
+;; (defun track-mouse (e))
+;; (setq mouse-wheel-follow-mouse 't)
 
 ;; make typing override text selection
 (delete-selection-mode 1) ;
