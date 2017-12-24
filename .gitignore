@@ -16,3 +16,4 @@ snippet/
 auto-save-list/
 site-lisp/local/
 .cask/
+ido.last
