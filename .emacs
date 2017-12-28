@@ -124,12 +124,23 @@
 
 ;; Set Fonts
 (when (display-graphic-p)
-  ;; (add-to-list 'default-frame-alist
-  ;;              '(font . "Source Code Pro Medium-9")) ; https://github.com/adobe-fonts/source-code-pro
-  (add-to-list 'default-frame-alist
-               '(font . "M+ 1m-9")) ;
-  (setq face-font-rescale-alist
-        '(("Microsoft YaHei". 1.2)))
+  (progn
+    (if (> (display-pixel-height) 1080)
+
+        (add-to-list 'default-frame-alist
+                     '(font . "M+ 1m-9")) ;
+      (setq face-font-rescale-alist
+            '(("Microsoft YaHei". 1.2)))
+      )
+
+    ;; (add-to-list 'default-frame-alist
+    ;;              '(font . "Source Code Pro Medium-9")) ; https://github.com/adobe-fonts/source-code-pro
+
+    (add-to-list 'default-frame-alist
+                 '(font . "M+ 1m-11")) ;
+    (setq face-font-rescale-alist
+          '(("Microsoft YaHei". 1.2))))
+
   (set-fontset-font "fontset-default"
                     'unicode '("Microsoft YaHei" . "unicode-bmp"))
   )
@@ -346,7 +357,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; LanguageTool
+;; LanguageTool https://languagetool.org/
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (eval-after-load "langtool"
   '(progn
