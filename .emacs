@@ -124,18 +124,15 @@
 
 ;; Set Fonts
 (when (display-graphic-p)
-  (progn
-    (if (> (display-pixel-height) 1080)
-
+  (if (> (display-pixel-height) 1080)
+      (progn
         (add-to-list 'default-frame-alist
                      '(font . "M+ 1m-9")) ;
-      (setq face-font-rescale-alist
-            '(("Microsoft YaHei". 1.2)))
-      )
+        (setq face-font-rescale-alist
+              '(("Microsoft YaHei". 1.2))))
 
     ;; (add-to-list 'default-frame-alist
     ;;              '(font . "Source Code Pro Medium-9")) ; https://github.com/adobe-fonts/source-code-pro
-
     (add-to-list 'default-frame-alist
                  '(font . "M+ 1m-11")) ;
     (setq face-font-rescale-alist
@@ -697,8 +694,9 @@
      (setq TeX-PDF-mode t)
      ;; (setq-default TeX-engine 'xetex) ;this can be set locally
 
-     (setq TeX-parse-self t) ; Enable parse on load.
-     (setq TeX-auto-save t) ; Enable parse on save.
+     ;; Parse on load/save
+     (setq TeX-parse-self t)
+     (setq TeX-auto-save t)
 
 
      ;; Add listings to verbatim environments
@@ -733,6 +731,7 @@
              [?\C-w ?\\ ?b ?m ?\{ ?\C-y ?\} right])
        (local-set-key (kbd "C-c C-x C-b") 'my-insert-bold-math))
      (add-hook 'LaTeX-mode-hook 'auctex-insert-special)
+
 
      ;; Enable file-line-error to avoid error message "Error occured after last TeX file closed" ; now is default for 11.89
      ;; (setq LaTeX-command-style (quote (("" "%(PDF)%(latex) -file-line-error %S%(PDFout)"))))
