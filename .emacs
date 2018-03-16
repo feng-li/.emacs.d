@@ -74,8 +74,8 @@
 
 ;; Default frame height and width
 (setq default-frame-alist
-      (append (list '(width  . 95)  ; Width set (characters)
-                    '(height . 55)) ; Height set (lines)
+      (append (list '(width  . 52)  ; Width set (characters)
+                    '(height . 50)) ; Height set (lines)
               default-frame-alist))
 ;; set the default fill column
 (setq default-fill-column 90)
@@ -129,14 +129,14 @@
         (add-to-list 'default-frame-alist
                      '(font . "M+ 1m-9")) ;
         (setq face-font-rescale-alist
-              '(("Microsoft YaHei". 1.2))))
+              '(("Noto Sans CJK SC". 1.2))))
 
     ;; (add-to-list 'default-frame-alist
     ;;              '(font . "Source Code Pro Medium-9")) ; https://github.com/adobe-fonts/source-code-pro
     (add-to-list 'default-frame-alist
                  '(font . "M+ 1m-11")) ;
     (setq face-font-rescale-alist
-          '(("Microsoft YaHei". 1.2))))
+          '(("Noto Sans CJK SC". 1.2))))
 
   (set-fontset-font "fontset-default"
                     'unicode '("Microsoft YaHei" . "unicode-bmp"))
