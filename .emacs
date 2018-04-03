@@ -97,12 +97,12 @@
 (if (display-graphic-p)
     (progn
       (set-frame-parameter nil 'background-mode 'light)
+      (setq solarized-termcolors 256)
+      (load-theme 'solarized t)
       )
-  (set-frame-parameter nil 'background-mode 'dark)
-  (set-terminal-parameter nil 'background-mode 'dark)
+  ;; (set-frame-parameter nil 'background-mode 'dark)
+  ;; (set-terminal-parameter nil 'background-mode 'dark)
   )
-;; (setq solarized-termcolors 256)
-(load-theme 'solarized t)
 
 
 
@@ -118,9 +118,12 @@
 ;; Disable backup files (*~)
 (setq make-backup-files nil)
 
-;; Disable vc-git
-(setq vc-handled-backends ())
-(vc-mode -1)
+;;Version Control
+;; (setq vc-handled-backends ()) ;; Disable vc-git
+;; (vc-mode -1)
+(require 'git)
+(require 'git-blame)
+
 
 ;; Set Fonts
 (when (display-graphic-p)
@@ -1009,17 +1012,21 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ess-assignment-face ((t (:inherit nil :foreground "green4" :weight bold))))
  '(ess-function-call-face ((t (:foreground "cyan"))))
  '(flyspell-duplicate ((t (:underline (:style wave)))))
  '(flyspell-incorrect ((t (:underline (:style wave)))))
  '(font-latex-sectioning-5-face ((t (:weight bold))))
  '(font-latex-sedate-face ((t (:foreground "blue"))))
- '(font-lock-comment-delimiter-face ((t (:foreground "royal blue" :slant italic))))
- '(font-lock-comment-face ((t (:foreground "royal blue" :slant italic))))
+ '(font-lock-builtin-face ((t (:foreground "cyan4"))))
+ '(font-lock-comment-delimiter-face ((t (:foreground "green4" :slant italic :weight bold))))
+ '(font-lock-comment-face ((t (:foreground "green4" :slant italic))))
  '(font-lock-function-name-face ((t (:weight bold))))
  '(font-lock-keyword-face ((t (:foreground "magenta"))))
+ '(font-lock-string-face ((t (:foreground "green"))))
+ '(font-lock-type-face ((t (:foreground "OrangeRed"))))
+ '(font-lock-variable-name-face ((t (:foreground "#268bd2"))))
  '(match ((t (:background "yellow1" :foreground "black"))))
- '(minibuffer-prompt ((t (:foreground "magenta"))))
- )
+ '(minibuffer-prompt ((t (:foreground "magenta")))))
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
