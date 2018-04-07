@@ -1,6 +1,9 @@
 abbrev_defs
 *.~
+*~
 *.elc
+*.desktop
+*.lock
 .session
 session.*
 !session.el
@@ -11,6 +14,7 @@ server/
 elpa/
 tutorial/
 eshell/
+tags/
 url/
 snippet/
 auto-save-list/

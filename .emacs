@@ -47,6 +47,7 @@
 ;; (setq tramp-ssh-controlmaster-options nil)
 (require 'iso-transl) ;; keyboard input definitions for ISO 8859/1
 (require 'session)
+(require 'dired-x)
 (require 'ispell)
 (require 'ibuffer)
 (require 'ido)
@@ -73,10 +74,10 @@
 ;; (setq default-directory "~/workspace/")
 
 ;; Default frame height and width
-(setq default-frame-alist
-      (append (list '(width  . 52)  ; Width set (characters)
-                    '(height . 50)) ; Height set (lines)
-              default-frame-alist))
+;; (setq default-frame-alist
+;;       (append (list '(width  . 52)  ; Width set (characters)
+;;                     '(height . 50)) ; Height set (lines)
+;;               default-frame-alist))
 ;; set the default fill column
 (setq default-fill-column 90)
 
@@ -206,31 +207,34 @@
 (global-visual-line-mode -1)
 
 ;; Dired mode
-(add-hook 'dired-load-hook '(lambda () (require 'dired-x)))
-(setq dired-omit-files-p t)
-(add-hook 'dired-mode-hook
-          (lambda ()
-            (setq dired-omit-files "^\\.[a-z|A-Z]+\\|^\\.?#\\|^\\.$")
-            (setq dired-omit-extensions
-                  '(".pyc" "CVS/" "~" ".o" ".bin" ".bak" ".obj" ".map" ".a"
-                    ".ln" ".blg" ".bbl" ".elc" ".lof" ".glo" ".idx" ".lot"
-                    ".dvi" ".fmt" ".tfm" ".class" ".fas" ".lib" ".x86f"
-                    ".sparcf" ".lo" ".la" ".toc" ".aux" ".cp" ".fn" ".ky"
-                    ".pg" ".tp" ".vr" ".cps" ".fns" ".kys" ".pgs" ".tps"
-                    ".vrs" ".idx" ".lof" ".lot" ".glo" ".blg" ".cp" ".cps"
-                    ".fn" ".fns" ".ky" ".kys" ".pg" ".pgs" ".tp" ".tps"
-                    ".vr" ".vrs" ".Rc" ))
-            (setq dired-listing-switches "-hla")
-            (setq directory-free-space-args "-h")
-            (define-key dired-mode-map (kbd "<return>")
-              'dired-find-alternate-file) ; was dired-advertised-find-file
-            (define-key dired-mode-map (kbd "<delete>") 'dired-do-delete)
-            (define-key dired-mode-map (kbd "<f9> DEL")
-              (lambda () (interactive) (find-alternate-file "..")))
-            (setq cursor-type 'box)
-            (dired-omit-mode 1)
-            (local-set-key (kbd "<f9> h") 'dired-omit-mode)))
-(put 'dired-find-alternate-file 'disabled nil)
+(eval-after-load "ibuffer"
+  '(progn
+     (setq dired-omit-files-p t)
+     (add-hook 'dired-mode-hook
+               (lambda ()
+                 (setq dired-omit-files "^\\.[a-z|A-Z]+\\|^\\.?#\\|^\\.$")
+                 (setq dired-omit-extensions
+                       '(".pyc" "CVS/" "~" ".o" ".bin" ".bak" ".obj" ".map" ".a"
+                         ".ln" ".blg" ".bbl" ".elc" ".lof" ".glo" ".idx" ".lot"
+                         ".dvi" ".fmt" ".tfm" ".class" ".fas" ".lib" ".x86f"
+                         ".sparcf" ".lo" ".la" ".toc" ".aux" ".cp" ".fn" ".ky"
+                         ".pg" ".tp" ".vr" ".cps" ".fns" ".kys" ".pgs" ".tps"
+                         ".vrs" ".idx" ".lof" ".lot" ".glo" ".blg" ".cp" ".cps"
+                         ".fn" ".fns" ".ky" ".kys" ".pg" ".pgs" ".tp" ".tps"
+                         ".vr" ".vrs" ".Rc" ))
+                 (setq dired-listing-switches "-hla")
+                 (setq directory-free-space-args "-h")
+                 (define-key dired-mode-map (kbd "<return>")
+                   'dired-find-alternate-file) ; was dired-advertised-find-file
+                 (define-key dired-mode-map (kbd "<delete>") 'dired-do-delete)
+                 (define-key dired-mode-map (kbd "<f9> DEL")
+                   (lambda () (interactive) (find-alternate-file "..")))
+                 (setq cursor-type 'box)
+                 (dired-omit-mode 1)
+                 (local-set-key (kbd "<f9> h") 'dired-omit-mode)))
+     (put 'dired-find-alternate-file 'disabled nil)
+     )
+  )
 
 ;; Personal global key settings
 (global-set-key (kbd "<home>") 'beginning-of-buffer)
@@ -663,7 +667,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Org-mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 (add-hook 'org-mode-hook
           '(lambda ()
              (setq org-file-apps
