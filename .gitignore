@@ -17,6 +17,7 @@ eshell/
 tags/
 url/
 snippet/
+site-lisp/yasnippet/
 auto-save-list/
 site-lisp/local/
 .cask/

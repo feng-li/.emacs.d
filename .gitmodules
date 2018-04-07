@@ -43,3 +43,6 @@
 [submodule "site-lisp/company-mode"]
 	path = site-lisp/company-mode
 	url = git@github.com:company-mode/company-mode.git
+[submodule "site-lisp/yasnippet-snippets"]
+	path = site-lisp/yasnippet-snippets
+	url = git@github.com:AndreaCrotti/yasnippet-snippets.git

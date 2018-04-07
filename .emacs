@@ -11,6 +11,7 @@
  '(indicate-empty-lines nil)
  '(org-support-shift-select t)
  '(send-mail-function (quote mailclient-send-it))
+;; '(session-use-package t nil (session))
  '(show-paren-mode t nil (paren))
  '(warning-suppress-types (quote ((undo discard-info)))))
 
@@ -62,7 +63,6 @@
 (require 'langtool)
 (require 'writegood-mode)
 (require 'yasnippet)
-(yas-global-mode 1)
 
 (require 'company)
 (require 'iedit)
@@ -169,6 +169,13 @@
 
 
 ;; Enable line number mode and enable visual line mode
+(if (display-graphic-p)
+    (progn
+      ;; Do nothing with window system
+      )
+  ;; Add a vertical line
+  (setq linum-format "%4d\u2502 ")
+  )
 (add-hook 'find-file-hook
           (lambda ()
             (linum-mode 1)
@@ -350,6 +357,21 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (setq diary-file "~/workspace/diary")
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Yasnippet settings
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(eval-after-load 'yasnippet
+  '(progn
+     (yas-global-mode 1)
+     (setq yas-snippet-dirs
+           '(;; personal snippets
+             "~/.emacs.d/snippets"
+             ;; snippet collection
+             "~/.emacs.d/site-lisp/yasnippet-snippets/snippets"
+             ))
+     )
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Matlab, Octave mode
@@ -1029,6 +1051,7 @@
  '(font-lock-string-face ((t (:foreground "green"))))
  '(font-lock-type-face ((t (:foreground "OrangeRed"))))
  '(font-lock-variable-name-face ((t (:foreground "#268bd2"))))
+ '(linum ((t (:inherit default))))
  '(match ((t (:background "yellow1" :foreground "black"))))
  '(minibuffer-prompt ((t (:foreground "magenta")))))
 (put 'upcase-region 'disabled nil)
