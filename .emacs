@@ -353,8 +353,23 @@
 (setq ring-bell-function (lambda ()  t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Diary mode
+;; Hide and Show code blocks
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(dolist (hook (list
+               'after-text-mode-hook
+               'c-mode-hook
+               'org-mode-hook
+               'python-mode-hook
+	       'mail-mode-hook
+               'ess-mode-hook))
+  (add-hook hook '(lambda () (hs-minor-mode))))
+(global-set-key (kbd "<C-M-insert>") 'hs-toggle-hiding)
+
+;; Hide and show mode
+;; (hs-minor-mode)
+
+
 (setq diary-file "~/workspace/diary")
 
 
@@ -876,10 +891,6 @@
 
                   ;; Set M-§ to complete the object in the ESS editor
                   ;; The default was "C-c Tab", Not needed if ac-R enabled
-
-                  ;; Hide and show mode
-                  ;; (hs-minor-mode)
-                  ;; (local-set-key (kbd "<C-M-insert>") 'hs-toggle-hiding)
 
                   ;; insert 8 spaces
                   (fset 'my-R-smart-indent
