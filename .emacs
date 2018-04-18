@@ -488,15 +488,17 @@
   '(progn
      (ido-mode t)
      (setq ido-use-virtual-buffers nil)
-     (setq ido-enable-flex-matching t)
+     (setq ido-enable-flex-matching nil)
+     (setq ido-ignore-extensions t)
      (setq ido-ignore-files
            '("\\.Rc$" "\\.dvi$" "\\.pdf$" "\\.ps$" "\\.out$"
              "\\.log$" "\\.ods$" "\\.eps$" "\\#$" "\\.png$" "\\~$"
              "\\.RData$" "\\.nav$" "\\.snm$" "\\`\\.\\./" "\\`\\./"
-             "\\.synctex.gz$" "\\.fdb_latexmk$"))
+             "\\.synctex.gz$" "\\.fdb_latexmk$" "\\.tar.gz$" "\\.zip$"
+             "\\.o$" "\\.tar$" "\\.Rproj$" "\\.Rcheck$"))
 
      (setq  ido-ignore-directories
-            '("\\.prv"))
+            '("\\.prv$" "\\.Rcheck$" "\\TAGS$" ))
 
      (setq ido-ignore-buffers
            '("\\` " "^\\*ESS\\*" "^\\*Messages\\*" "^\\*Help\\*"
