@@ -364,10 +364,8 @@
 	       'mail-mode-hook
                'ess-mode-hook))
   (add-hook hook '(lambda () (hs-minor-mode))))
-(global-set-key (kbd "<C-M-insert>") 'hs-toggle-hiding)
-
-;; Hide and show mode
-;; (hs-minor-mode)
+(global-set-key (kbd "M-+") 'hs-toggle-hiding)
+(global-set-key (kbd "M-*") 'hs-show-all)
 
 
 (setq diary-file "~/workspace/diary")
@@ -495,10 +493,10 @@
              "\\.log$" "\\.ods$" "\\.eps$" "\\#$" "\\.png$" "\\~$"
              "\\.RData$" "\\.nav$" "\\.snm$" "\\`\\.\\./" "\\`\\./"
              "\\.synctex.gz$" "\\.fdb_latexmk$" "\\.tar.gz$" "\\.zip$"
-             "\\.o$" "\\.tar$" "\\.Rproj$" "\\.Rcheck$"))
+             "\\.o$" "\\.tar$" "\\.Rproj$" "\\.Rcheck$" "\\.Rhistory$"))
 
      (setq  ido-ignore-directories
-            '("\\.prv$" "\\.Rcheck$" "\\TAGS$" ))
+            '("\\.prv$" "\\TAGS$" "\\.Rcheck/"))
 
      (setq ido-ignore-buffers
            '("\\` " "^\\*ESS\\*" "^\\*Messages\\*" "^\\*Help\\*"
