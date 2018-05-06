@@ -20,7 +20,7 @@
 ;;
 ;; Copyright: Feng Li <http://feng.li/>
 ;;
-;; Download: https://github.com/feng-li/.emacs.d
+;; Download: https://github.com/feng-li/.emacs.d/
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
@@ -41,8 +41,9 @@
 (add-to-list 'custom-theme-load-path "~/.emacs.d/site-lisp/emacs-color-theme-solarized")
 
 ;; Byte compile directory when files are changed
-;; (setq byte-compile-warnings nil)
-;; (byte-recompile-directory (expand-file-name "~/.emacs.d/site-lisp/") 0)
+(setq byte-compile-warnings nil)
+(byte-recompile-directory (expand-file-name "~/.emacs.d/site-lisp/") 0)
+(byte-recompile-file "~/.emacs.d/.emacs" nil 0)
 
 ;; Additional library loaded during start up.
 ;; (setq tramp-ssh-controlmaster-options nil)
@@ -79,7 +80,7 @@
 ;;                     '(height . 50)) ; Height set (lines)
 ;;               default-frame-alist))
 ;; set the default fill column
-(setq default-fill-column 90)
+(setq fill-column 90)
 
 ;; Personal information
 (setq frame-title-format "%b")
@@ -124,6 +125,7 @@
 ;; (vc-mode -1)
 (require 'git)
 (require 'git-blame)
+(setq vc-follow-symlinks nil)
 
 
 ;; Set Fonts
@@ -174,7 +176,7 @@
       ;; Do nothing with window system
       )
   ;; Add a vertical line
-  (setq linum-format "%4d\u2502 ")
+  (setq linum-format "%4d\u2502")
   )
 (add-hook 'find-file-hook
           (lambda ()
@@ -216,7 +218,7 @@
 ;; Dired mode
 (eval-after-load "ibuffer"
   '(progn
-     (setq dired-omit-files-p t)
+     (setq dired-omit-mode t)
      (add-hook 'dired-mode-hook
                (lambda ()
                  (setq dired-omit-files "^\\.[a-z|A-Z]+\\|^\\.?#\\|^\\.$")
@@ -258,7 +260,7 @@
 ;; The scratch settings
 (setq initial-scratch-message nil) ;; Disable scratch information
 (setq fundamental-mode 'text-mode)
-(setq default-major-mode 'text-mode)
+(setq major-mode 'text-mode)
 (setq initial-major-mode 'text-mode) ;; text mode in scratch
 (add-hook 'text-mode-hook
           (function (lambda () (turn-on-auto-fill)))) ;; Auto fill mode
@@ -348,7 +350,7 @@
 
 
 ;; copy with other applications
-(setq x-select-enable-clipboard t)
+(setq select-enable-clipboard t)
 
 (setq ring-bell-function (lambda ()  t))
 
@@ -534,13 +536,15 @@
      (setq comint-move-point-for-output t)
 
      ;; Clear buffer output
-     (defun comint-clear-buffer () (interactive)
-            (save-excursion
-              (comint-goto-process-mark)
-              (forward-line 0)
-              (kill-region (point-min) (point))))
-     (define-key comint-mode-map (kbd "C-l") 'comint-clear-buffer)
+     ;; (defun comint-clear-buffer () (interactive)
+     ;;        (save-excursion
+     ;;          (comint-goto-process-mark)
+     ;;          (forward-line 0)
+     ;;          (kill-region (point-min) (point))))
+     ;; (define-key comint-mode-map (kbd "C-l") 'comint-clear-buffer)
 
+     ;; Emacs 25's new default function was bound to (C-C, C-O)
+     (define-key comint-mode-map (kbd "C-l") 'comint-clear-buffer)
      ))
 
 ;; Replace ^M
@@ -575,15 +579,6 @@
      (setq ac-ignore-case 'smart)
      ))
 
-;; (dolist (hook '(emacs-lisp-mode-hook
-;;                 c-mode-hook
-;;                 c++-mode-hook
-;;                 ess-mode-hook
-;;                 org-mode-hook
-;;                 inferior-ess-mode-hook
-;;                 python-mode-hook))
-;;   (add-hook hook 'auto-complete-mode))
-;; (global-set-key (kbd "<f9> a") 'auto-complete-mode)
 
 ;; Font lock
 (global-font-lock-mode t)
