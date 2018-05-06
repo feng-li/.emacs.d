@@ -638,7 +638,7 @@
      (setenv "DICPATH" (concat (getenv "HOME") "/.emacs.d/hunspell/"))
      (setq ispell-dictionary "en_US")
      (setq ispell-local-dictionary-alist
-           '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil
+           '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "['’]" t
               ("-d" "en_US,en_GB") nil utf-8)))
      (defun ispell-get-coding-system () 'utf-8)
      (global-set-key (kbd "<f9> 4") 'ispell-word)))
