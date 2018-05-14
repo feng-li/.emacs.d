@@ -442,6 +442,10 @@
       '("~/code/TAGS/R/"
         "~/code/TAGS/C/"
         "~/code/TAGS/FORTRAN/"))
+(dolist (hook (list
+               'ess-mode-hook
+               'inferior-ess-mode-hook))
+  (add-hook hook '(lambda () (xref-etags-mode))))
 
 ;; (setq tags-table-list
 ;;       '("~/.emacs.d/tags" "~/code/"))
@@ -493,7 +497,8 @@
              "\\.log$" "\\.ods$" "\\.eps$" "\\#$" "\\.png$" "\\~$"
              "\\.RData$" "\\.nav$" "\\.snm$" "\\`\\.\\./" "\\`\\./"
              "\\.synctex.gz$" "\\.fdb_latexmk$" "\\.tar.gz$" "\\.zip$"
-             "\\.o$" "\\.tar$" "\\.Rproj$" "\\.Rcheck$" "\\.Rhistory$"))
+             "\\.o$" "\\.tar$" "\\.Rproj$" "\\.Rcheck$" "\\.Rhistory$"
+	     "\\__pycache__$"))
 
      (setq  ido-ignore-directories
             '("\\.prv$" "\\TAGS$" "\\.Rcheck/"))
