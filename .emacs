@@ -44,6 +44,10 @@
 (setq byte-compile-warnings nil)
 (byte-recompile-directory (expand-file-name "~/.emacs.d/site-lisp/") 0)
 (byte-recompile-file "~/.emacs.d/.emacs" nil 0)
+;; Kill the compile-log buffer
+(add-hook 'compilation-finish-functions
+          (lambda (buf strg) (kill-buffer buf)))
+
 
 ;; Additional library loaded during start up.
 ;; (setq tramp-ssh-controlmaster-options nil)
@@ -445,7 +449,11 @@
         "~/code/TAGS/C/"
         "~/code/TAGS/FORTRAN/"))
 (dolist (hook (list
+	       'after-text-mode-hook
                'ess-mode-hook
+	       'python-mode-hook
+	       'c-mode-hook
+	       'c++-mode-hook
                'inferior-ess-mode-hook))
   (add-hook hook '(lambda () (xref-etags-mode))))
 
@@ -499,11 +507,10 @@
              "\\.log$" "\\.ods$" "\\.eps$" "\\#$" "\\.png$" "\\~$"
              "\\.RData$" "\\.nav$" "\\.snm$" "\\`\\.\\./" "\\`\\./"
              "\\.synctex.gz$" "\\.fdb_latexmk$" "\\.tar.gz$" "\\.zip$"
-             "\\.o$" "\\.tar$" "\\.Rproj$" "\\.Rcheck$" "\\.Rhistory$"
-	     "\\__pycache__$"))
+             "\\.o$" "\\.tar$" "\\.Rproj$" "\\.Rcheck$" "\\.Rhistory$"))
 
      (setq  ido-ignore-directories
-            '("\\.prv$" "\\TAGS$" "\\.Rcheck/"))
+            '("\\.prv$" "\\TAGS$" "\\.Rcheck/" "\\__pycache__$"))
 
      (setq ido-ignore-buffers
            '("\\` " "^\\*ESS\\*" "^\\*Messages\\*" "^\\*Help\\*"
@@ -933,7 +940,6 @@
                '(lambda ()
                   (define-key inferior-ess-mode-map (kbd "C-c `") 'ess-parse-errors)
                   (define-key inferior-ess-mode-map (kbd "C-c d") 'ess-change-directory)
-                  (define-key inferior-ess-mode-map (kbd "C-k")   'kill-whole-line)
                   (define-key inferior-ess-mode-map (kbd "C-c l") 'ess-rutils-load-wkspc)))
 
      ;; ESS Code styles
