@@ -80,7 +80,7 @@
 ;;                     '(height . 50)) ; Height set (lines)
 ;;               default-frame-alist))
 ;; set the default fill column
-(setq fill-column 90)
+(setq-default fill-column 90)
 
 ;; Personal information
 (setq frame-title-format "%b")
