@@ -662,16 +662,24 @@
 (setq flyspell-issue-welcome-flag nil)
 (setq flyspell-issue-message-flag nil)
 
-;; Fly spell mode
-(dolist (hook '(text-mode-hook))
-  (add-hook hook (lambda () (flyspell-mode))))
+;; Fly spell mode for major mode
+(dolist (hook '(text-mode-hook
+                latex-mode-hook
+                markdown-mode-hook))
+  (add-hook hook (lambda () (flyspell-mode 1))))
+
+(add-hook 'tex-mode-hook (function (lambda () (setq ispell-parser 'tex))))
 
 ;; Disable flyspell for special modes
 (dolist (hook '(change-log-mode-hook log-edit-mode-hook))
   (add-hook hook (lambda () (flyspell-mode -1))))
 
 ;; Fly spell check comments for a programmer
-(dolist (hook '(emacs-lisp-mode-hook c-mode-hook c++-mode-hook ess-mode-hook python-mode-hook))
+(dolist (hook '(emacs-lisp-mode-hook
+                c-mode-hook
+                c++-mode-hook
+                ess-mode-hook
+                python-mode-hook))
   (add-hook hook (lambda () (flyspell-prog-mode))))
 
 ;; Dictionary
