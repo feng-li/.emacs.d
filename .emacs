@@ -645,14 +645,17 @@
 ;; Spelling Check
 (eval-after-load "ispell"
   '(progn
-     (setq ispell-program-name "hunspell")
-     (setq ispell-really-hunspell t)
-     (setenv "DICPATH" (concat (getenv "HOME") "/.emacs.d/hunspell/"))
-     (setq ispell-dictionary "en_US")
-     (setq ispell-local-dictionary-alist
-           '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "['’]" t
-              ("-d" "en_US,en_GB") nil utf-8)))
-     (defun ispell-get-coding-system () 'utf-8)
+     (setq ispell-dictionary "american-insane")
+
+     ;; (defun ispell-get-coding-system () 'utf-8)
+     ;; (setq ispell-program-name "hunspell")
+     ;; (setq ispell-really-hunspell t)
+     ;; (setenv "DICPATH" (concat (getenv "HOME") "/.emacs.d/hunspell/"))
+     ;; (setq ispell-local-dictionary "en_US")
+     ;; (setq ispell-local-dictionary-alist
+     ;;       '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil
+     ;;          ("-d" "en_US,en_GB") nil UTF-8)))
+
      (global-set-key (kbd "<f9> 4") 'ispell-word)))
 
 ;; Auto correct spelling mistakes
@@ -667,7 +670,6 @@
                 latex-mode-hook
                 markdown-mode-hook))
   (add-hook hook (lambda () (flyspell-mode 1))))
-
 (add-hook 'tex-mode-hook (function (lambda () (setq ispell-parser 'tex))))
 
 ;; Disable flyspell for special modes
