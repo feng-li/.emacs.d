@@ -266,8 +266,6 @@
 (setq fundamental-mode 'text-mode)
 (setq major-mode 'text-mode)
 (setq initial-major-mode 'text-mode) ;; text mode in scratch
-(add-hook 'text-mode-hook
-          (function (lambda () (turn-on-auto-fill)))) ;; Auto fill mode
 
 ;; Kill the current buffer, without confirmation.
 (fset 'my-kill-current-buffer
@@ -455,14 +453,12 @@
 	       'c-mode-hook
 	       'c++-mode-hook
                'inferior-ess-mode-hook))
-  (add-hook hook '(lambda () (xref-etags-mode))))
+  (add-hook hook '(lambda () (xref-etags-mode t))))
 
 ;; (setq tags-table-list
 ;;       '("~/.emacs.d/tags" "~/code/"))
-;; (visit-tags-table-buffer t)
 
 ;; Ibuffer mode
-
 (eval-after-load "ibuffer"
   '(progn
      (global-set-key (kbd "C-x C-b") 'ibuffer)
@@ -677,11 +673,18 @@
   (add-hook hook (lambda () (flyspell-mode -1))))
 
 ;; Fly spell check comments for a programmer
-(dolist (hook '(emacs-lisp-mode-hook
-                c-mode-hook
-                c++-mode-hook
-                ess-mode-hook
-                python-mode-hook))
+(dolist (hook (list
+               'after-text-mode-hook
+               'latex-mode-hook
+               'markdown-mode-hook))
+  (add-hook hook (lambda () (flyspell-mode 1))))
+
+(dolist (hook (list
+               'emacs-lisp-mode-hook
+               'c-mode-hook
+               'c++-mode-hook
+               'ess-mode-hook
+               'python-mode-hook))
   (add-hook hook (lambda () (flyspell-prog-mode))))
 
 ;; Dictionary
@@ -745,7 +748,6 @@
      (keyboard-translate ?§ ?`)
      (setq LaTeX-math-abbrev-prefix "`")
 
-     (add-hook 'LaTeX-mode-hook 'turn-on-auto-fill)
 
      (setq TeX-source-correlate-mode  t)
      (setq TeX-source-correlate-start-server nil)
@@ -942,7 +944,6 @@
                   ;; (make-local-variable 'paragraph-separate)
                   ;; (setq paragraph-separate
                   ;;       (concat "\\(" ess-roxy-str "\\)*" paragraph-separate))
-                  (auto-fill-mode)
                   ))
 
      ;; Settings on R shell
