@@ -456,6 +456,7 @@
 	       'c++-mode-hook
                'inferior-ess-mode-hook))
   (add-hook hook '(lambda () (xref-etags-mode))))
+;; (add-hook 'ess-mode-hook 'xref-etags-mode)
 
 ;; (setq tags-table-list
 ;;       '("~/.emacs.d/tags" "~/code/"))
@@ -846,6 +847,7 @@
      ;;                 ac-sources)))
      ;; (add-hook 'ess-mode-hook 'ac-ess-mode-setup)
      ;; (add-hook 'inferior-ess-mode-hook 'ac-ess-mode-setup)
+     (add-hook 'ess-mode-hook 'xref-etags-mode)
 
      ;; ESS tracebug
      (setq ess-use-tracebug nil)
