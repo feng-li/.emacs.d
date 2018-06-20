@@ -3,7 +3,7 @@
 	url = git://github.com/auto-complete/popup-el.git
 [submodule "site-lisp/markdown-mode"]
 	path = site-lisp/markdown-mode
-	url = git://jblevins.org/git/markdown-mode.git
+	url = git://github.com/jrblevin/markdown-mode.git
 [submodule "site-lisp/ESS"]
 	path = site-lisp/ESS
 	url = git@github.com:emacs-ess/ESS.git
