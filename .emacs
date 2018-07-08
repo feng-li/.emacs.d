@@ -1,3 +1,10 @@
+
+;; Added by Package.el.  This must come before configurations of
+;; installed packages.  Don't delete this line.  If you don't want it,
+;; just comment it out by adding a semicolon to the start of the line.
+;; You may delete these explanatory comments.
+(package-initialize)
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -40,6 +47,7 @@
          load-path)))
 (add-to-list 'custom-theme-load-path "~/.emacs.d/site-lisp/emacs-color-theme-solarized")
 
+
 ;; Byte compile directory when files are changed
 (setq byte-compile-warnings nil)
 (byte-recompile-directory (expand-file-name "~/.emacs.d/site-lisp/") 0)
@@ -71,6 +79,8 @@
 
 (require 'company)
 (require 'iedit)
+(require 'magit)
+
 
 ;(require 'benchmark-init-loaddefs)
 ;(benchmark-init/activate)
@@ -124,11 +134,13 @@
 ;; Disable backup files (*~)
 (setq make-backup-files nil)
 
-;;Version Control
-;; (setq vc-handled-backends ()) ;; Disable vc-git
-;; (vc-mode -1)
-(require 'git)
-(require 'git-blame)
+;; Version Control
+(setq vc-handled-backends ()) ;; Disable vc-git and use magit
+(vc-mode -1)
+(with-eval-after-load 'info
+  (info-initialize)
+  (add-to-list 'Info-directory-list
+               "~/.emacs.d/site-lisp/magit/Documentation/"))
 (setq vc-follow-symlinks nil)
 
 
