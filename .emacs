@@ -1,4 +1,3 @@
-
 ;; Added by Package.el.  This must come before configurations of
 ;; installed packages.  Don't delete this line.  If you don't want it,
 ;; just comment it out by adding a semicolon to the start of the line.
@@ -102,7 +101,12 @@
 (setq user-mail-address "m@feng.li")
 
 ;; Desktop save mode
-;; (desktop-save-mode 1)
+(desktop-save-mode 1)
+(add-to-list 'desktop-modes-not-to-save 'dired-mode)
+(add-to-list 'desktop-modes-not-to-save 'Info-mode)
+(add-to-list 'desktop-modes-not-to-save 'info-lookup-mode)
+(add-to-list 'desktop-modes-not-to-save 'fundamental-mode)
+
 
 ;; Environment variables
 (setenv "OMP_NUM_THREADS" "1")
@@ -519,7 +523,8 @@
              "\\.o$" "\\.tar$" "\\.Rproj$" "\\.Rcheck$" "\\.Rhistory$"))
 
      (setq  ido-ignore-directories
-            '("\\.prv$" "\\TAGS$" "\\.Rcheck/" "\\__pycache__$"))
+            '("\\`auto/" "\\.prv/" "\\`CVS/" "\\`.git/" "\\`.ropeproject/"
+              "\\`\\.\\./" "\\`\\./"))
 
      (setq ido-ignore-buffers
            '("\\` " "^\\*ESS\\*" "^\\*Messages\\*" "^\\*Help\\*"
@@ -861,7 +866,6 @@
 
      (require 'ess-rutils)
      ;; (require 'ess-tracebug) ;; ESS tracebug
-     (require 'ess-eldoc)
      ;; (require 'ess-R-object-tooltip)
 
      ;; R args at start up
