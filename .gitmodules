@@ -1,18 +1,6 @@
-[submodule "site-lisp/popup-el"]
-	path = site-lisp/popup-el
-	url = git://github.com/auto-complete/popup-el.git
-[submodule "site-lisp/markdown-mode"]
-	path = site-lisp/markdown-mode
-	url = git://github.com/jrblevin/markdown-mode.git
-[submodule "site-lisp/ESS"]
-	path = site-lisp/ESS
-	url = git@github.com:emacs-ess/ESS.git
 [submodule "site-lisp/math-symbol-lists"]
 	path = site-lisp/math-symbol-lists
 	url = git@github.com:vspinu/math-symbol-lists.git
-[submodule "org-mode"]
-	path = site=lisp/org-mode
-	url = https://orgmode.org/org-mode.git
 [submodule "site-lisp/Emacs-langtool"]
 	path = site-lisp/Emacs-langtool
 	url = git@github.com:mhayashi1120/Emacs-langtool.git
@@ -22,30 +10,9 @@
 [submodule "site-lisp/highlight-symbol.el"]
 	path = site-lisp/highlight-symbol.el
 	url = git@github.com:nschum/highlight-symbol.el.git
-[submodule "site-lisp/auctex"]
-	path = site-lisp/auctex
-	url = http://git.savannah.gnu.org/r/auctex.git
 [submodule "site-lisp/dictem"]
 	path = site-lisp/dictem
 	url = git@github.com:cheusov/dictem.git
-[submodule "site-lisp/emacs-color-theme-solarized"]
-	path = site-lisp/emacs-color-theme-solarized
-	url = git@github.com:sellout/emacs-color-theme-solarized.git
-[submodule "site-lisp/yasnippet"]
-	path = site-lisp/yasnippet
-	url = https://github.com/joaotavora/yasnippet
-[submodule "site-lisp/iedit"]
-	path = site-lisp/iedit
-	url = git@github.com:victorhge/iedit.git
 [submodule "site-lisp/benchmark-init-el"]
 	path = site-lisp/benchmark-init-el
 	url = git@github.com:dholm/benchmark-init-el.git
-[submodule "site-lisp/company-mode"]
-	path = site-lisp/company-mode
-	url = git@github.com:company-mode/company-mode.git
-[submodule "site-lisp/yasnippet-snippets"]
-	path = site-lisp/yasnippet-snippets
-	url = git@github.com:AndreaCrotti/yasnippet-snippets.git
-[submodule "site-lisp/magit"]
-	path = site-lisp/magit
-	url = git@github.com:magit/magit.git

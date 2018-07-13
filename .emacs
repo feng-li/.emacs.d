@@ -16,8 +16,11 @@
  '(hl-paren-background-colors (quote ("light gray" "steel blue" "lime green" "orange1")))
  '(indicate-empty-lines nil)
  '(org-support-shift-select t)
+ '(package-selected-packages
+   (quote
+    (auctex-latexmk highlight-symbol color-theme-solarized popup iedit markdown-mode session yasnippet-snippets yasnippet magit ess dash auctex with-editor magit-popup ghub)))
  '(send-mail-function (quote mailclient-send-it))
-;; '(session-use-package t nil (session))
+ '(session-use-package t nil (session))
  '(show-paren-mode t nil (paren))
  '(warning-suppress-types (quote ((undo discard-info)))))
 
@@ -55,6 +58,8 @@
 (add-hook 'compilation-finish-functions
           (lambda (buf strg) (kill-buffer buf)))
 
+;; Add MELPA repository
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 
 ;; Additional library loaded during start up.
 ;; (setq tramp-ssh-controlmaster-options nil)
@@ -748,7 +753,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (eval-after-load "auctex.el"
   '(progn
-     (load "preview-latex.el" nil t t)
+     ;; (load "preview-latex.el" nil t t)
 
      ;; LaTeX AUCTex features
      (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
