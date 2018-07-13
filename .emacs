@@ -18,7 +18,7 @@
  '(org-support-shift-select t)
  '(package-selected-packages
    (quote
-    (goldendict writegood-mode auctex-latexmk highlight-symbol color-theme-solarized popup iedit markdown-mode session yasnippet-snippets yasnippet magit ess dash auctex with-editor magit-popup ghub)))
+    (goldendict writegood-mode auctex-latexmk highlight-symbol color-theme-solarized popup iedit markdown-mode yasnippet-snippets yasnippet magit ess dash auctex with-editor magit-popup ghub)))
  '(send-mail-function (quote mailclient-send-it))
  '(session-use-package t nil (session))
  '(show-paren-mode t nil (paren))
