@@ -18,7 +18,7 @@
  '(org-support-shift-select t)
  '(package-selected-packages
    (quote
-    (auctex-latexmk highlight-symbol color-theme-solarized popup iedit markdown-mode session yasnippet-snippets yasnippet magit ess dash auctex with-editor magit-popup ghub)))
+    (goldendict writegood-mode auctex-latexmk highlight-symbol color-theme-solarized popup iedit markdown-mode session yasnippet-snippets yasnippet magit ess dash auctex with-editor magit-popup ghub)))
  '(send-mail-function (quote mailclient-send-it))
  '(session-use-package t nil (session))
  '(show-paren-mode t nil (paren))
@@ -51,12 +51,12 @@
 
 
 ;; Byte compile directory when files are changed
-(setq byte-compile-warnings nil)
-(byte-recompile-directory (expand-file-name "~/.emacs.d/site-lisp/") 0)
-(byte-recompile-file "~/.emacs.d/.emacs" nil 0)
+;; (setq byte-compile-warnings nil)
+;; (byte-recompile-directory (expand-file-name "~/.emacs.d/site-lisp/") 0)
+;; (byte-recompile-file "~/.emacs.d/.emacs" nil 0)
 ;; Kill the compile-log buffer
-(add-hook 'compilation-finish-functions
-          (lambda (buf strg) (kill-buffer buf)))
+;; (add-hook 'compilation-finish-functions
+;;           (lambda (buf strg) (kill-buffer buf)))
 
 ;; Add MELPA repository
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
@@ -77,9 +77,13 @@
 (require 'ess-site)
 (require 'python)
 (load "auctex.el" nil t t)
+;;(load "preview-latex.el" nil t t)
+;; (require 'auctex)
+(require 'auctex-latexmk)
 (require 'langtool)
 (require 'writegood-mode)
 (require 'yasnippet)
+(require 'goldendict)
 
 (require 'company)
 (require 'iedit)
@@ -183,6 +187,16 @@
 
 ;; Global auto revert mode
 ;; (global-auto-revert-mode t)
+
+
+;; Remove weird ESC ESC key
+(if (display-graphic-p)
+    (progn
+      ;; Do nothing with window system
+      )
+  (global-unset-key [?\e ?\e ?\e])
+  (global-set-key [?\e ?\e escape] 'keyboard-escape-quit)
+  )
 
 ;; Key bind to increase and decrease text size
 (global-set-key (kbd "C-+") 'text-scale-increase)
@@ -645,10 +659,7 @@
 ;; Goto matched parenthesis
 (global-set-key (kbd "?") 'goto-match-paren) ;;
 (defun goto-match-paren (arg)
-  "Go to the matching  if on (){}[], similar to vi style of % "
-  (interactive "p")
-  ;; first, check for "outside of bracket"
-  ;; positions expected by forward-sexp, etc.
+
   (cond ((looking-at "[\[\(\{]") (forward-sexp))
         ((looking-back "[\]\)\}]" 1) (backward-sexp))
         ;; now, try to succeed from inside of a bracket
@@ -728,6 +739,9 @@
      (define-key dictem-mode-map [tab] 'dictem-next-link)))
 ;;(define-key dictem-mode-map [(backtab)] 'dictem-previous-link)
 
+(eval-after-load "goldendict"
+  '(progn
+     (global-set-key (kbd "<f9> 9") 'goldendict-dwim)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Markdown mode
@@ -751,10 +765,14 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; LaTeX
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(eval-after-load "auctex-latexmk"
+  '(progn
+     ;; Use latexmk
+     (auctex-latexmk-setup)
+))
+
 (eval-after-load "auctex.el"
   '(progn
-     ;; (load "preview-latex.el" nil t t)
-
      ;; LaTeX AUCTex features
      (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
      (setq LaTeX-math-menu-unicode t)
