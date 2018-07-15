@@ -11,6 +11,9 @@
  ;; If there is more than one, they won't work right.
  '(case-fold-search t)
  '(column-number-mode t)
+ '(desktop-globals-to-save
+   (quote
+    (desktop-missing-file-warning search-ring regexp-search-ring register-alist file-name-history)))
  '(doc-view-continuous t)
  '(global-font-lock-mode t nil (font-lock))
  '(hl-paren-background-colors (quote ("light gray" "steel blue" "lime green" "orange1")))
@@ -111,6 +114,13 @@
 
 ;; Desktop save mode
 (desktop-save-mode 1)
+(setq desktop-load-locked-desktop nil)
+(setq desktop-restore-frames nil)
+(setq desktop-buffers-not-to-save
+      (concat "\\("
+              "^nn\\.a[0-9]+\\|\\.log\\|(ftp)\\|^tags\\|^TAGS"
+              "\\|\\.emacs.*\\|\\*Help*\\|\\.gz$"
+              "\\)$"))
 (add-to-list 'desktop-modes-not-to-save 'dired-mode)
 (add-to-list 'desktop-modes-not-to-save 'Info-mode)
 (add-to-list 'desktop-modes-not-to-save 'info-lookup-mode)
