@@ -669,7 +669,7 @@
 ;; Goto matched parenthesis
 (global-set-key (kbd "?") 'goto-match-paren) ;;
 (defun goto-match-paren (arg)
-
+  (interactive "p")
   (cond ((looking-at "[\[\(\{]") (forward-sexp))
         ((looking-back "[\]\)\}]" 1) (backward-sexp))
         ;; now, try to succeed from inside of a bracket
