@@ -23,7 +23,7 @@
    (quote
     (goldendict writegood-mode auctex-latexmk highlight-symbol color-theme-solarized popup iedit markdown-mode yasnippet-snippets yasnippet magit ess dash auctex with-editor magit-popup ghub)))
  '(send-mail-function (quote mailclient-send-it))
- '(session-use-package t nil (session))
+ ;;'(session-use-package t nil (session))
  '(show-paren-mode t nil (paren))
  '(warning-suppress-types (quote ((undo discard-info)))))
 
