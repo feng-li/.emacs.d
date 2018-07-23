@@ -1124,6 +1124,7 @@
  '(font-lock-string-face ((t (:foreground "green"))))
  '(font-lock-type-face ((t (:foreground "OrangeRed"))))
  '(font-lock-variable-name-face ((t (:foreground "#268bd2"))))
+ '(italic ((t (:underline nil :slant italic))))
  '(linum ((t (:inherit default))))
  '(match ((t (:background "yellow1" :foreground "black"))))
  '(minibuffer-prompt ((t (:foreground "magenta")))))
