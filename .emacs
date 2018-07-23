@@ -21,9 +21,9 @@
  '(org-support-shift-select t)
  '(package-selected-packages
    (quote
-    (goldendict writegood-mode auctex-latexmk highlight-symbol color-theme-solarized popup iedit markdown-mode yasnippet-snippets yasnippet magit ess dash auctex with-editor magit-popup ghub)))
+    (flymake-python-pyflakes company-auctex company-math goldendict writegood-mode auctex-latexmk highlight-symbol color-theme-solarized popup iedit markdown-mode yasnippet-snippets yasnippet magit ess dash auctex with-editor magit-popup ghub)))
  '(send-mail-function (quote mailclient-send-it))
- ;;'(session-use-package t nil (session))
+;; '(session-use-package t nil (session))
  '(show-paren-mode t nil (paren))
  '(warning-suppress-types (quote ((undo discard-info)))))
 
@@ -79,7 +79,10 @@
 (require 'dictem nil 'noerror)
 (require 'ess-site)
 (require 'python)
+(require 'flymake-python-pyflakes)
+
 (load "auctex.el" nil t t)
+(require 'company-auctex)
 ;;(load "preview-latex.el" nil t t)
 ;; (require 'auctex)
 (require 'auctex-latexmk)
@@ -139,6 +142,8 @@
       (setq solarized-termcolors 256)
       (load-theme 'solarized t)
       )
+  (set-face-background 'vertical-border "grey")
+  (set-face-foreground 'vertical-border (face-background 'vertical-border))
   ;; (set-frame-parameter nil 'background-mode 'dark)
   ;; (set-terminal-parameter nil 'background-mode 'dark)
   )
@@ -172,7 +177,7 @@
   (if (> (display-pixel-height) 1080)
       (progn
         (add-to-list 'default-frame-alist
-                     '(font . "M+ 1m-9")) ;
+                     '(font . "M+ 1mn-9")) ;
         (setq face-font-rescale-alist
               '(("Noto Sans CJK SC". 1.2))))
 
@@ -489,6 +494,7 @@
 ;; TAGS
 (setq tags-table-list
       '("~/code/TAGS/R/"
+        "~/code/TAGS/PYTHON/"
         "~/code/TAGS/C/"
         "~/code/TAGS/FORTRAN/"))
 (dolist (hook (list
@@ -792,6 +798,8 @@
      (keyboard-translate ?§ ?`)
      (setq LaTeX-math-abbrev-prefix "`")
 
+     ;; Allow company mode
+     (company-auctex-init)
 
      (setq TeX-source-correlate-mode  t)
      (setq TeX-source-correlate-start-server nil)
@@ -1015,6 +1023,11 @@
 (eval-after-load "python"
   '(progn
 
+
+     ;; Flymake for Python
+     (add-hook 'python-mode-hook 'flymake-python-pyflakes-load)
+     (setq flymake-python-pyflakes-executable "flake8")
+
      (setq python-shell-interpreter "python3")
      ;; (setenv "PYTHONSTARTUP" "/home/fli/.pystartup")
 
@@ -1045,18 +1058,6 @@
                   (setq ropemacs-enable-autoimport t)
                   (setq pymacs-auto-restart t)
 
-                  ;; Flymake for Python
-                  (when (load "flymake" t)
-                    (defun flymake-pyflakes-init ()
-                      (let* ((temp-file (flymake-init-create-temp-buffer-copy
-                                         'flymake-create-temp-inplace))
-                             (local-file (file-relative-name
-                                          temp-file
-                                          (file-name-directory buffer-file-name))))
-                        (list "pycheckers"  (list local-file))))
-                    (add-to-list 'flymake-allowed-file-name-masks
-                                 '("\\.py\\'" flymake-pyflakes-init)))
-                  (setq python-check-command "pyflakes") ;; check by hand
 
                   ;; Auto complete in buffer
                   ;; (require 'ac-python) ;; using just python (faster)
