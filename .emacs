@@ -1,8 +1,30 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Feng Li's .emacs configurations
+;;
+;; Copyright: Feng Li <http://feng.li/>
+;;
+;; Download: https://github.com/feng-li/.emacs.d/
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Load all required packages
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Added by Package.el.  This must come before configurations of
 ;; installed packages.  Don't delete this line.  If you don't want it,
 ;; just comment it out by adding a semicolon to the start of the line.
 ;; You may delete these explanatory comments.
 (package-initialize)
+
+;; Add personal load path recursively in front of the default load path
+(let ((default-directory "~/.emacs.d/site-lisp/"))
+  (setq load-path
+        (append
+         (let ((load-path (copy-sequence load-path))) ;; Shadow
+           (append
+            (copy-sequence (normal-top-level-add-to-load-path '(".")))
+            (normal-top-level-add-subdirs-to-load-path)))
+         load-path)))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -23,34 +45,11 @@
    (quote
     (flymake-python-pyflakes company-auctex company-math goldendict writegood-mode auctex-latexmk highlight-symbol color-theme-solarized popup iedit markdown-mode yasnippet-snippets yasnippet magit ess dash auctex with-editor magit-popup ghub)))
  '(send-mail-function (quote mailclient-send-it))
-;; '(session-use-package t nil (session))
+ '(session-use-package t nil (session))
  '(show-paren-mode t nil (paren))
  '(warning-suppress-types (quote ((undo discard-info)))))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Feng Li's .emacs configurations
-;;
-;; Copyright: Feng Li <http://feng.li/>
-;;
-;; Download: https://github.com/feng-li/.emacs.d/
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Load all required packages
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-;; Add personal load path recursively in front of the default load path
-(let ((default-directory "~/.emacs.d/site-lisp/"))
-  (setq load-path
-        (append
-         (let ((load-path (copy-sequence load-path))) ;; Shadow
-           (append
-            (copy-sequence (normal-top-level-add-to-load-path '(".")))
-            (normal-top-level-add-subdirs-to-load-path)))
-         load-path)))
-(add-to-list 'custom-theme-load-path "~/.emacs.d/site-lisp/emacs-color-theme-solarized")
+;; (add-to-list 'custom-theme-load-path "~/.emacs.d/site-lisp/emacs-color-theme-solarized")
 
 
 ;; Byte compile directory when files are changed
@@ -900,7 +899,6 @@
      ;;                 ac-sources)))
      ;; (add-hook 'ess-mode-hook 'ac-ess-mode-setup)
      ;; (add-hook 'inferior-ess-mode-hook 'ac-ess-mode-setup)
-     (add-hook 'ess-mode-hook 'xref-etags-mode)
 
      ;; ESS tracebug
      (setq ess-use-tracebug nil)
@@ -1125,8 +1123,10 @@
  '(font-lock-type-face ((t (:foreground "OrangeRed"))))
  '(font-lock-variable-name-face ((t (:foreground "#268bd2"))))
  '(italic ((t (:underline nil :slant italic))))
+ '(link ((t (:foreground "cyan" :underline nil))))
  '(linum ((t (:inherit default))))
  '(match ((t (:background "yellow1" :foreground "black"))))
- '(minibuffer-prompt ((t (:foreground "magenta")))))
+ '(minibuffer-prompt ((t (:foreground "magenta"))))
+ '(region ((t (:background "brightwhite")))))
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
