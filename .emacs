@@ -43,9 +43,9 @@
  '(org-support-shift-select t)
  '(package-selected-packages
    (quote
-    (flymake-python-pyflakes company-auctex company-math goldendict writegood-mode auctex-latexmk highlight-symbol color-theme-solarized popup iedit markdown-mode yasnippet-snippets yasnippet magit ess dash auctex with-editor magit-popup ghub)))
+    (math-symbol-lists langtool polymode flymake-python-pyflakes company-auctex company-math goldendict writegood-mode auctex-latexmk highlight-symbol color-theme-solarized popup iedit markdown-mode yasnippet-snippets yasnippet magit ess dash auctex with-editor magit-popup ghub)))
  '(send-mail-function (quote mailclient-send-it))
- '(session-use-package t nil (session))
+ '(session-use-package nil nil (session))
  '(show-paren-mode t nil (paren))
  '(warning-suppress-types (quote ((undo discard-info)))))
 
@@ -74,9 +74,11 @@
 (require 'comint)
 (require 'org)
 (require 'markdown-mode)
+(require 'poly-markdown)
 (require 'flymake)
 (require 'dictem nil 'noerror)
 (require 'ess-site)
+(require 'poly-R)
 (require 'python)
 (require 'flymake-python-pyflakes)
 
@@ -881,10 +883,11 @@
      ;;                   TeX-run-command nil (latex-mode)))
      ;;    ))
      ))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; ESS (Emacs speaks statistics)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(add-to-list 'auto-mode-alist '("\\.Rmd" . poly-markdown+r-mode))
 
 ;; ESS
 (eval-after-load "ess-site"
