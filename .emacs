@@ -43,9 +43,9 @@
  '(org-support-shift-select t)
  '(package-selected-packages
    (quote
-    (math-symbol-lists langtool polymode flymake-python-pyflakes company-auctex company-math goldendict writegood-mode auctex-latexmk highlight-symbol color-theme-solarized popup iedit markdown-mode yasnippet-snippets yasnippet magit ess dash auctex with-editor magit-popup ghub)))
+    (flycheck-julia julia-mode math-symbol-lists langtool polymode flymake-python-pyflakes company-auctex company-math goldendict writegood-mode auctex-latexmk highlight-symbol color-theme-solarized popup iedit markdown-mode yasnippet-snippets yasnippet magit ess dash auctex with-editor magit-popup ghub)))
  '(send-mail-function (quote mailclient-send-it))
- '(session-use-package nil nil (session))
+ '(session-use-package t nil (session))
  '(show-paren-mode t nil (paren))
  '(warning-suppress-types (quote ((undo discard-info)))))
 
@@ -74,11 +74,13 @@
 (require 'comint)
 (require 'org)
 (require 'markdown-mode)
+(require 'poly-R)
 (require 'poly-markdown)
 (require 'flymake)
 (require 'dictem nil 'noerror)
 (require 'ess-site)
-(require 'poly-R)
+(require 'julia-mode)
+(require 'flycheck-julia)
 (require 'python)
 (require 'flymake-python-pyflakes)
 
@@ -90,6 +92,7 @@
 (require 'langtool)
 (require 'writegood-mode)
 (require 'yasnippet)
+(require 'yasnippet-snippets)
 (require 'goldendict)
 
 (require 'company)
@@ -432,12 +435,12 @@
 (eval-after-load 'yasnippet
   '(progn
      (yas-global-mode 1)
-     (setq yas-snippet-dirs
-           '(;; personal snippets
-             "~/.emacs.d/snippets"
-             ;; snippet collection
-             "~/.emacs.d/site-lisp/yasnippet-snippets/snippets"
-             ))
+     ;; (setq yas-snippet-dirs
+     ;;       '(;; personal snippets
+     ;;         "~/.emacs.d/snippets"
+     ;;         ;; snippet collection
+     ;;         ;; "~/.emacs.d/site-lisp/yasnippet-snippets/snippets"
+     ;;         ))
      )
   )
 
@@ -446,8 +449,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Let m-file connected with octave mode.
-(setq auto-mode-alist
-      (cons '("\\.m$" . octave-mode) auto-mode-alist))
+(setq auto-mode-alist (cons '("\\.m$" . octave-mode) auto-mode-alist))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -765,8 +767,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (eval-after-load "markdown-mode"
   '(progn
-     (setq auto-mode-alist
-           (cons '("\\.md" . markdown-mode) auto-mode-alist))))
+     (setq auto-mode-alist (cons '("\\.md" . markdown-mode) auto-mode-alist))
+     ;; (setq auto-mode-alist (cons '("\\.Rmd" . markdown-mode) auto-mode-alist))
+     ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Org-mode
@@ -1017,6 +1020,20 @@
      (add-hook 'ess-mode-hook 'ess-code-style)
      (add-hook 'inferior-ess-mode-hook 'ess-code-style)))
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Julia mode
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(eval-after-load "julia-mode"
+  '(progn
+     (flycheck-julia-setup)
+     (add-to-list 'flycheck-global-modes 'julia-mode)
+     (add-to-list 'flycheck-global-modes 'ess-julia-mode)
+     )
+ )
+
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Python IDE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1128,6 +1145,7 @@
  '(italic ((t (:underline nil :slant italic))))
  '(link ((t (:foreground "cyan" :underline nil))))
  '(linum ((t (:inherit default))))
+ '(markdown-markup-face ((t (:foreground "magenta" :weight bold))))
  '(match ((t (:background "yellow1" :foreground "black"))))
  '(minibuffer-prompt ((t (:foreground "magenta"))))
  '(region ((t (:background "brightwhite")))))
