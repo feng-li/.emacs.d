@@ -43,7 +43,7 @@
  '(org-support-shift-select t)
  '(package-selected-packages
    (quote
-    (poly-R poly-markdown flycheck-julia julia-mode math-symbol-lists langtool polymode flymake-python-pyflakes company-auctex company-math goldendict writegood-mode auctex-latexmk highlight-symbol color-theme-solarized popup iedit markdown-mode yasnippet-snippets yasnippet magit ess dash auctex with-editor magit-popup ghub)))
+    (poly-R poly-markdown flycheck-julia julia-mode math-symbol-lists langtool polymode flymake-python-pyflakes company-auctex company-math goldendict writegood-mode auctex-latexmk highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup ghub)))
  '(send-mail-function (quote mailclient-send-it))
  '(session-use-package t nil (session))
  '(show-paren-mode t nil (paren))
@@ -74,8 +74,8 @@
 (require 'comint)
 (require 'org)
 (require 'markdown-mode)
-(require 'poly-R)
-(require 'poly-markdown)
+;(require 'poly-R)
+;(require 'poly-markdown)
 (require 'flymake)
 (require 'dictem nil 'noerror)
 (require 'ess-site)
@@ -229,17 +229,19 @@
 
 
 ;; Enable line number mode and enable visual line mode
-(if (display-graphic-p)
-    (progn
+;; (if (display-graphic-p)
+;;     (progn
       ;; Do nothing with window system
-      )
+      ;; )
   ;; Add a vertical line
-  (setq linum-format "%4d\u2502")
-  )
-(add-hook 'find-file-hook
-          (lambda ()
-            (linum-mode 1)
-            (visual-line-mode 1)))
+  ;; (setq linum-format "%4d\u2502")
+  ;; )
+
+(global-display-line-numbers-mode)
+;; (add-hook 'find-file-hook
+;;           (lambda ()
+;;             (linum-mode 1)
+;;             (visual-line-mode 1)))
 
 ;; Saving options
 (fset 'single-line-only
@@ -1027,8 +1029,8 @@
 (eval-after-load "julia-mode"
   '(progn
      (flycheck-julia-setup)
-     (add-to-list 'flycheck-global-modes 'julia-mode)
-     (add-to-list 'flycheck-global-modes 'ess-julia-mode)
+     ;; (add-to-list 'flycheck-global-modes 'julia-mode)
+     ;; (add-to-list 'flycheck-global-modes 'ess-julia-mode)
      )
  )
 
@@ -1143,8 +1145,8 @@
  '(font-lock-type-face ((t (:foreground "OrangeRed"))))
  '(font-lock-variable-name-face ((t (:foreground "#268bd2"))))
  '(italic ((t (:underline nil :slant italic))))
+ '(line-number ((t (:foreground "brightred"))))
  '(link ((t (:foreground "cyan" :underline nil))))
- '(linum ((t (:inherit default))))
  '(markdown-markup-face ((t (:foreground "magenta" :weight bold))))
  '(match ((t (:background "yellow1" :foreground "black"))))
  '(minibuffer-prompt ((t (:foreground "magenta"))))
