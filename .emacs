@@ -43,7 +43,7 @@
  '(org-support-shift-select t)
  '(package-selected-packages
    (quote
-    (poly-R poly-markdown flycheck-julia julia-mode math-symbol-lists langtool polymode flymake-python-pyflakes company-auctex company-math goldendict writegood-mode auctex-latexmk highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup ghub)))
+    (dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia julia-mode math-symbol-lists langtool polymode flymake-python-pyflakes company-auctex company-math goldendict writegood-mode auctex-latexmk highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup ghub)))
  '(send-mail-function (quote mailclient-send-it))
  '(session-use-package t nil (session))
  '(show-paren-mode t nil (paren))
@@ -121,7 +121,7 @@
 
 ;; Desktop save mode
 (desktop-save-mode 1)
-(setq desktop-load-locked-desktop nil)
+(setq desktop-load-locked-desktop t)
 (setq desktop-restore-frames nil)
 (setq desktop-buffers-not-to-save
       (concat "\\("
@@ -140,18 +140,21 @@
 ;; (setq explicit-bash-args '("--init-file" "~/.bashrc"))
 
 ;; Theme
-(if (display-graphic-p)
+(if (string= (system-name) "hp")
     (progn
-      (set-frame-parameter nil 'background-mode 'light)
-      (setq solarized-termcolors 256)
-      (load-theme 'solarized t)
-      )
-  (set-face-background 'vertical-border "grey")
-  (set-face-foreground 'vertical-border (face-background 'vertical-border))
-  ;; (set-frame-parameter nil 'background-mode 'dark)
-  ;; (set-terminal-parameter nil 'background-mode 'dark)
-  )
+      (load-theme 'dracula t))
 
+  (if (display-graphic-p)
+      (progn
+        (set-frame-parameter nil 'background-mode 'light)
+        (setq solarized-termcolors 256)
+        (load-theme 'solarized t))
+    (progn
+      (load-theme 'dracula t)
+      (set-face-background 'vertical-border "grey")
+      (set-face-foreground 'vertical-border (face-background 'vertical-border)))
+    )
+  )
 
 
 (when (display-graphic-p)
@@ -178,22 +181,15 @@
 
 ;; Set Fonts
 (when (display-graphic-p)
-  (if (> (display-pixel-height) 1080)
+  (if (> (display-pixel-height) 1080) ;; HDPi
       (progn
-        (add-to-list 'default-frame-alist
-                     '(font . "M+ 1mn-9")) ;
-        (setq face-font-rescale-alist
-              '(("Noto Sans CJK SC". 1.2))))
+        (add-to-list 'default-frame-alist '(font . "M+ 1mn-9")) ;
+        )
+    (add-to-list 'default-frame-alist '(font . "M+ 1mn-10")) ;
+    )
 
-    ;; (add-to-list 'default-frame-alist
-    ;;              '(font . "Source Code Pro Medium-9")) ; https://github.com/adobe-fonts/source-code-pro
-    (add-to-list 'default-frame-alist
-                 '(font . "M+ 1m-11")) ;
-    (setq face-font-rescale-alist
-          '(("Noto Sans CJK SC". 1.2))))
-
-  (set-fontset-font "fontset-default"
-                    'unicode '("Microsoft YaHei" . "unicode-bmp"))
+  (setq face-font-rescale-alist '(("Noto Sans CJK SC". 1.2)))
+  (set-fontset-font "fontset-default" 'unicode '("Microsoft YaHei" . "unicode-bmp"))
   )
 ;; Menu bar
 (menu-bar-mode t)
@@ -1130,26 +1126,28 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ess-assignment-face ((t (:inherit nil :foreground "green4" :weight bold))))
- '(ess-function-call-face ((t (:foreground "cyan"))))
- '(flyspell-duplicate ((t (:underline (:style wave)))))
- '(flyspell-incorrect ((t (:underline (:style wave)))))
- '(font-latex-sectioning-5-face ((t (:weight bold))))
- '(font-latex-sedate-face ((t (:foreground "blue"))))
- '(font-lock-builtin-face ((t (:foreground "cyan4"))))
- '(font-lock-comment-delimiter-face ((t (:foreground "green4" :slant italic :weight bold))))
- '(font-lock-comment-face ((t (:foreground "green4" :slant italic))))
- '(font-lock-function-name-face ((t (:weight bold))))
- '(font-lock-keyword-face ((t (:foreground "magenta"))))
- '(font-lock-string-face ((t (:foreground "green"))))
- '(font-lock-type-face ((t (:foreground "OrangeRed"))))
- '(font-lock-variable-name-face ((t (:foreground "#268bd2"))))
- '(italic ((t (:underline nil :slant italic))))
- '(line-number ((t (:foreground "brightred"))))
- '(link ((t (:foreground "cyan" :underline nil))))
- '(markdown-markup-face ((t (:foreground "magenta" :weight bold))))
- '(match ((t (:background "yellow1" :foreground "black"))))
- '(minibuffer-prompt ((t (:foreground "magenta"))))
- '(region ((t (:background "brightwhite")))))
+;;  '(ess-assignment-face ((t (:inherit nil :foreground "green4" :weight bold))))
+;;  '(ess-function-call-face ((t (:foreground "cyan"))))
+;;  '(flyspell-duplicate ((t (:underline (:style wave)))))
+;;  '(flyspell-incorrect ((t (:underline (:style wave)))))
+;;  '(font-latex-sectioning-5-face ((t (:weight bold))))
+;;  '(font-latex-sedate-face ((t (:foreground "blue"))))
+;;  '(font-lock-builtin-face ((t (:foreground "cyan4"))))
+;;  '(font-lock-comment-delimiter-face ((t (:foreground "green4" :slant italic :weight bold))))
+;;  '(font-lock-comment-face ((t (:foreground "green4" :slant italic))))
+'(font-lock-comment-face ((t (:inherit t :slant italic))))
+;;  '(font-lock-function-name-face ((t (:weight bold))))
+;;  '(font-lock-keyword-face ((t (:foreground "magenta"))))
+;;  '(font-lock-string-face ((t (:foreground "green"))))
+;;  '(font-lock-type-face ((t (:foreground "OrangeRed"))))
+;;  '(font-lock-variable-name-face ((t (:foreground "#268bd2"))))
+;;  '(italic ((t (:underline nil :slant italic))))
+;;  '(line-number ((t (:foreground "brightred"))))
+;;  '(link ((t (:foreground "cyan" :underline nil))))
+;;  '(markdown-markup-face ((t (:foreground "magenta" :weight bold))))
+;;  '(match ((t (:background "yellow1" :foreground "black"))))
+;;  '(minibuffer-prompt ((t (:foreground "magenta"))))
+ ;;  '(region ((t (:background "brightwhite"))))
+ )
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
