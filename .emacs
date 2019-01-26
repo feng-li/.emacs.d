@@ -151,8 +151,7 @@
         (load-theme 'solarized t))
     (progn
       (load-theme 'dracula t)
-      (set-face-background 'vertical-border "grey")
-      (set-face-foreground 'vertical-border (face-background 'vertical-border)))
+      )
     )
   )
 
@@ -203,6 +202,10 @@
 ;; Global auto revert mode
 ;; (global-auto-revert-mode t)
 
+;; Better vertical bar
+(set-display-table-slot standard-display-table 'vertical-border ?│)
+(set-face-background 'vertical-border (face-background 'mode-line))
+(set-face-foreground 'vertical-border (face-background 'vertical-border))
 
 ;; Remove weird ESC ESC key
 (if (display-graphic-p)
