@@ -43,7 +43,7 @@
  '(org-support-shift-select t)
  '(package-selected-packages
    (quote
-    (dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia julia-mode math-symbol-lists langtool polymode flymake-python-pyflakes company-auctex company-math goldendict writegood-mode auctex-latexmk highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup ghub)))
+    (markdown-mode dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia julia-mode math-symbol-lists langtool polymode flymake-python-pyflakes company-auctex company-math goldendict writegood-mode auctex-latexmk highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup ghub)))
  '(send-mail-function (quote mailclient-send-it))
  '(session-use-package t nil (session))
  '(show-paren-mode t nil (paren))
@@ -61,7 +61,13 @@
 ;;           (lambda (buf strg) (kill-buffer buf)))
 
 ;; Add MELPA repository
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+;; (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+(add-to-list 'package-archives
+             '("melpa-stable" . "https://stable.melpa.org/packages/"))
+(unless package-archive-contents
+  (package-refresh-contents))
+(package-install-selected-packages)
+
 
 ;; Additional library loaded during start up.
 ;; (setq tramp-ssh-controlmaster-options nil)
@@ -1129,28 +1135,6 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
-;;  '(ess-assignment-face ((t (:inherit nil :foreground "green4" :weight bold))))
-;;  '(ess-function-call-face ((t (:foreground "cyan"))))
-;;  '(flyspell-duplicate ((t (:underline (:style wave)))))
-;;  '(flyspell-incorrect ((t (:underline (:style wave)))))
-;;  '(font-latex-sectioning-5-face ((t (:weight bold))))
-;;  '(font-latex-sedate-face ((t (:foreground "blue"))))
-;;  '(font-lock-builtin-face ((t (:foreground "cyan4"))))
-;;  '(font-lock-comment-delimiter-face ((t (:foreground "green4" :slant italic :weight bold))))
-;;  '(font-lock-comment-face ((t (:foreground "green4" :slant italic))))
-'(font-lock-comment-face ((t (:inherit t :slant italic))))
-;;  '(font-lock-function-name-face ((t (:weight bold))))
-;;  '(font-lock-keyword-face ((t (:foreground "magenta"))))
-;;  '(font-lock-string-face ((t (:foreground "green"))))
-;;  '(font-lock-type-face ((t (:foreground "OrangeRed"))))
-;;  '(font-lock-variable-name-face ((t (:foreground "#268bd2"))))
-;;  '(italic ((t (:underline nil :slant italic))))
-;;  '(line-number ((t (:foreground "brightred"))))
-;;  '(link ((t (:foreground "cyan" :underline nil))))
-;;  '(markdown-markup-face ((t (:foreground "magenta" :weight bold))))
-;;  '(match ((t (:background "yellow1" :foreground "black"))))
-;;  '(minibuffer-prompt ((t (:foreground "magenta"))))
- ;;  '(region ((t (:background "brightwhite"))))
- )
+ '(font-lock-comment-face ((t (:inherit t :slant italic)))))
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
