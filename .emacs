@@ -560,6 +560,7 @@
      (setq ido-use-virtual-buffers nil)
      (setq ido-enable-flex-matching nil)
      (setq ido-ignore-extensions t)
+     (setq ido-save-directory-list-file "~/.ido.last")
      (setq ido-ignore-files
            '("\\.Rc$" "\\.dvi$" "\\.pdf$" "\\.ps$" "\\.out$"
              "\\.log$" "\\.ods$" "\\.eps$" "\\#$" "\\.png$" "\\~$"
