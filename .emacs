@@ -10,10 +10,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Load all required packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Added by Package.el.  This must come before configurations of
-;; installed packages.  Don't delete this line.  If you don't want it,
-;; just comment it out by adding a semicolon to the start of the line.
-;; You may delete these explanatory comments.
+;; Added by Package.el.  This must come before configurations of installed packages.
+;; Don't delete this line.  If you don't want it, just comment it out by adding a
+;; semicolon to the start of the line.  You may delete these explanatory comments.  Add
+;; MELPA repository
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (package-initialize)
 
 ;; Add personal load path recursively in front of the default load path
@@ -60,10 +62,7 @@
 ;; (add-hook 'compilation-finish-functions
 ;;           (lambda (buf strg) (kill-buffer buf)))
 
-;; Add MELPA repository
-;; (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
-(add-to-list 'package-archives
-             '("melpa-stable" . "https://stable.melpa.org/packages/"))
+
 (unless package-archive-contents
   (package-refresh-contents))
 (package-install-selected-packages)
