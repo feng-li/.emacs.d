@@ -42,7 +42,7 @@
  '(org-support-shift-select t)
  '(package-selected-packages
    (quote
-    (markdown-mode dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia julia-mode math-symbol-lists langtool polymode flymake-python-pyflakes company-auctex company-math goldendict writegood-mode auctex-latexmk highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup ghub)))
+    (electric-operator markdown-mode dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia julia-mode math-symbol-lists langtool polymode flymake-python-pyflakes company-auctex company-math goldendict writegood-mode auctex-latexmk highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup ghub)))
  '(send-mail-function (quote mailclient-send-it))
  '(session-use-package t nil (session))
  '(show-paren-mode t nil (paren))
@@ -76,8 +76,8 @@
 (require 'comint)
 (require 'org)
 (require 'markdown-mode)
-;(require 'poly-R)
-;(require 'poly-markdown)
+(require 'poly-R)
+(require 'poly-markdown)
 (require 'flymake)
 (require 'dictem nil 'noerror)
 (require 'ess-site)
@@ -96,7 +96,7 @@
 (require 'yasnippet)
 (require 'yasnippet-snippets)
 (require 'goldendict)
-
+(require 'electric-operator)
 (require 'company)
 (require 'iedit)
 (require 'magit)
@@ -688,6 +688,14 @@
       'Info-default-directory-list "~/.emacs.d/info")))
 
 
+; Electric operators
+(dolist (hook (list
+               'python-mode-hook
+               'c-mode-hook
+               'LaTeX-mode-hook
+               'ess-mode-hook))
+  (add-hook hook '(lambda () (electric-operator-mode 1))))
+
 ;; Goto matched parenthesis
 (global-set-key (kbd "?") 'goto-match-paren) ;;
 (defun goto-match-paren (arg)
@@ -1024,9 +1032,6 @@
 
      ;; ESS Code styles
      (defun ess-code-style ()
-       (local-set-key (kbd ",") (lambda () (interactive) (insert ", ")))
-       (local-set-key (kbd "=") (lambda () (interactive) (insert " = ")))
-       (local-set-key (kbd "<f9> =") (lambda () (interactive) (insert " == ")))
        (local-set-key (kbd "<f9> *") (lambda () (interactive) (insert " %*% ")))
        (local-set-key (kbd "<f9> x") (lambda () (interactive) (insert " %x% ")))
        (local-set-key (kbd "<f9> n") (lambda () (interactive) (insert " %in% "))))
