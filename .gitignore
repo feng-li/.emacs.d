@@ -20,5 +20,6 @@ snippet/
 site-lisp/yasnippet/
 auto-save-list/
 site-lisp/local/
+transient/
 .cask/
 ido.last

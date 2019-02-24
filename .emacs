@@ -42,7 +42,7 @@
  '(org-support-shift-select t)
  '(package-selected-packages
    (quote
-    (electric-operator markdown-mode dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia julia-mode math-symbol-lists langtool polymode flymake-python-pyflakes company-auctex company-math goldendict writegood-mode auctex-latexmk highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup ghub)))
+    (elpy electric-operator markdown-mode dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia julia-mode math-symbol-lists langtool polymode flymake-python-pyflakes company-auctex company-math goldendict writegood-mode auctex-latexmk highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup ghub)))
  '(send-mail-function (quote mailclient-send-it))
  '(session-use-package t nil (session))
  '(show-paren-mode t nil (paren))
@@ -691,10 +691,15 @@
 ; Electric operators
 (dolist (hook (list
                'python-mode-hook
+               'inferior-python-mode-hook
                'c-mode-hook
                'LaTeX-mode-hook
-               'ess-mode-hook))
+               'ess-mode-hook
+               'inferior-ess-mode-hook))
   (add-hook hook '(lambda () (electric-operator-mode 1))))
+
+(electric-operator-add-rules-for-mode 'c-mode
+                                      (cons "*" nil))
 
 ;; Goto matched parenthesis
 (global-set-key (kbd "?") 'goto-match-paren) ;;
@@ -790,8 +795,12 @@
   '(progn
      (setq auto-mode-alist (cons '("\\.md" . markdown-mode) auto-mode-alist))
      ;; (setq auto-mode-alist (cons '("\\.Rmd" . markdown-mode) auto-mode-alist))
-     ))
 
+     (autoload 'gfm-mode "markdown-mode"
+       "Major mode for editing GitHub Flavored Markdown files" t)
+     (add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode))
+
+     ))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Org-mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1059,6 +1068,7 @@
 (eval-after-load "python"
   '(progn
 
+     (elpy-enable)
 
      ;; Flymake for Python
      ;; (add-hook 'python-mode-hook 'flymake-python-pyflakes-load)
@@ -1068,14 +1078,15 @@
      ;; (setenv "PYTHONSTARTUP" "/home/fli/.pystartup")
 
      ;; Bug fix for Python warning in Emacs 25.1
-     (defun python-shell-completion-native-try ()
-       "Return non-nil if can trigger native completion."
-       (let ((python-shell-completion-native-enable t)
-             (python-shell-completion-native-output-timeout
-              python-shell-completion-native-try-output-timeout))
-         (python-shell-completion-native-get-completions
-          (get-buffer-process (current-buffer))
-          nil "_")))
+     ;; (defun python-shell-completion-native-try ()
+     ;;   "Return non-nil if can trigger native completion."
+     ;;   (let ((python-shell-completion-native-enable t)
+     ;;         (python-shell-completion-native-output-timeout
+     ;;          python-shell-completion-native-try-output-timeout))
+     ;;     (python-shell-completion-native-get-completions
+     ;;      (get-buffer-process (current-buffer))
+     ;;      nil "_")))
+     (setq python-shell-completion-native-enable nil)
 
      ;; Enter to indent in python.el
      (add-hook 'python-mode-hook
