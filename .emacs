@@ -267,6 +267,10 @@
 (global-set-key (kbd "C-<f2>")  'follow-delete-other-windows-and-split)
 
 
+;; Kill buffer without conformation
+(global-set-key (kbd "C-x k") 'kill-current-buffer)
+
+
 ;; Suspend and resume hook
 (add-hook 'suspend-hook
           (function (lambda ()
@@ -580,7 +584,7 @@
      (setq ido-ignore-buffers
            '("\\` " "^\\*ESS\\*" "^\\*Messages\\*" "^\\*Help\\*"
              "^\\*Buffer" "^\\*Ibuffer*" "^\\*ESS-errors*"
-             "^\\*Warnings*" "output*" "*TeX Help*"
+             "^\\*Warnings*" "output*" "*TeX Help*" "*Pymacs*" "*Flymake log*"
              "^\\*.*Completions\\*$" "^\\*Ediff" "^\\*tramp" "^\\*cvs-"
              "_region_" "^TAGS$" "^\*Ido" "^\\*.*dictem buffer\\*$"
              "^\\*inferior-lisp*" "^\\*Compile-Log\\*"))
@@ -697,6 +701,8 @@
                'ess-mode-hook
                'inferior-ess-mode-hook))
   (add-hook hook '(lambda () (electric-operator-mode 1))))
+(apply #'electric-operator-add-rules-for-mode 'inferior-python-mode
+       (electric-operator-get-rules-for-mode 'python-mode))
 
 (electric-operator-add-rules-for-mode 'c-mode
                                       (cons "*" nil))
@@ -735,6 +741,10 @@
 
 ;; Auto correct spelling mistakes
 (global-set-key (kbd "<f9> c") 'flyspell-auto-correct-word)
+
+(with-eval-after-load 'comint
+  (define-key comint-mode-map "\C-d" nil))
+
 
 ;; Fly spell performance
 (setq flyspell-issue-welcome-flag nil)
@@ -1069,7 +1079,7 @@
   '(progn
 
      (elpy-enable)
-
+     (setq highlight-indentation-mode nil)
      ;; Flymake for Python
      ;; (add-hook 'python-mode-hook 'flymake-python-pyflakes-load)
      ;; (setq flymake-python-pyflakes-executable "flake8")
