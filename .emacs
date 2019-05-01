@@ -36,6 +36,20 @@
  '(case-fold-search t)
  '(column-number-mode t)
  '(doc-view-continuous t)
+ '(ess-R-font-lock-keywords
+   (quote
+    ((ess-R-fl-keyword:keywords . t)
+     (ess-R-fl-keyword:constants . t)
+     (ess-R-fl-keyword:modifiers . t)
+     (ess-R-fl-keyword:fun-defs . t)
+     (ess-R-fl-keyword:assign-ops . t)
+     (ess-R-fl-keyword:%op% . t)
+     (ess-fl-keyword:fun-calls . t)
+     (ess-fl-keyword:numbers)
+     (ess-fl-keyword:operators)
+     (ess-fl-keyword:delimiters)
+     (ess-fl-keyword:=)
+     (ess-R-fl-keyword:F&T))))
  '(global-font-lock-mode t nil (font-lock))
  '(hl-paren-background-colors (quote ("light gray" "steel blue" "lime green" "orange1")))
  '(indicate-empty-lines nil)
@@ -100,7 +114,7 @@
 (require 'company)
 (require 'iedit)
 (require 'magit)
-
+(require 'flycheck)
 
 ;(require 'benchmark-init-loaddefs)
 ;(benchmark-init/activate)
@@ -703,9 +717,9 @@
   (add-hook hook '(lambda () (electric-operator-mode 1))))
 (apply #'electric-operator-add-rules-for-mode 'inferior-python-mode
        (electric-operator-get-rules-for-mode 'python-mode))
+(setq electric-operator-R-named-argument-style "spaced")
+(electric-operator-add-rules-for-mode 'c-mode (cons "*" nil))
 
-(electric-operator-add-rules-for-mode 'c-mode
-                                      (cons "*" nil))
 
 ;; Goto matched parenthesis
 (global-set-key (kbd "?") 'goto-match-paren) ;;
@@ -744,6 +758,9 @@
 
 (with-eval-after-load 'comint
   (define-key comint-mode-map "\C-d" nil))
+
+;; FlyCheck
+;; (global-flycheck-mode)
 
 
 ;; Fly spell performance
@@ -947,7 +964,7 @@
      ;; (add-hook 'inferior-ess-mode-hook 'ac-ess-mode-setup)
 
      ;; ESS tracebug
-     (setq ess-use-tracebug nil)
+     ;; (setq ess-use-tracebug nil)
 
      (require 'ess-rutils)
      ;; (require 'ess-tracebug) ;; ESS tracebug
