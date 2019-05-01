@@ -50,13 +50,16 @@
      (ess-fl-keyword:delimiters)
      (ess-fl-keyword:=)
      (ess-R-fl-keyword:F&T))))
+ '(flycheck-python-flake8-executable "python3")
+ '(flycheck-python-pylint-executable "python3")
  '(global-font-lock-mode t nil (font-lock))
  '(hl-paren-background-colors (quote ("light gray" "steel blue" "lime green" "orange1")))
  '(indicate-empty-lines nil)
  '(org-support-shift-select t)
  '(package-selected-packages
    (quote
-    (elpy electric-operator markdown-mode dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia julia-mode math-symbol-lists langtool polymode flymake-python-pyflakes company-auctex company-math goldendict writegood-mode auctex-latexmk highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup ghub)))
+    (elpy electric-operator markdown-mode dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia julia-mode math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup ghub)))
+ '(pylint-command "pylint3")
  '(send-mail-function (quote mailclient-send-it))
  '(session-use-package t nil (session))
  '(show-paren-mode t nil (paren))
@@ -92,19 +95,17 @@
 (require 'markdown-mode)
 (require 'poly-R)
 (require 'poly-markdown)
-(require 'flymake)
+(require 'flycheck)
 (require 'dictem nil 'noerror)
 (require 'ess-site)
 (require 'julia-mode)
 (require 'flycheck-julia)
 (require 'python)
-(require 'flymake-python-pyflakes)
+;; (require 'flymake-python-pyflakes)
 
 (load "auctex.el" nil t t)
 (require 'company-auctex)
 ;;(load "preview-latex.el" nil t t)
-;; (require 'auctex)
-(require 'auctex-latexmk)
 (require 'langtool)
 (require 'writegood-mode)
 (require 'yasnippet)
@@ -114,7 +115,6 @@
 (require 'company)
 (require 'iedit)
 (require 'magit)
-(require 'flycheck)
 
 ;(require 'benchmark-init-loaddefs)
 ;(benchmark-init/activate)
@@ -289,16 +289,14 @@
 (add-hook 'suspend-hook
           (function (lambda ()
                       (or (y-or-n-p
-                           "Really suspend emacs?")
-                          (error "Suspend canceled.")))))
+                           "Really suspend emacs? ")
+                          (error "Suspend canceled")))))
 (add-hook 'suspend-resume-hook
           (function (lambda () (message "Emacs resumed!"))))
 
 
 ;;Mutt
 (add-to-list 'auto-mode-alist '("/mutt" . mail-mode))
-
-
 
 ;; Global visual line mode
 (global-visual-line-mode -1)
@@ -658,21 +656,6 @@
   '(progn
     (add-hook 'after-init-hook 'global-company-mode)
     ))
-(eval-after-load "auto-complete-config"
-  '(progn
-     (ac-config-default)
-     (ac-flyspell-workaround) ; prevent AutoComplete striking as soon as I enable Flymake
-     (ac-linum-workaround)
-     (setq ac-auto-start 2) ; nil of not auto start
-     ;; (ac-set-trigger-key "TAB") ; unset this if auto-start
-     (setq ac-menu-height 10)
-     (setq ac-use-comphist nil) ;slow when exit Emacs
-     (define-key ac-completing-map [tab] 'ac-complete)
-     (define-key ac-completing-map [return] nil)
-     (setq ac-delay 0.05)
-     (setq ac-quick-help-delay 1.5)
-     (setq ac-ignore-case 'smart)
-     ))
 
 
 ;; Font lock
@@ -842,12 +825,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; LaTeX
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(eval-after-load "auctex-latexmk"
-  '(progn
-     ;; Use latexmk
-     (auctex-latexmk-setup)
-))
-
 (eval-after-load "auctex.el"
   '(progn
      ;; LaTeX AUCTex features
@@ -952,16 +929,6 @@
 ;; ESS
 (eval-after-load "ess-site"
   '(progn
-
-     ;; auto complete for R
-     ;; (setq ess-use-auto-complete t)
-
-     ;; (defun ac-ess-mode-setup ()
-     ;;   (setq ac-sources
-     ;;         (append '(ac-source-words-in-same-mode-buffers)
-     ;;                 ac-sources)))
-     ;; (add-hook 'ess-mode-hook 'ac-ess-mode-setup)
-     ;; (add-hook 'inferior-ess-mode-hook 'ac-ess-mode-setup)
 
      ;; ESS tracebug
      ;; (setq ess-use-tracebug nil)
@@ -1095,11 +1062,8 @@
 (eval-after-load "python"
   '(progn
 
-     (elpy-enable)
+     ;; (elpy-enable)
      (setq highlight-indentation-mode nil)
-     ;; Flymake for Python
-     ;; (add-hook 'python-mode-hook 'flymake-python-pyflakes-load)
-     ;; (setq flymake-python-pyflakes-executable "flake8")
 
      (setq python-shell-interpreter "python3")
      ;; (setenv "PYTHONSTARTUP" "/home/fli/.pystartup")
@@ -1131,14 +1095,6 @@
                   (pymacs-load "ropemacs" "rope-")
                   (setq ropemacs-enable-autoimport t)
                   (setq pymacs-auto-restart t)
-
-
-                  ;; Auto complete in buffer
-                  ;; (require 'ac-python) ;; using just python (faster)
-                  ;; (ac-ropemacs-initialize) ;; using rope (intensive)
-                  ;; (add-hook 'python-mode-hook
-                  ;;           (lambda ()
-                  ;;             (add-to-list 'ac-sources 'ac-source-ropemacs)))
 
                   ;; ElDoc for Python in the minor buffer
                   (add-hook 'python-mode-hook 'turn-on-eldoc-mode)
