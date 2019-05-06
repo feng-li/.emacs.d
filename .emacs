@@ -14,6 +14,7 @@
 ;; Don't delete this line.  If you don't want it, just comment it out by adding a
 ;; semicolon to the start of the line.  You may delete these explanatory comments.  Add
 ;; MELPA repository
+;;; Code:
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (package-initialize)
@@ -52,6 +53,7 @@
      (ess-R-fl-keyword:F&T))))
  '(flycheck-python-flake8-executable "python3")
  '(flycheck-python-pylint-executable "python3")
+ '(global-display-line-numbers-mode t)
  '(global-font-lock-mode t nil (font-lock))
  '(hl-paren-background-colors (quote ("light gray" "steel blue" "lime green" "orange1")))
  '(indicate-empty-lines nil)
@@ -60,9 +62,11 @@
    (quote
     (elpy electric-operator markdown-mode dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia julia-mode math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup ghub)))
  '(pylint-command "pylint3")
+ '(scroll-bar-mode nil)
  '(send-mail-function (quote mailclient-send-it))
  '(session-use-package t nil (session))
  '(show-paren-mode t nil (paren))
+ '(tool-bar-mode nil)
  '(warning-suppress-types (quote ((undo discard-info)))))
 
 ;; (add-to-list 'custom-theme-load-path "~/.emacs.d/site-lisp/emacs-color-theme-solarized")
@@ -119,6 +123,10 @@
 ;(require 'benchmark-init-loaddefs)
 ;(benchmark-init/activate)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Initialize emacs server if it is not already running
+(require 'server)
+(if (not (eq t (server-running-p server-name)))
+    (server-start))
 ;; Set home directory
 ;; (setq default-directory "~/workspace/")
 
@@ -186,16 +194,6 @@
       (load-theme 'dracula t)
       )
     )
-  )
-
-
-(when (display-graphic-p)
-
-  ;; tool-bar mode
-  (tool-bar-mode -1)
-
-  ;; Disable scroll-bar
-  (scroll-bar-mode -1)
   )
 
 ;; Disable backup files (*~)
@@ -1151,3 +1149,5 @@
  '(font-lock-comment-face ((t (:inherit t :slant italic)))))
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
+(provide '.emacs)
+;;; .emacs ends here
