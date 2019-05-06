@@ -139,6 +139,14 @@
 (desktop-save-mode 1)
 (setq desktop-load-locked-desktop t)
 (setq desktop-restore-frames nil)
+
+;; Add a hook when emacs is closed to we reset the desktop modification time (in this way
+;; the user does not get a warning message about desktop modifications)
+(add-hook 'kill-emacs-hook
+          (lambda ()
+            ;; Reset desktop modification time so the user is not bothered
+            (setq desktop-file-modtime (nth 5 (file-attributes (desktop-full-file-name))))))
+
 (setq desktop-path '("~"))
 (setq desktop-dirname "~")
 (setq desktop-buffers-not-to-save
@@ -1087,14 +1095,14 @@
                   (define-key python-mode-map "\C-m" 'newline-and-indent)
 
                   ;; Pythonmacs (use Python function in Elisp)
-                  (autoload 'pymacs-apply "pymacs")
-                  (autoload 'pymacs-call "pymacs")
-                  (autoload 'pymacs-eval "pymacs" nil t)
-                  (autoload 'pymacs-exec "pymacs" nil t)
-                  (autoload 'pymacs-load "pymacs" nil t)
-                  (pymacs-load "ropemacs" "rope-")
-                  (setq ropemacs-enable-autoimport t)
-                  (setq pymacs-auto-restart t)
+                  ;; (autoload 'pymacs-apply "pymacs")
+                  ;; (autoload 'pymacs-call "pymacs")
+                  ;; (autoload 'pymacs-eval "pymacs" nil t)
+                  ;; (autoload 'pymacs-exec "pymacs" nil t)
+                  ;; (autoload 'pymacs-load "pymacs" nil t)
+                  ;; (pymacs-load "ropemacs" "rope-")
+                  ;; (setq ropemacs-enable-autoimport t)
+                  ;; (setq pymacs-auto-restart t)
 
                   ;; ElDoc for Python in the minor buffer
                   (add-hook 'python-mode-hook 'turn-on-eldoc-mode)
