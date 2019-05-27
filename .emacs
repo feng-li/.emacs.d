@@ -1146,6 +1146,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(company-tooltip ((t (:background "brightblack" :foreground "#e2e2dc"))))
  '(font-lock-comment-face ((t (:inherit t :slant italic)))))
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
