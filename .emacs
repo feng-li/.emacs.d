@@ -729,8 +729,9 @@
 ;; Spelling Check
 (eval-after-load "ispell"
   '(progn
-     (setq ispell-dictionary "american-insane")
+     (setq ispell-dictionary "american")
 
+     ;; Hunspell 1.7 is broken with emacs 26.1
      ;; (defun ispell-get-coding-system () 'utf-8)
      ;; (setq ispell-program-name "hunspell")
      ;; (setq ispell-really-hunspell t)
@@ -740,9 +741,10 @@
      ;;       '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil
      ;;          ("-d" "en_US,en_GB") nil UTF-8)))
 
+
      (global-set-key (kbd "<f9> 4") 'ispell-word)))
 
-;; Auto correct spelling mistakes
+;; Audddto correct spelling mistakes
 (global-set-key (kbd "<f9> c") 'flyspell-auto-correct-word)
 
 (with-eval-after-load 'comint
