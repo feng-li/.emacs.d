@@ -854,15 +854,14 @@
      (setq TeX-PDF-mode t)
      ;; (setq-default TeX-engine 'xetex) ;this can be set locally
 
-     ;; Parse on load/save
-     (setq TeX-parse-self t)
-     (setq TeX-auto-save t)
-
-
      ;; Add listings to verbatim environments
      (eval-after-load 'latex
        '(add-to-list 'LaTeX-verbatim-environments "lstlisting"))
 
+
+     ;; Parse on load/save
+     (setq TeX-parse-self t)
+     (setq TeX-auto-save t)
 
      (setq TeX-source-correlate-method (quote source-specials)) ; only for dvi
      (setq TeX-source-correlate-method (quote synctex)) ;only for evince
