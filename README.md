@@ -19,7 +19,6 @@ Installation
 
         cd ~
         git clone git://github.com/feng-li/.emacs.d.git
-        ln -sf .emacs.d/.emacs
         cd ~/.emacs.d/
         git submodule update --init --recursive
 
