@@ -16,8 +16,8 @@
 ;; MELPA repository
 ;;; Code:
 (require 'package)
-(setq package-archives '(("melpa" . "https://melpa.org/packages/")
-                          ("gnu-cn"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
+(setq package-archives '(;("melpa" . "https://melpa.org/packages/")
+                          ;("gnu-cn"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
                           ("melpa-cn" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
                                  ))
 (package-initialize)
