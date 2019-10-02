@@ -809,6 +809,27 @@
   '(progn
      (global-set-key (kbd "<f9> 9") 'goldendict-dwim)))
 
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Add font lock keywords
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(mapc (lambda (mode)
+        (font-lock-add-keywords
+         mode
+         '(("\\<\\(FIXME\\):" 1 font-lock-warning-face t)
+           ("\\<\\(DEPENDS\\):" 1 font-lock-warning-face t)
+           ("\\<\\(TODO\\):" 1 font-lock-warning-face t)
+           ("\\<\\(DATE\\):" 1 font-lock-warning-face t)
+           ("\\<\\(NOTE\\):" 1 font-lock-warning-face t)
+           ("\\<\\(DEBUG\\):" 1 font-lock-warning-face t)
+           ;;output values high light at comments
+           ("\\(\\\\item[ \t]+{[\._A-Za-z0-9]+}\\)" 1 font-lock-warning-face t)
+           ("\\<\\([\._A-Za-z0-9]+\$[\-\._A-Za-z0-9]+\\):" 1 font-lock-warning-face t))))
+      '(text-mode latex-mode html-mode emacs-lisp-mode
+                  python-mode c-mode ess-mode julia-mode markdown-mode))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Markdown mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -972,40 +993,20 @@
                '(lambda ()
 
                   ;;Roxygen template
-                  (setq ess-roxy-template-alist
-                        (list
-                         (cons "description" "<title>")
-                         (cons "details" "<description>")
-                         (cons "param" "")
-                         (cons "return" "NA")
-                         (cons "references" "NA")
-                         (cons "author" "Feng Li, Central University of Finance and Economics.")
-                         (cons "export" "")
-                         ))
-
-                  (font-lock-add-keywords
-                   nil
-                   '(("\\<\\(FIXME\\):" 1 font-lock-warning-face t)
-                     ("\\<\\(DEPENDS\\):" 1 font-lock-warning-face t)
-                     ("\\<\\(TODO\\):" 1 font-lock-warning-face t)
-                     ("\\<\\(DATE\\):" 1 font-lock-warning-face t)
-                     ("\\<\\(NOTE\\):" 1 font-lock-warning-face t)
-                     ("\\<\\(DEBUG\\):" 1 font-lock-warning-face t)
-                     ;;output values high light at comments
-                     ("\\(\\\\item[ \t]+{[\._A-Za-z0-9]+}\\)" 1
-                      font-lock-warning-face t)
-                     ("\\<\\([\._A-Za-z0-9]+\$[\-\._A-Za-z0-9]+\\):" 1
-                      font-lock-warning-face t)))
+                  ;; (setq ess-roxy-template-alist
+                  ;;       (list
+                  ;;        (cons "description" "<title>")
+                  ;;        (cons "details" "<description>")
+                  ;;        ;; (cons "param" "")
+                  ;;        (cons "return" "NA")
+                  ;;        (cons "references" "NA")
+                  ;;        (cons "author" "Feng Li, Central University of Finance and Economics.")
+                  ;;        (cons "export" "")
+                  ;;        ))
 
 
                   ;; Set M-§ to complete the object in the ESS editor
                   ;; The default was "C-c Tab", Not needed if ac-R enabled
-
-                  ;; insert 8 spaces
-                  (fset 'my-R-smart-indent
-                        [return ?\C-u ?8 ? ])
-                  (local-set-key (kbd "<C-return>") 'my-R-smart-indent)
-
 
                   (fset 'my-R-comment-level-1
                         (lambda (&optional arg) "Insert level-1 R comment block"
@@ -1123,20 +1124,6 @@
                   (make-face 'font-lock-special-macro-face)
                   (set-face-background 'font-lock-special-macro-face "magenta")
                   (set-face-foreground 'font-lock-special-macro-face "white")
-
-                  (add-hook
-                   'python-mode-hook
-                   (lambda ()
-                     (font-lock-add-keywords
-                      nil
-                      '(("\\<\\(FIXME\\):" 1 font-lock-warning-face t)
-                        ("\\<\\(DEPENDS\\):" 1 font-lock-warning-face t)
-                        ("\\<\\(TODO\\):" 1 font-lock-warning-face t)
-                        ("\\<\\(DATE\\):" 1 font-lock-warning-face t)
-                        ("\\<\\(DEBUG\\):" 1 font-lock-warning-face t)
-                        ("\\<\\(import pdb;[\n \t]*pdb.set_trace()\\)" .
-                         'font-lock-special-macro-face)))))
-
 
                   ))
      )
