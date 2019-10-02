@@ -63,7 +63,7 @@
  '(org-support-shift-select t)
  '(package-selected-packages
    (quote
-    (elpy electric-operator markdown-mode dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia julia-mode math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup ghub)))
+    (highlight-indent-guides elpy electric-operator markdown-mode dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia julia-mode math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup ghub)))
  '(pylint-command "pylint3")
  '(scroll-bar-mode nil)
  '(send-mail-function (quote mailclient-send-it))
@@ -809,6 +809,18 @@
   '(progn
      (global-set-key (kbd "<f9> 9") 'goldendict-dwim)))
 
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; General settings for program mode
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; highlight-indent-guides-mode
+(add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
+(setq highlight-indent-guides-method 'character)
+(setq highlight-indent-guides-auto-odd-face-perc 30)
+(setq highlight-indent-guides-auto-even-face-perc 30)
+(setq highlight-indent-guides-auto-character-face-perc 40)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
