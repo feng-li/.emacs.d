@@ -1100,8 +1100,11 @@
 (eval-after-load "python"
   '(progn
 
-     ;; (elpy-enable)
-     (setq highlight-indentation-mode nil)
+     (elpy-enable)
+
+     ;; Disable elpy's highlight-indentation-mode, use highlight-indentation-guide
+     (add-hook 'elpy-mode-hook (lambda () (highlight-indentation-mode -1)))
+     ;; (setq highlight-indentation-mode nil)
 
      (setq python-shell-interpreter "python3")
      ;; (setenv "PYTHONSTARTUP" "/home/fli/.pystartup")
