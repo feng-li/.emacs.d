@@ -421,7 +421,17 @@
 (eval-after-load "session"
   '(progn
      (setq session-use-package nil)
-     (add-hook 'after-init-hook 'session-initialize)))
+     (add-hook 'after-init-hook 'session-initialize)
+
+     ;; Save sessions with customization
+     (setq session-save-file
+           (expand-file-name (concat "."  system-name ".session")
+                             (cond
+                              ((boundp 'user-emacs-directory) user-emacs-directory)
+                              ((boundp 'user-init-directory) user-init-directory)
+                              (t "~"))))
+
+     ))
 
 ;; Cursor is bar: Not clear under console
 (setq-default cursor-type 'box)
@@ -818,6 +828,7 @@
 ;; highlight-indent-guides-mode
 (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
 (setq highlight-indent-guides-method 'character)
+(setq highlight-indent-guides-character ?\│)
 (setq highlight-indent-guides-auto-odd-face-perc 30)
 (setq highlight-indent-guides-auto-even-face-perc 30)
 (setq highlight-indent-guides-auto-character-face-perc 40)
@@ -976,7 +987,7 @@
      ;; ESS tracebug
      ;; (setq ess-use-tracebug nil)
 
-     (require 'ess-rutils)
+     ;; (require 'ess-rutils)
      ;; (require 'ess-tracebug) ;; ESS tracebug
      ;; (require 'ess-R-object-tooltip)
 
@@ -1054,7 +1065,8 @@
                '(lambda ()
                   (define-key inferior-ess-mode-map (kbd "C-c `") 'ess-parse-errors)
                   (define-key inferior-ess-mode-map (kbd "C-c d") 'ess-change-directory)
-                  (define-key inferior-ess-mode-map (kbd "C-c l") 'ess-rutils-load-wkspc)))
+                  ;; (define-key inferior-ess-mode-map (kbd "C-c l") 'ess-rutils-load-wkspc))
+                  ))
 
      ;; ESS Code styles
      (defun ess-code-style ()
@@ -1062,7 +1074,10 @@
        (local-set-key (kbd "<f9> x") (lambda () (interactive) (insert " %x% ")))
        (local-set-key (kbd "<f9> n") (lambda () (interactive) (insert " %in% "))))
      (add-hook 'ess-mode-hook 'ess-code-style)
-     (add-hook 'inferior-ess-mode-hook 'ess-code-style)))
+     (add-hook 'inferior-ess-mode-hook 'ess-code-style))
+  )
+
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

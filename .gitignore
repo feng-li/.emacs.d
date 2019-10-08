@@ -4,6 +4,7 @@ abbrev_defs
 *.elc
 *.desktop
 *.lock
+*.*.session
 .session
 session.*
 !session.el
