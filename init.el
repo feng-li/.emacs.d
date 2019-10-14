@@ -63,7 +63,7 @@
  '(org-support-shift-select t)
  '(package-selected-packages
    (quote
-    (highlight-indent-guides elpy electric-operator markdown-mode dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia julia-mode math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup ghub)))
+    (electric-operator highlight-indent-guides elpy markdown-mode dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup)))
  '(pylint-command "pylint3")
  '(scroll-bar-mode nil)
  '(send-mail-function (quote mailclient-send-it))

@@ -13,6 +13,7 @@ ede-projects.el
 *conflicted\ copy*
 server/
 elpa/
+elpy/
 tutorial/
 eshell/
 tags/
