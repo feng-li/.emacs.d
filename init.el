@@ -783,12 +783,16 @@
   (add-hook hook (lambda () (flyspell-mode -1))))
 
 ;; Fly spell check comments for a programmer
-(dolist (hook '(emacs-lisp-mode-hook
-                c-mode-hook
-                c++-mode-hook
-                ess-mode-hook
-                python-mode-hook))
-  (add-hook hook (lambda () (flyspell-prog-mode))))
+;; (dolist (hook '(emacs-lisp-mode-hook
+;;                 c-mode-hook
+;;                 c++-mode-hook
+;;                 ess-mode-hook
+;;                 python-mode-hook))
+;;   (add-hook hook (lambda () (flyspell-prog-mode))))
+(add-hook 'prog-mode-hook 'flyspell-prog-mode)
+
+
+
 
 ;; Dictionary
 (eval-after-load "dictem"
