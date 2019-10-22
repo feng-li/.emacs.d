@@ -54,6 +54,7 @@
      (ess-fl-keyword:delimiters)
      (ess-fl-keyword:=)
      (ess-R-fl-keyword:F&T))))
+ '(ess-eldoc-show-on-symbol t)
  '(flycheck-python-flake8-executable "python3")
  '(flycheck-python-pylint-executable "python3")
  '(global-display-line-numbers-mode t)
@@ -990,7 +991,6 @@
 
      ;; ESS tracebug
      ;; (setq ess-use-tracebug nil)
-
      ;; (require 'ess-rutils)
      ;; (require 'ess-tracebug) ;; ESS tracebug
      ;; (require 'ess-R-object-tooltip)
