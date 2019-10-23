@@ -417,8 +417,12 @@
 ;; TAB settings
 (setq-default indent-tabs-mode nil)
 
+;; ediff
+(setq ediff-window-setup-function 'ediff-setup-windows-plain)
+(setq ediff-split-window-function 'split-window-horizontally)
+(setq-default ediff-ignore-similar-regions t)
 
-;;Session(Keep section each time)
+;;Session (keep sections with different machines)
 (eval-after-load "session"
   '(progn
      (setq session-use-package nil)
