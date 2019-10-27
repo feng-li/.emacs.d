@@ -770,7 +770,7 @@
   (define-key comint-mode-map "\C-d" nil))
 
 ;; FlyCheck
-;; (global-flycheck-mode)
+(global-flycheck-mode)
 
 
 ;; Fly spell performance
