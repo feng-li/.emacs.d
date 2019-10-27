@@ -725,7 +725,8 @@
 (apply #'electric-operator-add-rules-for-mode 'inferior-python-mode
        (electric-operator-get-rules-for-mode 'python-mode))
 (setq electric-operator-R-named-argument-style "spaced")
-(electric-operator-add-rules-for-mode 'c-mode (cons "*" nil))
+(electric-operator-add-rules-for-mode 'prog-mode (cons "*" nil))
+(electric-operator-add-rules-for-mode 'prog-mode (cons "/" nil))
 
 
 ;; Goto matched parenthesis
@@ -1112,6 +1113,9 @@
 
      ;; Disable elpy's highlight-indentation-mode, use highlight-indentation-guide
      (add-hook 'elpy-mode-hook (lambda () (highlight-indentation-mode -1)))
+
+     ;; Disable elpy's flymake, use flycheck
+     (add-hook 'elpy-mode-hook (lambda () (flymake-mode -1)))
      ;; (setq highlight-indentation-mode nil)
 
      (setq python-shell-interpreter "python3")
