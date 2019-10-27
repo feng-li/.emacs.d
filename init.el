@@ -55,6 +55,7 @@
      (ess-fl-keyword:=)
      (ess-R-fl-keyword:F&T))))
  '(ess-eldoc-show-on-symbol t)
+ '(ess-use-flymake nil)
  '(flycheck-python-flake8-executable "python3")
  '(flycheck-python-pylint-executable "python3")
  '(global-display-line-numbers-mode t)
@@ -770,7 +771,7 @@
   (define-key comint-mode-map "\C-d" nil))
 
 ;; FlyCheck
-(global-flycheck-mode)
+;; (add-hook 'after-init-hook #'global-flycheck-mode)
 
 
 ;; Fly spell performance
@@ -993,12 +994,15 @@
 ;; ESS
 (eval-after-load "ess-site"
   '(progn
-
      ;; ESS tracebug
      ;; (setq ess-use-tracebug nil)
      ;; (require 'ess-rutils)
      ;; (require 'ess-tracebug) ;; ESS tracebug
      ;; (require 'ess-R-object-tooltip)
+
+     ;; Disable flymake, use flycheck instead
+     ;; (add-hook 'ess-mode-hook
+     ;;           (lambda () (flycheck-mode t)))
 
      ;; R args at start up
      (global-set-key (kbd "<f9> <f6>") 'R) ;; The default R
