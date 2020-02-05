@@ -37,6 +37,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(blink-cursor-mode t)
  '(case-fold-search t)
  '(column-number-mode t)
  '(doc-view-continuous t)
@@ -55,6 +56,7 @@
      (ess-fl-keyword:=)
      (ess-R-fl-keyword:F&T))))
  '(ess-eldoc-show-on-symbol t)
+ '(ess-roxy-str "#'")
  '(ess-use-flymake nil)
  '(flycheck-python-flake8-executable "python3")
  '(flycheck-python-pylint-executable "python3")
@@ -67,6 +69,7 @@
    (quote
     (electric-operator highlight-indent-guides elpy markdown-mode dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup)))
  '(pylint-command "pylint3")
+ '(save-place-mode t)
  '(scroll-bar-mode nil)
  '(send-mail-function (quote mailclient-send-it))
  '(session-use-package t nil (session))
@@ -335,7 +338,6 @@
                  (define-key dired-mode-map (kbd "<delete>") 'dired-do-delete)
                  (define-key dired-mode-map (kbd "<f9> DEL")
                    (lambda () (interactive) (find-alternate-file "..")))
-                 (setq cursor-type 'box)
                  (dired-omit-mode 1)
                  (local-set-key (kbd "<f9> h") 'dired-omit-mode)))
      (put 'dired-find-alternate-file 'disabled nil)
@@ -441,7 +443,7 @@
 
 ;; Cursor is bar: Not clear under console
 (setq-default cursor-type 'box)
-
+(setq-default visible-cursor t)
 ;;set visible-bell
 (setq visible-bell t)
 
