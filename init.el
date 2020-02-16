@@ -67,10 +67,9 @@
  '(org-support-shift-select t)
  '(package-selected-packages
    (quote
-    (electric-operator highlight-indent-guides elpy markdown-mode dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup)))
+    (company-reftex electric-operator highlight-indent-guides elpy markdown-mode dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup)))
  '(pylint-command "pylint3")
  '(save-place-mode t)
- '(require-final-newline t)
  '(scroll-bar-mode nil)
  '(send-mail-function (quote mailclient-send-it))
  '(session-use-package t nil (session))
@@ -109,6 +108,7 @@
 (require 'poly-R)
 (require 'poly-markdown)
 (require 'flycheck)
+(require 'company)
 ;; (require 'dictem nil 'noerror)
 (require 'ess-site)
 (require 'julia-mode)
@@ -125,7 +125,6 @@
 (require 'yasnippet-snippets)
 (require 'goldendict)
 (require 'electric-operator)
-(require 'company)
 (require 'iedit)
 (require 'magit)
 
@@ -904,8 +903,13 @@
      (keyboard-translate ?§ ?`)
      (setq LaTeX-math-abbrev-prefix "`")
 
-     ;; Allow company mode
+     ;; Allow company-auctex backends
      (company-auctex-init)
+
+     ;; Allow company-reftex backends
+     (add-to-list 'company-backends 'company-reftex-labels)
+     (add-to-list 'company-backends 'company-reftex-citations)
+
 
      (setq TeX-source-correlate-mode  t)
      (setq TeX-source-correlate-start-server nil)
