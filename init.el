@@ -70,6 +70,7 @@
     (electric-operator highlight-indent-guides elpy markdown-mode dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup)))
  '(pylint-command "pylint3")
  '(save-place-mode t)
+ '(require-final-newline t)
  '(scroll-bar-mode nil)
  '(send-mail-function (quote mailclient-send-it))
  '(session-use-package t nil (session))
@@ -108,7 +109,7 @@
 (require 'poly-R)
 (require 'poly-markdown)
 (require 'flycheck)
-(require 'dictem nil 'noerror)
+;; (require 'dictem nil 'noerror)
 (require 'ess-site)
 (require 'julia-mode)
 (require 'flycheck-julia)
@@ -804,33 +805,32 @@
 
 
 ;; Dictionary
-(eval-after-load "dictem"
-  '(progn
-     (setq dictem-server "localhost")
-     (setq dictem-port   "2628")
-     (dictem-initialize)
-     (global-set-key (kbd "<f50>") 'dictem-run-search)
-     (fset 'my-search-dictem
-           [f50 return return return])
-     (global-set-key (kbd "<f9> d") 'my-search-dictem)
-     (setq dictem-default-database "Collins")
-     (setq dictem-default-strategy "exact")
-     (add-hook 'dictem-postprocess-match-hook
-               'dictem-postprocess-match)
-     (add-hook 'dictem-postprocess-definition-hook
-               'dictem-postprocess-definition-separator)
-     (add-hook 'dictem-postprocess-definition-hook
-               'dictem-postprocess-definition-hyperlinks)
-     (add-hook 'dictem-postprocess-show-info-hook
-               'dictem-postprocess-definition-hyperlinks)
-     (add-hook 'dictem-postprocess-definition-hook
-               'dictem-postprocess-definition-remove-header)
-     (define-key dictem-mode-map [tab] 'dictem-next-link)))
+;; (eval-after-load "dictem"
+;;   '(progn
+;;      (setq dictem-server "localhost")
+;;      (setq dictem-port   "2628")
+;;      (dictem-initialize)
+;;      (global-set-key (kbd "<f50>") 'dictem-run-search)
+;;      (fset 'my-search-dictem
+;;            [f50 return return return])
+;;      (global-set-key (kbd "<f9> d") 'my-search-dictem)
+;;      (setq dictem-default-database "Collins")
+;;      (setq dictem-default-strategy "exact")
+;;      (add-hook 'dictem-postprocess-match-hook
+;;                'dictem-postprocess-match)
+;;      (add-hook 'dictem-postprocess-definition-hook
+;;                'dictem-postprocess-definition-separator)
+;;      (add-hook 'dictem-postprocess-definition-hook
+;;                'dictem-postprocess-definition-hyperlinks)
+;;      (add-hook 'dictem-postprocess-show-info-hook
+;;                'dictem-postprocess-definition-hyperlinks)
+;;      (add-hook 'dictem-postprocess-definition-hook
+;;                'dictem-postprocess-definition-remove-header)
+;;      (define-key dictem-mode-map [tab] 'dictem-next-link)))
 ;;(define-key dictem-mode-map [(backtab)] 'dictem-previous-link)
-
 (eval-after-load "goldendict"
   '(progn
-     (global-set-key (kbd "<f9> 9") 'goldendict-dwim)))
+     (global-set-key (kbd "<f9> d") 'goldendict-dwim)))
 
 
 
