@@ -1189,9 +1189,10 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(company-tooltip ((t (:background "brightblack" :foreground "#e2e2dc"))))
+ '(company-tooltip ((t (:background "dim gray" :foreground "light gray"))))
+ '(font-latex-sectioning-5-face ((t (:foreground "deep sky blue" :weight bold))))
  '(font-lock-comment-face ((t (:inherit t :slant italic))))
- '(region ((t (:background "brightblack")))))
+ '(region ((t (:background "dim gray" :foreground "light gray")))))
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
 (provide '.emacs)
