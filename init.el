@@ -62,6 +62,9 @@
  '(flycheck-python-pylint-executable "python3")
  '(global-display-line-numbers-mode t)
  '(global-font-lock-mode t nil (font-lock))
+ '(highlight-doxygen-commend-start-regexp
+   "\\(/\\*\\(!\\|\\*[^*]\\)\\|#\\('\\)\\|##\\('\\)\\|//\\(!\\|'\\|/[^/
+]\\)\\)") ;; allow to highlight Roxygen files
  '(hl-paren-background-colors (quote ("light gray" "steel blue" "lime green" "orange1")))
  '(indicate-empty-lines nil)
  '(org-support-shift-select t)
@@ -852,6 +855,14 @@
 
 ;; Highlight doxygen mode
 (highlight-doxygen-global-mode 1)
+(dolist (hook (list
+               'c-mode-hook
+               'c++-mode-hook
+               'python-mode-hook
+               'ess-mode-hook))
+  (add-hook hook '(lambda () (highlight-doxygen-mode))))
+
+;; (add-hook 'prog-mode-hook 'highlight-doxygen-mode)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Add font lock keywords
