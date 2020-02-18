@@ -313,7 +313,7 @@
 (add-to-list 'auto-mode-alist '("/mutt" . mail-mode))
 
 ;; Global visual line mode
-(global-visual-line-mode -1)
+(global-visual-line-mode t)
 
 ;; Dired mode
 (eval-after-load "ibuffer"
@@ -1190,8 +1190,11 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(company-tooltip ((t (:background "dim gray" :foreground "light gray"))))
+ '(font-latex-math-face ((t (:foreground "dark orange"))))
  '(font-latex-sectioning-5-face ((t (:foreground "deep sky blue" :weight bold))))
+ '(font-latex-sedate-face ((t (:foreground "dark magenta"))))
  '(font-lock-comment-face ((t (:inherit t :slant italic))))
+ '(font-lock-function-name-face ((t (:foreground "deep sky blue"))))
  '(region ((t (:background "dim gray" :foreground "light gray")))))
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
