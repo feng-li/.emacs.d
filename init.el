@@ -67,7 +67,7 @@
  '(org-support-shift-select t)
  '(package-selected-packages
    (quote
-    (company-reftex electric-operator highlight-indent-guides elpy markdown-mode dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup)))
+    (highlight-doxygen company-reftex electric-operator highlight-indent-guides elpy markdown-mode dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup)))
  '(pylint-command "pylint3")
  '(save-place-mode t)
  '(scroll-bar-mode nil)
@@ -721,6 +721,7 @@
                'python-mode-hook
                'inferior-python-mode-hook
                'c-mode-hook
+               'c++-mode-hook
                'LaTeX-mode-hook
                'ess-mode-hook
                'inferior-ess-mode-hook))
@@ -837,14 +838,20 @@
 ;; General settings for program mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; highlight-indent-guides-mode
-(add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
-(setq highlight-indent-guides-method 'character)
-(setq highlight-indent-guides-character ?\│)
-(setq highlight-indent-guides-auto-odd-face-perc 30)
-(setq highlight-indent-guides-auto-even-face-perc 30)
-(setq highlight-indent-guides-auto-character-face-perc 40)
+;; highlight-indent-guides-mode, can make emacs slow with large files
+(eval-after-load "highlight-indent-guides"
+  '(progn
+     (add-hook 'python-mode-hook 'highlight-indent-guides-mode)
+     (setq highlight-indent-guides-method 'character)
+     (setq highlight-indent-guides-character ?\│)
+     (setq highlight-indent-guides-auto-odd-face-perc 30)
+     (setq highlight-indent-guides-auto-even-face-perc 30)
+     (setq highlight-indent-guides-auto-character-face-perc 40)
+     )
+  )
 
+;; Highlight doxygen mode
+(highlight-doxygen-global-mode 1)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Add font lock keywords
@@ -1194,7 +1201,8 @@
  '(font-latex-sectioning-5-face ((t (:foreground "deep sky blue" :weight bold))))
  '(font-latex-sedate-face ((t (:foreground "dark magenta"))))
  '(font-lock-comment-face ((t (:inherit t :slant italic))))
- '(font-lock-function-name-face ((t (:foreground "deep sky blue"))))
+ '(font-lock-function-name-face ((t (:foreground "deep sky blue" :weight normal))))
+ '(highlight-doxygen-comment ((t (:inherit font-lock-doc-face :background "navy"))))
  '(region ((t (:background "dim gray" :foreground "light gray")))))
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
