@@ -64,13 +64,13 @@
  '(global-font-lock-mode t nil (font-lock))
  '(highlight-doxygen-commend-start-regexp
    "\\(/\\*\\(!\\|\\*[^*]\\)\\|#\\('\\)\\|##\\('\\)\\|//\\(!\\|'\\|/[^/
-]\\)\\)") ;; allow to highlight Roxygen files
+]\\)\\)")
  '(hl-paren-background-colors (quote ("light gray" "steel blue" "lime green" "orange1")))
  '(indicate-empty-lines nil)
  '(org-support-shift-select t)
  '(package-selected-packages
    (quote
-    (highlight-doxygen company-reftex electric-operator highlight-indent-guides elpy markdown-mode dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup)))
+    (highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup)))
  '(pylint-command "pylint3")
  '(save-place-mode t)
  '(scroll-bar-mode nil)
@@ -317,6 +317,7 @@
 
 ;; Global visual line mode
 (global-visual-line-mode t)
+;; (add-hook 'prog-mode-hook '(flyspell-prog-mode -t))
 
 ;; Dired mode
 (eval-after-load "ibuffer"
@@ -711,13 +712,11 @@
 ;; Commenting
 (global-set-key (kbd "M-3") 'comment-or-uncomment-region)
 
-
 ;; Add extra info path
 (eval-after-load "info-look"
   '(progn
      (add-to-list
       'Info-default-directory-list "~/.emacs.d/info")))
-
 
 ; Electric operators
 (dolist (hook (list
@@ -842,16 +841,16 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; highlight-indent-guides-mode, can make emacs slow with large files
-(eval-after-load "highlight-indent-guides"
-  '(progn
-     (add-hook 'python-mode-hook 'highlight-indent-guides-mode)
-     (setq highlight-indent-guides-method 'character)
-     (setq highlight-indent-guides-character ?\│)
-     (setq highlight-indent-guides-auto-odd-face-perc 30)
-     (setq highlight-indent-guides-auto-even-face-perc 30)
-     (setq highlight-indent-guides-auto-character-face-perc 40)
-     )
-  )
+;; (eval-after-load "highlight-indent-guides"
+;;   '(progn
+;;      (add-hook 'python-mode-hook 'highlight-indent-guides-mode)
+;;      (setq highlight-indent-guides-method 'character)
+;;      (setq highlight-indent-guides-character ?\│)
+;;      (setq highlight-indent-guides-auto-odd-face-perc 30)
+;;      (setq highlight-indent-guides-auto-even-face-perc 30)
+;;      (setq highlight-indent-guides-auto-character-face-perc 40)
+;;      )
+;;   )
 
 ;; Highlight doxygen mode
 (highlight-doxygen-global-mode 1)
@@ -859,7 +858,7 @@
                'c-mode-hook
                'c++-mode-hook
                'python-mode-hook
-               'ess-mode-hook))
+               'ess-r-mode-hook))
   (add-hook hook '(lambda () (highlight-doxygen-mode))))
 
 ;; (add-hook 'prog-mode-hook 'highlight-doxygen-mode)
@@ -1214,6 +1213,7 @@
  '(font-lock-comment-face ((t (:inherit t :slant italic))))
  '(font-lock-function-name-face ((t (:foreground "deep sky blue" :weight normal))))
  '(highlight-doxygen-comment ((t (:inherit font-lock-doc-face :background "navy"))))
+ '(neo-dir-link-face ((t (:inherit font-lock-function-name-face))))
  '(region ((t (:background "dim gray" :foreground "light gray")))))
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
