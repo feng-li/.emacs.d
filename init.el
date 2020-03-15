@@ -16,10 +16,11 @@
 ;; MELPA repository
 ;;; Code:
 (require 'package)
-(setq package-archives '(;("melpa" . "https://melpa.org/packages/")
-                          ;("gnu-cn"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
-                          ("melpa-cn" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
-                                 ))
+(setq package-archives '
+      (;("melpa" . "https://melpa.org/packages/")
+       ("gnu-cn"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
+       ("melpa-cn" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
+       ))
 (package-initialize)
 
 ;; Add personal load path recursively in front of the default load path
@@ -70,7 +71,7 @@
  '(org-support-shift-select t)
  '(package-selected-packages
    (quote
-    (highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup)))
+    (adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup)))
  '(pylint-command "pylint3")
  '(save-place-mode t)
  '(scroll-bar-mode nil)
@@ -131,8 +132,8 @@
 (require 'iedit)
 (require 'magit)
 
-;(require 'benchmark-init-loaddefs)
-;(benchmark-init/activate)
+                                        ;(require 'benchmark-init-loaddefs)
+                                        ;(benchmark-init/activate)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Initialize emacs server if it is not already running
 (require 'server)
@@ -216,7 +217,8 @@
 (with-eval-after-load 'info
   (info-initialize)
   (add-to-list 'Info-directory-list
-               "~/.emacs.d/site-lisp/magit/Documentation/"))
+               "~/.emacs.d/site-lisp/magit/Documentation/")
+  )
 (setq vc-follow-symlinks nil)
 
 
@@ -272,11 +274,11 @@
 ;; Enable line number mode and enable visual line mode
 ;; (if (display-graphic-p)
 ;;     (progn
-      ;; Do nothing with window system
-      ;; )
-  ;; Add a vertical line
-  ;; (setq linum-format "%4d\u2502")
-  ;; )
+;; Do nothing with window system
+;; )
+;; Add a vertical line
+;; (setq linum-format "%4d\u2502")
+;; )
 
 (global-display-line-numbers-mode)
 ;; (add-hook 'find-file-hook
@@ -315,8 +317,11 @@
 ;;Mutt
 (add-to-list 'auto-mode-alist '("/mutt" . mail-mode))
 
-;; Global visual line mode
+;; Global visual line mode with better indentation
+(setq-default adaptive-wrap-extra-indent 4)
+(add-hook 'visual-line-mode-hook #'adaptive-wrap-prefix-mode)
 (global-visual-line-mode t)
+
 ;; (add-hook 'prog-mode-hook '(flyspell-prog-mode -t))
 
 ;; Dired mode
@@ -491,7 +496,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Yasnippet settings
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(eval-after-load 'yasnippet
+(eval-after-load "yasnippet"
   '(progn
      (yas-global-mode 1)
      ;; (setq yas-snippet-dirs
@@ -540,8 +545,8 @@
            'langtool-autoshow-detail-popup)))
 
 (eval-after-load "writegood-mode"
-'(progn
-   (global-set-key "\C-cg" 'writegood-mode)))
+  '(progn
+     (global-set-key "\C-cg" 'writegood-mode)))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; General IDE settings (ElDoc, ECB, Comint...)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -685,8 +690,8 @@
 ;; Auto complete mode
 (eval-after-load "company"
   '(progn
-    (add-hook 'after-init-hook 'global-company-mode)
-    ))
+     (add-hook 'after-init-hook 'global-company-mode)
+     ))
 
 
 ;; Font lock
@@ -718,7 +723,7 @@
      (add-to-list
       'Info-default-directory-list "~/.emacs.d/info")))
 
-; Electric operators
+                                        ; Electric operators
 (dolist (hook (list
                'python-mode-hook
                'inferior-python-mode-hook
@@ -773,7 +778,8 @@
 (global-set-key (kbd "<f9> c") 'flyspell-auto-correct-word)
 
 (with-eval-after-load 'comint
-  (define-key comint-mode-map "\C-d" nil))
+  (define-key comint-mode-map "\C-d" nil)
+  )
 
 ;; FlyCheck
 ;; (add-hook 'after-init-hook #'global-flycheck-mode)
@@ -936,7 +942,7 @@
      ;; (setq-default TeX-engine 'xetex) ;this can be set locally
 
      ;; Add listings to verbatim environments
-     (eval-after-load 'latex
+     (eval-after-load "latex"
        '(add-to-list 'LaTeX-verbatim-environments "lstlisting"))
 
 
@@ -1125,7 +1131,7 @@
      ;; (add-to-list 'flycheck-global-modes 'julia-mode)
      ;; (add-to-list 'flycheck-global-modes 'ess-julia-mode)
      )
- )
+  )
 
 
 
@@ -1212,7 +1218,7 @@
  '(font-latex-sedate-face ((t (:foreground "dark magenta"))))
  '(font-lock-comment-face ((t (:inherit t :slant italic))))
  '(font-lock-function-name-face ((t (:foreground "deep sky blue" :weight normal))))
- '(highlight-doxygen-comment ((t (:inherit font-lock-doc-face :background "navy"))))
+ '(highlight-doxygen-comment ((t (:inherit highlight))))
  '(neo-dir-link-face ((t (:inherit font-lock-function-name-face))))
  '(region ((t (:background "dim gray" :foreground "light gray")))))
 (put 'upcase-region 'disabled nil)
