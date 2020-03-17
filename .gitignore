@@ -5,6 +5,7 @@ abbrev_defs
 *.desktop
 *.lock
 places
+request/
 *.*.session
 .session
 session.*

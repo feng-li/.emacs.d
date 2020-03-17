@@ -68,10 +68,11 @@
 ]\\)\\)")
  '(hl-paren-background-colors (quote ("light gray" "steel blue" "lime green" "orange1")))
  '(indicate-empty-lines nil)
+ '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
    (quote
-    (adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup)))
+    (neotree flycheck-grammarly format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup)))
  '(pylint-command "pylint3")
  '(save-place-mode t)
  '(scroll-bar-mode nil)
@@ -112,6 +113,7 @@
 (require 'poly-R)
 (require 'poly-markdown)
 (require 'flycheck)
+(require 'flycheck-grammarly)
 (require 'company)
 ;; (require 'dictem nil 'noerror)
 (require 'ess-site)
@@ -811,6 +813,8 @@
 
 
 
+(add-hook 'c-mode-common-hook
+          (lambda () (define-key c-mode-base-map (kbd "<f5>") 'compile)))
 
 ;; Dictionary
 ;; (eval-after-load "dictem"
@@ -840,6 +844,19 @@
   '(progn
      (global-set-key (kbd "<f9> d") 'goldendict-dwim)))
 
+
+;; Unfilling a region joins all the lines in a paragraph into a single line for each
+;; paragraphs in that region. It is the contrary of fill-region.
+
+(defun unfill-region (beg end)
+  "Unfill the region, joining text paragraphs into a single
+    logical line.  This is useful, e.g., for use with
+    `visual-line-mode'."
+  (interactive "*r")
+  (let ((fill-column (point-max)))
+    (fill-region beg end)))
+;; Handy key definition
+(define-key global-map "\C-\M-Q" 'unfill-region)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1087,19 +1104,6 @@
                                ?\C-u ?3 ?# return ?\C-a ?\C-u ?3 ?# ?\C-u ?7 ?6 ?- up ? ])
                   (local-set-key (kbd "<f9> 2") 'my-R-comment-level-2)
 
-
-                  ;; (make-local-variable 'adaptive-fill-regexp)
-                  ;; (setq adaptive-fill-regexp (concat ess-roxy-str adaptive-fill-regexp))
-                  ;; (make-local-variable 'adaptive-fill-first-line-regexp)
-                  ;; (setq adaptive-fill-first-line-regexp
-                  ;;       (concat ess-roxy-str
-                  ;;               adaptive-fill-first-line-regexp))
-
-                  ;; (make-local-variable 'paragraph-start)
-                  ;; (setq paragraph-start (concat "\\(" ess-roxy-str "\\)*" paragraph-start))
-                  ;; (make-local-variable 'paragraph-separate)
-                  ;; (setq paragraph-separate
-                  ;;       (concat "\\(" ess-roxy-str "\\)*" paragraph-separate))
                   ))
 
      ;; Settings on R shell
