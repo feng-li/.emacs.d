@@ -694,6 +694,7 @@
      (add-hook 'after-init-hook 'global-company-mode)
      ))
 
+(add-hook 'prog-mode-hook 'flyspell-prog-mode)
 
 ;; Font lock
 (global-font-lock-mode t)
@@ -724,21 +725,20 @@
      (add-to-list
       'Info-default-directory-list "~/.emacs.d/info")))
 
-                                        ; Electric operators
+;; Electric operators
 (dolist (hook (list
                'python-mode-hook
-               'inferior-python-mode-hook
                'c-mode-hook
                'c++-mode-hook
                'LaTeX-mode-hook
-               'ess-mode-hook
-               'inferior-ess-mode-hook))
+               'ess-r-mode-hook))
   (add-hook hook '(lambda () (electric-operator-mode 1))))
 (apply #'electric-operator-add-rules-for-mode 'inferior-python-mode
        (electric-operator-get-rules-for-mode 'python-mode))
 (setq electric-operator-R-named-argument-style "spaced")
 (electric-operator-add-rules-for-mode 'prog-mode (cons "*" nil))
 (electric-operator-add-rules-for-mode 'prog-mode (cons "/" nil))
+(electric-operator-add-rules-for-mode 'prog-mode (cons "?" nil))
 
 
 ;; Goto matched parenthesis
@@ -808,9 +808,6 @@
 ;;                 ess-mode-hook
 ;;                 python-mode-hook))
 ;;   (add-hook hook (lambda () (flyspell-prog-mode))))
-(add-hook 'prog-mode-hook 'flyspell-prog-mode)
-
-
 
 (add-hook 'c-mode-common-hook
           (lambda () (define-key c-mode-base-map (kbd "<f5>") 'compile)))
@@ -945,9 +942,6 @@
      ;; Allow company-auctex backends
      (company-auctex-init)
 
-     ;; Allow company-reftex backends
-     (add-to-list 'company-backends 'company-reftex-labels)
-     (add-to-list 'company-backends 'company-reftex-citations)
 
 
      (setq TeX-source-correlate-mode  t)
@@ -1005,6 +999,15 @@
      ;; RefTeX
      (setq reftex-plug-into-AUCTeX t)
      (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+     (setq reftex-toc-follow-mode t)
+     (setq reftex-revisit-to-follow t)
+     (setq reftex-toc-split-windows-horizontally t)
+     (setq reftex-toc-split-windows-fraction 0.3)
+
+     ;; Allow company-reftex backends
+     (add-to-list 'company-backends 'company-reftex-labels)
+     (add-to-list 'company-backends 'company-reftex-citations)
+
      (setq reftex-cite-format 'natbib)
      (setq reftex-use-external-file-finders t)
      (setq reftex-external-file-finders
