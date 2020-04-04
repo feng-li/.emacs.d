@@ -134,8 +134,8 @@
 (require 'iedit)
 (require 'magit)
 
-                                        ;(require 'benchmark-init-loaddefs)
-                                        ;(benchmark-init/activate)
+;; (require 'benchmark-init-loaddefs)
+;; (benchmark-init/activate)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Initialize emacs server if it is not already running
 (require 'server)
@@ -193,21 +193,11 @@
 (setenv "OMP_NUM_THREADS" "1")
 
 ;; Theme
+(setq dracula-use-24-bit-colors-on-256-colors-terms t)
+(load-theme 'dracula t)
 (unless (display-graphic-p)
   (progn
-    (set-face-background 'default "nil" nil)
-    (setq dracula-use-24-bit-colors-on-256-colors-terms t)))
-(load-theme 'dracula t)
-
-;; (if (display-graphic-p)
-;;     (progn
-;;       (set-frame-parameter nil 'background-mode 'light)
-;;       (setq solarized-termcolors 256)
-;;       (load-theme 'solarized t))
-;;   (progn
-;; (set-face-background 'default "black" nil)
-;; (load-theme 'dracula t)
-;; )
+    (set-face-background 'default "black" nil)))
 
 ;; Disable backup files (*~)
 (setq make-backup-files nil)
@@ -1238,7 +1228,7 @@
  '(font-lock-comment-face ((t (:inherit t :slant italic))))
  '(font-lock-function-name-face ((t (:foreground "deep sky blue" :weight normal))))
  '(highlight-doxygen-comment ((t (:inherit highlight))))
- '(line-number ((t (:inherit t :background "nil"))))
+ '(line-number ((t (:inherit t :background nil))))
  '(neo-dir-link-face ((t (:inherit font-lock-function-name-face))))
  '(region ((t (:background "dim gray" :foreground "light gray")))))
 (put 'upcase-region 'disabled nil)
