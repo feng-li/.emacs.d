@@ -72,7 +72,7 @@
  '(org-support-shift-select t)
  '(package-selected-packages
    (quote
-    (neotree flycheck-grammarly format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup)))
+    (auctex-latexmk neotree flycheck-grammarly format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup)))
  '(pylint-command "pylint3")
  '(save-place-mode t)
  '(scroll-bar-mode nil)
@@ -271,6 +271,10 @@
 
 ;; )
 
+;; (require 'helm-config)
+;; (global-set-key (kbd "M-x") #'helm-M-x)
+;; (global-set-key (kbd "C-x r b") #'helm-filtered-bookmarks)
+;; (global-set-key (kbd "C-x C-f") #'helm-find-files)
 
 ;; Enable line number mode and enable visual line mode
 ;; (if (display-graphic-p)
@@ -933,6 +937,15 @@
      ;; LaTeX AUCTex features
      (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
      (setq LaTeX-math-menu-unicode t)
+
+     (require 'auctex-latexmk)
+     ;; (auctex-latexmk-setup) ; not needed auctex-latexmk-pvc already called.
+     (require 'auctex-latexmk-pvc)
+     (auctex-latexmk-pvc-setup)
+
+     (setcdr (assoc "LaTeX" TeX-command-list)
+             '("latexmk -pvc %t" TeX-run-latexmk-pvc nil
+               :help "Run LaTeX with LatexMK -pvc"))
 
      ;; Translate key § to ` so both can be used as a math abbreviation
      ;; Drawback, could not type § anymore. Make it locally?
