@@ -197,7 +197,7 @@
 (load-theme 'dracula t)
 (unless (display-graphic-p)
   (progn
-    (set-face-background 'default "black" nil)))
+    (set-face-background 'default "#262626" nil)))
 
 ;; Disable backup files (*~)
 (setq make-backup-files nil)
