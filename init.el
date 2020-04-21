@@ -197,7 +197,7 @@
 (load-theme 'dracula t)
 (unless (display-graphic-p)
   (progn
-    (set-face-background 'default "#262626" nil)))
+    (set-face-background 'default "unspecified-bg" nil)))
 
 ;; Disable backup files (*~)
 (setq make-backup-files nil)
@@ -313,7 +313,7 @@
 (add-to-list 'auto-mode-alist '("/mutt" . mail-mode))
 
 ;; Global visual line mode with better indentation
-(setq-default adaptive-wrap-extra-indent 4)
+(setq-default adaptive-wrap-extra-indent 0)
 (add-hook 'visual-line-mode-hook #'adaptive-wrap-prefix-mode)
 (global-visual-line-mode t)
 
