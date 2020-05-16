@@ -622,7 +622,7 @@
 
      (setq  ido-ignore-directories
             '("\\`auto/" "\\.prv/" "\\`CVS/" "\\`.git/" "\\`.ropeproject/"
-              "\\`\\.\\./" "\\`\\./"))
+              "\\`\\.\\./" "\\`\\./" "\\`_bookdown_files/"))
 
      (setq ido-ignore-buffers
            '("\\` " "^\\*ESS\\*" "^\\*Messages\\*" "^\\*Help\\*"
