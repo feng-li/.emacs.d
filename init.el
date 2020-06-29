@@ -934,7 +934,7 @@
      (auctex-latexmk-pvc-setup)
 
      (setcdr (assoc "LaTeX" TeX-command-list)
-             '("latexmk -pvc %t" TeX-run-latexmk-pvc nil
+             '("latexmk -pvc -synctex=1 -halt-on-error --shell-escape -file-line-error %t" TeX-run-latexmk-pvc nil
                :help "Run LaTeX with LatexMK -pvc"))
 
      ;; Translate key § to ` so both can be used as a math abbreviation
