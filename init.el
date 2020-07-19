@@ -212,7 +212,6 @@
   )
 (setq vc-follow-symlinks nil)
 
-
 ;; Set Fonts
 (when (display-graphic-p)
   (if (> (display-pixel-height) 1080) ;; HDPi
@@ -233,6 +232,9 @@
 
 ;; Control-tab to switch among buffers
 (global-set-key (kbd "C-<tab>") 'next-buffer)
+
+;; Unset 'exchange-point-and-mark' key which may cause conflicts with Fcitx
+(global-unset-key (kbd "C-x C-x"))
 
 ;; Global auto revert mode
 ;; (global-auto-revert-mode t)
