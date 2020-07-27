@@ -211,6 +211,23 @@
                "~/.emacs.d/site-lisp/magit/Documentation/")
   )
 (setq vc-follow-symlinks nil)
+(setq transient-history-file )
+
+(eval-after-load "magit"
+  '(progn
+
+     ;; Save transient file with customization
+     (setq transient-history-file
+           (expand-file-name (concat "transient/" system-name ".history.el")
+                             (cond
+                              ((boundp 'user-emacs-directory) user-emacs-directory)
+                              ((boundp 'user-init-directory) user-init-directory)
+                              (t "~")))
+           )
+     )
+  )
+
+
 
 ;; Set Fonts
 (when (display-graphic-p)
