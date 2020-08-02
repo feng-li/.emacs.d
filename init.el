@@ -193,7 +193,7 @@
 
 
 ;; save-place-mode
-(setq save-place-file (concat "~/.emacs.d/site-lisp" system-name ".save-place-file.el"))
+(setq save-place-file (concat "~/.emacs.d/auto-save-list/" system-name ".save-place-file.el"))
 
 ;; Environment variables
 (setenv "OMP_NUM_THREADS" "1")
