@@ -158,6 +158,11 @@
 (setq user-mail-address "m@feng.li")
 
 ;; Desktop save mode
+(defvar my-desktop-path (concat "~/.emacs.d/auto-save-list/desktop/" system-name "/"))
+(unless (file-directory-p my-desktop-path) (make-directory my-desktop-path t))
+(setq desktop-path (list my-desktop-path))
+(setq desktop-dirname my-desktop-path)
+
 (desktop-save-mode 1)
 (setq desktop-load-locked-desktop t)
 (setq desktop-restore-frames nil)
@@ -169,8 +174,6 @@
             ;; Reset desktop modification time so the user is not bothered
             (setq desktop-file-modtime (nth 5 (file-attributes (desktop-full-file-name))))))
 
-(setq desktop-path '("~"))
-(setq desktop-dirname "~")
 (setq desktop-buffers-not-to-save
       (concat "\\("
               "^nn\\.a[0-9]+\\|\\.log\\|(ftp)\\|^tags\\|^TAGS"
@@ -188,6 +191,9 @@
 (add-to-list 'desktop-modes-not-to-save 'info-lookup-mode)
 (add-to-list 'desktop-modes-not-to-save 'fundamental-mode)
 
+
+;; save-place-mode
+(setq save-place-file (concat "~/.emacs.d/site-lisp" system-name ".save-place-file.el"))
 
 ;; Environment variables
 (setenv "OMP_NUM_THREADS" "1")
@@ -211,19 +217,11 @@
                "~/.emacs.d/site-lisp/magit/Documentation/")
   )
 (setq vc-follow-symlinks nil)
-(setq transient-history-file )
 
 (eval-after-load "magit"
   '(progn
-
      ;; Save transient file with customization
-     (setq transient-history-file
-           (expand-file-name (concat "transient/" system-name ".history.el")
-                             (cond
-                              ((boundp 'user-emacs-directory) user-emacs-directory)
-                              ((boundp 'user-init-directory) user-init-directory)
-                              (t "~")))
-           )
+     (setq transient-history-file (concat "~/.emacs.d/auto-save-list/" system-name ".transient-history-file.el"))
      )
   )
 
@@ -455,12 +453,7 @@
      (add-hook 'after-init-hook 'session-initialize)
 
      ;; Save sessions with customization
-     (setq session-save-file
-           (expand-file-name (concat "."  system-name ".session")
-                             (cond
-                              ((boundp 'user-emacs-directory) user-emacs-directory)
-                              ((boundp 'user-init-directory) user-init-directory)
-                              (t "~"))))
+     (setq session-save-file (concat "~/.emacs.d/auto-save-list/"  system-name ".session-save-file.el"))
 
      ))
 
@@ -631,7 +624,7 @@
      (setq ido-use-virtual-buffers nil)
      (setq ido-enable-flex-matching nil)
      (setq ido-ignore-extensions t)
-     (setq ido-save-directory-list-file "~/.ido.last")
+     (setq ido-save-directory-list-file (concat "~/.emacs.d/auto-save-list/" system-name ".ido-save-directory-list-file.el"))
      (setq ido-ignore-files
            '("\\.Rc$" "\\.dvi$" "\\.pdf$" "\\.ps$" "\\.out$"
              "\\.log$" "\\.ods$" "\\.eps$" "\\#$" "\\.png$" "\\~$"
