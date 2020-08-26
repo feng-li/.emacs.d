@@ -770,18 +770,23 @@
 
      ;; Hunspell 1.7 is broken with emacs 26.1
      (defun ispell-get-coding-system () 'utf-8)
-     (setq ispell-program-name "hunspell")
-     (setq ispell-really-hunspell t)
-     (setenv "DICPATH" (concat (getenv "HOME") "/.emacs.d/hunspell/"))
-     (setq ispell-local-dictionary "en_US")
-     (setq ispell-local-dictionary-alist
-           '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil
-              ("-d" "en_US,en_GB") nil UTF-8)))
 
+     ;; Prefer hunspell if exits
+     (if (locate-file "hunspell" exec-path)
+         (progn
+           (setq ispell-program-name "hunspell")
+           (setq ispell-really-hunspell t)
+           (setenv "DICPATH" (concat (getenv "HOME") "/.emacs.d/hunspell/"))
+           (setq ispell-local-dictionary "en_US")
+           (setq ispell-local-dictionary-alist
+                 '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil
+                    ("-d" "en_US,en_GB") nil UTF-8)))
+           )
+       )
 
      (global-set-key (kbd "<f9> 4") 'ispell-word)))
 
-;; Audddto correct spelling mistakes
+;; Auto correct spelling mistakes
 (global-set-key (kbd "<f9> c") 'flyspell-auto-correct-word)
 
 (with-eval-after-load 'comint
