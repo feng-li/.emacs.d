@@ -478,6 +478,7 @@
 
 ;; copy with other applications
 (setq select-enable-clipboard t)
+(global-set-key (kbd "<mouse-2>") 'clipboard-yank)
 
 (setq ring-bell-function (lambda ()  t))
 
