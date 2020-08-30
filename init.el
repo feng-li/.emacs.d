@@ -533,12 +533,8 @@
      (setq langtool-default-language "en-US")
 
 
-     (global-set-key "\C-x4w" 'langtool-check)
-     (global-set-key "\C-x4W" 'langtool-check-done)
-     (global-set-key "\C-x4l" 'langtool-switch-default-language)
-     (global-set-key "\C-x44" 'langtool-show-message-at-point)
-     (global-set-key "\C-x4c" 'langtool-correct-buffer)
-
+     (global-set-key (kbd "<f9> l") 'langtool-check)
+     (global-set-key (kbd "<f9> L") 'langtool-check-done)
 
      ;; Show LanguageTool report automatically by popup
      (defun langtool-autoshow-detail-popup (overlays)
@@ -554,7 +550,7 @@
 
 (eval-after-load "writegood-mode"
   '(progn
-     (global-set-key "\C-cg" 'writegood-mode)))
+     (global-set-key (kbd "<f9> w") 'writegood-mode)))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; General IDE settings (ElDoc, ECB, Comint...)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -715,13 +711,14 @@
 
 ;; parentheses mode
 (show-paren-mode t)
-(setq show-paren-style 'parentheses) ;; enable autopair insert globally
+(setq show-paren-style 'expression)
+
 (setq skeleton-pair t)
 (global-set-key "(" 'skeleton-pair-insert-maybe)
 (global-set-key "[" 'skeleton-pair-insert-maybe)
-;;(global-set-key "{" 'skeleton-pair-insert-maybe)
-;;(global-set-key "\"" 'skeleton-pair-insert-maybe)
-;;(global-set-key "\'" 'skeleton-pair-insert-maybe)
+(global-set-key "{" 'skeleton-pair-insert-maybe)
+(global-set-key "\"" 'skeleton-pair-insert-maybe)
+(global-set-key "\'" 'skeleton-pair-insert-maybe)
 
 ;; Commenting
 (global-set-key (kbd "M-3") 'comment-or-uncomment-region)
@@ -1248,7 +1245,9 @@
  '(highlight-doxygen-comment ((t (:inherit highlight))))
  '(line-number ((t (:inherit t :background nil))))
  '(neo-dir-link-face ((t (:inherit font-lock-function-name-face))))
- '(region ((t (:background "dim gray" :foreground "light gray")))))
+ '(region ((t (:background "dim gray" :foreground "light gray"))))
+ '(show-paren-match-expression ((t (:inherit nil :background "dim gray" :slant oblique))))
+ '(show-paren-mismatch ((t (:inherit font-lock-warning-face)))))
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
 (provide '.emacs)
