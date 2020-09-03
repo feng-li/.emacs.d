@@ -41,6 +41,7 @@
  '(blink-cursor-mode t)
  '(case-fold-search t)
  '(column-number-mode t)
+ '(company-minimum-prefix-length 1)
  '(doc-view-continuous t)
  '(ess-R-font-lock-keywords
    (quote
