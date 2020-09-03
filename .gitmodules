@@ -1,12 +1,12 @@
 [submodule "site-lisp/math-symbol-lists"]
 	path = site-lisp/math-symbol-lists
-	url = git@github.com:vspinu/math-symbol-lists.git
+	url = https://github.com/vspinu/math-symbol-lists.git
 [submodule "site-lisp/highlight-symbol.el"]
 	path = site-lisp/highlight-symbol.el
-	url = git@github.com:nschum/highlight-symbol.el.git
+	url = https://github.com/nschum/highlight-symbol.el.git
 [submodule "site-lisp/dictem"]
 	path = site-lisp/dictem
-	url = git@github.com:cheusov/dictem.git
+	url = https://github.com/cheusov/dictem.git
 [submodule "site-lisp/benchmark-init-el"]
 	path = site-lisp/benchmark-init-el
-	url = git@github.com:dholm/benchmark-init-el.git
+	url = https://github.com/dholm/benchmark-init-el.git
