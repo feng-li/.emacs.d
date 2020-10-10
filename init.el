@@ -1169,6 +1169,9 @@
 
      (elpy-enable)
 
+     ;; Use Python3 as default rpc command
+     (setq elpy-rpc-python-command "python3")
+
      ;; Disable elpy's highlight-indentation-mode, use highlight-indentation-guide
      (add-hook 'elpy-mode-hook (lambda () (highlight-indentation-mode -1)))
 
