@@ -1164,10 +1164,17 @@
 ;;; Python IDE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+
 (eval-after-load "python"
   '(progn
 
      (elpy-enable)
+
+     (setq python-shell-interpreter "python3")
+
+     ;; Pydoc
+     (require 'pydoc)
+     (setq pydoc-command "python3 -m pydoc")
 
      ;; Use Python3 as default rpc command
      (setq elpy-rpc-python-command "python3")

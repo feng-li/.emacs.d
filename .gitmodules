@@ -10,3 +10,6 @@
 [submodule "site-lisp/benchmark-init-el"]
 	path = site-lisp/benchmark-init-el
 	url = https://github.com/dholm/benchmark-init-el.git
+[submodule "site-lisp/pydoc"]
+	path = site-lisp/pydoc
+	url = git@github.com:feng-li/pydoc.git
