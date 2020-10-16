@@ -1169,53 +1169,39 @@
   '(progn
 
      (elpy-enable)
-
-     (setq python-shell-interpreter "python3")
-
-     ;; Pydoc
-     (require 'pydoc)
-     (setq pydoc-command "python3 -m pydoc")
-
-     ;; Use Python3 as default rpc command
      (setq elpy-rpc-python-command "python3")
 
-     ;; Disable elpy's highlight-indentation-mode, use highlight-indentation-guide
-     (add-hook 'elpy-mode-hook (lambda () (highlight-indentation-mode -1)))
-
      ;; Disable elpy's flymake, use flycheck
-     (add-hook 'elpy-mode-hook (lambda () (flymake-mode -1)))
-     ;; (setq highlight-indentation-mode nil)
+     (remove-hook 'elpy-modules 'elpy-module-flymake)
+     (remove-hook 'elpy-modules 'elpy-module-pyvenv)
+     (remove-hook 'elpy-modules 'elpy-module-highlight-indentation)
+
+     (require 'pydoc)
+     (global-unset-key (kbd "C-c C-v"))
+     (global-set-key (kbd "C-c C-v") 'pydoc)
 
      (setq python-shell-interpreter "python3")
-     ;; (setenv "PYTHONSTARTUP" "/home/fli/.pystartup")
-
-     ;; Bug fix for Python warning in Emacs 25.1
-     ;; (defun python-shell-completion-native-try ()
-     ;;   "Return non-nil if can trigger native completion."
-     ;;   (let ((python-shell-completion-native-enable t)
-     ;;         (python-shell-completion-native-output-timeout
-     ;;          python-shell-completion-native-try-output-timeout))
-     ;;     (python-shell-completion-native-get-completions
-     ;;      (get-buffer-process (current-buffer))
-     ;;      nil "_")))
      (setq python-shell-completion-native-enable nil)
 
-     ;; Enter to indent in python.el
      (add-hook 'python-mode-hook
                '(lambda ()
-                  (setq python-python-command "python3")
+                  ;; (setq python-python-command "python3")
 
+
+
+                  ;; Enter to indent in python.el
                   (define-key python-mode-map "\C-m" 'newline-and-indent)
 
-                  ;; Pythonmacs (use Python function in Elisp)
-                  ;; (autoload 'pymacs-apply "pymacs")
-                  ;; (autoload 'pymacs-call "pymacs")
-                  ;; (autoload 'pymacs-eval "pymacs" nil t)
-                  ;; (autoload 'pymacs-exec "pymacs" nil t)
-                  ;; (autoload 'pymacs-load "pymacs" nil t)
-                  ;; (pymacs-load "ropemacs" "rope-")
-                  ;; (setq ropemacs-enable-autoimport t)
-                  ;; (setq pymacs-auto-restart t)
+                  (define-key python-mode-map (kbd "C-c M-r") 'python-shell-send-region)
+
+                  (defun my-python-send-line-and-step (beg end)
+                    (interactive "r")
+                    (if (eq beg end)
+                        (python-shell-send-region (point-at-bol) (point-at-eol))
+                      (python-shell-send-region beg end))
+                    (next-line))
+                  (define-key python-mode-map (kbd "C-c C-n") 'my-python-send-line-and-step)
+
 
                   ;; ElDoc for Python in the minor buffer
                   (add-hook 'python-mode-hook 'turn-on-eldoc-mode)
