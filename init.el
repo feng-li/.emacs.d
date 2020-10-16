@@ -1178,6 +1178,9 @@
      (remove-hook 'elpy-modules 'elpy-module-pyvenv)
      (remove-hook 'elpy-modules 'elpy-module-highlight-indentation)
 
+     (define-key elpy-mode-map (kbd "C-c C-f") 'elpy-shell-send-defun-and-step-and-go)
+     (define-key elpy-mode-map (kbd "C-c C-r") 'elpy-shell-send-region-or-buffer-and-step-and-go)
+
 
      (require 'pydoc)
      (global-unset-key (kbd "C-c C-v"))
