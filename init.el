@@ -1173,8 +1173,11 @@
 
      ;; Disable elpy's flymake, use flycheck
      (remove-hook 'elpy-modules 'elpy-module-flymake)
+     (define-key elpy-mode-map (kbd "C-c C-n") nil)
+
      (remove-hook 'elpy-modules 'elpy-module-pyvenv)
      (remove-hook 'elpy-modules 'elpy-module-highlight-indentation)
+
 
      (require 'pydoc)
      (global-unset-key (kbd "C-c C-v"))
@@ -1200,7 +1203,7 @@
                         (python-shell-send-region (point-at-bol) (point-at-eol))
                       (python-shell-send-region beg end))
                     (next-line))
-                  (define-key python-mode-map (kbd "C-c C-n") 'my-python-send-line-and-step)
+                  (local-set-key (kbd "C-c C-n") 'my-python-send-line-and-step)
 
 
                   ;; ElDoc for Python in the minor buffer
