@@ -1193,7 +1193,8 @@
                '(lambda ()
                   ;; (setq python-python-command "python3")
 
-
+                  ;; Enable flycheck mode
+                  (flycheck-mode t)
 
                   ;; Enter to indent in python.el
                   (define-key python-mode-map "\C-m" 'newline-and-indent)
