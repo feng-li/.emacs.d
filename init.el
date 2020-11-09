@@ -822,37 +822,12 @@
           (lambda () (define-key c-mode-base-map (kbd "<f5>") 'compile)))
 
 ;; Dictionary
-;; (eval-after-load "dictem"
-;;   '(progn
-;;      (setq dictem-server "localhost")
-;;      (setq dictem-port   "2628")
-;;      (dictem-initialize)
-;;      (global-set-key (kbd "<f50>") 'dictem-run-search)
-;;      (fset 'my-search-dictem
-;;            [f50 return return return])
-;;      (global-set-key (kbd "<f9> d") 'my-search-dictem)
-;;      (setq dictem-default-database "Collins")
-;;      (setq dictem-default-strategy "exact")
-;;      (add-hook 'dictem-postprocess-match-hook
-;;                'dictem-postprocess-match)
-;;      (add-hook 'dictem-postprocess-definition-hook
-;;                'dictem-postprocess-definition-separator)
-;;      (add-hook 'dictem-postprocess-definition-hook
-;;                'dictem-postprocess-definition-hyperlinks)
-;;      (add-hook 'dictem-postprocess-show-info-hook
-;;                'dictem-postprocess-definition-hyperlinks)
-;;      (add-hook 'dictem-postprocess-definition-hook
-;;                'dictem-postprocess-definition-remove-header)
-;;      (define-key dictem-mode-map [tab] 'dictem-next-link)))
-;;(define-key dictem-mode-map [(backtab)] 'dictem-previous-link)
 (eval-after-load "goldendict"
   '(progn
      (global-set-key (kbd "<f9> d") 'goldendict-dwim)))
 
-
 ;; Unfilling a region joins all the lines in a paragraph into a single line for each
 ;; paragraphs in that region. It is the contrary of fill-region.
-
 (defun unfill-region (beg end)
   "Unfill the region, joining text paragraphs into a single
     logical line.  This is useful, e.g., for use with
