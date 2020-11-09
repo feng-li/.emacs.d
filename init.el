@@ -624,22 +624,21 @@
      (setq ido-ignore-extensions t)
      (setq ido-save-directory-list-file (concat "~/.emacs.d/auto-save-list/" system-name ".ido-save-directory-list-file.el"))
      (setq ido-ignore-files
-           '("\\.Rc$" "\\.dvi$" "\\.pdf$" "\\.ps$" "\\.out$"
-             "\\.log$" "\\.ods$" "\\.eps$" "\\#$" "\\.png$" "\\~$"
-             "\\.RData$" "\\.nav$" "\\.snm$" "\\`\\.\\./" "\\`\\./"
-             "\\.synctex.gz$" "\\.fdb_latexmk$" "\\.tar.gz$" "\\.zip$"
-             "\\.o$" "\\.tar$" "\\.Rproj$" "\\.Rcheck$" "\\.Rhistory$"))
+           '("\\.Rc$" "\\.dvi$" "\\.pdf$" "\\.ps$" "\\.out$" "\\.fls$" "\\.spl$" "\\.fff$"
+             "\\.ttt$" "\\.log$" "\\.ods$" "\\.eps$" "\\#$" "\\.png$" "\\~$" "\\.RData$"
+             "\\.nav$" "\\.snm$" "\\`\\.\\./" "\\`\\./" "\\.synctex.gz$" "\\.fdb_latexmk$"
+             "\\.tar.gz$" "\\.zip$" "\\.o$" "\\.tar$" "\\.Rproj$" "\\.Rcheck$" "\\.doc$"
+             "\\.docx$" "\\.Rhistory$"))
 
      (setq  ido-ignore-directories
-            '("\\`auto/" "\\.prv/" "\\`CVS/" "\\`.git/" "\\`.ropeproject/"
-              "\\`\\.\\./" "\\`\\./" "\\`_bookdown_files/"))
+            '("\\`auto/" "\\.prv/" "\\`CVS/" "\\`.git/" "\\`.ropeproject/" "\\`\\.\\./"
+              "\\`\\./" "\\`_bookdown_files/"))
 
      (setq ido-ignore-buffers
-           '("\\` " "^\\*ESS\\*" "^\\*Messages\\*" "^\\*Help\\*"
-             "^\\*Buffer" "^\\*Ibuffer*" "^\\*ESS-errors*"
-             "^\\*Warnings*" "output*" "*TeX Help*" "*Pymacs*" "*Flymake log*"
-             "^\\*.*Completions\\*$" "^\\*Ediff" "^\\*tramp" "^\\*cvs-"
-             "_region_" "^TAGS$" "^\*Ido" "^\\*.*dictem buffer\\*$"
+           '("\\` " "^\\*ESS\\*" "^\\*Messages\\*" "^\\*Help\\*" "^\\*Buffer"
+             "^\\*Ibuffer*" "^\\*ESS-errors*" "^\\*Warnings*" "output*" "*TeX Help*"
+             "*Pymacs*" "*Flymake log*" "^\\*.*Completions\\*$" "^\\*Ediff" "^\\*tramp"
+             "^\\*cvs-" "_region_" "^TAGS$" "^\\*Ido" "^\\*.*dictem buffer\\*$"
              "^\\*inferior-lisp*" "^\\*Compile-Log\\*"))
      ))
 
