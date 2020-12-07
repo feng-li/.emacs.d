@@ -203,8 +203,8 @@
 (setq dracula-use-24-bit-colors-on-256-colors-terms t)
 (load-theme 'dracula t)
 (unless (display-graphic-p)
-  (progn
-    (set-face-background 'default "unspecified-bg" nil)))
+ (progn
+   (set-face-background 'default "black" nil)))
 
 ;; Disable backup files (*~)
 (setq make-backup-files nil)
@@ -669,13 +669,6 @@
      (setq comint-move-point-for-output t)
 
      ;; Clear buffer output
-     ;; (defun comint-clear-buffer () (interactive)
-     ;;        (save-excursion
-     ;;          (comint-goto-process-mark)
-     ;;          (forward-line 0)
-     ;;          (kill-region (point-min) (point))))
-     ;; (define-key comint-mode-map (kbd "C-l") 'comint-clear-buffer)
-
      ;; Emacs 25's new default function was bound to (C-C, C-O)
      (define-key comint-mode-map (kbd "C-l") 'comint-clear-buffer)
      ))
@@ -934,8 +927,6 @@
 
      ;; Allow company-auctex backends
      (company-auctex-init)
-
-
 
      (setq TeX-source-correlate-mode  t)
      (setq TeX-source-correlate-start-server nil)
@@ -1224,7 +1215,7 @@
  '(line-number ((t (:inherit t :background nil))))
  '(neo-dir-link-face ((t (:inherit font-lock-function-name-face))))
  '(region ((t (:background "dim gray" :foreground "light gray"))))
- '(show-paren-match-expression ((t (:inherit nil :background "dim gray" :slant oblique))))
+ '(show-paren-match-expression ((t (:inherit nil :slant oblique))))
  '(show-paren-mismatch ((t (:inherit font-lock-warning-face)))))
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
