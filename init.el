@@ -202,9 +202,10 @@
 ;; Theme
 (setq dracula-use-24-bit-colors-on-256-colors-terms t)
 (load-theme 'dracula t)
+(set-face-background 'default "#282A36" nil)
 (unless (display-graphic-p)
  (progn
-   (set-face-background 'default "black" nil)))
+   (set-face-background 'default "#262626" nil)))
 
 ;; Disable backup files (*~)
 (setq make-backup-files nil)
