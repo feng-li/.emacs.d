@@ -198,6 +198,7 @@
 
 ;; Environment variables
 (setenv "OMP_NUM_THREADS" "1")
+(setenv "PATH" (concat (concat (getenv "HOME") "/.local/bin:") (getenv "PATH")))
 
 ;; Theme
 (setq dracula-use-24-bit-colors-on-256-colors-terms t)
