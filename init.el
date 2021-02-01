@@ -60,8 +60,8 @@
  '(ess-eldoc-show-on-symbol t)
  '(ess-roxy-str "#'")
  '(ess-use-flymake nil)
- '(flycheck-python-flake8-executable "python3")
- '(flycheck-python-pylint-executable "python3")
+ '(flycheck-python-flake8-executable (concat (getenv "HOME") "/.emacs.d/elpy/rpc-venv/bin/python3"))
+ '(flycheck-python-pylint-executable (concat (getenv "HOME") "/.emacs.d/elpy/rpc-venv/bin/python3"))
  '(global-display-line-numbers-mode t)
  '(global-font-lock-mode t nil (font-lock))
  '(highlight-doxygen-commend-start-regexp
@@ -327,10 +327,6 @@
                           (error "Suspend canceled")))))
 (add-hook 'suspend-resume-hook
           (function (lambda () (message "Emacs resumed!"))))
-
-
-;;Mutt
-(add-to-list 'auto-mode-alist '("/mutt" . mail-mode))
 
 ;; Global visual line mode with better indentation
 (setq-default adaptive-wrap-extra-indent 0)
@@ -819,7 +815,7 @@
 ;; Dictionary
 (eval-after-load "goldendict"
   '(progn
-     (global-set-key (kbd "<f9> d") 'goldendict-dwim)))
+     (global-set-key (kbd "\C-c \C-d") 'goldendict-dwim)))
 
 ;; Unfilling a region joins all the lines in a paragraph into a single line for each
 ;; paragraphs in that region. It is the contrary of fill-region.
@@ -1136,13 +1132,14 @@
   '(progn
 
      (elpy-enable)
-     (setq elpy-rpc-python-command "python3")
+     (setq elpy-rpc-virtualenv-path 'default)
+     ; (setq elpy-rpc-python-command "python3")
 
      ;; Disable elpy's flymake, use flycheck
      (remove-hook 'elpy-modules 'elpy-module-flymake)
      (define-key elpy-mode-map (kbd "C-c C-n") nil)
 
-     (remove-hook 'elpy-modules 'elpy-module-pyvenv)
+     ;; (remove-hook 'elpy-modules 'elpy-module-pyvenv)
      (remove-hook 'elpy-modules 'elpy-module-highlight-indentation)
 
      (define-key elpy-mode-map (kbd "C-c C-f") 'elpy-shell-send-defun-and-step-and-go)
