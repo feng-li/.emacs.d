@@ -1133,7 +1133,7 @@
 
      (elpy-enable)
      (setq elpy-rpc-virtualenv-path 'default)
-     ; (setq elpy-rpc-python-command "python3")
+     (setq elpy-rpc-python-command "python3")
 
      ;; Disable elpy's flymake, use flycheck
      (remove-hook 'elpy-modules 'elpy-module-flymake)
