@@ -44,8 +44,7 @@
  '(company-minimum-prefix-length 1)
  '(doc-view-continuous t)
  '(ess-R-font-lock-keywords
-   (quote
-    ((ess-R-fl-keyword:keywords . t)
+   '((ess-R-fl-keyword:keywords . t)
      (ess-R-fl-keyword:constants . t)
      (ess-R-fl-keyword:modifiers . t)
      (ess-R-fl-keyword:fun-defs . t)
@@ -56,32 +55,37 @@
      (ess-fl-keyword:operators)
      (ess-fl-keyword:delimiters)
      (ess-fl-keyword:=)
-     (ess-R-fl-keyword:F&T))))
+     (ess-R-fl-keyword:F&T)))
  '(ess-eldoc-show-on-symbol t)
  '(ess-roxy-str "#'")
  '(ess-use-flymake nil)
- '(flycheck-python-flake8-executable (concat (getenv "HOME") "/.emacs.d/elpy/rpc-venv/bin/python3"))
- '(flycheck-python-pylint-executable (concat (getenv "HOME") "/.emacs.d/elpy/rpc-venv/bin/python3"))
+ '(flycheck-python-flake8-executable
+   (concat
+    (getenv "HOME")
+    "/.emacs.d/elpy/rpc-venv/bin/python3"))
+ '(flycheck-python-pylint-executable
+   (concat
+    (getenv "HOME")
+    "/.emacs.d/elpy/rpc-venv/bin/python3"))
  '(global-display-line-numbers-mode t)
  '(global-font-lock-mode t nil (font-lock))
  '(highlight-doxygen-commend-start-regexp
    "\\(/\\*\\(!\\|\\*[^*]\\)\\|#\\('\\)\\|##\\('\\)\\|//\\(!\\|'\\|/[^/
 ]\\)\\)")
- '(hl-paren-background-colors (quote ("light gray" "steel blue" "lime green" "orange1")))
+ '(hl-paren-background-colors '("light gray" "steel blue" "lime green" "orange1"))
  '(indicate-empty-lines nil)
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   (quote
-    (julia-mode auctex-latexmk neotree flycheck-grammarly format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup)))
+   '(julia-mode auctex-latexmk neotree flycheck-grammarly format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
  '(pylint-command "pylint3")
  '(save-place-mode t)
  '(scroll-bar-mode nil)
- '(send-mail-function (quote mailclient-send-it))
+ '(send-mail-function 'mailclient-send-it)
  '(session-use-package t nil (session))
  '(show-paren-mode t nil (paren))
  '(tool-bar-mode nil)
- '(warning-suppress-types (quote ((undo discard-info)))))
+ '(warning-suppress-types '((undo discard-info))))
 
 ;; (add-to-list 'custom-theme-load-path "~/.emacs.d/site-lisp/emacs-color-theme-solarized")
 
@@ -621,16 +625,16 @@
      (setq ido-enable-flex-matching nil)
      (setq ido-ignore-extensions t)
      (setq ido-save-directory-list-file (concat "~/.emacs.d/auto-save-list/" system-name ".ido-save-directory-list-file.el"))
-     (setq ido-ignore-files
+     (setq ido-ignore-files ; this also works with directories with c-x c-f
            '("\\.Rc$" "\\.dvi$" "\\.pdf$" "\\.ps$" "\\.out$" "\\.fls$" "\\.spl$" "\\.fff$"
              "\\.ttt$" "\\.log$" "\\.ods$" "\\.eps$" "\\#$" "\\.png$" "\\~$" "\\.RData$"
              "\\.nav$" "\\.snm$" "\\`\\.\\./" "\\`\\./" "\\.synctex.gz$" "\\.fdb_latexmk$"
              "\\.tar.gz$" "\\.zip$" "\\.o$" "\\.tar$" "\\.Rproj$" "\\.Rcheck$" "\\.doc$"
-             "\\.docx$" "\\.Rhistory$"))
+             "\\.docx$" "\\.Rhistory$" "auto/" "__pycache__/"))
 
-     (setq  ido-ignore-directories
+     (setq  ido-ignore-directories ; only works with ido-dired
             '("\\`auto/" "\\.prv/" "\\`CVS/" "\\`.git/" "\\`.ropeproject/" "\\`\\.\\./"
-              "\\`\\./" "\\`_bookdown_files/"))
+              "\\`\\./" "\\`_bookdown_files/" "__pycache__/"))
 
      (setq ido-ignore-buffers
            '("\\` " "^\\*ESS\\*" "^\\*Messages\\*" "^\\*Help\\*" "^\\*Buffer"
@@ -702,7 +706,7 @@
 
 ;; parentheses mode
 (show-paren-mode t)
-(setq show-paren-style 'expression)
+;; (setq show-paren-style 'expression) ;; highlight whole block
 
 (setq skeleton-pair t)
 (global-set-key "(" 'skeleton-pair-insert-maybe)
@@ -1213,9 +1217,7 @@
  '(highlight-doxygen-comment ((t (:inherit highlight))))
  '(line-number ((t (:inherit t :background nil))))
  '(neo-dir-link-face ((t (:inherit font-lock-function-name-face))))
- '(region ((t (:background "dim gray" :foreground "light gray"))))
- '(show-paren-match-expression ((t (:inherit nil :slant oblique))))
- '(show-paren-mismatch ((t (:inherit font-lock-warning-face)))))
+ '(region ((t (:background "dim gray" :foreground "light gray")))))
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
 (provide '.emacs)
