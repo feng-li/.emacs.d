@@ -642,6 +642,8 @@
              "*Pymacs*" "*Flymake log*" "^\\*.*Completions\\*$" "^\\*Ediff" "^\\*tramp"
              "^\\*cvs-" "_region_" "^TAGS$" "^\\*Ido" "^\\*.*dictem buffer\\*$"
              "^\\*inferior-lisp*" "^\\*Compile-Log\\*"))
+
+     (defun ido-kill-emacs-hook () (ignore-errors (ido-save-history)))
      ))
 
 ;; ElDoc mode
