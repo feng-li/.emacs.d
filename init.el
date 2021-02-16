@@ -59,14 +59,6 @@
  '(ess-eldoc-show-on-symbol t)
  '(ess-roxy-str "#'")
  '(ess-use-flymake nil)
- '(flycheck-python-flake8-executable
-   (concat
-    (getenv "HOME")
-    "/.emacs.d/elpy/rpc-venv/bin/python3"))
- '(flycheck-python-pylint-executable
-   (concat
-    (getenv "HOME")
-    "/.emacs.d/elpy/rpc-venv/bin/python3"))
  '(global-display-line-numbers-mode t)
  '(global-font-lock-mode t nil (font-lock))
  '(highlight-doxygen-commend-start-regexp
@@ -78,7 +70,6 @@
  '(org-support-shift-select t)
  '(package-selected-packages
    '(julia-mode auctex-latexmk neotree flycheck-grammarly format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
- '(pylint-command "pylint3")
  '(save-place-mode t)
  '(scroll-bar-mode nil)
  '(send-mail-function 'mailclient-send-it)
@@ -1138,14 +1129,17 @@
   '(progn
 
      (elpy-enable)
-     (setq elpy-rpc-virtualenv-path 'default)
+     ;; (setq elpy-rpc-virtualenv-path (concat (getenv "HOME") "/.emacs.d/elpy/" system-name "/rpc-venv"))
+     (setq elpy-rpc-virtualenv-path (concat (getenv "HOME") "/.cache/elpy/rpc-venv"))
      (setq elpy-rpc-python-command "python3")
-     (setq elpy-syntax-check-command
-           (concat (getenv "HOME") "/.emacs.d/elpy/rpc-venv/bin/flake8"))
+     (setq elpy-syntax-check-command (concat elpy-rpc-virtualenv-path  "/bin/flake8"))
 
      ;; Disable elpy's flymake, use flycheck
      (remove-hook 'elpy-modules 'elpy-module-flymake)
      (define-key elpy-mode-map (kbd "C-c C-n") nil)
+     (setq flycheck-python-flake8-executable (concat elpy-rpc-virtualenv-path  "bin/python3"))
+     (setq flycheck-python-pylint-executable (concat elpy-rpc-virtualenv-path  "bin/python3"))
+     (setq pylint-command (concat elpy-rpc-virtualenv-path  "bin/pylint3"))
 
      ;; (remove-hook 'elpy-modules 'elpy-module-pyvenv)
      (remove-hook 'elpy-modules 'elpy-module-highlight-indentation)
