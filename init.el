@@ -1155,8 +1155,8 @@
 
 
      (require 'pydoc)
-     (global-unset-key (kbd "C-c C-v"))
-     (global-set-key (kbd "C-c C-v") 'pydoc)
+     (define-key elpy-mode-map (kbd "C-c C-v") 'pydoc)
+     (global-set-key (kbd "C-c C-v") 'pydoc) ; C-c C-v was bounded to elpy-check
 
      (setq python-shell-interpreter "python3")
      (setq python-shell-completion-native-enable nil)
