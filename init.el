@@ -234,7 +234,7 @@
     (add-to-list 'default-frame-alist '(font . "M+ 1mn-10")) ;
     )
 
-  (setq face-font-rescale-alist '(("Noto Sans CJK SC". 1.2)))
+  ;; (setq face-font-rescale-alist '(("Noto Sans CJK SC". 1.2)))
   (set-fontset-font "fontset-default" 'unicode '("Microsoft YaHei" . "unicode-bmp"))
   )
 ;; Menu bar
@@ -621,7 +621,8 @@
              "\\.ttt$" "\\.log$" "\\.ods$" "\\.eps$" "\\#$" "\\.png$" "\\~$" "\\.RData$"
              "\\.nav$" "\\.snm$" "\\`\\.\\./" "\\`\\./" "\\.synctex.gz$" "\\.fdb_latexmk$"
              "\\.tar.gz$" "\\.zip$" "\\.o$" "\\.tar$" "\\.Rproj$" "\\.Rcheck$" "\\.doc$"
-             "\\.docx$" "\\.Rhistory$" "auto/" "__pycache__/"))
+             "\\.docx$" "\\.Rhistory$" "auto/" "__pycache__/" "\\.bcf$" "\\.run.xml$"
+             "\\.xdv$" "\\.DS_Store$" "\\.cfg$" "\\.bak$" "\\.gitignore"))
 
      (setq  ido-ignore-directories ; only works with ido-dired
             '("\\`auto/" "\\.prv/" "\\`CVS/" "\\`.git/" "\\`.ropeproject/" "\\`\\.\\./"
