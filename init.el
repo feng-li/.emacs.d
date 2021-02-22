@@ -907,14 +907,26 @@
      (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
      (setq LaTeX-math-menu-unicode t)
 
+     ;; Set default TeX engine
+     (setq TeX-PDF-mode t)
+     ;; (setq-default TeX-engine 'xetex) ;this can be set locally
+
      (require 'auctex-latexmk)
      ;; (auctex-latexmk-setup) ; not needed auctex-latexmk-pvc already called.
      (require 'auctex-latexmk-pvc)
      (auctex-latexmk-pvc-setup)
 
-     (setcdr (assoc "LaTeX" TeX-command-list)
-             '("latexmk -pvc -synctex=1 -halt-on-error --shell-escape -file-line-error %t" TeX-run-latexmk-pvc nil
-               :help "Run LaTeX with LatexMK -pvc"))
+     ;; Use latexmkpvc as the main command
+     (defun TeX-command-run-latexmkpvc ()
+       (interactive)
+       (TeX-save-document (TeX-master-file))
+       (TeX-command "LatexMkPvc" 'TeX-master-file -1))
+     (add-hook 'LaTeX-mode-hook
+               '(lambda ()
+                  ;; (local-set-key (kbd "C-c `") 'TeX-next-error)
+                  (local-set-key (kbd "C-c C-a") 'TeX-command-run-latexmkpvc)
+                  ))
+
 
      ;; Translate key § to ` so both can be used as a math abbreviation
      ;; Drawback, could not type § anymore. Make it locally?
@@ -926,10 +938,6 @@
 
      (setq TeX-source-correlate-mode  t)
      (setq TeX-source-correlate-start-server nil)
-
-     ;; Set default TeX engine
-     (setq TeX-PDF-mode t)
-     ;; (setq-default TeX-engine 'xetex) ;this can be set locally
 
      ;; Add listings to verbatim environments
      (eval-after-load "latex"
@@ -994,13 +1002,6 @@
            '(("tex" . "kpsewhich -format=.tex %f")
              ("bib" . "kpsewhich -format=.bib %f")
 	     ("bst" . "kpsewhich -format=.bst %f")))
-
-     ;; LaTeX Command list
-     (add-hook 'LaTeX-mode-hook
-               '(lambda ()
-                  (local-set-key (kbd "C-c `") 'TeX-next-error)
-                  (local-set-key (kbd "<f5>") 'TeX-command-run-all)
-                  ))
 
      ;; (add-hook
      ;;  'LaTeX-mode-hook
@@ -1151,7 +1152,7 @@
 
      (require 'pydoc)
      (define-key elpy-mode-map (kbd "C-c C-v") 'pydoc)
-     (global-set-key (kbd "C-c C-v") 'pydoc) ; C-c C-v was bounded to elpy-check
+     ;; (local-set-key (kbd "C-c C-v") 'pydoc) ; C-c C-v was bounded to elpy-check
 
      (setq python-shell-interpreter "python3")
      (setq python-shell-completion-native-enable nil)

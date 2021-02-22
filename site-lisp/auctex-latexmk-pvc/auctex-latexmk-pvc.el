@@ -39,12 +39,31 @@
 
   (auctex-latexmk-setup)
 
+  "Add LatexMk -pvc command to TeX-command-list."
+  (add-to-list 'TeX-expand-list
+               '("%(-PDF)"
+                 (lambda ()
+                   (cond
+                    ((and (eq TeX-engine 'default)
+                          TeX-PDF-mode
+                          auctex-latexmk-inherit-TeX-PDF-mode)
+                     "-pdf ")
+                    ((and (eq TeX-engine 'xetex)
+                          TeX-PDF-mode
+                          auctex-latexmk-inherit-TeX-PDF-mode)
+                     "-pdf -pdflatex=xelatex ")
+                    ((eq TeX-engine 'xetex) "-xelatex ")
+                    ((eq TeX-engine 'luatex) "-lualatex ")
+                    (t "")))))
   (setq-default TeX-command-list
                 (cons
-                 '("LatexMkPvc" "latexmk -pvc %t" TeX-run-latexmk-pvc nil
-                   (plain-tex-mode latex-mode doctex-mode) :help "Run LatexMk in -pvc mode")
+                 '("LatexMkPvc" "latexmk -pvc %(-PDF)%S%(mode) %(file-line-error) %(extraopts) %t" TeX-run-latexmk-pvc nil
+                   (plain-tex-mode latex-mode doctex-mode) :help "Run LatexMk (-pvc: preview continuously)")
                  TeX-command-list)
-                ))
+                LaTeX-clean-intermediate-suffixes
+                (append LaTeX-clean-intermediate-suffixes
+                        '("\\.fdb_latexmk" "\\.aux.bak" "\\.fls")))
+  )
 
 (defun TeX-run-latexmk-pvc (name command file)
   (let ((TeX-sentinel-default-function 'Latexmk-pvc-sentinel)
