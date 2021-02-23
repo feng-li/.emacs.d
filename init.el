@@ -226,17 +226,19 @@
 
 
 ;; Set Fonts
-(when (display-graphic-p)
-  (if (> (display-pixel-height) 1080) ;; HDPi
-      (progn
-        (add-to-list 'default-frame-alist '(font . "M+ 1mn-9")) ;
-        )
-    (add-to-list 'default-frame-alist '(font . "M+ 1mn-10")) ;
-    )
-
-  ;; (setq face-font-rescale-alist '(("Noto Sans CJK SC". 1.2)))
-  (set-fontset-font "fontset-default" 'unicode '("Microsoft YaHei" . "unicode-bmp"))
-  )
+(add-to-list 'default-frame-alist '(font . "Noto Sans Mono CJK SC")) ;
+;; (when (display-graphic-p)
+;;   (if (> (display-pixel-height) 1080) ;; HDPi
+;;       (progn
+;;         (add-to-list 'default-frame-alist '(font . "Noto Sans Mono CJK SC")) ;
+;;         ;; (add-to-list 'default-frame-alist '(font . "M+ 1mn-9")) ;
+;;         )
+;;     (add-to-list 'default-frame-alist '(font . "Noto Sans Mono CJK SC")) ;
+;;     ;; (add-to-list 'default-frame-alist '(font . "M+ 1mn-10")) ;
+;;     )
+;;   ;; (setq face-font-rescale-alist '(("Noto Sans CJK SC". 1.2)))
+;;   ;; (set-fontset-font "fontset-default" 'unicode '("Microsoft YaHei" . "unicode-bmp"))
+;;   )
 ;; Menu bar
 (menu-bar-mode t)
 
