@@ -923,10 +923,13 @@
        (TeX-command "LatexMkPvc" 'TeX-master-file -1))
      (add-hook 'LaTeX-mode-hook
                '(lambda ()
-                  ;; (local-set-key (kbd "C-c `") 'TeX-next-error)
-                  (local-set-key (kbd "C-c C-a") 'TeX-command-run-latexmkpvc)
+                  (local-set-key (kbd "<f5>") 'TeX-command-run-latexmkpvc)
                   ))
 
+     ;; Replace LaTeX with latexmk -pvc
+     (setcdr (assoc "LaTeX" TeX-command-list)
+             '("latexmk -pvc -pv- %(-PDF)%S%(mode) %(file-line-error) %(extraopts) %t" TeX-run-latexmk-pvc nil
+               :help "Run LaTeX with LatexMKPvc"))
 
      ;; Translate key § to ` so both can be used as a math abbreviation
      ;; Drawback, could not type § anymore. Make it locally?

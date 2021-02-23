@@ -52,12 +52,12 @@
                           TeX-PDF-mode
                           auctex-latexmk-inherit-TeX-PDF-mode)
                      "-pdf -pdflatex=xelatex ")
-                    ((eq TeX-engine 'xetex) "-xelatex ")
-                    ((eq TeX-engine 'luatex) "-lualatex ")
+                    ((eq TeX-engine 'xetex) "-pdf -pdflatex=xelatex ")
+                    ((eq TeX-engine 'luatex) "-pdf -pdflatex=lualatex ")
                     (t "")))))
   (setq-default TeX-command-list
                 (cons
-                 '("LatexMkPvc" "latexmk -pvc %(-PDF)%S%(mode) %(file-line-error) %(extraopts) %t" TeX-run-latexmk-pvc nil
+                 '("LatexMkPvc" "latexmk -pvc -pv- %(-PDF)%S%(mode) %(file-line-error) %(extraopts) %t" TeX-run-latexmk-pvc nil
                    (plain-tex-mode latex-mode doctex-mode) :help "Run LatexMk (-pvc: preview continuously)")
                  TeX-command-list)
                 LaTeX-clean-intermediate-suffixes
