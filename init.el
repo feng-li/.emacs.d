@@ -133,10 +133,16 @@
 ;; (require 'benchmark-init-loaddefs)
 ;; (benchmark-init/activate)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Initialize emacs server if it is not already running
-(require 'server)
-(if (not (eq t (server-running-p server-name)))
-    (server-start))
+;; set server-start
+;; systemctl enable --user emacs
+;; systemctl start --user emacs
+(add-hook 'server-switch-hook
+          (lambda ()
+            (when (current-local-map)
+              (use-local-map (copy-keymap (current-local-map))))
+            (when server-buffer-clients
+              (local-set-key (kbd "C-x k") 'server-edit))))
+(add-hook 'server-done-hook 'delete-frame)
 ;; Set home directory
 ;; (setq default-directory "~/workspace/")
 
@@ -393,18 +399,6 @@
   (switch-to-buffer (other-buffer)))
 (global-set-key (kbd "ESC <f2>") 'switch-to-previous-buffer)
 
-;; set server-start
-(if (and (fboundp 'server-running-p)
-         (not (server-running-p)))
-    (server-start)
-  )
-(add-hook 'server-switch-hook
-          (lambda ()
-            (when (current-local-map)
-              (use-local-map (copy-keymap (current-local-map))))
-            (when server-buffer-clients
-              (local-set-key (kbd "C-x k") 'server-edit))))
-(add-hook 'server-done-hook 'delete-frame)
 
 ;;stop start up message
 (setq inhibit-startup-message t)
