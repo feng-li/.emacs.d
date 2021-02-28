@@ -199,9 +199,8 @@
 ;; bookmarks
 ;; everytime bookmark is changed, automatically save it
 (setq bookmark-save-flag 1)
-(setq bookmark-default-file "~/.emacs.d/auto-save-list/bookmars")
+(setq bookmark-default-file "~/.emacs.d/auto-save-list/bookmarks")
 (bookmark-bmenu-list)
-(switch-to-buffer "*Bookmark List*")
 
 ;; Environment variables
 (setenv "OMP_NUM_THREADS" "1")
@@ -588,10 +587,15 @@
             (("default"
               ("Scripts" (or
                           (mode . ess-mode)
+                          (mode . prog-mode)
+                          (mode . shell-script-mode)
+                          (mode . makefile-mode)
+                          (mode . conf-mode)
                           (mode . emacs-lisp-mode)))
               ("Files" (or
                         (mode . LaTeX-mode)
                         (mode . latex-mode)
+                        (mode . bibtex-mode)
                         (mode . org-mode)))
               ("Proc" (or
                        (mode . inferior-ess-mode)))
@@ -602,6 +606,7 @@
                        (mode . Info-mode)))
               ("Messages" (or
                            (name . "^\\*scratch\\*$")
+                           (name . "^\\*Bookmark List\\*$")
                            (name . "^\\*Messages\\*$")
                            (name . "^\\*Completions\\*$")
                            (mode . fundamental-mode)))
