@@ -193,9 +193,15 @@
 (add-to-list 'desktop-modes-not-to-save 'info-lookup-mode)
 (add-to-list 'desktop-modes-not-to-save 'fundamental-mode)
 
-
 ;; save-place-mode
 (setq save-place-file (concat "~/.emacs.d/auto-save-list/" system-name ".save-place-file.el"))
+
+;; bookmarks
+;; everytime bookmark is changed, automatically save it
+(setq bookmark-save-flag 1)
+(setq bookmark-default-file "~/.emacs.d/auto-save-list/bookmars")
+(bookmark-bmenu-list)
+(switch-to-buffer "*Bookmark List*")
 
 ;; Environment variables
 (setenv "OMP_NUM_THREADS" "1")
@@ -626,10 +632,10 @@
 
      (setq ido-ignore-buffers
            '("\\` " "^\\*ESS\\*" "^\\*Messages\\*" "^\\*Help\\*" "^\\*Buffer"
-             "^\\*Ibuffer*" "^\\*ESS-errors*" "^\\*Warnings*" "output*" "*TeX Help*"
+             "^\\*Ibuffer*" "^\\*ESS-errors*" "^\\*Warnings*" "*TeX Help*"
              "*Pymacs*" "*Flymake log*" "^\\*.*Completions\\*$" "^\\*Ediff" "^\\*tramp"
              "^\\*cvs-" "_region_" "^TAGS$" "^\\*Ido" "^\\*.*dictem buffer\\*$"
-             "^\\*inferior-lisp*" "^\\*Compile-Log\\*"))
+             "^\\*inferior-lisp*" "^\\*Compile-Log\\*"  "\\*output\\*$"))
 
      (defun ido-kill-emacs-hook () (ignore-errors (ido-save-history)))
      ))
