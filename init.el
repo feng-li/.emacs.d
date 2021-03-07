@@ -965,17 +965,17 @@
      ;; Add short cuts, hold Windows key
      (defun auctex-insert-special ()
        (local-set-key (kbd "<f9> (") (lambda () (interactive) (insert "\\\left( ")))
-       (local-set-key (kbd "<f9> )") (lambda () (interactive) (insert "\\\ right)")))
+       (local-set-key (kbd "<f9> )") (lambda () (interactive) (insert "\\\\ right)")))
 
        (local-set-key (kbd "<f9> [") (lambda () (interactive) (insert "\\\left[ ")))
-       (local-set-key (kbd "<f9> ]") (lambda () (interactive) (insert "\\\ right]")))
+       (local-set-key (kbd "<f9> ]") (lambda () (interactive) (insert "\\\\ right]")))
 
        (local-set-key (kbd "<f9> {") (lambda () (interactive) (insert "\\\left\\\{ ")))
-       (local-set-key (kbd "<f9> }") (lambda () (interactive) (insert "\\\right\\\}")))
+       (local-set-key (kbd "<f9> }") (lambda () (interactive) (insert "\\\\right\\\}")))
 
-       (local-set-key (kbd "<f9> |") (lambda () (interactive) (insert "\\\left| \\\ right|")))
+       (local-set-key (kbd "<f9> |") (lambda () (interactive) (insert "\\\left| \\\\ right|")))
 
-       (local-set-key (kbd "<f9> |") (lambda () (interactive) (insert "\\\left| \\\ right|")))
+       (local-set-key (kbd "<f9> |") (lambda () (interactive) (insert "\\\left| \\\\ right|")))
 
 
        (local-set-key (kbd "C-\\") (lambda () (interactive) (insert "\\")))
@@ -984,6 +984,7 @@
        (fset 'my-insert-bold-math
              [?\C-w ?\\ ?b ?m ?\{ ?\C-y ?\} right])
        (local-set-key (kbd "C-c C-x C-b") 'my-insert-bold-math))
+
      (add-hook 'LaTeX-mode-hook 'auctex-insert-special)
 
 
