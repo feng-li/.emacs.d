@@ -556,6 +556,10 @@
      (global-set-key "\C-ci" 'iedit-mode)
      ))
 
+;; Keybind to browse the kill ring
+(global-set-key "\C-cy" '(lambda ()
+                           (interactive)
+                           (popup-menu 'yank-menu)))
 
 ;; TAGS
 (setq tags-table-list
@@ -931,6 +935,7 @@
      (add-hook 'LaTeX-mode-hook
                '(lambda ()
                   (local-set-key (kbd "<f5>") 'TeX-command-run-latexmkpvc)
+
                   ))
 
      ;; Replace LaTeX with latexmk -pvc
