@@ -42,6 +42,8 @@
  '(case-fold-search t)
  '(column-number-mode t)
  '(company-minimum-prefix-length 1)
+ '(custom-safe-themes
+   '("81c3de64d684e23455236abde277cda4b66509ef2c28f66e059aa925b8b12534" default))
  '(doc-view-continuous t)
  '(ess-R-font-lock-keywords
    '((ess-R-fl-keyword:keywords . t)
@@ -200,7 +202,7 @@
 ;; everytime bookmark is changed, automatically save it
 (setq bookmark-save-flag 1)
 (setq bookmark-default-file "~/.emacs.d/auto-save-list/bookmarks")
-(bookmark-bmenu-list)
+(global-set-key (kbd "<f9> b") 'bookmark-bmenu-list)
 
 ;; Environment variables
 (setenv "OMP_NUM_THREADS" "1")
@@ -208,11 +210,9 @@
 
 ;; Theme
 (setq dracula-use-24-bit-colors-on-256-colors-terms t)
-(load-theme 'dracula t)
-(set-face-background 'default "#282A36" nil)
 (unless (display-graphic-p)
- (progn
-   (set-face-background 'default "#262626" nil)))
+  (set-face-background 'default "black" nil))
+(load-theme 'dracula t)
 
 ;; Disable backup files (*~)
 (setq make-backup-files nil)
@@ -560,6 +560,9 @@
 (global-set-key "\C-cy" '(lambda ()
                            (interactive)
                            (popup-menu 'yank-menu)))
+
+
+
 
 ;; TAGS
 (setq tags-table-list
@@ -969,20 +972,16 @@
 
      ;; Add short cuts, hold Windows key
      (defun auctex-insert-special ()
-       (local-set-key (kbd "<f9> (") (lambda () (interactive) (insert "\\\left( ")))
-       (local-set-key (kbd "<f9> )") (lambda () (interactive) (insert "\\\\ right)")))
+       (local-set-key (kbd "<f9> (") (lambda () (interactive) (insert "\\left( ")))
+       (local-set-key (kbd "<f9> )") (lambda () (interactive) (insert "\\right)")))
 
-       (local-set-key (kbd "<f9> [") (lambda () (interactive) (insert "\\\left[ ")))
-       (local-set-key (kbd "<f9> ]") (lambda () (interactive) (insert "\\\\ right]")))
+       (local-set-key (kbd "<f9> [") (lambda () (interactive) (insert "\\left[ ")))
+       (local-set-key (kbd "<f9> ]") (lambda () (interactive) (insert "\\right]")))
 
-       (local-set-key (kbd "<f9> {") (lambda () (interactive) (insert "\\\left\\\{ ")))
-       (local-set-key (kbd "<f9> }") (lambda () (interactive) (insert "\\\\right\\\}")))
+       (local-set-key (kbd "<f9> {") (lambda () (interactive) (insert "\\left\\{ ")))
+       (local-set-key (kbd "<f9> }") (lambda () (interactive) (insert "\\right\\}")))
 
-       (local-set-key (kbd "<f9> |") (lambda () (interactive) (insert "\\\left| \\\\ right|")))
-
-       (local-set-key (kbd "<f9> |") (lambda () (interactive) (insert "\\\left| \\\\ right|")))
-
-
+       (local-set-key (kbd "<f9> |") (lambda () (interactive) (insert "\\left| \\right|")))
        (local-set-key (kbd "C-\\") (lambda () (interactive) (insert "\\")))
 
        ;; Use \bm{} to repace \mathbf{}
