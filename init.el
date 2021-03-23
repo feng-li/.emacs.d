@@ -71,7 +71,7 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(julia-mode auctex-latexmk neotree flycheck-grammarly format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
+   '(powerthesaurus mw-thesaurus julia-mode auctex-latexmk neotree flycheck-grammarly format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
  '(send-mail-function 'mailclient-send-it)
@@ -112,6 +112,8 @@
 (require 'poly-markdown)
 (require 'flycheck)
 (require 'flycheck-grammarly)
+(require 'mw-thesaurus)
+(require 'powerthesaurus)
 (require 'company)
 ;; (require 'dictem nil 'noerror)
 (require 'ess-site)
@@ -398,6 +400,9 @@
 ;; Bind undo with the common keyboard
 (global-set-key (kbd "C-z") 'undo)
 
+;; Unset suspend-frame key
+(global-unset-key (kbd "C-x C-z"))
+
 ;; Switch to previous buffer
 (defun switch-to-previous-buffer ()
   (interactive)
@@ -553,11 +558,11 @@
 ;; iedit mode
 (eval-after-load "iedit"
   '(progn
-     (global-set-key "\C-ci" 'iedit-mode)
+     (global-set-key (kbd "C-c i") 'iedit-mode)
      ))
 
 ;; Keybind to browse the kill ring
-(global-set-key "\C-cy" '(lambda ()
+(global-set-key (kbd "C-c y") '(lambda ()
                            (interactive)
                            (popup-menu 'yank-menu)))
 
@@ -688,7 +693,7 @@
       [escape ?< escape ?% ?\C-q ?\C-m return ?  return ?! escape ?<])
 
 ;; Insert Current time, linux only?
-(global-set-key "\C-ct" 'my-insert-time)
+(global-set-key (kbd "C-c t") 'my-insert-time)
 (defun my-insert-time ()
   (interactive)
   (insert (format-time-string "%a %b %d %H:%M:%S %Z %Y")))
@@ -791,7 +796,7 @@
 (global-set-key (kbd "<f9> c") 'flyspell-auto-correct-word)
 
 (with-eval-after-load 'comint
-  (define-key comint-mode-map "\C-d" nil)
+  (define-key comint-mode-map (kbd "C-d") nil)
   )
 
 ;; FlyCheck
@@ -820,6 +825,9 @@
 ;;                 ess-mode-hook
 ;;                 python-mode-hook))
 ;;   (add-hook hook (lambda () (flyspell-prog-mode))))
+(setq mw-thesaurus--api-key "23ed2cad-ce64-4ab1-abd9-774760e6842d")
+(global-set-key (kbd "<f9> d") 'mw-thesaurus-lookup-dwim)
+(global-set-key (kbd "<f9> t") 'powerthesaurus-lookup-word-dwim)
 
 (add-hook 'c-mode-common-hook
           (lambda () (define-key c-mode-base-map (kbd "<f5>") 'compile)))
@@ -827,7 +835,7 @@
 ;; Dictionary
 (eval-after-load "goldendict"
   '(progn
-     (global-set-key (kbd "\C-c \C-d") 'goldendict-dwim)))
+     (global-set-key (kbd "C-c d") 'goldendict-dwim)))
 
 ;; Unfilling a region joins all the lines in a paragraph into a single line for each
 ;; paragraphs in that region. It is the contrary of fill-region.
@@ -839,7 +847,7 @@
   (let ((fill-column (point-max)))
     (fill-region beg end)))
 ;; Handy key definition
-(define-key global-map "\C-\M-Q" 'unfill-region)
+(define-key global-map (kbd "C-M-q") 'unfill-region)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1180,7 +1188,7 @@
                   (flycheck-mode t)
 
                   ;; Enter to indent in python.el
-                  (define-key python-mode-map "\C-m" 'newline-and-indent)
+                  (define-key python-mode-map (kbd "C-m") 'newline-and-indent)
 
                   (define-key python-mode-map (kbd "C-c M-r") 'python-shell-send-region)
 
