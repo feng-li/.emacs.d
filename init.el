@@ -71,7 +71,7 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(powerthesaurus mw-thesaurus julia-mode auctex-latexmk neotree flycheck-grammarly format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
+   '(yaml-mode powerthesaurus mw-thesaurus julia-mode auctex-latexmk neotree flycheck-grammarly format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
  '(send-mail-function 'mailclient-send-it)
@@ -133,6 +133,7 @@
 (require 'electric-operator)
 (require 'iedit)
 (require 'magit)
+(require 'yaml-mode)
 
 ;; (require 'benchmark-init-loaddefs)
 ;; (benchmark-init/activate)
@@ -201,10 +202,15 @@
 (setq save-place-file (concat "~/.emacs.d/auto-save-list/" system-name ".save-place-file.el"))
 
 ;; bookmarks
-;; everytime bookmark is changed, automatically save it
+;; every time bookmark is changed, automatically save it
 (setq bookmark-save-flag 1)
 (setq bookmark-default-file "~/.emacs.d/auto-save-list/bookmarks")
 (global-set-key (kbd "<f9> b") 'bookmark-bmenu-list)
+(defun bookmark-current-file ()
+  (interactive)
+  (bookmark-set (buffer-file-name) nil))
+(global-set-key (kbd "<f9> m") 'bookmark-current-file)
+
 
 ;; Environment variables
 (setenv "OMP_NUM_THREADS" "1")
@@ -213,7 +219,8 @@
 ;; Theme
 (setq dracula-use-24-bit-colors-on-256-colors-terms t)
 (unless (display-graphic-p)
-  (set-face-background 'default "black" nil))
+  (set-face-background 'default "black" nil)
+  )
 (load-theme 'dracula t)
 
 ;; Disable backup files (*~)
@@ -500,6 +507,7 @@
 
 (setq diary-file "~/workspace/diary")
 
+(add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Yasnippet settings
