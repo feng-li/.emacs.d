@@ -217,6 +217,8 @@
 (setenv "PATH" (concat (concat (getenv "HOME") "/.local/bin:") (getenv "PATH")))
 
 ;; Theme
+(add-to-list 'term-file-aliases '("dumb" . "xterm-256color"))
+
 (setq dracula-use-24-bit-colors-on-256-colors-terms t)
 (unless (display-graphic-p)
   (set-face-background 'default "black" nil)
@@ -1243,7 +1245,6 @@
  '(font-latex-math-face ((t (:foreground "dark orange"))))
  '(font-latex-sectioning-5-face ((t (:foreground "deep sky blue" :weight bold))))
  '(font-latex-sedate-face ((t (:foreground "dark magenta"))))
- '(font-lock-comment-face ((t (:inherit t :slant italic))))
  '(font-lock-function-name-face ((t (:foreground "deep sky blue" :weight normal))))
  '(highlight-doxygen-comment ((t (:inherit highlight))))
  '(line-number ((t (:inherit t :background nil))))
