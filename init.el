@@ -71,7 +71,7 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(yaml-mode powerthesaurus mw-thesaurus julia-mode auctex-latexmk neotree flycheck-grammarly format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
+   '(unfill yaml-mode powerthesaurus mw-thesaurus julia-mode auctex-latexmk neotree flycheck-grammarly format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
  '(send-mail-function 'mailclient-send-it)
@@ -242,6 +242,15 @@
   '(progn
      ;; Save transient file with customization
      (setq transient-history-file (concat "~/.emacs.d/auto-save-list/" system-name ".transient-history-file.el"))
+
+     ;; magit with-editor support
+     (define-key (current-global-map)
+       [remap async-shell-command] 'with-editor-async-shell-command)
+     (define-key (current-global-map)
+       [remap shell-command] 'with-editor-shell-command)
+
+     (define-key with-editor-mode-map (kbd "C-c C-c") nil)
+
      )
   )
 
@@ -847,18 +856,18 @@
   '(progn
      (global-set-key (kbd "C-c d") 'goldendict-dwim)))
 
+;; replaced with unfill.el
 ;; Unfilling a region joins all the lines in a paragraph into a single line for each
 ;; paragraphs in that region. It is the contrary of fill-region.
-(defun unfill-region (beg end)
-  "Unfill the region, joining text paragraphs into a single
-    logical line.  This is useful, e.g., for use with
-    `visual-line-mode'."
-  (interactive "*r")
-  (let ((fill-column (point-max)))
-    (fill-region beg end)))
+;; (defun unfill-region (beg end)
+;;   "Unfill the region, joining text paragraphs into a single
+;;     logical line.  This is useful, e.g., for use with
+;;     `visual-line-mode'."
+;;   (interactive "*r")
+;;   (let ((fill-column (point-max)))
+;;     (fill-region beg end)))
 ;; Handy key definition
 (define-key global-map (kbd "C-M-q") 'unfill-region)
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; General settings for program mode
