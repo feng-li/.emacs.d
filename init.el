@@ -163,6 +163,8 @@
 (setq frame-title-format "%b")
 (setq user-full-name "Feng Li")
 (setq user-mail-address "m@feng.li")
+(defun display-startup-echo-area-message ()
+  (message "Make sure you have defined the Hyper key (H). Use Gnome Tweaks to set \"Caps Lock as Control, Control as Hyper\""))
 
 ;; Desktop save mode
 (defvar my-desktop-path (concat "~/.emacs.d/auto-save-list/desktop/" system-name "/"))
@@ -205,10 +207,12 @@
 ;; every time bookmark is changed, automatically save it
 (setq bookmark-save-flag 1)
 (setq bookmark-default-file "~/.emacs.d/auto-save-list/bookmarks")
+(global-set-key (kbd "H-b") 'bookmark-bmenu-list)
 (global-set-key (kbd "<f9> b") 'bookmark-bmenu-list)
 (defun bookmark-current-file ()
   (interactive)
   (bookmark-set (buffer-file-name) nil))
+(global-set-key (kbd "H-m") 'bookmark-current-file)
 (global-set-key (kbd "<f9> m") 'bookmark-current-file)
 
 
@@ -387,7 +391,9 @@
                  (define-key dired-mode-map (kbd "<f9> DEL")
                    (lambda () (interactive) (find-alternate-file "..")))
                  (dired-omit-mode 1)
-                 (local-set-key (kbd "<f9> h") 'dired-omit-mode)))
+                 (local-set-key (kbd "<f9> h") 'dired-omit-mode)
+                 )
+               )
      (put 'dired-find-alternate-file 'disabled nil)
      )
   )
@@ -809,9 +815,12 @@
            )
        )
 
-     (global-set-key (kbd "<f9> 4") 'ispell-word)))
+     (global-set-key (kbd "H-4") 'ispell-word)
+     (global-set-key (kbd "<f9> 4") 'ispell-word)
+     ))
 
 ;; Auto correct spelling mistakes
+(global-set-key (kbd "H-c") 'flyspell-auto-correct-word)
 (global-set-key (kbd "<f9> c") 'flyspell-auto-correct-word)
 
 (with-eval-after-load 'comint
@@ -845,9 +854,10 @@
 ;;                 python-mode-hook))
 ;;   (add-hook hook (lambda () (flyspell-prog-mode))))
 (setq mw-thesaurus--api-key "23ed2cad-ce64-4ab1-abd9-774760e6842d")
+(global-set-key (kbd "H-d") 'mw-thesaurus-lookup-dwim)
 (global-set-key (kbd "<f9> d") 'mw-thesaurus-lookup-dwim)
+(global-set-key (kbd "H-t") 'powerthesaurus-lookup-word-dwim)
 (global-set-key (kbd "<f9> t") 'powerthesaurus-lookup-word-dwim)
-
 (add-hook 'c-mode-common-hook
           (lambda () (define-key c-mode-base-map (kbd "<f5>") 'compile)))
 
