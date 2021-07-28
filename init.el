@@ -812,11 +812,11 @@
                     ("-d" "en_US,en_GB") nil UTF-8)))
            )
        )
-w     (global-set-key (kbd "<f9> 4") 'ispell-word)
+     (global-set-key (kbd "<f9> 4") 'ispell-word)
      ))
 
 ;; Auto correct spelling mistakes
-w(global-set-key (kbd "<f9> c") 'flyspell-auto-correct-word)
+(global-set-key (kbd "<f9> c") 'flyspell-auto-correct-word)
 
 (with-eval-after-load 'comint
   (define-key comint-mode-map (kbd "C-d") nil)
