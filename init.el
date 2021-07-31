@@ -74,6 +74,7 @@
    '(unfill yaml-mode powerthesaurus mw-thesaurus julia-mode auctex-latexmk neotree flycheck-grammarly format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
+ '(scroll-conservatively 1)
  '(send-mail-function 'mailclient-send-it)
  '(session-use-package t nil (session))
  '(show-paren-mode t nil (paren))
@@ -141,13 +142,13 @@
 ;; set server-start
 ;; systemctl enable --user emacs
 ;; systemctl start --user emacs
-(add-hook 'server-switch-hook
-          (lambda ()
-            (when (current-local-map)
-              (use-local-map (copy-keymap (current-local-map))))
-            (when server-buffer-clients
-              (local-set-key (kbd "C-x k") 'server-edit))))
-(add-hook 'server-done-hook 'delete-frame)
+;; (add-hook 'server-switch-hook
+;;           (lambda ()
+;;             (when (current-local-map)
+;;               (use-local-map (copy-keymap (current-local-map))))
+;;             (when server-buffer-clients
+;;               (local-set-key (kbd "C-x k") 'server-edit))))
+;; (add-hook 'server-done-hook 'delete-frame)
 ;; Set home directory
 ;; (setq default-directory "~/workspace/")
 
@@ -163,8 +164,6 @@
 (setq frame-title-format "%b")
 (setq user-full-name "Feng Li")
 (setq user-mail-address "m@feng.li")
-;; (defun display-startup-echo-area-message ()
-;;   (message "Make sure you have defined the Hyper key (H). Use Gnome Tweaks to set \"Caps Lock as Control, Control as Hyper\""))
 
 ;; Desktop save mode
 (defvar my-desktop-path (concat "~/.emacs.d/auto-save-list/desktop/" system-name "/"))
@@ -290,7 +289,7 @@
 ;; Better vertical bar
 (set-display-table-slot standard-display-table 'vertical-border ?│)
 (set-face-background 'vertical-border (face-background 'mode-line))
-(set-face-foreground 'vertical-border (face-background 'vertical-border))
+(set-face-foreground 'vertical-border (face-background 'mode-line))
 
 ;; Remove weird ESC ESC key
 (if (display-graphic-p)
@@ -389,9 +388,7 @@
                  (define-key dired-mode-map (kbd "<f9> DEL")
                    (lambda () (interactive) (find-alternate-file "..")))
                  (dired-omit-mode 1)
-                 (local-set-key (kbd "<f9> h") 'dired-omit-mode)
-                 )
-               )
+                 (local-set-key (kbd "<f9> h") 'dired-omit-mode)))
      (put 'dired-find-alternate-file 'disabled nil)
      )
   )
@@ -812,8 +809,8 @@
                     ("-d" "en_US,en_GB") nil UTF-8)))
            )
        )
-     (global-set-key (kbd "<f9> 4") 'ispell-word)
-     ))
+
+     (global-set-key (kbd "<f9> 4") 'ispell-word)))
 
 ;; Auto correct spelling mistakes
 (global-set-key (kbd "<f9> c") 'flyspell-auto-correct-word)
@@ -851,6 +848,7 @@
 (setq mw-thesaurus--api-key "23ed2cad-ce64-4ab1-abd9-774760e6842d")
 (global-set-key (kbd "<f9> d") 'mw-thesaurus-lookup-dwim)
 (global-set-key (kbd "<f9> t") 'powerthesaurus-lookup-word-dwim)
+
 (add-hook 'c-mode-common-hook
           (lambda () (define-key c-mode-base-map (kbd "<f5>") 'compile)))
 
@@ -1260,6 +1258,7 @@
  '(font-lock-function-name-face ((t (:foreground "deep sky blue" :weight normal))))
  '(highlight-doxygen-comment ((t (:inherit highlight))))
  '(line-number ((t (:inherit t :background nil))))
+ '(line-number-current-line ((t (:inherit mode-line-inactive :slant italic))))
  '(neo-dir-link-face ((t (:inherit font-lock-function-name-face))))
  '(region ((t (:background "dim gray" :foreground "light gray")))))
 (put 'upcase-region 'disabled nil)
