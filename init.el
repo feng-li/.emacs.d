@@ -330,9 +330,6 @@
 ;;             (linum-mode 1)
 ;;             (visual-line-mode 1)))
 
-;; Saving options
-(fset 'single-line-only
-      [?\C-x ?h ?\C-\M-\% ?^ ?\C-q ?\C-j ?\C-q ?\C-j ?+ return ?\C-q ?\C-j return])
 
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
@@ -1258,7 +1255,8 @@
  '(font-lock-function-name-face ((t (:foreground "deep sky blue" :weight normal))))
  '(highlight-doxygen-comment ((t (:inherit highlight))))
  '(line-number ((t (:inherit t :background nil))))
- '(line-number-current-line ((t (:inherit mode-line-inactive :slant italic))))
+;; '(line-number-current-line ((t (:inherit mode-line-inactive :slant italic))))
+ '(line-number-current-line ((t (:inherit secondary-selection :slant italic))))
  '(neo-dir-link-face ((t (:inherit font-lock-function-name-face))))
  '(region ((t (:background "dim gray" :foreground "light gray")))))
 (put 'upcase-region 'disabled nil)
