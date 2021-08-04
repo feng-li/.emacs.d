@@ -15,16 +15,16 @@
 ;; semicolon to the start of the line.  You may delete these explanatory comments.  Add
 ;; MELPA repository
 ;;; Code:
-(setq url-proxy-services
-      '(("no_proxy" . "^\\(localhost\\|10.*\\)")
-        ("http" . "127.0.0.1:41091")
-        ("https" . "127.0.0.1:41091")))
+;; (setq url-proxy-services
+;;       '(("no_proxy" . "^\\(localhost\\|10.*\\)")
+;;         ("http" . "127.0.0.1:41091")
+;;         ("https" . "127.0.0.1:41091")))
 (require 'package)
 (setq package-archives '
       (
-       ("melpa" . "https://melpa.org/packages/")
-       ;; ("gnu-cn"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
-       ;; ("melpa-cn" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
+       ;; ("melpa" . "https://melpa.org/packages/")
+       ("gnu-elpa-cn"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
+       ("melpa-cn" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
        ))
 (package-initialize)
 
@@ -76,7 +76,7 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(yaml-mode mw-thesaurus unfill powerthesaurus julia-mode auctex-latexmk neotree flycheck-grammarly format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
+   '(yaml-mode mw-thesaurus unfill powerthesaurus julia-mode auctex-latexmk neotree flycheck-grammarly format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
  '(scroll-conservatively 1)
@@ -114,11 +114,11 @@
 (require 'comint)
 (require 'org)
 (require 'markdown-mode)
-(require 'poly-R)
-(require 'poly-markdown)
+;(require 'poly-R)
+;(require 'poly-markdown)
 (require 'flycheck)
 (require 'flycheck-grammarly)
-;; (require 'mw-thesaurus)
+(require 'mw-thesaurus)
 (require 'powerthesaurus)
 (require 'company)
 ;; (require 'dictem nil 'noerror)
@@ -139,7 +139,7 @@
 (require 'electric-operator)
 (require 'iedit)
 (require 'magit)
-;; (require 'yaml-mode)
+(require 'yaml-mode)
 
 ;; (require 'benchmark-init-loaddefs)
 ;; (benchmark-init/activate)
