@@ -17,7 +17,8 @@
 ;;; Code:
 (require 'package)
 (setq package-archives '
-      (;("melpa" . "https://melpa.org/packages/")
+      (
+       ;; ("melpa" . "https://melpa.org/packages/")
        ("gnu-cn"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
        ("melpa-cn" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
        ))
@@ -71,7 +72,7 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(unfill yaml-mode powerthesaurus mw-thesaurus julia-mode auctex-latexmk neotree flycheck-grammarly format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
+   '(unfill powerthesaurus julia-mode auctex-latexmk neotree flycheck-grammarly format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets poly-R poly-markdown flycheck-julia math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
  '(scroll-conservatively 1)
@@ -113,7 +114,7 @@
 (require 'poly-markdown)
 (require 'flycheck)
 (require 'flycheck-grammarly)
-(require 'mw-thesaurus)
+;; (require 'mw-thesaurus)
 (require 'powerthesaurus)
 (require 'company)
 ;; (require 'dictem nil 'noerror)
@@ -134,7 +135,7 @@
 (require 'electric-operator)
 (require 'iedit)
 (require 'magit)
-(require 'yaml-mode)
+;; (require 'yaml-mode)
 
 ;; (require 'benchmark-init-loaddefs)
 ;; (benchmark-init/activate)
@@ -184,7 +185,7 @@
 
 (setq desktop-buffers-not-to-save
       (concat "\\("
-              "^nn\\.a[0-9]+\\|\\.log\\|(ftp)\\|^tags\\|^TAGS"
+              "^\\.a[0-9]+\\|\\.log\\|(ftp)\\|^tags\\|^TAGS"
               "\\|\\.emacs.*\\|\\*Help*\\|\\.gz$"
               "\\)$"))
 (setq desktop-globals-to-save
@@ -516,7 +517,11 @@
 
 (setq diary-file "~/workspace/diary")
 
-(add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
+(eval-after-load "yaml-mode"
+  '(progn
+     (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
+     )
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Yasnippet settings
@@ -842,9 +847,13 @@
 ;;                 ess-mode-hook
 ;;                 python-mode-hook))
 ;;   (add-hook hook (lambda () (flyspell-prog-mode))))
-(setq mw-thesaurus--api-key "23ed2cad-ce64-4ab1-abd9-774760e6842d")
-(global-set-key (kbd "<f9> d") 'mw-thesaurus-lookup-dwim)
-(global-set-key (kbd "<f9> t") 'powerthesaurus-lookup-word-dwim)
+(eval-after-load "mw-thesaurus"
+  '(progn
+     (setq mw-thesaurus--api-key "23ed2cad-ce64-4ab1-abd9-774760e6842d")
+     (global-set-key (kbd "<f9> d") 'mw-thesaurus-lookup-dwim)
+     (global-set-key (kbd "<f9> t") 'powerthesaurus-lookup-word-dwim)
+     )
+  )
 
 (add-hook 'c-mode-common-hook
           (lambda () (define-key c-mode-base-map (kbd "<f5>") 'compile)))
@@ -854,18 +863,13 @@
   '(progn
      (global-set-key (kbd "C-c d") 'goldendict-dwim)))
 
-;; replaced with unfill.el
 ;; Unfilling a region joins all the lines in a paragraph into a single line for each
 ;; paragraphs in that region. It is the contrary of fill-region.
-;; (defun unfill-region (beg end)
-;;   "Unfill the region, joining text paragraphs into a single
-;;     logical line.  This is useful, e.g., for use with
-;;     `visual-line-mode'."
-;;   (interactive "*r")
-;;   (let ((fill-column (point-max)))
-;;     (fill-region beg end)))
-;; Handy key definition
-(define-key global-map (kbd "C-M-q") 'unfill-region)
+(eval-after-load "unfill"
+  '(progn
+     (define-key global-map (kbd "C-M-q") 'unfill-region)
+     )
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; General settings for program mode
