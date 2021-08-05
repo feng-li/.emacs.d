@@ -180,6 +180,11 @@
 (setq desktop-load-locked-desktop t)
 (setq desktop-restore-frames nil)
 
+;; save mini buffer history
+(savehist-mode 1)
+(setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring))
+(setq savehist-file (concat "~/.emacs.d/auto-save-list/desktop/" system-name ".savehist-file.el"))
+
 ;; Add a hook when emacs is closed to we reset the desktop modification time (in this way
 ;; the user does not get a warning message about desktop modifications)
 (add-hook 'kill-emacs-hook
@@ -199,10 +204,7 @@
         regexp-search-ring
         register-alist
         file-name-history)))
-(add-to-list 'desktop-modes-not-to-save 'dired-mode)
-(add-to-list 'desktop-modes-not-to-save 'Info-mode)
-(add-to-list 'desktop-modes-not-to-save 'info-lookup-mode)
-(add-to-list 'desktop-modes-not-to-save 'fundamental-mode)
+(add-to-list 'desktop-modes-not-to-save '(dired-mode Info-mode fundamental-mode))
 
 ;; save-place-mode
 (setq save-place-file (concat "~/.emacs.d/auto-save-list/" system-name ".save-place-file.el"))
@@ -970,8 +972,7 @@
        (TeX-command "LatexMkPvc" 'TeX-master-file -1))
      (add-hook 'LaTeX-mode-hook
                '(lambda ()
-                  (local-set-key (kbd "<f5>") 'TeX-command-run-latexmkpvc)
-
+                  (local-set-key (kbd "<f5>") 'TeX-command-run-all)
                   ))
 
      ;; Replace LaTeX with latexmk -pvc
