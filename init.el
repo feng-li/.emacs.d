@@ -88,7 +88,6 @@
 
 ;; (add-to-list 'custom-theme-load-path "~/.emacs.d/site-lisp/emacs-color-theme-solarized")
 
-
 ;; Byte compile directory when files are changed
 ;; (setq byte-compile-warnings nil)
 ;; (byte-recompile-directory (expand-file-name "~/.emacs.d/site-lisp/") 0)
@@ -426,6 +425,9 @@
 ;; Unset suspend-frame key
 (global-unset-key (kbd "C-x C-z"))
 
+;; Disable capitalize-key, conflict with tmux prefix ESC.
+(global-unset-key (kbd "M-c"))
+
 ;; Switch to previous buffer
 (defun switch-to-previous-buffer ()
   (interactive)
@@ -716,11 +718,7 @@
      (define-key comint-mode-map (kbd "C-l") 'comint-clear-buffer)
      ))
 
-;; Replace ^M
-(fset 'my-replace-m
-      [escape ?< escape ?% ?\C-q ?\C-m return ?  return ?! escape ?<])
-
-;; Insert Current time, linux only?
+;; Insert current time, Linux only?
 (global-set-key (kbd "C-c t") 'my-insert-time)
 (defun my-insert-time ()
   (interactive)
