@@ -46,7 +46,6 @@
  '(blink-cursor-mode t)
  '(case-fold-search t)
  '(column-number-mode t)
- '(company-minimum-prefix-length 1)
  '(custom-safe-themes
    '("81c3de64d684e23455236abde277cda4b66509ef2c28f66e059aa925b8b12534" default))
  '(doc-view-continuous t)
@@ -86,21 +85,9 @@
  '(tool-bar-mode nil)
  '(warning-suppress-types '((undo discard-info))))
 
-;; (add-to-list 'custom-theme-load-path "~/.emacs.d/site-lisp/emacs-color-theme-solarized")
-
-;; Byte compile directory when files are changed
-;; (setq byte-compile-warnings nil)
-;; (byte-recompile-directory (expand-file-name "~/.emacs.d/site-lisp/") 0)
-;; (byte-recompile-file "~/.emacs.d/.emacs" nil 0)
-;; Kill the compile-log buffer
-;; (add-hook 'compilation-finish-functions
-;;           (lambda (buf strg) (kill-buffer buf)))
-
-
 (unless package-archive-contents
   (package-refresh-contents))
 (package-install-selected-packages)
-
 
 ;; Additional library loaded during start up.
 ;; (setq tramp-ssh-controlmaster-options nil)
@@ -143,25 +130,6 @@
 ;; (require 'benchmark-init-loaddefs)
 ;; (benchmark-init/activate)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; set server-start
-;; systemctl enable --user emacs
-;; systemctl start --user emacs
-;; (add-hook 'server-switch-hook
-;;           (lambda ()
-;;             (when (current-local-map)
-;;               (use-local-map (copy-keymap (current-local-map))))
-;;             (when server-buffer-clients
-;;               (local-set-key (kbd "C-x k") 'server-edit))))
-;; (add-hook 'server-done-hook 'delete-frame)
-;; Set home directory
-;; (setq default-directory "~/workspace/")
-
-;; Default frame height and width
-;; (setq default-frame-alist
-;;       (append (list '(width  . 52)  ; Width set (characters)
-;;                     '(height . 50)) ; Height set (lines)
-;;               default-frame-alist))
-;; set the default fill column
 (setq-default fill-column 90)
 
 ;; Personal information
@@ -225,7 +193,6 @@
 
 ;; Theme
 (add-to-list 'term-file-aliases '("dumb" . "xterm-256color"))
-
 (setq dracula-use-24-bit-colors-on-256-colors-terms t)
 (unless (display-graphic-p)
   (set-face-background 'default "black" nil)
@@ -316,19 +283,6 @@
 
 ;; )
 
-;; (require 'helm-config)
-;; (global-set-key (kbd "M-x") #'helm-M-x)
-;; (global-set-key (kbd "C-x r b") #'helm-filtered-bookmarks)
-;; (global-set-key (kbd "C-x C-f") #'helm-find-files)
-
-;; Enable line number mode and enable visual line mode
-;; (if (display-graphic-p)
-;;     (progn
-;; Do nothing with window system
-;; )
-;; Add a vertical line
-;; (setq linum-format "%4d\u2502")
-;; )
 
 (global-display-line-numbers-mode)
 ;; (add-hook 'find-file-hook
@@ -452,13 +406,7 @@
 (setq shift-select-mode t)
 
 ;; allow mouse to select
-;; (require 'un-define)
-;; (require 'xt-mouse)
-;; (xterm-mouse-mode)
-;; (require 'mouse)
 ;; (xterm-mouse-mode t)
-;; (defun track-mouse (e))
-;; (setq mouse-wheel-follow-mouse 't)
 
 ;; make typing override text selection
 (delete-selection-mode 1) ;
@@ -596,9 +544,6 @@
                            (interactive)
                            (popup-menu 'yank-menu)))
 
-
-
-
 ;; TAGS
 (setq tags-table-list
       '("~/code/TAGS/R/"
@@ -670,7 +615,7 @@
              "\\.ttt$" "\\.log$" "\\.ods$" "\\.eps$" "\\#$" "\\.png$" "\\~$" "\\.RData$"
              "\\.nav$" "\\.snm$" "\\`\\.\\./" "\\`\\./" "\\.synctex.gz$" "\\.fdb_latexmk$"
              "\\.tar.gz$" "\\.zip$" "\\.o$" "\\.tar$" "\\.Rproj$" "\\.Rcheck$" "\\.doc$"
-             "\\.docx$" "\\.Rhistory$" "auto/" "__pycache__/" "\\.bcf$" "\\.run.xml$"
+             "\\.docx$" "\\.Rhistory$" "auto/" "__pycache__/" "\\.bcf$" "\\.run.xml$" "_region_.tex$"
              "\\.xdv$" "\\.DS_Store$" "\\.cfg$" "\\.bak$" "\\.gitignore"))
 
      (setq  ido-ignore-directories ; only works with ido-dired
@@ -729,6 +674,7 @@
 (eval-after-load "company"
   '(progn
      (add-hook 'after-init-hook 'global-company-mode)
+     (setq company-minimum-prefix-length 1)
 
      ;; Add yasnippet support for all company backends
      ;; https://github.com/syl20bnr/spacemacs/pull/179
@@ -741,6 +687,39 @@
                  '(:with company-yasnippet))))
      (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
 
+     ;; Use company quick access number to select candidates. The key want binded to M-numbers.
+     ;;https://github.com/abo-abo/oremacs/blob/d2b2cd8371b94f35a42000debef1c2b644cb9472/modes/ora-company.el#L22
+     (setq company-show-quick-access t)
+     (defun ora-company-number ()
+       "Forward to `company-complete-number'.
+     Unless the number is potentially part of the candidate.  In
+     that case, insert the number."
+       (interactive)
+       (let* ((k (this-command-keys))
+              (re (concat "^" company-prefix k)))
+         (if (or (cl-find-if (lambda (s) (string-match re s))
+                             company-candidates)
+                 (> (string-to-number k)
+                    (length company-candidates))
+                 (looking-back "[0-9]+\\.[0-9]*" (line-beginning-position)))
+             (self-insert-command 1)
+           (company-complete-number
+            (if (equal k "0")
+                10
+              (string-to-number k))))))
+
+     ;;https://github.com/abo-abo/oremacs/blob/d2b2cd8371b94f35a42000debef1c2b644cb9472/init.el#L28
+     (defun ora-advice-add (&rest args)
+       (when (fboundp 'advice-add)
+         (apply #'advice-add args)))
+     (defun ora--company-good-prefix-p (orig-fn prefix)
+       (unless (and (stringp prefix) (string-match-p "\\`[0-9]+\\'" prefix))
+         (funcall orig-fn prefix)))
+     (ora-advice-add 'company--good-prefix-p :around #'ora--company-good-prefix-p)
+
+     (let ((map company-active-map))
+       (mapc (lambda (x) (define-key map (format "%d" x) 'ora-company-number))
+             (number-sequence 0 9)))
      ))
 
 (add-hook 'prog-mode-hook 'flyspell-prog-mode)
@@ -1037,10 +1016,8 @@
 
      (add-hook 'LaTeX-mode-hook 'auctex-insert-special)
 
-
      ;; Enable file-line-error to avoid error message "Error occured after last TeX file closed" ; now is default for 11.89
      ;; (setq LaTeX-command-style (quote (("" "%(PDF)%(latex) -file-line-error %S%(PDFout)"))))
-
 
      (add-hook 'LaTeX-mode-hook (lambda () (TeX-fold-mode 1)))
      (setq TeX-save-query  nil )
@@ -1054,7 +1031,7 @@
      (setq reftex-toc-split-windows-fraction 0.3)
 
      ;; Extra keybinds
-     (setq reftex-extra-bindings t) ;; equavalent as below
+     ;; (setq reftex-extra-bindings t) ;; equavalent as below
      (add-hook 'reftex-load-hook
                '(lambda ()
                   (define-key reftex-mode-map (kbd "C-c t") 'reftex-toc)
@@ -1068,40 +1045,20 @@
                )
 
      ;; Allow company-reftex backends
-     (add-to-list 'company-backends 'company-reftex-labels 'company-reftex-citations)
+     (add-hook 'LaTeX-mode-hook
+               '(lambda ()
+                  (make-local-variable 'company-backends)
+                  (setq company-backends (copy-tree company-backends))
+                  (setf (car company-backends)
+                        (append '(company-reftex-labels company-reftex-citations) (car company-backends)))
+                  ))
 
      (setq reftex-cite-format 'natbib)
-     ;; (eval-after-load 'reftex-vars
-     ;;   '(progn
-     ;;      (setq reftex-cite-format
-     ;;            '((?\C-m .   "\\autocite{%l}")
-     ;;              (?t .   "\\citet[][]{%l}")
-     ;;              (?T .   "\\citet*[][]{%l}")
-     ;;              (?p .    "\\citep[][]{%l}")
-     ;;              (?P .    "\\citep*[][]{%l}")
-     ;;              (?e .    "\\citep[e.g.][]{%l}")
-     ;;              (?s .    "\\citep[see][]{%l}")
-     ;;              (?a .    "\\citeauthor{%l}")
-     ;;              (?A .    "\\citeauthor*{%l}")
-     ;;              (?y .    "\\citeyear{%l}")
-     ;;              (?n .    "\\nocite{%l}")))))
-
      (setq reftex-use-external-file-finders t)
      (setq reftex-external-file-finders
            '(("tex" . "kpsewhich -format=.tex %f")
              ("bib" . "kpsewhich -format=.bib %f")
 	     ("bst" . "kpsewhich -format=.bst %f")))
-
-     ;; (add-hook
-     ;;  'LaTeX-mode-hook
-     ;;  (lambda()
-     ;;    (add-to-list 'TeX-command-list
-     ;;                 '("TeX2LyX" "tex2lyx -f %s.tex ../%s.lyx "
-     ;;                   TeX-run-command nil (latex-mode)))
-     ;;    (add-to-list 'TeX-command-list
-     ;;                 '("View-PDF-via-Adobe" "acroread %s.pdf"
-     ;;                   TeX-run-command nil (latex-mode)))
-     ;;    ))
      ))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; ESS (Emacs speaks statistics)
@@ -1141,27 +1098,8 @@
 
      ;; Let help on new frame
      ;; (setq ess-help-own-frame t)
-
-
      (add-hook 'ess-mode-hook
                '(lambda ()
-
-                  ;;Roxygen template
-                  ;; (setq ess-roxy-template-alist
-                  ;;       (list
-                  ;;        (cons "description" "<title>")
-                  ;;        (cons "details" "<description>")
-                  ;;        ;; (cons "param" "")
-                  ;;        (cons "return" "NA")
-                  ;;        (cons "references" "NA")
-                  ;;        (cons "author" "Feng Li, Central University of Finance and Economics.")
-                  ;;        (cons "export" "")
-                  ;;        ))
-
-
-                  ;; Set M-§ to complete the object in the ESS editor
-                  ;; The default was "C-c Tab", Not needed if ac-R enabled
-
                   (fset 'my-R-comment-level-1
                         (lambda (&optional arg) "Insert level-1 R comment block"
                           (interactive "p")
@@ -1194,9 +1132,6 @@
      (add-hook 'ess-mode-hook 'ess-code-style)
      (add-hook 'inferior-ess-mode-hook 'ess-code-style))
   )
-
-
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Julia mode
