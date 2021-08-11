@@ -1041,9 +1041,19 @@
      (setq reftex-toc-split-windows-horizontally t)
      (setq reftex-toc-split-windows-fraction 0.3)
 
+     ;; Extra keybinds
+     ;; (setq reftex-extra-bindings t) ;; equavalent as below
+     (define-key reftex-mode-map (kbd "C-c t") 'reftex-toc)
+     (define-key reftex-mode-map (kbd "C-c l") 'reftex-label)
+     (define-key reftex-mode-map (kbd "C-c r") 'reftex-reference)
+     (define-key reftex-mode-map (kbd "C-c c") 'reftex-citation)
+     (define-key reftex-mode-map (kbd "C-c v") 'reftex-view-crossref)
+     (define-key reftex-mode-map (kbd "C-c s") 'reftex-search-document)
+     (define-key reftex-mode-map (kbd "C-c g") 'reftex-grep-document)
+
+
      ;; Allow company-reftex backends
-     (add-to-list 'company-backends 'company-reftex-labels)
-     (add-to-list 'company-backends 'company-reftex-citations)
+     (add-to-list 'company-backends 'company-reftex-labels 'company-reftex-citations)
 
      (setq reftex-cite-format 'natbib)
      (setq reftex-use-external-file-finders t)
