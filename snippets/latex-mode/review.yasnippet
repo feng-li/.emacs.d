@@ -1,0 +1,74 @@
+# -*- mode: snippet -*-
+# contributor: Feng Li <m@feng.li>
+# key: review
+# group: skeleton
+# name: \documentclass{amsart} ...
+# --
+\documentclass[reqno,12pt]{amsart}
+
+% Support various non-standard letters
+%\usepackage[utf8x] {inputenc}
+%\usepackage[T1]{fontenc}
+
+%\usepackage[adobe-utopia]{mathdesign}
+%\usepackage[T1]{fontenc}
+
+%% BibLaTeX
+\usepackage[style=authoryear-comp, backend=biber, natbib=true]{biblatex}
+\addbibresource{references.bib}
+\usepackage{longtable,booktabs}
+
+\usepackage{graphicx}
+\usepackage[usenames]{color}
+\definecolor{DarkBlue}{rgb}{0,0.08,0.45}
+
+\usepackage{hyperref}
+\usepackage{breakurl}
+\usepackage{bm}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=bblue,
+  citecolor=blue,
+  urlcolor=blue
+}
+
+\usepackage{setspace}
+\onehalfspacing
+
+\usepackage[a4paper]{geometry}
+\geometry{verbose,tmargin=2.0cm,bmargin=4.0cm,lmargin=2.5cm,rmargin=2.5cm}
+
+
+\title[Referee report]{ }
+
+\author{Referee report}
+\thanks{\texttt{   }}
+
+\begin{document}
+\maketitle
+
+%\section{Contents and major comments}
+
+
+\section*{General comments}
+
+\begin{enumerate}
+
+\item
+
+\end{enumerate}
+
+\section*{Minor comments}
+
+I noticed some styling issues in the paper, and please correct them before the next
+submission.
+
+\begin{enumerate}
+
+\item
+
+\end{enumerate}
+
+\printbibliography
+\end{document}

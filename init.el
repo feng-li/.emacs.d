@@ -966,7 +966,7 @@
      (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
      (setq LaTeX-math-menu-unicode t)
 
-     (setq LaTeX-document-regexp "document\\|refsection")
+     (setq LaTeX-document-regexp "document\\|refsection\\|frontmatter")
 
      ;; Set default TeX engine
      (setq TeX-PDF-mode t)

@@ -1,0 +1,86 @@
+# -*- mode: snippet -*-
+# contributor: Feng Li <m@feng.li>
+# key: elsarticle
+# group: skeleton
+# name: \documentclass{elsarticle} ...
+# --
+\documentclass[a4paper,review,11pt,authoryear]{elsarticle}
+\journal{arXiv}
+
+\usepackage[utf8]{inputenc}
+\usepackage[a4paper,text={16cm,25cm}]{geometry}
+\geometry{verbose,tmargin=1in,bmargin=1in,margin=1in,rmargin=1in}
+\usepackage[labelsep=period]{caption}
+
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{amstext}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{xurl}
+
+%% BibLaTeX
+\usepackage[style=authoryear-comp, backend=biber, natbib=true]{biblatex}
+\addbibresource{references-feng.bib}
+\usepackage{longtable,booktabs}
+
+
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage{verbatim}
+
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  citecolor=blue,
+  urlcolor=blue}
+
+%% Fonts
+\usepackage{bm}% Use \bm instead of \mathbf
+
+\usepackage{setspace}
+\onehalfspacing
+
+%% Reduce Bibliography space
+\usepackage{enumitem}
+\setlength{\bibsep}{0.0pt}
+\setlength{\itemsep}{0.0pt}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{definition}{Definition}
+\newtheorem{algthm}[theorem]{Algorithm}
+
+
+\begin{document}
+\begin{frontmatter}
+
+\title{ XXX }
+
+\begin{abstract}
+
+\end{abstract}
+
+\begin{keyword}
+
+\end{keyword}
+
+\end{frontmatter}
+
+\section{Introduction}
+\label{sec:intro}
+
+
+
+
+\section*{Acknowledgements}
+\label{acknowledgements}
+
+
+
+%\newpage
+\printbibliography
