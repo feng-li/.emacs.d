@@ -954,6 +954,8 @@
      (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
      (setq LaTeX-math-menu-unicode t)
 
+     (setq LaTeX-document-regexp "document\\|refsection")
+
      ;; Set default TeX engine
      (setq TeX-PDF-mode t)
      ;; (setq-default TeX-engine 'xetex) ;this can be set locally
