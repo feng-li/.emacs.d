@@ -729,6 +729,18 @@
 (eval-after-load "company"
   '(progn
      (add-hook 'after-init-hook 'global-company-mode)
+
+     ;; Add yasnippet support for all company backends
+     ;; https://github.com/syl20bnr/spacemacs/pull/179
+     (defvar company-mode/enable-yas t
+       "Enable yasnippet for all backends.")
+     (defun company-mode/backend-with-yas (backend)
+       (if (or (not company-mode/enable-yas) (and (listp backend) (member 'company-yasnippet backend)))
+           backend
+         (append (if (consp backend) backend (list backend))
+                 '(:with company-yasnippet))))
+     (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
+
      ))
 
 (add-hook 'prog-mode-hook 'flyspell-prog-mode)
@@ -1042,20 +1054,38 @@
      (setq reftex-toc-split-windows-fraction 0.3)
 
      ;; Extra keybinds
-     ;; (setq reftex-extra-bindings t) ;; equavalent as below
-     (define-key reftex-mode-map (kbd "C-c t") 'reftex-toc)
-     (define-key reftex-mode-map (kbd "C-c l") 'reftex-label)
-     (define-key reftex-mode-map (kbd "C-c r") 'reftex-reference)
-     (define-key reftex-mode-map (kbd "C-c c") 'reftex-citation)
-     (define-key reftex-mode-map (kbd "C-c v") 'reftex-view-crossref)
-     (define-key reftex-mode-map (kbd "C-c s") 'reftex-search-document)
-     (define-key reftex-mode-map (kbd "C-c g") 'reftex-grep-document)
-
+     (setq reftex-extra-bindings t) ;; equavalent as below
+     (add-hook 'reftex-load-hook
+               '(lambda ()
+                  (define-key reftex-mode-map (kbd "C-c t") 'reftex-toc)
+                  (define-key reftex-mode-map (kbd "C-c l") 'reftex-label)
+                  (define-key reftex-mode-map (kbd "C-c r") 'reftex-reference)
+                  (define-key reftex-mode-map (kbd "C-c c") 'reftex-citation)
+                  (define-key reftex-mode-map (kbd "C-c v") 'reftex-view-crossref)
+                  (define-key reftex-mode-map (kbd "C-c s") 'reftex-search-document)
+                  (define-key reftex-mode-map (kbd "C-c g") 'reftex-grep-document)
+                  )
+               )
 
      ;; Allow company-reftex backends
      (add-to-list 'company-backends 'company-reftex-labels 'company-reftex-citations)
 
      (setq reftex-cite-format 'natbib)
+     ;; (eval-after-load 'reftex-vars
+     ;;   '(progn
+     ;;      (setq reftex-cite-format
+     ;;            '((?\C-m .   "\\autocite{%l}")
+     ;;              (?t .   "\\citet[][]{%l}")
+     ;;              (?T .   "\\citet*[][]{%l}")
+     ;;              (?p .    "\\citep[][]{%l}")
+     ;;              (?P .    "\\citep*[][]{%l}")
+     ;;              (?e .    "\\citep[e.g.][]{%l}")
+     ;;              (?s .    "\\citep[see][]{%l}")
+     ;;              (?a .    "\\citeauthor{%l}")
+     ;;              (?A .    "\\citeauthor*{%l}")
+     ;;              (?y .    "\\citeyear{%l}")
+     ;;              (?n .    "\\nocite{%l}")))))
+
      (setq reftex-use-external-file-finders t)
      (setq reftex-external-file-finders
            '(("tex" . "kpsewhich -format=.tex %f")
