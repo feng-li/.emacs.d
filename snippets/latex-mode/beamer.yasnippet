@@ -1,0 +1,100 @@
+# -*- mode: snippet -*-
+# contributor: Feng Li <m@feng.li>
+# key: beamer
+# group: skeleton
+# name: \documentclass{beamer} ...
+# --
+\documentclass[11pt,aspectratio=169]{beamer}
+
+\usepackage{multicol}
+\usepackage{multirow}
+\usepackage{mathabx}
+\usepackage{threeparttable}
+\usepackage[scaled]{helvet}
+\usepackage{lmodern}
+\usepackage{natbib}
+\usepackage{booktabs}
+\usepackage{amsfonts}
+\usefonttheme[onlymath]{serif}
+% \usefonttheme{professionalfonts}
+\usefonttheme{structurebold}
+\usepackage{bm}
+\usepackage{xurl}
+
+%% Color & Theme
+\definecolor{SUblue}{RGB}{0,0,180}
+\usecolortheme[RGB={0,0,180}]{structure}
+\usetheme{Boadilla}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{itemize items}[circle]
+\setbeamertemplate{enumerate items}[circle]
+\setbeamerfont{title}{size=\large}
+\setbeamerfont{frametitle}{size=\large}
+\setbeamerfont{framesubtitle}{size=\large,shape =$\color{violet}{\looparrowdownright}~$}
+\setbeamercolor{title}{fg=white, bg= SUblue!75!green}
+\setbeamercolor{framesubtitle}{fg=violet}
+%% \setlength{\leftmargini}{5pt}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  citecolor=blue,
+  urlcolor=magenta}
+
+
+\title[ XXX ]{\textbf{ XXX }}
+
+\author[Feng Li]{\includegraphics[height=2cm]{cufelogo}\\
+  \vspace{0.5cm}\textbf{Feng Li}\\
+\includegraphics[height=0.35cm]{twitter}@f3ngli}
+
+\institute[\url{https://feng.li/}]{\footnotesize{\textbf{School of Statistics and
+      Mathematics\\ Central University of Finance and Economics}}}
+
+\date{}
+%\date{ISBA 2021 Conference}
+\begin{document}
+
+\begin{frame}[plain]
+  \addtocounter{framenumber}{-1}
+  \titlepage
+  \vspace{-1cm}
+\end{frame}
+
+
+
+\section*{Outline}
+
+\begin{frame}
+  \frametitle{Outline}
+  \addtocounter{framenumber}{-1}
+  \tableofcontents
+\end{frame}
+
+\section{ XXX }
+
+\begin{frame}
+  \frametitle{ XXX }
+  \framesubtitle{ XXX }
+
+\end{frame}
+
+
+\begin{frame}
+
+  % {\color{SUblue} \Large \em The best way to predict the future is to create it!}
+  \centering \Huge Thank you!
+  \vspace{2cm}
+
+  \Large \url{https://kllab.org}
+
+  \Large \texttt{\url{feng.li@cufe.edu.cn}}
+
+\end{frame}
+
+\begin{frame}%[allowframebreaks]
+  \frametitle{References}
+  \footnotesize
+  \bibliography{references-feng}
+  \bibliographystyle{agsm}
+\end{frame}
