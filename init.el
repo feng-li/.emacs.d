@@ -75,7 +75,7 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(yaml-mode mw-thesaurus unfill powerthesaurus julia-mode auctex-latexmk neotree flycheck-grammarly format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
+   '(wordnut synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode auctex-latexmk neotree flycheck-grammarly format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
  '(scroll-conservatively 1)
@@ -104,8 +104,6 @@
 ;(require 'poly-markdown)
 (require 'flycheck)
 (require 'flycheck-grammarly)
-(require 'mw-thesaurus)
-(require 'powerthesaurus)
 (require 'company)
 ;; (require 'dictem nil 'noerror)
 (require 'ess-site)
@@ -126,6 +124,9 @@
 (require 'iedit)
 (require 'magit)
 (require 'yaml-mode)
+(require 'synosaurus)
+(require 'mw-thesaurus)
+(require 'powerthesaurus)
 
 ;; (require 'benchmark-init-loaddefs)
 ;; (benchmark-init/activate)
@@ -793,6 +794,7 @@
 
      ;; Hunspell 1.7 is broken with emacs 26.1
      (defun ispell-get-coding-system () 'utf-8)
+     (setq ispell-use-framepop-p t)
 
      ;; Prefer hunspell if exits
      (if (locate-file "hunspell" exec-path)
@@ -818,6 +820,28 @@
 
 ;; FlyCheck
 ;; (add-hook 'after-init-hook #'global-flycheck-mode)
+(eval-after-load "synosaurus"
+  '(progn
+     (dolist (hook '(text-mode-hook
+                     latex-mode-hook
+                     LaTeX-mode-hook
+                     prog-mode-hook
+                     org-mode-hook
+                     markdown-mode-hook))
+       (add-hook hook (lambda () (synosaurus-mode))))
+
+     (setq synosaurus-choose-method 'popup) ; popup, ido
+     ;; (setq synosaurus-backend  'Wordnet) ; apt install wordnet
+     (define-key synosaurus-mode-map (kbd "<f4>") 'synosaurus-choose-and-replace)
+     )
+  )
+(eval-after-load "mw-thesaurus"
+  '(progn
+     (setq mw-thesaurus--api-key "23ed2cad-ce64-4ab1-abd9-774760e6842d")
+     (global-set-key (kbd "<f9> d") 'mw-thesaurus-lookup-dwim)
+     ;; (global-set-key (kbd "<f4>") 'powerthesaurus-lookup-word-dwim)
+     )
+  )
 
 
 ;; Fly spell performance
@@ -842,13 +866,6 @@
 ;;                 ess-mode-hook
 ;;                 python-mode-hook))
 ;;   (add-hook hook (lambda () (flyspell-prog-mode))))
-(eval-after-load "mw-thesaurus"
-  '(progn
-     (setq mw-thesaurus--api-key "23ed2cad-ce64-4ab1-abd9-774760e6842d")
-     (global-set-key (kbd "<f9> d") 'mw-thesaurus-lookup-dwim)
-     (global-set-key (kbd "<f9> t") 'powerthesaurus-lookup-word-dwim)
-     )
-  )
 
 (add-hook 'c-mode-common-hook
           (lambda () (define-key c-mode-base-map (kbd "<f5>") 'compile)))
