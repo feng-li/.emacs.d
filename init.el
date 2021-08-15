@@ -966,7 +966,7 @@
 
      ;; Set default TeX engine
      (setq TeX-PDF-mode t)
-     ;; (setq-default TeX-engine 'xetex) ;this can be set locally
+     (setq-default TeX-engine 'lualatex) ;this can be set locally
 
      (require 'auctex-latexmk)
      ;; (auctex-latexmk-setup) ; not needed auctex-latexmk-pvc already called.
