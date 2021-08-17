@@ -2,57 +2,54 @@
 # contributor: Feng Li <m@feng.li>
 # key: review
 # group: skeleton
-# name: \documentclass{amsart} ...
+# name: <review letter> ...
 # --
-\documentclass[reqno,12pt]{amsart}
+\documentclass[11pt,a4paper]{article}
 
-% Support various non-standard letters
-%\usepackage[utf8x] {inputenc}
-%\usepackage[T1]{fontenc}
+%% Fonts
+\usepackage{fontspec} % LuaLaTeX or XeLaTeX only
+\setmainfont{Times New Roman}
 
-%\usepackage[adobe-utopia]{mathdesign}
-%\usepackage[T1]{fontenc}
+\usepackage{amssymb,amsmath}
 
-%% BibLaTeX
+%% Page margin and linspacing
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{setspace}
+\spacing{1.1}
+
+%% BibTeX
 \usepackage[style=authoryear-comp, backend=biber, natbib=true]{biblatex}
-\addbibresource{references.bib}
+\addbibresource{references-feng.bib}
 \usepackage{longtable,booktabs}
 
-\usepackage{graphicx}
-\usepackage[usenames]{color}
-\definecolor{DarkBlue}{rgb}{0,0.08,0.45}
-
-\usepackage{hyperref}
-\usepackage{breakurl}
-\usepackage{bm}
-
+\usepackage[unicode=true]{hyperref}
 \hypersetup{
   colorlinks=true,
-  linkcolor=bblue,
+  linkcolor=blue,
   citecolor=blue,
-  urlcolor=blue
-}
+  urlcolor=blue}
 
-\usepackage{setspace}
-\onehalfspacing
+%% Table numbering
+\renewcommand{\thetable}{S.\arabic{table}}
+\renewcommand{\thefigure}{S.\arabic{figure}}
 
-\usepackage[a4paper]{geometry}
-\geometry{verbose,tmargin=2.0cm,bmargin=4.0cm,lmargin=2.5cm,rmargin=2.5cm}
-
-
-\title[Referee report]{ }
-
-\author{Referee report}
-\thanks{\texttt{   }}
+\usepackage[compact,center]{titlesec}
+\usepackage{enumitem}
+\setlist[enumerate,itemize]{listparindent=\parindent}% Indented paragraphs within lists
+\setlength{\itemsep}{0.0pt}
 
 \begin{document}
+\title{\bf\Large Referee report for
+  \\`` XXX ''}
+
+\date{\texttt{ XXX }}
 \maketitle
 
-%\section{Contents and major comments}
+% \section{Contents and major comments}
 
 
 \section*{General comments}
-
 \begin{enumerate}
 
 \item
@@ -70,5 +67,5 @@ submission.
 
 \end{enumerate}
 
-\printbibliography
+\printbibliographytitle={References}]
 \end{document}
