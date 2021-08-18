@@ -1,7 +1,7 @@
 Feng Li's Emacs configurations
 ==============================
 
-Copyright 
+Copyright
 ---------
 
 See each individual file.
@@ -18,7 +18,7 @@ Installation
 * Clone the repository
 
         cd ~
-        git clone git://github.com/feng-li/.emacs.d.git
+        git clone https://github.com/feng-li/dlsa.git
         cd ~/.emacs.d/
         git submodule update --init --recursive
 
@@ -26,7 +26,7 @@ Installation
 
         cd ~/.emacs.d/
         git pull
-        git submodule sync 
+        git submodule sync
         git submodule foreach git checkout master
         git submodule foreach git pull
 
@@ -35,4 +35,3 @@ Bug reports
 
 * For submodules, please report bugs to the corresponding authors.
 * For other issues, please visit https://github.com/feng-li/.emacs.d/issues .
-

@@ -75,7 +75,7 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(wordnut synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode auctex-latexmk neotree flycheck-grammarly format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
+   '(pandoc-mode wordnut synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode auctex-latexmk neotree flycheck-grammarly format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
  '(scroll-conservatively 1)
@@ -942,6 +942,24 @@
      (add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode))
 
      ))
+
+     (dolist (hook '(text-mode-hook
+                     latex-mode-hook
+                     LaTeX-mode-hook
+                     prog-mode-hook
+                     org-mode-hook
+                     markdown-mode-hook))
+       (add-hook hook (lambda () (synosaurus-mode))))
+
+
+(eval-after-load "pandoc"
+  '(progn
+     (dolist (hook '(text-mode-hook
+                     latex-mode-hook
+                     LaTeX-mode-hook
+                     org-mode-hook
+                     markdown-mode-hook))
+       (add-hook hook (lambda () (pandoc-mode))))))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Org-mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
