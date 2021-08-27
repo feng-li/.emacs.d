@@ -818,6 +818,11 @@
   (define-key comint-mode-map (kbd "C-d") nil)
   )
 
+;; Moby Thesaurus II
+(setq synonyms-file        "~/.emacs.d/hunspell/mobythesaurus/mthesaur.txt")
+(setq synonyms-cache-file  "~/.emacs.d/hunspell/mobythesaurus/mthesaur.txt.cache")
+(require 'synonyms)
+
 ;; FlyCheck
 ;; (add-hook 'after-init-hook #'global-flycheck-mode)
 (eval-after-load "synosaurus"
