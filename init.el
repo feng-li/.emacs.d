@@ -1191,7 +1191,8 @@
 
      (elpy-enable)
      ;; (setq elpy-rpc-virtualenv-path (concat (getenv "HOME") "/.emacs.d/elpy/" system-name "/rpc-venv"))
-     (setq elpy-rpc-virtualenv-path (concat (getenv "HOME") "/.cache/elpy/rpc-venv"))
+     ;; (setq elpy-rpc-virtualenv-path (concat (getenv "HOME") "/.cache/elpy/rpc-venv"))
+     (setq elpy-rpc-virtualenv-path (concat (getenv "HOME") "/.local"))
      (setq elpy-rpc-python-command "python3")
      (setq elpy-syntax-check-command (concat elpy-rpc-virtualenv-path  "/bin/flake8"))
 
