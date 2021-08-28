@@ -75,7 +75,7 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(pandoc-mode wordnut synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode auctex-latexmk neotree flycheck-grammarly format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
+   '(lexic pandoc-mode wordnut synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode auctex-latexmk neotree flycheck-grammarly format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
  '(scroll-conservatively 1)
@@ -126,8 +126,7 @@
 (require 'yaml-mode)
 (require 'synosaurus)
 (require 'mw-thesaurus)
-(require 'powerthesaurus)
-
+(require 'lexic)
 ;; (require 'benchmark-init-loaddefs)
 ;; (benchmark-init/activate)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -801,7 +800,7 @@
          (progn
            (setq ispell-program-name "hunspell")
            (setq ispell-really-hunspell t)
-           (setenv "DICPATH" (concat (getenv "HOME") "/.emacs.d/hunspell/"))
+           (setenv "DICPATH" (concat (getenv "HOME") "/.emacs.d/dicts/hunspell"))
            (setq ispell-local-dictionary "en_US")
            (setq ispell-local-dictionary-alist
                  '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil
@@ -819,9 +818,35 @@
   )
 
 ;; Moby Thesaurus II
-(setq synonyms-file        "~/.emacs.d/hunspell/mobythesaurus/mthesaur.txt")
-(setq synonyms-cache-file  "~/.emacs.d/hunspell/mobythesaurus/mthesaur.txt.cache")
-(require 'synonyms)
+;; (setq synonyms-file        "~/.emacs.d/hunspell/mobythesaurus/mthesaur.txt")
+;; (setq synonyms-cache-file  "~/.emacs.d/hunspell/mobythesaurus/mthesaur.txt.cache")
+;; (require 'synonyms)
+
+;; Golden Dictionary
+;; (eval-after-load "goldendict"
+;;   '(progn
+;;      (global-set-key (kbd "C-c d") 'goldendict-dwim)))
+
+;; StarDict
+;; apt install sdcv
+;; https://github.com/Dushistov/sdcv
+(eval-after-load "lexic"
+  '(progn
+     (setq lexic-dictionary-path "~/.emacs.d/dict/sdcv/")
+     (setq lexic-dictionary-list
+           '(;; "Soule's Dictionary of English Synonyms (En-En)"
+             "Merriam-Webster's Collegiate Thesaurus (En-En)"
+             ;; "Merriam-Webster's Advanced Learner's Dictionary (En-En)"
+             "Longman Dictionary of Common Errors (En-En)"))
+     (global-set-key (kbd "<f9> d") 'lexic-search)
+     ))
+
+(eval-after-load "mw-thesaurus"
+  '(progn
+     (setq mw-thesaurus--api-key "23ed2cad-ce64-4ab1-abd9-774760e6842d")
+     (global-set-key (kbd "<f9> t") 'mw-thesaurus-lookup-dwim)
+     )
+  )
 
 ;; FlyCheck
 ;; (add-hook 'after-init-hook #'global-flycheck-mode)
@@ -838,13 +863,6 @@
      (setq synosaurus-choose-method 'popup) ; popup, ido
      ;; (setq synosaurus-backend  'Wordnet) ; apt install wordnet
      (define-key synosaurus-mode-map (kbd "<f4>") 'synosaurus-choose-and-replace)
-     )
-  )
-(eval-after-load "mw-thesaurus"
-  '(progn
-     (setq mw-thesaurus--api-key "23ed2cad-ce64-4ab1-abd9-774760e6842d")
-     (global-set-key (kbd "<f9> d") 'mw-thesaurus-lookup-dwim)
-     ;; (global-set-key (kbd "<f4>") 'powerthesaurus-lookup-word-dwim)
      )
   )
 
@@ -875,10 +893,6 @@
 (add-hook 'c-mode-common-hook
           (lambda () (define-key c-mode-base-map (kbd "<f5>") 'compile)))
 
-;; Dictionary
-(eval-after-load "goldendict"
-  '(progn
-     (global-set-key (kbd "C-c d") 'goldendict-dwim)))
 
 ;; Unfilling a region joins all the lines in a paragraph into a single line for each
 ;; paragraphs in that region. It is the contrary of fill-region.
