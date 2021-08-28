@@ -6,7 +6,6 @@
 ;; Download: https://github.com/feng-li/.emacs.d/
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Load all required packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -37,6 +36,10 @@
             (copy-sequence (normal-top-level-add-to-load-path '(".")))
             (normal-top-level-add-subdirs-to-load-path)))
          load-path)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; custom-set-variables
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -97,7 +100,7 @@
 (require 'ispell)
 (require 'ibuffer)
 (require 'ido)
-(require 'comint)
+;(require 'comint)
 (require 'org)
 (require 'markdown-mode)
 ;(require 'poly-R)
@@ -105,7 +108,6 @@
 (require 'flycheck)
 (require 'flycheck-grammarly)
 (require 'company)
-;; (require 'dictem nil 'noerror)
 (require 'ess-site)
 (require 'julia-mode)
 (require 'flycheck-julia)
@@ -127,15 +129,216 @@
 (require 'synosaurus)
 (require 'mw-thesaurus)
 (require 'lexic)
-;; (require 'benchmark-init-loaddefs)
-;; (benchmark-init/activate)
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(setq-default fill-column 90)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Basic Preferences
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Personal information
 (setq frame-title-format "%b")
 (setq user-full-name "Feng Li")
 (setq user-mail-address "m@feng.li")
+
+;; Environment variables
+(setenv "OMP_NUM_THREADS" "1")
+(setenv "PATH" (concat (concat (getenv "HOME") "/.local/bin:") (getenv "PATH")))
+
+;; Term
+(add-to-list 'term-file-aliases '("dumb" . "xterm-256color"))
+;; Allow shift-arrow keys and control-arrow keys under different tty
+;; Set export TERM="xterm" in .bashrc and
+;; term "xterm" in .screenrc.
+(defadvice terminal-init-xterm (after select-shift-up activate)
+  (define-key input-decode-map "\e[1;2A" [S-up]))
+
+;; Theme
+(setq dracula-use-24-bit-colors-on-256-colors-terms t)
+(unless (display-graphic-p)
+  (set-face-background 'default "black" nil)
+  )
+(load-theme 'dracula t)
+
+;; The scratch settings
+(setq initial-scratch-message nil) ;; Disable scratch information
+(setq inhibit-startup-message t) ;;stop start up message
+(setq fundamental-mode 'text-mode)
+(setq initial-major-mode 'text-mode) ;; text mode in scratch
+(setq major-mode 'text-mode)
+(setq initial-buffer-choice 'ibuffer)
+
+
+;; Suspend and resume hook
+(add-hook 'suspend-hook
+          (function (lambda ()
+                      (or (y-or-n-p
+                           "Really suspend emacs? ")
+                          (error "Suspend canceled")))))
+(add-hook 'suspend-resume-hook
+          (function (lambda () (message "Emacs resumed!"))))
+
+;; TAB settings
+(setq-default indent-tabs-mode nil)
+
+;; Switch to previous buffer
+(defun switch-to-previous-buffer ()
+  (interactive)
+  (switch-to-buffer (other-buffer)))
+(global-set-key (kbd "ESC <f2>") 'switch-to-previous-buffer)
+
+;;Use y-n for short
+(fset 'yes-or-no-p 'y-or-n-p)
+
+;; Set Fonts
+(add-to-list 'default-frame-alist '(font . "M+ 1mn-9.5")) ;
+;; (when (display-graphic-p)
+;;   (if (> (display-pixel-height) 1080) ;; HDPi
+;;       (progn
+;;         (add-to-list 'default-frame-alist '(font . "Noto Sans Mono CJK SC")) ;
+;;         ;; (add-to-list 'default-frame-alist '(font . "M+ 1mn-9")) ;
+;;         )
+;;     (add-to-list 'default-frame-alist '(font . "Noto Sans Mono CJK SC")) ;
+;;     ;; (add-to-list 'default-frame-alist '(font . "M+ 1mn-10")) ;
+;;     )
+;;   ;; (setq face-font-rescale-alist '(("Noto Sans CJK SC". 1.2)))
+;;   ;; (set-fontset-font "fontset-default" 'unicode '("Microsoft YaHei" . "unicode-bmp"))
+;;   )
+;; Menu bar
+(menu-bar-mode t)
+
+;; Tooltip mode
+(tooltip-mode nil)
+
+;; Global auto revert mode
+;; (global-auto-revert-mode t)
+
+;; Better vertical bar
+(set-display-table-slot standard-display-table 'vertical-border ?│)
+(set-face-background 'vertical-border (face-background 'mode-line))
+(set-face-foreground 'vertical-border (face-background 'mode-line))
+
+;; Remove weird ESC ESC key
+(if (display-graphic-p)
+    (progn
+      ;; Do nothing with window system
+      )
+  (global-unset-key [?\e ?\e ?\e])
+  (global-set-key [?\e ?\e escape] 'keyboard-escape-quit)
+  )
+
+(global-display-line-numbers-mode)
+
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+
+;; Let Alt key be the meta key
+(setq x-alt-keysym 'meta)
+
+;; Global visual line mode with better indentation
+(setq-default adaptive-wrap-extra-indent 0)
+(add-hook 'visual-line-mode-hook #'adaptive-wrap-prefix-mode)
+(global-visual-line-mode t)
+
+;; (add-hook 'prog-mode-hook '(flyspell-prog-mode -t))
+
+;; shift selection
+(setq shift-select-mode t)
+
+;; allow mouse to select
+;; (xterm-mouse-mode t)
+
+;; make typing override text selection
+(delete-selection-mode 1) ;
+
+;; Cursor is bar: Not clear under console
+(setq-default cursor-type 'box)
+(setq-default visible-cursor t)
+;;set visible-bell
+(setq visible-bell t)
+
+;; set big kill ring
+(setq kill-ring-max 150)
+
+;; auto fill mode
+(setq-default fill-column 90)
+(dolist (hook (list
+               'after-text-mode-hook
+               'message-mode-hook
+               'org-mode-hook
+	       'mail-mode-hook
+               'ess-mode-hook))
+  (add-hook hook '(lambda () (auto-fill-mode 1))))
+
+;; Unfilling a region joins all the lines in a paragraph into a single line for each
+;; paragraphs in that region. It is the contrary of fill-region.
+(eval-after-load "unfill"
+  '(progn
+     (define-key global-map (kbd "C-M-q") 'unfill-region)
+     )
+  )
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Global key bindings
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; copy with other applications
+(setq select-enable-clipboard t)
+(global-set-key (kbd "<mouse-2>") 'clipboard-yank)
+
+;; Keybind to browse the kill ring
+(global-set-key (kbd "C-c y")
+                '(lambda ()
+                   (interactive)
+                   (popup-menu 'yank-menu)))
+(setq ring-bell-function (lambda ()  t))
+
+;; Disable capitalize-key, conflict with tmux prefix ESC.
+(global-unset-key (kbd "M-c"))
+;; Kill the current buffer, without confirmation.
+;; Kill buffer without conformation
+(global-set-key (kbd "C-x k") 'kill-current-buffer)
+
+;; Bind undo with the common keyboard
+(global-set-key (kbd "C-z") 'undo)
+
+;; Unset suspend-frame key
+(global-unset-key (kbd "C-x C-z"))
+
+;; Personal global key settings
+(global-set-key (kbd "<home>") 'beginning-of-buffer)
+(global-set-key (kbd "<end>") 'end-of-buffer)
+(global-set-key (kbd "<select>") 'end-of-buffer)
+(global-set-key (kbd "<f9> n") 'new-frame)
+(global-set-key (kbd "<f9> g") 'rgrep)
+(global-set-key (kbd "<f9> f") 'find-name-dired)
+(global-set-key (kbd "<f9> q") 'fill-region-as-paragraph)
+(global-set-key (kbd "<f9> TAB") 'indent-relative)
+(global-set-key (kbd "<f2>") 'next-multiframe-window) ;; Circulate among windows
+;; Follow mode (dual pages display)
+(global-set-key (kbd "C-<f2>")  'follow-delete-other-windows-and-split)
+;; Control-tab to switch among buffers
+(global-set-key (kbd "C-<tab>") 'next-buffer)
+
+;; Unset 'exchange-point-and-mark' key which may cause conflicts with Fcitx
+(global-unset-key (kbd "C-x C-x"))
+
+;; Key bind to increase and decrease text size
+(global-set-key (kbd "C-+") 'text-scale-increase)
+(global-set-key (kbd "C--") 'text-scale-decrease)
+
+;; (global-set-key (kbd "M-SPC") 'set-mark-command) ;It was C-SPC
+
+;; Insert current time, Linux only?
+(global-set-key (kbd "C-c t") 'my-insert-time)
+(defun my-insert-time ()
+  (interactive)
+  (insert (format-time-string "%a %b %d %H:%M:%S %Z %Y")))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Desktop and history
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Disable backup files (*~)
+(setq make-backup-files nil)
 
 ;; Desktop save mode
 (defvar my-desktop-path (concat "~/.emacs.d/auto-save-list/desktop/" system-name "/"))
@@ -187,143 +390,123 @@
 (global-set-key (kbd "<f9> m") 'bookmark-current-file)
 
 
-;; Environment variables
-(setenv "OMP_NUM_THREADS" "1")
-(setenv "PATH" (concat (concat (getenv "HOME") "/.local/bin:") (getenv "PATH")))
-
-;; Theme
-(add-to-list 'term-file-aliases '("dumb" . "xterm-256color"))
-(setq dracula-use-24-bit-colors-on-256-colors-terms t)
-(unless (display-graphic-p)
-  (set-face-background 'default "black" nil)
-  )
-(load-theme 'dracula t)
-
-;; Disable backup files (*~)
-(setq make-backup-files nil)
-
-;; Version Control
-(setq vc-handled-backends ()) ;; Disable vc-git and use magit
-(vc-mode -1)
-(with-eval-after-load 'info
-  (info-initialize)
-  (add-to-list 'Info-directory-list
-               "~/.emacs.d/site-lisp/magit/Documentation/")
-  )
-(setq vc-follow-symlinks nil)
-
-(eval-after-load "magit"
+;;Session (keep sections with different machines)
+(eval-after-load "session"
   '(progn
-     ;; Save transient file with customization
-     (setq transient-history-file (concat "~/.emacs.d/auto-save-list/" system-name ".transient-history-file.el"))
+     (setq session-use-package nil)
+     (add-hook 'after-init-hook 'session-initialize)
 
-     ;; magit with-editor support
-     (define-key (current-global-map)
-       [remap async-shell-command] 'with-editor-async-shell-command)
-     (define-key (current-global-map)
-       [remap shell-command] 'with-editor-shell-command)
+     ;; Save sessions with customization
+     (setq session-save-file (concat "~/.emacs.d/auto-save-list/"  system-name ".session-save-file.el"))
 
-     (define-key with-editor-mode-map (kbd "C-c C-c") nil)
+     ))
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Hide and Show code blocks
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(dolist (hook (list
+               'after-text-mode-hook
+               'c-mode-hook
+               'org-mode-hook
+               'python-mode-hook
+	       'mail-mode-hook
+               'ess-mode-hook))
+  (add-hook hook '(lambda () (hs-minor-mode))))
+(global-set-key (kbd "M-+") 'hs-toggle-hiding)
+(global-set-key (kbd "M-*") 'hs-show-all)
+
+
+;; Electric operators
+(dolist (hook (list
+               'python-mode-hook
+               'c-mode-hook
+               'c++-mode-hook
+               'LaTeX-mode-hook
+               'ess-r-mode-hook))
+  (add-hook hook '(lambda () (electric-operator-mode 1))))
+(apply #'electric-operator-add-rules-for-mode 'inferior-python-mode
+       (electric-operator-get-rules-for-mode 'python-mode))
+(setq electric-operator-R-named-argument-style "spaced")
+(electric-operator-add-rules-for-mode 'prog-mode (cons "*" nil))
+(electric-operator-add-rules-for-mode 'prog-mode (cons "/" nil))
+(electric-operator-add-rules-for-mode 'prog-mode (cons "?" nil))
+
+
+;; Goto matched parenthesis
+(global-set-key (kbd "?") 'goto-match-paren) ;;
+(defun goto-match-paren (arg)
+  (interactive "p")
+  (cond ((looking-at "[\[\(\{]") (forward-sexp))
+        ((looking-back "[\]\)\}]" 1) (backward-sexp))
+        ;; now, try to succeed from inside of a bracket
+        ((looking-at "[\]\)\}]") (forward-char) (backward-sexp))
+        ((looking-back "[\[\(\{]" 1) (backward-char) (forward-sexp))
+        (t (self-insert-command (or arg 1)))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Matlab, Octave mode
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Let m-file connected with octave mode.
+(setq auto-mode-alist (cons '("\\.m$" . octave-mode) auto-mode-alist))
+
+(eval-after-load "yaml-mode"
+  '(progn
+     (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
      )
   )
 
 
 
-;; Set Fonts
-(add-to-list 'default-frame-alist '(font . "Noto Sans Mono CJK SC")) ;
-;; (when (display-graphic-p)
-;;   (if (> (display-pixel-height) 1080) ;; HDPi
-;;       (progn
-;;         (add-to-list 'default-frame-alist '(font . "Noto Sans Mono CJK SC")) ;
-;;         ;; (add-to-list 'default-frame-alist '(font . "M+ 1mn-9")) ;
-;;         )
-;;     (add-to-list 'default-frame-alist '(font . "Noto Sans Mono CJK SC")) ;
-;;     ;; (add-to-list 'default-frame-alist '(font . "M+ 1mn-10")) ;
-;;     )
-;;   ;; (setq face-font-rescale-alist '(("Noto Sans CJK SC". 1.2)))
-;;   ;; (set-fontset-font "fontset-default" 'unicode '("Microsoft YaHei" . "unicode-bmp"))
-;;   )
-;; Menu bar
-(menu-bar-mode t)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Language https://languagetool.org/
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Tooltip mode
-(tooltip-mode nil)
+;; LanguageTool https://languagetool.org/download/
+(eval-after-load "langtool"
+  '(progn
+     (setq langtool-language-tool-jar "~/.APP/LanguageTool/languagetool-commandline.jar")
+     (setq langtool-default-language "en-US")
 
-;; Control-tab to switch among buffers
-(global-set-key (kbd "C-<tab>") 'next-buffer)
+     (global-set-key (kbd "<f9> l") 'langtool-check)
+     (global-set-key (kbd "<f9> L") 'langtool-check-done)
 
-;; Unset 'exchange-point-and-mark' key which may cause conflicts with Fcitx
-(global-unset-key (kbd "C-x C-x"))
+     ;; Show LanguageTool report automatically by popup
+     (defun langtool-autoshow-detail-popup (overlays)
+       (when (require 'popup nil t)
+         ;; Do not interrupt current popup
+         (unless (or popup-instances
+                     ;; suppress popup after type `C-g` .
+                     (memq last-command '(keyboard-quit)))
+           (let ((msg (langtool-details-error-message overlays)))
+             (popup-tip msg)))))
+     (setq langtool-autoshow-message-function
+           'langtool-autoshow-detail-popup)))
 
-;; Global auto revert mode
-;; (global-auto-revert-mode t)
-
-;; Better vertical bar
-(set-display-table-slot standard-display-table 'vertical-border ?│)
-(set-face-background 'vertical-border (face-background 'mode-line))
-(set-face-foreground 'vertical-border (face-background 'mode-line))
-
-;; Remove weird ESC ESC key
-(if (display-graphic-p)
-    (progn
-      ;; Do nothing with window system
-      )
-  (global-unset-key [?\e ?\e ?\e])
-  (global-set-key [?\e ?\e escape] 'keyboard-escape-quit)
-  )
-
-;; Key bind to increase and decrease text size
-(global-set-key (kbd "C-+") 'text-scale-increase)
-(global-set-key (kbd "C--") 'text-scale-decrease)
-
-;; Speed bar
-;; (speedbar t)
-;; (speedbar-add-supported-extension (quote(".R" ".r" ".bib" ".org")))
-
-;; )
+(eval-after-load "writegood-mode"
+  '(progn
+     (global-set-key (kbd "<f9> w") 'writegood-mode)))
 
 
-(global-display-line-numbers-mode)
-;; (add-hook 'find-file-hook
-;;           (lambda ()
-;;             (linum-mode 1)
-;;             (visual-line-mode 1)))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; General IDE settings
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; iedit mode
+(eval-after-load "iedit"
+  '(progn
+     (global-set-key (kbd "C-c i") 'iedit-mode)
+     ))
 
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
-
-;; Let Alt key be the meta key
-(setq x-alt-keysym 'meta)
-
-
-;; Follow mode (dual pages display)
-(global-set-key (kbd "C-<f2>")  'follow-delete-other-windows-and-split)
-
-
-;; Kill buffer without conformation
-(global-set-key (kbd "C-x k") 'kill-current-buffer)
-
-
-;; Suspend and resume hook
-(add-hook 'suspend-hook
-          (function (lambda ()
-                      (or (y-or-n-p
-                           "Really suspend emacs? ")
-                          (error "Suspend canceled")))))
-(add-hook 'suspend-resume-hook
-          (function (lambda () (message "Emacs resumed!"))))
-
-;; Global visual line mode with better indentation
-(setq-default adaptive-wrap-extra-indent 0)
-(add-hook 'visual-line-mode-hook #'adaptive-wrap-prefix-mode)
-(global-visual-line-mode t)
-
-;; (add-hook 'prog-mode-hook '(flyspell-prog-mode -t))
-
-;; Dired mode
+;; Ibuffer mode
 (eval-after-load "ibuffer"
   '(progn
+     (global-set-key (kbd "C-x C-b") 'ibuffer)
+     (global-set-key (kbd "<f9> i") 'ibuffer)
+
      (setq dired-omit-mode t)
      (add-hook 'dired-mode-hook
                (lambda ()
@@ -347,227 +530,7 @@
                  (dired-omit-mode 1)
                  (local-set-key (kbd "<f9> h") 'dired-omit-mode)))
      (put 'dired-find-alternate-file 'disabled nil)
-     )
-  )
 
-;; Personal global key settings
-(global-set-key (kbd "<home>") 'beginning-of-buffer)
-(global-set-key (kbd "<end>") 'end-of-buffer)
-(global-set-key (kbd "<select>") 'end-of-buffer)
-(global-set-key (kbd "<f9> n") 'new-frame)
-(global-set-key (kbd "<f9> g") 'rgrep)
-(global-set-key (kbd "<f9> f") 'find-name-dired)
-(global-set-key (kbd "<f9> q") 'fill-region-as-paragraph)
-(global-set-key (kbd "<f9> TAB") 'indent-relative)
-(global-set-key (kbd "<f2>") 'next-multiframe-window) ;; Circulate among windows
-;; (global-set-key (kbd "M-SPC") 'set-mark-command) ;It was C-SPC
-
-;; The scratch settings
-(setq initial-scratch-message nil) ;; Disable scratch information
-(setq fundamental-mode 'text-mode)
-(setq major-mode 'text-mode)
-(setq initial-major-mode 'text-mode) ;; text mode in scratch
-
-;; Kill the current buffer, without confirmation.
-(fset 'my-kill-current-buffer
-      [?\C-x ?k return])
-(global-set-key (kbd "<f9> k") 'my-kill-current-buffer)
-
-;; Bind undo with the common keyboard
-(global-set-key (kbd "C-z") 'undo)
-
-;; Unset suspend-frame key
-(global-unset-key (kbd "C-x C-z"))
-
-;; Disable capitalize-key, conflict with tmux prefix ESC.
-(global-unset-key (kbd "M-c"))
-
-;; Switch to previous buffer
-(defun switch-to-previous-buffer ()
-  (interactive)
-  (switch-to-buffer (other-buffer)))
-(global-set-key (kbd "ESC <f2>") 'switch-to-previous-buffer)
-
-
-;;stop start up message
-(setq inhibit-startup-message t)
-
-;;Use y-n short
-(fset 'yes-or-no-p 'y-or-n-p)
-
-;; Allow shift-arrow keys and control-arrow keys under different tty
-;; Set export TERM="xterm" in .bashrc and
-;; term "xterm" in .screenrc.
-
-(defadvice terminal-init-xterm (after select-shift-up activate)
-  (define-key input-decode-map "\e[1;2A" [S-up]))
-
-;; shift selection
-(setq shift-select-mode t)
-
-;; allow mouse to select
-;; (xterm-mouse-mode t)
-
-;; make typing override text selection
-(delete-selection-mode 1) ;
-
-;; TAB settings
-(setq-default indent-tabs-mode nil)
-
-;; ediff
-(setq ediff-window-setup-function 'ediff-setup-windows-plain)
-(setq ediff-split-window-function 'split-window-horizontally)
-(setq-default ediff-ignore-similar-regions t)
-
-;;Session (keep sections with different machines)
-(eval-after-load "session"
-  '(progn
-     (setq session-use-package nil)
-     (add-hook 'after-init-hook 'session-initialize)
-
-     ;; Save sessions with customization
-     (setq session-save-file (concat "~/.emacs.d/auto-save-list/"  system-name ".session-save-file.el"))
-
-     ))
-
-;; Cursor is bar: Not clear under console
-(setq-default cursor-type 'box)
-(setq-default visible-cursor t)
-;;set visible-bell
-(setq visible-bell t)
-
-;; set big kill ring
-(setq kill-ring-max 150)
-
-;; auto fill mode
-(dolist (hook (list
-               'after-text-mode-hook
-               'message-mode-hook
-               'org-mode-hook
-	       'mail-mode-hook
-               'ess-mode-hook))
-  (add-hook hook '(lambda () (auto-fill-mode 1))))
-
-
-;; copy with other applications
-(setq select-enable-clipboard t)
-(global-set-key (kbd "<mouse-2>") 'clipboard-yank)
-
-(setq ring-bell-function (lambda ()  t))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Hide and Show code blocks
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(dolist (hook (list
-               'after-text-mode-hook
-               'c-mode-hook
-               'org-mode-hook
-               'python-mode-hook
-	       'mail-mode-hook
-               'ess-mode-hook))
-  (add-hook hook '(lambda () (hs-minor-mode))))
-(global-set-key (kbd "M-+") 'hs-toggle-hiding)
-(global-set-key (kbd "M-*") 'hs-show-all)
-
-
-(setq diary-file "~/workspace/diary")
-
-(eval-after-load "yaml-mode"
-  '(progn
-     (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
-     )
-  )
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Yasnippet settings
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(eval-after-load "yasnippet"
-  '(progn
-     (yas-global-mode 1)
-     ;; (setq yas-snippet-dirs
-     ;;       '(;; personal snippets
-     ;;         "~/.emacs.d/snippets"
-     ;;         ;; snippet collection
-     ;;         ;; "~/.emacs.d/site-lisp/yasnippet-snippets/snippets"
-     ;;         ))
-     )
-  )
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Matlab, Octave mode
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; Let m-file connected with octave mode.
-(setq auto-mode-alist (cons '("\\.m$" . octave-mode) auto-mode-alist))
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; LanguageTool https://languagetool.org/
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(eval-after-load "langtool"
-  '(progn
-     (setq langtool-language-tool-jar "~/.APP/LanguageTool/languagetool-commandline.jar")
-     (setq langtool-default-language "en-US")
-
-
-     (global-set-key (kbd "<f9> l") 'langtool-check)
-     (global-set-key (kbd "<f9> L") 'langtool-check-done)
-
-     ;; Show LanguageTool report automatically by popup
-     (defun langtool-autoshow-detail-popup (overlays)
-       (when (require 'popup nil t)
-         ;; Do not interrupt current popup
-         (unless (or popup-instances
-                     ;; suppress popup after type `C-g` .
-                     (memq last-command '(keyboard-quit)))
-           (let ((msg (langtool-details-error-message overlays)))
-             (popup-tip msg)))))
-     (setq langtool-autoshow-message-function
-           'langtool-autoshow-detail-popup)))
-
-(eval-after-load "writegood-mode"
-  '(progn
-     (global-set-key (kbd "<f9> w") 'writegood-mode)))
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; General IDE settings (ElDoc, ECB, Comint...)
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; iedit mode
-(eval-after-load "iedit"
-  '(progn
-     (global-set-key (kbd "C-c i") 'iedit-mode)
-     ))
-
-;; Keybind to browse the kill ring
-(global-set-key (kbd "C-c y") '(lambda ()
-                           (interactive)
-                           (popup-menu 'yank-menu)))
-
-;; TAGS
-(setq tags-table-list
-      '("~/code/TAGS/R/"
-        "~/code/TAGS/PYTHON/"
-        "~/code/TAGS/C/"
-        "~/code/TAGS/FORTRAN/"))
-(dolist (hook (list
-	       'after-text-mode-hook
-               'ess-mode-hook
-	       'python-mode-hook
-	       'c-mode-hook
-	       'c++-mode-hook
-               'inferior-ess-mode-hook))
-  (add-hook hook '(lambda () (xref-etags-mode))))
-
-
-;; (setq tags-table-list
-;;       '("~/.emacs.d/tags" "~/code/"))
-
-;; Ibuffer mode
-(eval-after-load "ibuffer"
-  '(progn
-     (global-set-key (kbd "C-x C-b") 'ibuffer)
-     (global-set-key (kbd "<f9> i") 'ibuffer)
 
      (setq ibuffer-saved-filter-groups
            (quote
@@ -576,19 +539,26 @@
                           (mode . ess-mode)
                           (mode . prog-mode)
                           (mode . shell-script-mode)
+                          (mode . sh-mode)
+                          (mode . python-mode)
                           (mode . makefile-mode)
-                          (mode . conf-mode)
+                          (mode . snippet-mode)
                           (mode . emacs-lisp-mode)))
               ("Files" (or
                         (mode . LaTeX-mode)
                         (mode . latex-mode)
+                        (mode . markdown-mode)
                         (mode . bibtex-mode)
                         (mode . org-mode)))
+              ("Config" (or
+                       (mode . yaml-mode)
+                       (mode . conf-unix-mode)))
+
               ("Proc" (or
                        (mode . inferior-ess-mode)))
               ("Help" (or
                        (mode . help-mode)
-                       (mode . dictem-mode)
+                       (mode . lexic-mode)
                        (mode . ess-help-mode)
                        (mode . Info-mode)))
               ("Messages" (or
@@ -663,14 +633,22 @@
      (define-key comint-mode-map (kbd "C-l") 'comint-clear-buffer)
      ))
 
-;; Insert current time, Linux only?
-(global-set-key (kbd "C-c t") 'my-insert-time)
-(defun my-insert-time ()
-  (interactive)
-  (insert (format-time-string "%a %b %d %H:%M:%S %Z %Y")))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Auto completion settings (company mode, yasnippet)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(eval-after-load "yasnippet"
+  '(progn
+     (yas-global-mode 1)
+     ;; (setq yas-snippet-dirs
+     ;;       '(;; personal snippets
+     ;;         "~/.emacs.d/snippets"
+     ;;         ;; snippet collection
+     ;;         ;; "~/.emacs.d/site-lisp/yasnippet-snippets/snippets"
+     ;;         ))
+     )
+  )
 
-;; Auto complete mode
 (eval-after-load "company"
   '(progn
      (add-hook 'after-init-hook 'global-company-mode)
@@ -754,33 +732,41 @@
      (add-to-list
       'Info-default-directory-list "~/.emacs.d/info")))
 
-;; Electric operators
-(dolist (hook (list
-               'python-mode-hook
-               'c-mode-hook
-               'c++-mode-hook
-               'LaTeX-mode-hook
-               'ess-r-mode-hook))
-  (add-hook hook '(lambda () (electric-operator-mode 1))))
-(apply #'electric-operator-add-rules-for-mode 'inferior-python-mode
-       (electric-operator-get-rules-for-mode 'python-mode))
-(setq electric-operator-R-named-argument-style "spaced")
-(electric-operator-add-rules-for-mode 'prog-mode (cons "*" nil))
-(electric-operator-add-rules-for-mode 'prog-mode (cons "/" nil))
-(electric-operator-add-rules-for-mode 'prog-mode (cons "?" nil))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Version Control
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; ediff
+(setq ediff-window-setup-function 'ediff-setup-windows-plain)
+(setq ediff-split-window-function 'split-window-horizontally)
+(setq-default ediff-ignore-similar-regions t)
 
 
-;; Goto matched parenthesis
-(global-set-key (kbd "?") 'goto-match-paren) ;;
-(defun goto-match-paren (arg)
-  (interactive "p")
-  (cond ((looking-at "[\[\(\{]") (forward-sexp))
-        ((looking-back "[\]\)\}]" 1) (backward-sexp))
-        ;; now, try to succeed from inside of a bracket
-        ((looking-at "[\]\)\}]") (forward-char) (backward-sexp))
-        ((looking-back "[\[\(\{]" 1) (backward-char) (forward-sexp))
-        (t (self-insert-command (or arg 1)))))
+(setq vc-handled-backends ()) ;; Disable vc-git and use magit
+(vc-mode -1)
+(with-eval-after-load 'info
+  (info-initialize)
+  (add-to-list 'Info-directory-list
+               "~/.emacs.d/site-lisp/magit/Documentation/")
+  )
+(setq vc-follow-symlinks nil)
 
+(eval-after-load "magit"
+  '(progn
+     ;; Save transient file with customization
+     (setq transient-history-file (concat "~/.emacs.d/auto-save-list/"
+                                          system-name ".transient-history-file.el"))
+
+     ;; magit with-editor support
+     (define-key (current-global-map)
+       [remap async-shell-command] 'with-editor-async-shell-command)
+     (define-key (current-global-map)
+       [remap shell-command] 'with-editor-shell-command)
+
+     (define-key with-editor-mode-map (kbd "C-c C-c") nil)
+
+     )
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Spelling checking & dictionaries
@@ -815,37 +801,6 @@
 
 (with-eval-after-load 'comint
   (define-key comint-mode-map (kbd "C-d") nil)
-  )
-
-;; Moby Thesaurus II
-;; (setq synonyms-file        "~/.emacs.d/hunspell/mobythesaurus/mthesaur.txt")
-;; (setq synonyms-cache-file  "~/.emacs.d/hunspell/mobythesaurus/mthesaur.txt.cache")
-;; (require 'synonyms)
-
-;; Golden Dictionary
-;; (eval-after-load "goldendict"
-;;   '(progn
-;;      (global-set-key (kbd "C-c d") 'goldendict-dwim)))
-
-;; StarDict
-;; apt install sdcv
-;; https://github.com/Dushistov/sdcv
-(eval-after-load "lexic"
-  '(progn
-     (setq lexic-dictionary-path "~/.emacs.d/dict/sdcv/")
-     (setq lexic-dictionary-list
-           '(;; "Soule's Dictionary of English Synonyms (En-En)"
-             "Merriam-Webster's Collegiate Thesaurus (En-En)"
-             ;; "Merriam-Webster's Advanced Learner's Dictionary (En-En)"
-             "Longman Dictionary of Common Errors (En-En)"))
-     (global-set-key (kbd "<f9> d") 'lexic-search)
-     ))
-
-(eval-after-load "mw-thesaurus"
-  '(progn
-     (setq mw-thesaurus--api-key "23ed2cad-ce64-4ab1-abd9-774760e6842d")
-     (global-set-key (kbd "<f9> t") 'mw-thesaurus-lookup-dwim)
-     )
   )
 
 ;; FlyCheck
@@ -890,21 +845,60 @@
 ;;                 python-mode-hook))
 ;;   (add-hook hook (lambda () (flyspell-prog-mode))))
 
+;; Moby Thesaurus II
+;; (setq synonyms-file        "~/.emacs.d/hunspell/mobythesaurus/mthesaur.txt")
+;; (setq synonyms-cache-file  "~/.emacs.d/hunspell/mobythesaurus/mthesaur.txt.cache")
+;; (require 'synonyms)
+
+;; Golden Dictionary
+;; (eval-after-load "goldendict"
+;;   '(progn
+;;      (global-set-key (kbd "C-c d") 'goldendict-dwim)))
+
+;; StarDict
+;; apt install sdcv
+;; https://github.com/Dushistov/sdcv
+(eval-after-load "lexic"
+  '(progn
+     (setq lexic-dictionary-path "~/.emacs.d/dict/sdcv/")
+     (setq lexic-dictionary-list
+           '(;; "Soule's Dictionary of English Synonyms (En-En)"
+             "Merriam-Webster's Collegiate Thesaurus (En-En)"
+             ;; "Merriam-Webster's Advanced Learner's Dictionary (En-En)"
+             "Longman Dictionary of Common Errors (En-En)"))
+     (global-set-key (kbd "<f9> d") 'lexic-search)
+     ))
+
+(eval-after-load "mw-thesaurus"
+  '(progn
+     (setq mw-thesaurus--api-key "23ed2cad-ce64-4ab1-abd9-774760e6842d")
+     (global-set-key (kbd "<f9> t") 'mw-thesaurus-lookup-dwim)
+     )
+  )
+
+
 (add-hook 'c-mode-common-hook
           (lambda () (define-key c-mode-base-map (kbd "<f5>") 'compile)))
 
 
-;; Unfilling a region joins all the lines in a paragraph into a single line for each
-;; paragraphs in that region. It is the contrary of fill-region.
-(eval-after-load "unfill"
-  '(progn
-     (define-key global-map (kbd "C-M-q") 'unfill-region)
-     )
-  )
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; General settings for program mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; TAGS
+(setq tags-table-list
+      '("~/code/TAGS/R/"
+        "~/code/TAGS/PYTHON/"
+        "~/code/TAGS/C/"
+        "~/code/TAGS/FORTRAN/"))
+(dolist (hook (list
+	       'after-text-mode-hook
+               'ess-mode-hook
+	       'python-mode-hook
+	       'c-mode-hook
+	       'c++-mode-hook
+               'inferior-ess-mode-hook))
+  (add-hook hook '(lambda () (xref-etags-mode))))
 
 ;; highlight-indent-guides-mode, can make emacs slow with large files
 ;; (eval-after-load "highlight-indent-guides"
@@ -929,10 +923,7 @@
 
 ;; (add-hook 'prog-mode-hook 'highlight-doxygen-mode)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Add font lock keywords
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 (mapc (lambda (mode)
         (font-lock-add-keywords
          mode
@@ -979,6 +970,7 @@
                      org-mode-hook
                      markdown-mode-hook))
        (add-hook hook (lambda () (pandoc-mode))))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Org-mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -993,6 +985,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; LaTeX
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (eval-after-load "auctex.el"
   '(progn
      ;; LaTeX AUCTex features
@@ -1114,6 +1107,7 @@
              ("bib" . "kpsewhich -format=.bib %f")
 	     ("bst" . "kpsewhich -format=.bst %f")))
      ))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; ESS (Emacs speaks statistics)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1190,6 +1184,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Julia mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (eval-after-load "julia-mode"
   '(progn
      (flycheck-julia-setup)
@@ -1198,12 +1193,9 @@
      )
   )
 
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Python IDE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 
 (eval-after-load "python"
   '(progn
