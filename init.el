@@ -257,14 +257,15 @@
 ;; set big kill ring
 (setq kill-ring-max 150)
 
-;; auto fill mode
+;; auto-fill mode
 (setq-default fill-column 90)
-(dolist (hook (list
-               'after-text-mode-hook
-               'message-mode-hook
-               'org-mode-hook
-	       'mail-mode-hook
-               'ess-mode-hook))
+(dolist (hook '(after-text-mode-hook
+                LaTeX-mode-hook
+                markdown-mode-hook
+                message-mode-hook
+                org-mode-hook
+	        mail-mode-hook
+                ess-mode-hook))
   (add-hook hook '(lambda () (auto-fill-mode 1))))
 
 ;; Unfilling a region joins all the lines in a paragraph into a single line for each
@@ -272,9 +273,7 @@
 (eval-after-load "unfill"
   '(progn
      (define-key global-map (kbd "C-M-q") 'unfill-region)
-     )
-  )
-
+     ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Global key bindings
@@ -406,25 +405,23 @@
 ;; Hide and Show code blocks
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(dolist (hook (list
-               'after-text-mode-hook
-               'c-mode-hook
-               'org-mode-hook
-               'python-mode-hook
-	       'mail-mode-hook
-               'ess-mode-hook))
+(dolist (hook '(after-text-mode-hook
+                c-mode-hook
+                org-mode-hook
+                python-mode-hook
+	        mail-mode-hook
+                ess-mode-hook))
   (add-hook hook '(lambda () (hs-minor-mode))))
 (global-set-key (kbd "M-+") 'hs-toggle-hiding)
 (global-set-key (kbd "M-*") 'hs-show-all)
 
 
 ;; Electric operators
-(dolist (hook (list
-               'python-mode-hook
-               'c-mode-hook
-               'c++-mode-hook
-               'LaTeX-mode-hook
-               'ess-r-mode-hook))
+(dolist (hook '(python-mode-hook
+                c-mode-hook
+                c++-mode-hook
+                LaTeX-mode-hook
+                ess-r-mode-hook))
   (add-hook hook '(lambda () (electric-operator-mode 1))))
 (apply #'electric-operator-add-rules-for-mode 'inferior-python-mode
        (electric-operator-get-rules-for-mode 'python-mode))
@@ -447,7 +444,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Matlab, Octave mode
+;; Matlab, Octave, yaml mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Let m-file connected with octave mode.
@@ -459,10 +456,8 @@
      )
   )
 
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Language https://languagetool.org/
+;; Language and writing https://languagetool.org/
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; LanguageTool https://languagetool.org/download/
@@ -489,7 +484,6 @@
 (eval-after-load "writegood-mode"
   '(progn
      (global-set-key (kbd "<f9> w") 'writegood-mode)))
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; General IDE settings
@@ -891,13 +885,12 @@
         "~/code/TAGS/PYTHON/"
         "~/code/TAGS/C/"
         "~/code/TAGS/FORTRAN/"))
-(dolist (hook (list
-	       'after-text-mode-hook
-               'ess-mode-hook
-	       'python-mode-hook
-	       'c-mode-hook
-	       'c++-mode-hook
-               'inferior-ess-mode-hook))
+(dolist (hook '(after-text-mode-hook
+                ess-mode-hook
+	        python-mode-hook
+	        c-mode-hook
+	        c++-mode-hook
+                inferior-ess-mode-hook))
   (add-hook hook '(lambda () (xref-etags-mode))))
 
 ;; highlight-indent-guides-mode, can make emacs slow with large files
@@ -914,11 +907,10 @@
 
 ;; Highlight doxygen mode
 (highlight-doxygen-global-mode 1)
-(dolist (hook (list
-               'c-mode-hook
-               'c++-mode-hook
-               'python-mode-hook
-               'ess-r-mode-hook))
+(dolist (hook '(c-mode-hook
+                c++-mode-hook
+                python-mode-hook
+                ess-r-mode-hook))
   (add-hook hook '(lambda () (highlight-doxygen-mode))))
 
 ;; (add-hook 'prog-mode-hook 'highlight-doxygen-mode)
