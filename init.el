@@ -164,8 +164,6 @@
 (setq fundamental-mode 'text-mode)
 (setq initial-major-mode 'text-mode) ;; text mode in scratch
 (setq major-mode 'text-mode)
-(setq initial-buffer-choice 'ibuffer)
-
 
 ;; Suspend and resume hook
 (add-hook 'suspend-hook
