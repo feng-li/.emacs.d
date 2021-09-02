@@ -585,9 +585,9 @@
               "\\`\\./" "\\`_bookdown_files/" "__pycache__/"))
 
      (setq ido-ignore-buffers
-           '("\\` " "^\\*ESS\\*" "^\\*Messages\\*" "^\\*Help\\*" "^\\*Buffer"
+           '("\\` " "^\\*ESS\\*" "^\\*Messages\\*" "^\\*Help\\*" "^\\*Buffer" "*scratch*"
              "^\\*Ibuffer*" "^\\*ESS-errors*" "^\\*Warnings*" "*TeX Help*"
-             "*Pymacs*" "*Flymake log*" "^\\*.*Completions\\*$" "^\\*Ediff" "^\\*tramp"
+             "*Pymacs*" "*Flymake log*" "\\.log$" "^\\*.*Completions\\*$" "^\\*Ediff" "^\\*tramp"
              "^\\*cvs-" "_region_" "^TAGS$" "^\\*Ido" "^\\*.*dictem buffer\\*$"
              "^\\*inferior-lisp*" "^\\*Compile-Log\\*" "*output*" "^.*output\\*$"))
 
