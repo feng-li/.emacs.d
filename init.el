@@ -28,7 +28,7 @@
 (package-initialize)
 
 ;; Add personal load path recursively in front of the default load path
-(let ((default-directory "~/.emacs.d/site-lisp/"))
+(let ((default-directory (concat user-emacs-directory  "site-lisp")))
   (setq load-path
         (append
          (let ((load-path (copy-sequence load-path))) ;; Shadow
@@ -37,6 +37,9 @@
             (normal-top-level-add-subdirs-to-load-path)))
          load-path)))
 
+;; Add path for auto saved files
+(defvar my-auto-save-list (concat (getenv "HOME") "/.config/.emacs.d/auto-save-list"))
+(unless (file-directory-p my-auto-save-list) (make-directory my-auto-save-list t))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; custom-set-variables
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -330,16 +333,15 @@
   (interactive)
   (insert (format-time-string "%a %b %d %H:%M:%S %Z %Y")))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Desktop and history
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ;; Desktop and history
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Disable backup files (*~)
 (setq make-backup-files nil)
 
 ;; Desktop save mode
-(defvar my-desktop-path (concat "~/.emacs.d/auto-save-list/desktop/" system-name "/"))
-(unless (file-directory-p my-desktop-path) (make-directory my-desktop-path t))
+(defvar my-desktop-path my-auto-save-list)
 (setq desktop-path (list my-desktop-path))
 (setq desktop-dirname my-desktop-path)
 
@@ -350,7 +352,7 @@
 ;; save mini buffer history
 (savehist-mode 1)
 (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring))
-(setq savehist-file (concat "~/.emacs.d/auto-save-list/desktop/" system-name ".savehist-file.el"))
+(setq savehist-file (concat my-desktop-path "/savehist-file.el"))
 
 ;; Add a hook when emacs is closed to we reset the desktop modification time (in this way
 ;; the user does not get a warning message about desktop modifications)
@@ -374,12 +376,12 @@
 (add-to-list 'desktop-modes-not-to-save '(dired-mode Info-mode fundamental-mode))
 
 ;; save-place-mode
-(setq save-place-file (concat "~/.emacs.d/auto-save-list/" system-name ".save-place-file.el"))
+(setq save-place-file (concat my-auto-save-list "/save-place-file.el"))
 
 ;; bookmarks
 ;; every time bookmark is changed, automatically save it
 (setq bookmark-save-flag 1)
-(setq bookmark-default-file "~/.emacs.d/auto-save-list/bookmarks")
+(setq bookmark-default-file (concat my-auto-save-list "/bookmarks"))
 (global-set-key (kbd "<f9> b") 'bookmark-bmenu-list)
 (defun bookmark-current-file ()
   (interactive)
@@ -392,10 +394,8 @@
   '(progn
      (setq session-use-package nil)
      (add-hook 'after-init-hook 'session-initialize)
-
      ;; Save sessions with customization
-     (setq session-save-file (concat "~/.emacs.d/auto-save-list/"  system-name ".session-save-file.el"))
-
+     (setq session-save-file (concat my-auto-save-list "/session-save-file.el"))
      ))
 
 
@@ -571,7 +571,7 @@
      (setq ido-use-virtual-buffers nil)
      (setq ido-enable-flex-matching nil)
      (setq ido-ignore-extensions t)
-     (setq ido-save-directory-list-file (concat "~/.emacs.d/auto-save-list/" system-name ".ido-save-directory-list-file.el"))
+     (setq ido-save-directory-list-file (concat my-auto-save-list "/ido-save-directory-list-file.el"))
      (setq ido-ignore-files ; this also works with directories with c-x c-f
            '("\\.Rc$" "\\.dvi$" "\\.pdf$" "\\.ps$" "\\.out$" "\\.fls$" "\\.spl$" "\\.fff$"
              "\\.ttt$" "\\.log$" "\\.ods$" "\\.eps$" "\\#$" "\\.png$" "\\~$" "\\.RData$"
@@ -722,7 +722,7 @@
 (eval-after-load "info-look"
   '(progn
      (add-to-list
-      'Info-default-directory-list "~/.emacs.d/info")))
+      'Info-default-directory-list (concat user-emacs-directory "info"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Version Control
@@ -739,15 +739,14 @@
 (with-eval-after-load 'info
   (info-initialize)
   (add-to-list 'Info-directory-list
-               "~/.emacs.d/site-lisp/magit/Documentation/")
+               (concat user-emacs-directory "/magit/Documentation/"))
   )
 (setq vc-follow-symlinks nil)
 
 (eval-after-load "magit"
   '(progn
      ;; Save transient file with customization
-     (setq transient-history-file (concat "~/.emacs.d/auto-save-list/"
-                                          system-name ".transient-history-file.el"))
+     (setq transient-history-file (concat my-auto-save-list "/transient-history-file.el"))
 
      ;; magit with-editor support
      (define-key (current-global-map)
@@ -759,6 +758,7 @@
 
      )
   )
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Spelling checking & dictionaries
@@ -778,7 +778,7 @@
          (progn
            (setq ispell-program-name "hunspell")
            (setq ispell-really-hunspell t)
-           (setenv "DICPATH" (concat (getenv "HOME") "/.emacs.d/dicts/hunspell"))
+           (setenv "DICPATH" (concat user-emacs-directory "dicts/hunspell"))
            (setq ispell-local-dictionary "en_US")
            (setq ispell-local-dictionary-alist
                  '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil
@@ -852,7 +852,7 @@
 ;; https://github.com/Dushistov/sdcv
 (eval-after-load "lexic"
   '(progn
-     (setq lexic-dictionary-path "~/.emacs.d/dict/sdcv/")
+     (setq lexic-dictionary-path (concat my-auto-save-list "dict/sdcv/"))
      (setq lexic-dictionary-list
            '(;; "Soule's Dictionary of English Synonyms (En-En)"
              "Merriam-Webster's Collegiate Thesaurus (En-En)"
@@ -1098,9 +1098,11 @@
 	     ("bst" . "kpsewhich -format=.bst %f")))
      ))
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; ESS (Emacs speaks statistics)
+;; ESS (Emacs speaks statistics)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 
 (add-to-list 'auto-mode-alist '("\\.Rmd" . poly-markdown+r-mode))
 
