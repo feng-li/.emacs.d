@@ -21,7 +21,6 @@
 %% BibTeX
 \usepackage[style=authoryear-comp, backend=biber, natbib=true]{biblatex}
 \addbibresource{references-feng.bib}
-\usepackage{longtable,booktabs}
 
 \usepackage[unicode=true]{hyperref}
 \hypersetup{
@@ -31,6 +30,7 @@
   urlcolor=blue}
 
 %% Table numbering
+\usepackage{longtable,booktabs}
 \renewcommand{\thetable}{S.\arabic{table}}
 \renewcommand{\thefigure}{S.\arabic{figure}}
 
@@ -44,13 +44,13 @@
 % \preauthor{\\}
 % \postauthor{}
 \usepackage{enumitem}
-\setlist[enumerate,itemize]{listparindent=\parindent}% Indented paragraphs within lists
+\setlist[enumerate,itemize]{listparindent=\parindent,leftmargin=0pt}% Indented paragraphs within lists
 \setlength{\itemsep}{0.0pt}
 
 \begin{document}
-\title{\bf\Large Authors' Responses to the Editor and Reviewers Comments \\\emph{for}
+\title{\bf\Large Authors' Responses to the Editor and Reviewers' Comments \\\emph{for}
   \\`` XXX ''}
-\author{ XXX }
+\author{ }
 \date{}
 \maketitle
 

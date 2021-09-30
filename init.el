@@ -852,7 +852,7 @@
 ;; https://github.com/Dushistov/sdcv
 (eval-after-load "lexic"
   '(progn
-     (setq lexic-dictionary-path (concat my-auto-save-list "dict/sdcv/"))
+     (setq lexic-dictionary-path (concat user-emacs-directory "dict/sdcv/"))
      (setq lexic-dictionary-list
            '(;; "Soule's Dictionary of English Synonyms (En-En)"
              "Merriam-Webster's Collegiate Thesaurus (En-En)"
