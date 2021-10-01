@@ -398,7 +398,8 @@
      (setq session-save-file (concat my-auto-save-list "/session-save-file.el"))
      ))
 
-
+;; Eshell
+(setq eshell-directory-name (concat my-auto-save-list "/eshell"))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Hide and Show code blocks
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
