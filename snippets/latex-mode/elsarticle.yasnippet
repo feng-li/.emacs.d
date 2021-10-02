@@ -4,7 +4,7 @@
 # group: skeleton
 # name: \documentclass{elsarticle} ...
 # --
-\documentclass[a4paper,review,11pt,authoryear]{elsarticle}
+\documentclass[a4paper,review,11pt,nonatbib]{elsarticle}
 \journal{arXiv}
 
 \usepackage[utf8]{inputenc}
@@ -22,11 +22,16 @@
 \usepackage{xurl}
 
 %% BibLaTeX
-\usepackage[style=authoryear-comp, backend=biber, natbib=true, maxcitenames=2, maxbibnames=99]{biblatex}
+% BUGFIX in elsarticle. Unload natbib from elsarticle with
+% \documentclass[nonatbib]{elsarticle}.
+\makeatletter
+\let\c@author\relax
+\makeatother
+% Then load BibLaTeX as usual
+\usepackage[style=authoryear-comp, backend=biber, uniquename=false, maxnames=9, maxcitenames=2, natbib=true]{biblatex}
 \addbibresource{references-feng.bib}
+
 \usepackage{longtable,booktabs}
-
-
 \usepackage{algorithm}
 \usepackage{algorithmicx}
 \usepackage{algpseudocode}
@@ -47,8 +52,6 @@
 
 %% Reduce Bibliography space
 \usepackage{enumitem}
-\setlength{\bibsep}{0.0pt}
-\setlength{\itemsep}{0.0pt}
 
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}[theorem]{Lemma}
