@@ -726,14 +726,11 @@
       'Info-default-directory-list (concat user-emacs-directory "info"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Version Control
+;; Version Control and Diff
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; ediff
-(setq ediff-window-setup-function 'ediff-setup-windows-plain)
-(setq ediff-split-window-function 'split-window-horizontally)
-(setq-default ediff-ignore-similar-regions t)
-
+(setq ediff-ignore-similar-regions t)
 
 (setq vc-handled-backends ()) ;; Disable vc-git and use magit
 (vc-mode -1)
@@ -1273,6 +1270,10 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(company-tooltip ((t (:background "dim gray" :foreground "light gray"))))
+ '(ediff-even-diff-A ((t (:extend t :background "grey20"))))
+ '(ediff-even-diff-B ((t (:extend t (:inherit ediff-even-diff-A)))))
+ '(ediff-odd-diff-A ((t (:extend t :background "grey40"))))
+ '(ediff-odd-diff-B ((t (:extend t (:inherit ediff-odd-diff-A)))))
  '(font-latex-math-face ((t (:foreground "dark orange"))))
  '(font-latex-sectioning-5-face ((t (:foreground "deep sky blue" :weight bold))))
  '(font-latex-sedate-face ((t (:foreground "dark magenta"))))
