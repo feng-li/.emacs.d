@@ -854,7 +854,7 @@
      (setq lexic-dictionary-list
            '(;; "Soule's Dictionary of English Synonyms (En-En)"
              "Merriam-Webster's Collegiate Thesaurus (En-En)"
-             ;; "Merriam-Webster's Advanced Learner's Dictionary (En-En)"
+             "Merriam-Webster's Advanced Learner's Dictionary (En-En)"
              "Longman Dictionary of Common Errors (En-En)"))
      (global-set-key (kbd "<f9> d") 'lexic-search)
      ))
