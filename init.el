@@ -27,15 +27,17 @@
        ))
 (package-initialize)
 
-;; Add personal load path recursively in front of the default load path
-(let ((default-directory (concat user-emacs-directory  "site-lisp")))
-  (setq load-path
-        (append
-         (let ((load-path (copy-sequence load-path))) ;; Shadow
-           (append
-            (copy-sequence (normal-top-level-add-to-load-path '(".")))
-            (normal-top-level-add-subdirs-to-load-path)))
-         load-path)))
+;; Add personal load path recursively in front of the default load path if it exists.
+(defvar my-site-lisp (concat user-emacs-directory "site-lisp"))
+(if (file-directory-p my-site-lisp)
+    (let ((default-directory my-site-lisp))
+      (setq load-path
+            (append
+             (let ((load-path (copy-sequence load-path))) ;; Shadow
+               (append
+                (copy-sequence (normal-top-level-add-to-load-path '(".")))
+                (normal-top-level-add-subdirs-to-load-path)))
+             load-path))))
 
 ;; Add path for auto saved files
 (defvar my-auto-save-list (concat (getenv "HOME") "/.config/.emacs.d/auto-save-list"))
@@ -1279,7 +1281,7 @@
  '(font-latex-sedate-face ((t (:foreground "dark magenta"))))
  '(font-lock-function-name-face ((t (:foreground "deep sky blue" :weight normal))))
  '(highlight-doxygen-comment ((t (:inherit highlight))))
- '(line-number ((t (:inherit t :background nil))))
+ '(line-number ((t (:inherit t :background "color-234"))))
  '(line-number-current-line ((t (:inherit secondary-selection :slant italic))))
  '(neo-dir-link-face ((t (:inherit font-lock-function-name-face))))
  '(region ((t (:background "dim gray" :foreground "light gray")))))
