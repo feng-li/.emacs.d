@@ -47,6 +47,9 @@
 \setlist[enumerate,itemize]{listparindent=\parindent,leftmargin=0pt}% Indented paragraphs within lists
 \setlength{\itemsep}{0.0pt}
 
+%% Reply Environment: \RE[]{} -> blue text, \RE{} -> Re: blue text
+\newcommand{\RE}[2][Re:~]{{\color{blue}\textbf{#1}#2}}
+
 \begin{document}
 \title{\bf\Large Authors' Responses to the Editor and Reviewers' Comments \\\emph{for}
   \\`` XXX ''}

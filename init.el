@@ -648,6 +648,7 @@
   '(progn
      (add-hook 'after-init-hook 'global-company-mode)
      (setq company-minimum-prefix-length 1)
+     (setq company-dabbrev-downcase nil)
 
      ;; Add yasnippet support for all company backends
      ;; https://github.com/syl20bnr/spacemacs/pull/179
