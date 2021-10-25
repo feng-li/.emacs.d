@@ -999,6 +999,7 @@
        (interactive)
        (TeX-save-document (TeX-master-file))
        (TeX-command "LatexMkPvc" 'TeX-master-file -1))
+
      (add-hook 'LaTeX-mode-hook
                '(lambda ()
                   (local-set-key (kbd "<f5>") 'TeX-command-run-all)
@@ -1284,8 +1285,10 @@
  '(highlight-doxygen-comment ((t (:inherit highlight))))
  '(line-number ((t (:inherit t :background "color-234"))))
  '(line-number-current-line ((t (:inherit secondary-selection :slant italic))))
+ '(menu ((t (:inherit mode-line))))
  '(neo-dir-link-face ((t (:inherit font-lock-function-name-face))))
- '(region ((t (:background "dim gray" :foreground "light gray")))))
+ '(region ((t (:background "dim gray" :foreground "light gray"))))
+ '(tty-menu-enabled-face ((t (:background "brightblack" :foreground "white" :weight bold)))))
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
 (provide '.emacs)
