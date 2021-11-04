@@ -294,7 +294,7 @@
 (setq ring-bell-function (lambda ()  t))
 
 ;; Disable capitalize-key, conflict with tmux prefix ESC.
-(global-unset-key (kbd "M-c"))
+;; (global-unset-key (kbd "M-c"))
 ;; Kill the current buffer, without confirmation.
 ;; Kill buffer without conformation
 (global-set-key (kbd "C-x k") 'kill-current-buffer)
@@ -1036,17 +1036,11 @@
 
      ;; Add short cuts, hold Windows key
      (defun auctex-insert-special ()
-       (local-set-key (kbd "<f9> (") (lambda () (interactive) (insert "\\left( ")))
-       (local-set-key (kbd "<f9> )") (lambda () (interactive) (insert "\\right)")))
-
-       (local-set-key (kbd "<f9> [") (lambda () (interactive) (insert "\\left[ ")))
-       (local-set-key (kbd "<f9> ]") (lambda () (interactive) (insert "\\right]")))
-
-       (local-set-key (kbd "<f9> {") (lambda () (interactive) (insert "\\left\\{ ")))
-       (local-set-key (kbd "<f9> }") (lambda () (interactive) (insert "\\right\\}")))
-
+       (local-set-key (kbd "<f9> (") (lambda () (interactive) (insert "\\left( \\right)")))
+       (local-set-key (kbd "<f9> [") (lambda () (interactive) (insert "\\left[ \\right]")))
+       (local-set-key (kbd "<f9> {") (lambda () (interactive) (insert "\\left\\{ \\right\\}")))
        (local-set-key (kbd "<f9> |") (lambda () (interactive) (insert "\\left| \\right|")))
-       (local-set-key (kbd "C-\\") (lambda () (interactive) (insert "\\")))
+       (local-set-key "\$" 'skeleton-pair-insert-maybe)
 
        ;; Use \bm{} to repace \mathbf{}
        (fset 'my-insert-bold-math
