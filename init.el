@@ -19,11 +19,14 @@
 ;;         ("http" . "127.0.0.1:41091")
 ;;         ("https" . "127.0.0.1:41091")))
 (require 'package)
-(setq package-archives '
-      (
-       ;; ("melpa" . "https://melpa.org/packages/")
-       ("gnu-elpa-cn"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
-       ("melpa-cn" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
+(setq package-archives
+      '(
+        ("melpa" . "https://melpa.org/packages/")
+        ("elpa" . "https://elpa.gnu.org/packages/")
+       ;; ("gnu-elpa-cn"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
+       ;; ("melpa-cn" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
+       ("gnu-elpa-cn"   . "http://mirrors.cloud.tencent.com/elpa/gnu/")
+       ("melpa-cn" . "http://mirrors.cloud.tencent.com/elpa/melpa/")
        ))
 (package-initialize)
 
