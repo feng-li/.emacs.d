@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: \PassOptionsToPackage{draft}{graphicx}
+# key: draft
+# --
+\PassOptionsToPackage{draft}{graphicx} % comment out this for compiling the final version
