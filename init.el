@@ -18,6 +18,10 @@
 ;;       '(("no_proxy" . "^\\(localhost\\|10.*\\)")
 ;;         ("http" . "127.0.0.1:41091")
 ;;         ("https" . "127.0.0.1:41091")))
+;; Add path for auto saved files
+(defvar my-auto-save-list (concat (getenv "HOME") "/.config/.emacs.d/auto-save-list"))
+(unless (file-directory-p my-auto-save-list) (make-directory my-auto-save-list t))
+
 (require 'package)
 (setq package-archives
       '(
@@ -28,6 +32,7 @@
        ("gnu-elpa-cn"   . "http://mirrors.cloud.tencent.com/elpa/gnu/")
        ("melpa-cn" . "http://mirrors.cloud.tencent.com/elpa/melpa/")
        ))
+(setq package-user-dir (concat my-auto-save-list "/elpa"))
 (package-initialize)
 
 ;; Add personal load path recursively in front of the default load path if it exists.
@@ -42,9 +47,6 @@
                 (normal-top-level-add-subdirs-to-load-path)))
              load-path))))
 
-;; Add path for auto saved files
-(defvar my-auto-save-list (concat (getenv "HOME") "/.config/.emacs.d/auto-save-list"))
-(unless (file-directory-p my-auto-save-list) (make-directory my-auto-save-list t))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; custom-set-variables
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -963,7 +965,11 @@
                      LaTeX-mode-hook
                      org-mode-hook
                      markdown-mode-hook))
-       (add-hook hook (lambda () (pandoc-mode))))))
+       (add-hook hook (lambda () (pandoc-mode))))
+     (add-hook 'pandoc-mode-hook
+               (lambda ()
+                 (local-set-key (kbd "C-c p") 'pandoc-main-hydra/body)))
+     ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Org-mode
