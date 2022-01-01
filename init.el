@@ -153,6 +153,9 @@
 (setenv "OMP_NUM_THREADS" "1")
 (setenv "PATH" (concat (concat (getenv "HOME") "/.local/bin:") (getenv "PATH")))
 
+;; Auto-save list file prefix
+(setq auto-save-list-file-prefix (concat my-auto-save-list "/.saves-"))
+
 ;; Term
 (add-to-list 'term-file-aliases '("dumb" . "xterm-256color"))
 ;; Allow shift-arrow keys and control-arrow keys under different tty
