@@ -992,6 +992,18 @@
 ;; LaTeX
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; BibTeX
+(setq bibtex-align-at-equal-sign t)
+(defun bibtex-mode-setup ()
+  (setq-local fill-prefix ""))
+(add-hook 'bibtex-mode-hook #'bibtex-mode-setup)
+
+(defun bibtex-reset-fill-prefix (orig-func &rest args)
+  (let ((fill-prefix (make-string (1+ bibtex-text-indentation) ? )))
+    (apply orig-func args)))
+(advice-add 'bibtex-clean-entry :around #'bibtex-reset-fill-prefix)
+
+
 (eval-after-load "auctex.el"
   '(progn
      ;; LaTeX AUCTex features
