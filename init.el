@@ -999,16 +999,20 @@
 
 ;; BibTeX
 (setq bibtex-align-at-equal-sign t)
+(setq bibtex-maintain-sorted-entries t)
 (defun bibtex-mode-setup ()
   (setq-local fill-prefix ""))
 (add-hook 'bibtex-mode-hook #'bibtex-mode-setup)
+(add-hook 'bibtex-mode-hook
+          '(lambda ()
+             (local-set-key (kbd "C-M-\\") 'bibtex-reformat)))
 
 (defun bibtex-reset-fill-prefix (orig-func &rest args)
   (let ((fill-prefix (make-string (1+ bibtex-text-indentation) ? )))
     (apply orig-func args)))
 (advice-add 'bibtex-clean-entry :around #'bibtex-reset-fill-prefix)
 
-
+;; AUCTEX
 (eval-after-load "auctex.el"
   '(progn
      ;; LaTeX AUCTex features
@@ -1068,7 +1072,6 @@
 
      (setq TeX-source-correlate-method (quote source-specials)) ; only for dvi
      (setq TeX-source-correlate-method (quote synctex)) ;only for evince
-     (setq bibtex-maintain-sorted-entries t)
 
      ;; Add short cuts, hold Windows key
      (defun auctex-insert-special ()
