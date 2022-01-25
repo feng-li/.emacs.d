@@ -165,16 +165,16 @@
   (define-key input-decode-map "\e[1;2A" [S-up]))
 
 ;; Theme
-(defun on-after-init ()
-  (unless (display-graphic-p (selected-frame))
-    (set-face-background 'default "unspecified-bg" (selected-frame))))
-(add-hook 'window-setup-hook 'on-after-init)
+;; (defun on-after-init ()
+;;   (unless (display-graphic-p (selected-frame))
+;;     (set-face-background 'default "unspecified-bg" (selected-frame))))
+;; (add-hook 'window-setup-hook 'on-after-init)
 
-;; (setq dracula-use-24-bit-colors-on-256-colors-terms t)
-;; (unless (display-graphic-p)
-;;   (set-face-background 'default "black" nil)
-;;   )
-;; (load-theme 'dracula t)
+(unless (display-graphic-p)
+  (set-face-background 'default "unspecified-bg" nil)
+  )
+(setq dracula-use-24-bit-colors-on-256-colors-terms t)
+(load-theme 'dracula t)
 
 ;; The scratch settings
 (setq initial-scratch-message nil) ;; Disable scratch information
@@ -1035,12 +1035,16 @@
      (add-hook 'LaTeX-mode-hook
                '(lambda ()
                   (local-set-key (kbd "<f5>") 'TeX-command-run-all)
+
+                  ;; Clean all intermediate files, like 'latexmk -c'
+                  (local-unset-key (kbd "C-c C-k"))
+                  (local-set-key (kbd "C-c C-k") (lambda () (interactive) (TeX-clean t)))
                   ))
 
      ;; Replace LaTeX with latexmk -pvc
      (setcdr (assoc "LaTeX" TeX-command-list)
              '("latexmk -pvc -pv- %(-PDF)%S%(mode) %(file-line-error) %(extraopts) %t" TeX-run-latexmk-pvc nil
-               :help "Run LaTeX with LatexMKPvc"))
+               :help "Run LaTeX with `latexmk -pvc`"))
 
      ;; Translate key § to ` so both can be used as a math abbreviation
      ;; Drawback, could not type § anymore. Make it locally?
@@ -1307,14 +1311,15 @@
  '(font-latex-math-face ((t (:foreground "dark orange"))))
  '(font-latex-sectioning-5-face ((t (:foreground "deep sky blue" :weight bold))))
  '(font-latex-sedate-face ((t (:foreground "dark magenta"))))
+ ;; '(font-lock-comment-face ((t (:foreground "color-27" :slant italic))))
  '(font-lock-function-name-face ((t (:foreground "deep sky blue" :weight normal))))
  '(highlight-doxygen-comment ((t (:inherit highlight))))
-; '(line-number ((t (:inherit t :background "dim gray"))))
- '(line-number-current-line ((t (:inherit secondary-selection :slant italic))))
- ;; '(menu ((t (:inherit mode-line))))
+ '(line-number ((t (:inherit t :background "unspecified-bg"))))
+ '(line-number-current-line ((t (:background "light gray" :slant italic))))
+ '(menu ((t (:inherit t :background "dim gray"))))
+ '(minibuffer-prompt ((t (:foreground "red"))))
  '(mode-line ((t (:inherit :background "#373844"))))
  '(mode-line-inactive ((t (:inherit t :background "dim gray"))))
- '(menu ((t (:inherit t :background "dim gray"))))
  '(neo-dir-link-face ((t (:inherit font-lock-function-name-face))))
  '(region ((t (:background "dim gray" :foreground "light gray"))))
  '(tty-menu-enabled-face ((t (:background "brightblack" :foreground "white" :weight bold)))))
