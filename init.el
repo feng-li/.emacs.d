@@ -165,11 +165,16 @@
   (define-key input-decode-map "\e[1;2A" [S-up]))
 
 ;; Theme
-(setq dracula-use-24-bit-colors-on-256-colors-terms t)
-(unless (display-graphic-p)
-  (set-face-background 'default "black" nil)
-  )
-(load-theme 'dracula t)
+(defun on-after-init ()
+  (unless (display-graphic-p (selected-frame))
+    (set-face-background 'default "unspecified-bg" (selected-frame))))
+(add-hook 'window-setup-hook 'on-after-init)
+
+;; (setq dracula-use-24-bit-colors-on-256-colors-terms t)
+;; (unless (display-graphic-p)
+;;   (set-face-background 'default "black" nil)
+;;   )
+;; (load-theme 'dracula t)
 
 ;; The scratch settings
 (setq initial-scratch-message nil) ;; Disable scratch information
@@ -1304,7 +1309,7 @@
  '(font-latex-sedate-face ((t (:foreground "dark magenta"))))
  '(font-lock-function-name-face ((t (:foreground "deep sky blue" :weight normal))))
  '(highlight-doxygen-comment ((t (:inherit highlight))))
- '(line-number ((t (:inherit t :background "color-234"))))
+; '(line-number ((t (:inherit t :background "dim gray"))))
  '(line-number-current-line ((t (:inherit secondary-selection :slant italic))))
  ;; '(menu ((t (:inherit mode-line))))
  '(mode-line ((t (:inherit :background "#373844"))))
