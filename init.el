@@ -431,6 +431,14 @@
 
 
 ;; Electric operators
+(electric-pair-mode t)
+;; (setq skeleton-pair t)
+;; (global-set-key "(" 'skeleton-pair-insert-maybe)
+;; (global-set-key "[" 'skeleton-pair-insert-maybe)
+;; (global-set-key "{" 'skeleton-pair-insert-maybe)
+;; (global-set-key "\"" 'skeleton-pair-insert-maybe)
+;; (global-set-key "\'" 'skeleton-pair-insert-maybe)
+
 (dolist (hook '(python-mode-hook
                 c-mode-hook
                 c++-mode-hook
@@ -728,13 +736,6 @@
 (show-paren-mode t)
 ;; (setq show-paren-style 'expression) ;; highlight whole block
 
-(setq skeleton-pair t)
-(global-set-key "(" 'skeleton-pair-insert-maybe)
-(global-set-key "[" 'skeleton-pair-insert-maybe)
-(global-set-key "{" 'skeleton-pair-insert-maybe)
-(global-set-key "\"" 'skeleton-pair-insert-maybe)
-(global-set-key "\'" 'skeleton-pair-insert-maybe)
-
 ;; Commenting
 (global-set-key (kbd "M-3") 'comment-or-uncomment-region)
 
@@ -1015,11 +1016,18 @@
 ;; AUCTEX
 (eval-after-load "auctex.el"
   '(progn
+
+     (setq TeX-save-query  nil )
+
      ;; LaTeX AUCTex features
      (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
      (setq LaTeX-math-menu-unicode t)
 
+     ;; Special Environment
      (setq LaTeX-document-regexp "document\\|refsection\\|frontmatter")
+     ;; Add listings to verbatim environments
+     (eval-after-load "latex"
+       '(add-to-list 'LaTeX-verbatim-environments "lstlisting"))
 
      ;; Set default TeX engine
      (setq TeX-PDF-mode t)
@@ -1038,11 +1046,23 @@
 
      (add-hook 'LaTeX-mode-hook
                '(lambda ()
-                  (local-set-key (kbd "<f5>") 'TeX-command-run-all)
 
+                  (TeX-fold-mode 1)
                   ;; Clean all intermediate files, like 'latexmk -c'
                   (local-unset-key (kbd "C-c C-k"))
                   (local-set-key (kbd "C-c C-k") (lambda () (interactive) (TeX-clean t)))
+                  (local-set-key (kbd "<f5>") 'TeX-command-run-all)
+
+                  (local-set-key (kbd "<f9> (") (lambda () (interactive) (insert "\\left( \\right)")))
+                  (local-set-key (kbd "<f9> [") (lambda () (interactive) (insert "\\left[ \\right]")))
+                  (local-set-key (kbd "<f9> {") (lambda () (interactive) (insert "\\left\\{ \\right\\}")))
+                  (local-set-key (kbd "<f9> |") (lambda () (interactive) (insert "\\left| \\right|")))
+                  (local-set-key "\$" 'skeleton-pair-insert-maybe)
+
+                  ;; Use \bm{} to repace \mathbf{}
+                  (fset 'my-insert-bold-math
+                        [?\C-w ?\\ ?b ?m ?\{ ?\C-y ?\} right])
+                  (local-set-key (kbd "C-c C-x C-b") 'my-insert-bold-math)
                   ))
 
      ;; Replace LaTeX with latexmk -pvc
@@ -1060,11 +1080,7 @@
 
      (setq TeX-source-correlate-mode  t)
      (setq TeX-source-correlate-start-server nil)
-
-     ;; Add listings to verbatim environments
-     (eval-after-load "latex"
-       '(add-to-list 'LaTeX-verbatim-environments "lstlisting"))
-
+     (setq TeX-debug-warnings t)
 
      ;; Parse on load/save
      (setq TeX-parse-self t)
@@ -1072,27 +1088,6 @@
 
      (setq TeX-source-correlate-method (quote source-specials)) ; only for dvi
      (setq TeX-source-correlate-method (quote synctex)) ;only for evince
-
-     ;; Add short cuts, hold Windows key
-     (defun auctex-insert-special ()
-       (local-set-key (kbd "<f9> (") (lambda () (interactive) (insert "\\left( \\right)")))
-       (local-set-key (kbd "<f9> [") (lambda () (interactive) (insert "\\left[ \\right]")))
-       (local-set-key (kbd "<f9> {") (lambda () (interactive) (insert "\\left\\{ \\right\\}")))
-       (local-set-key (kbd "<f9> |") (lambda () (interactive) (insert "\\left| \\right|")))
-       (local-set-key "\$" 'skeleton-pair-insert-maybe)
-
-       ;; Use \bm{} to repace \mathbf{}
-       (fset 'my-insert-bold-math
-             [?\C-w ?\\ ?b ?m ?\{ ?\C-y ?\} right])
-       (local-set-key (kbd "C-c C-x C-b") 'my-insert-bold-math))
-
-     (add-hook 'LaTeX-mode-hook 'auctex-insert-special)
-
-     ;; Enable file-line-error to avoid error message "Error occured after last TeX file closed" ; now is default for 11.89
-     ;; (setq LaTeX-command-style (quote (("" "%(PDF)%(latex) -file-line-error %S%(PDFout)"))))
-
-     (add-hook 'LaTeX-mode-hook (lambda () (TeX-fold-mode 1)))
-     (setq TeX-save-query  nil )
 
      ;; RefTeX
      (setq reftex-plug-into-AUCTeX t)
