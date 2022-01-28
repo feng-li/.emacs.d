@@ -165,15 +165,15 @@
   (define-key input-decode-map "\e[1;2A" [S-up]))
 
 ;; Theme
-;; (defun on-after-init ()
-;;   (unless (display-graphic-p (selected-frame))
-;;     (set-face-background 'default "unspecified-bg" (selected-frame))))
-;; (add-hook 'window-setup-hook 'on-after-init)
+(defun on-after-init ()
+  (unless (display-graphic-p (selected-frame))
+    (set-face-background 'default "unspecified-bg" (selected-frame))))
+(add-hook 'window-setup-hook 'on-after-init)
 
-(unless (display-graphic-p)
-  (set-face-background 'default "unspecified-bg" nil)
-  )
-(setq dracula-use-24-bit-colors-on-256-colors-terms t)
+;; (setq dracula-use-24-bit-colors-on-256-colors-terms t)
+;; (unless (display-graphic-p)
+;;   (set-face-background 'default "black" nil)
+;;   )
 (load-theme 'dracula t)
 
 ;; The scratch settings
@@ -594,7 +594,7 @@
              "\\.nav$" "\\.snm$" "\\`\\.\\./" "\\`\\./" "\\.synctex.gz$" "\\.fdb_latexmk$"
              "\\.tar.gz$" "\\.zip$" "\\.o$" "\\.tar$" "\\.Rproj$" "\\.Rcheck$" "\\.doc$"
              "\\.docx$" "\\.Rhistory$" "auto/" "__pycache__/" "\\.bcf$" "\\.run.xml$" "_region_.tex$"
-             "\\.xdv$" "\\.DS_Store$" "\\.cfg$" "\\.bak$" "\\.gitignore"))
+             "\\.xdv$" "\\.DS_Store$" "\\.cfg$" "\\.bak$" "\\.gitignore" "\\.tmp$"))
 
      (setq  ido-ignore-directories ; only works with ido-dired
             '("\\`auto/" "\\.prv/" "\\`CVS/" "\\`.git/" "\\`.ropeproject/" "\\`\\.\\./"
@@ -1298,6 +1298,20 @@
      )
   )
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; SCALA IDE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(eval-after-load "scala-mode"
+  '(progn
+
+     (add-hook 'scala-mode-hook
+               (lambda ()
+                 (ammonite-term-repl-minor-mode t)))
+
+     ))
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customize faces
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1318,13 +1332,15 @@
  '(highlight-doxygen-comment ((t (:inherit highlight))))
  '(line-number ((t (:inherit t :background "unspecified-bg"))))
  '(line-number-current-line ((t (:background "light gray" :slant italic))))
- '(menu ((t (:inherit t :background "dim gray"))))
+ ;;'(menu ((t (:inherit t :background "dim gray"))))
  '(minibuffer-prompt ((t (:foreground "red"))))
- '(mode-line ((t (:inherit :background "#373844"))))
- '(mode-line-inactive ((t (:inherit t :background "dim gray"))))
- '(neo-dir-link-face ((t (:inherit font-lock-function-name-face))))
+ '(mode-line ((t (:inherit :background "black"))))
+ '(menu ((t (:inherit t :background "dim gray"))))
+ ;; '(mode-line-inactive ((t (:inherit t :background "dim gray"))))
+ ;; '(mode-line-inactive ((t (:inherit menu))))
+ '(neo-dir-link-face ((t (:inherit t :background font-lock-function-name-face))))
  '(region ((t (:background "dim gray" :foreground "light gray"))))
- '(tty-menu-enabled-face ((t (:background "brightblack" :foreground "white" :weight bold)))))
+ '(tty-menu-enabled-face ((t (:background "dim gray" :foreground "white" :weight bold)))))
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
 (provide '.emacs)
