@@ -14,10 +14,11 @@
 ;; semicolon to the start of the line.  You may delete these explanatory comments.  Add
 ;; MELPA repository
 ;;; Code:
-;; (setq url-proxy-services
-;;       '(("no_proxy" . "^\\(localhost\\|10.*\\)")
-;;         ("http" . "127.0.0.1:41091")
-;;         ("https" . "127.0.0.1:41091")))
+
+(setq url-proxy-services
+   '(("no_proxy" . "^\\(localhost\\|10\\..*\\|192\\.168\\..*\\)")
+     ("http" . "127.0.0.1:41091")
+     ("https" . "127.0.0.1:41091")))
 ;; Add path for auto saved files
 (defvar my-auto-save-list (concat (getenv "HOME") "/.config/.emacs.d/auto-save-list"))
 (unless (file-directory-p my-auto-save-list) (make-directory my-auto-save-list t))
@@ -88,7 +89,7 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(sbt-mode ammonite-term-repl scala-mode lexic pandoc-mode wordnut synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode auctex-latexmk neotree flycheck-grammarly format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists langtool polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
+   '(keytar lsp-grammarly gnu-elpa-keyring-update lsp-ui lsp-metals use-package lsp-mode sbt-mode ammonite-term-repl scala-mode lexic pandoc-mode wordnut synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode auctex-latexmk neotree format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
  '(scroll-conservatively 1)
@@ -104,6 +105,14 @@
 
 ;; Additional library loaded during start up.
 ;; (setq tramp-ssh-controlmaster-options nil)
+(require 'use-package)
+;; Enable defer and ensure by default for use-package
+;; Keep auto-save/backup files separate from source code:  https://github.com/scalameta/metals/issues/1027
+(setq use-package-always-defer t
+      use-package-always-ensure t
+      backup-directory-alist `((".*" . ,temporary-file-directory))
+      auto-save-file-name-transforms `((".*" ,temporary-file-directory t)))
+
 (require 'iso-transl) ;; keyboard input definitions for ISO 8859/1
 (require 'session)
 (require 'dired-x)
@@ -116,7 +125,6 @@
 ;(require 'poly-R)
 ;(require 'poly-markdown)
 (require 'flycheck)
-(require 'flycheck-grammarly)
 (require 'company)
 (require 'ess-site)
 (require 'julia-mode)
@@ -328,6 +336,7 @@
 (global-set-key (kbd "<f9> q") 'fill-region-as-paragraph)
 (global-set-key (kbd "<f9> TAB") 'indent-relative)
 (global-set-key (kbd "<f2>") 'next-multiframe-window) ;; Circulate among windows
+(global-set-key (kbd "C-x o") 'next-window-any-frame) ;; Circulate among windows
 ;; Follow mode (dual pages display)
 (global-set-key (kbd "C-<f2>")  'follow-delete-other-windows-and-split)
 ;; Control-tab to switch among buffers
@@ -815,6 +824,10 @@
 
 ;; FlyCheck
 ;; (add-hook 'after-init-hook #'global-flycheck-mode)
+;; Enable nice rendering of diagnostics like compile errors.
+;; (use-package flycheck
+;;   :init (global-flycheck-mode))
+
 (eval-after-load "synosaurus"
   '(progn
      (dolist (hook '(text-mode-hook
@@ -1295,17 +1308,91 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Language server mode
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(use-package lsp-mode
+  ;; Optional - enable lsp-mode automatically in scala files
+  :hook  (scala-mode . lsp)
+         (lsp-mode . lsp-lens-mode)
+  :config
+  ;; Uncomment following section if you would like to tune lsp-mode performance according to
+  ;; https://emacs-lsp.github.io/lsp-mode/page/performance/
+  ;;       (setq gc-cons-threshold 100000000) ;; 100mb
+  ;;       (setq read-process-output-max (* 1024 1024)) ;; 1mb
+  ;;       (setq lsp-idle-delay 0.500)
+  ;;       (setq lsp-log-io nil)
+  ;;       (setq lsp-completion-provider :capf)
+  (setq lsp-server-install-dir (concat my-auto-save-list "/lsp"))
+  (setq lsp-verify-signature nil) ;; Disable to get metals server (key expired) working
+  (setq lsp-prefer-flymake nil)
+  (setq lsp-headerline-breadcrumb-enable nil)
+  )
+
+;; Add metals backend for lsp-mode
+(use-package lsp-metals
+  :ensure t
+  :custom
+  ;; Metals claims to support range formatting by default but it supports range
+  ;; formatting of multiline strings only. You might want to disable it so that
+  ;; emacs can use indentation provided by scala-mode.
+  (lsp-metals-server-args '("-J-Dmetals.allow-multiline-string-formatting=off"))
+  :hook (scala-mode . lsp))
+;; Enable nice rendering of documentation on hover
+;;   Warning: on some systems this package can reduce your emacs responsiveness significally.
+;;   (See: https://emacs-lsp.github.io/lsp-mode/page/performance/)
+;;   In that case you have to not only disable this but also remove from the packages since
+;;   lsp-mode can activate it automatically.
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; SCALA IDE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(eval-after-load "scala-mode"
-  '(progn
 
-     (add-hook 'scala-mode-hook
-               (lambda ()
-                 (ammonite-term-repl-minor-mode t)))
+;; Enable scala-mode for highlighting, indentation and motion commands
+(use-package scala-mode
+  :interpreter
+    ("scala" . scala-mode))
 
-     ))
+;; Enable sbt mode for executing sbt commands
+(use-package sbt-mode
+  :commands sbt-start sbt-command
+  :config
+  ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
+  ;; allows using SPACE when in the minibuffer
+  (substitute-key-definition
+   'minibuffer-complete-word
+   'self-insert-command
+   minibuffer-local-completion-map)
+   ;; sbt-supershell kills sbt-mode:  https://github.com/hvesalai/emacs-sbt-mode/issues/152
+   (setq sbt:program-options '("-Dsbt.supershell=false"))
+)
 
+(use-package lsp-grammarly
+  :ensure t
+  :hook (text-mode . (lambda ()
+                       (require 'lsp-grammarly)
+                       (lsp))))  ; or lsp-deferred
+
+;; (use-package lsp-ltex
+;;   :ensure t
+;;   :hook (text-mode . (lambda ()
+;;                        (require 'lsp-ltex)
+;;                        (lsp))))  ; or lsp-deferred
+
+;; Use company-capf as a completion provider.
+(use-package company
+  :hook (scala-mode . company-mode)
+  :config
+  (setq lsp-completion-provider :capf))
+
+;; Use the Debug Adapter Protocol for running tests and debugging
+(use-package posframe
+  ;; Posframe is a pop-up tool that must be manually installed for dap-mode
+  )
+(use-package dap-mode
+  :hook
+  (lsp-mode . dap-mode)
+  (lsp-mode . dap-ui-mode)
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customize faces
@@ -1327,12 +1414,9 @@
  '(highlight-doxygen-comment ((t (:inherit highlight))))
  '(line-number ((t (:inherit t :background "unspecified-bg"))))
  '(line-number-current-line ((t (:background "light gray" :slant italic))))
- ;;'(menu ((t (:inherit t :background "dim gray"))))
+ '(menu ((t (:inherit t :background "dim gray"))))
  '(minibuffer-prompt ((t (:foreground "red"))))
  '(mode-line ((t (:inherit :background "black"))))
- '(menu ((t (:inherit t :background "dim gray"))))
- ;; '(mode-line-inactive ((t (:inherit t :background "dim gray"))))
- ;; '(mode-line-inactive ((t (:inherit menu))))
  '(neo-dir-link-face ((t (:inherit t :background font-lock-function-name-face))))
  '(region ((t (:background "dim gray" :foreground "light gray"))))
  '(tty-menu-enabled-face ((t (:background "dim gray" :foreground "white" :weight bold)))))
