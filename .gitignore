@@ -27,3 +27,6 @@ site-lisp/local/
 transient/
 .cask/
 ido.last
+.cache/**
+.dap*
+.lsp*
