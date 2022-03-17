@@ -51,7 +51,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; custom-set-variables
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -63,22 +62,6 @@
  '(custom-safe-themes
    '("81c3de64d684e23455236abde277cda4b66509ef2c28f66e059aa925b8b12534" default))
  '(doc-view-continuous t)
- '(ess-R-font-lock-keywords
-   '((ess-R-fl-keyword:keywords . t)
-     (ess-R-fl-keyword:constants . t)
-     (ess-R-fl-keyword:modifiers . t)
-     (ess-R-fl-keyword:fun-defs . t)
-     (ess-R-fl-keyword:assign-ops . t)
-     (ess-R-fl-keyword:%op% . t)
-     (ess-fl-keyword:fun-calls . t)
-     (ess-fl-keyword:numbers)
-     (ess-fl-keyword:operators)
-     (ess-fl-keyword:delimiters)
-     (ess-fl-keyword:=)
-     (ess-R-fl-keyword:F&T)))
- '(ess-eldoc-show-on-symbol t)
- '(ess-roxy-str "#'")
- '(ess-use-flymake nil)
  '(global-display-line-numbers-mode t)
  '(global-font-lock-mode t nil (font-lock))
  '(highlight-doxygen-commend-start-regexp
@@ -89,7 +72,7 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(keytar lsp-grammarly gnu-elpa-keyring-update lsp-ui lsp-metals use-package lsp-mode sbt-mode ammonite-term-repl scala-mode lexic pandoc-mode wordnut synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode auctex-latexmk neotree format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
+   '(keytar lsp-grammarly gnu-elpa-keyring-update lsp-ui lsp-metals use-package lsp-mode ammonite-term-repl scala-mode lexic pandoc-mode wordnut synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode auctex-latexmk neotree format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
  '(scroll-conservatively 1)
@@ -159,7 +142,9 @@
 
 ;; Environment variables
 (setenv "OMP_NUM_THREADS" "1")
-(setenv "PATH" (concat (concat (getenv "HOME") "/.local/bin:") (getenv "PATH")))
+(setenv "PATH" (concat (concat (getenv "HOME") "/.local/bin:")
+                       (concat (getenv "HOME") "/.local/share/coursier/bin:")
+                       (getenv "PATH")))
 
 ;; Auto-save list file prefix
 (setq auto-save-list-file-prefix (concat my-auto-save-list "/.saves-"))
@@ -677,7 +662,7 @@
 (eval-after-load "company"
   '(progn
      (add-hook 'after-init-hook 'global-company-mode)
-     (setq company-minimum-prefix-length 1)
+     (setq company-minimum-prefix-length 2)
 
      ;; Preserve initial cases
      (setq company-dabbrev-downcase nil)
@@ -714,7 +699,6 @@
             (if (equal k "0")
                 10
               (string-to-number k))))))
-
      ;;https://github.com/abo-abo/oremacs/blob/d2b2cd8371b94f35a42000debef1c2b644cb9472/init.el#L28
      (defun ora-advice-add (&rest args)
        (when (fboundp 'advice-add)
@@ -1072,10 +1056,29 @@
                   (local-set-key (kbd "<f9> |") (lambda () (interactive) (insert "\\left| \\right|")))
                   (local-set-key "\$" 'skeleton-pair-insert-maybe)
 
+                  ;; This was `c-c c-f c-a`
+                  (setq LaTeX-font-list
+                    '((?a ""              ""  "\\mathcal{"    "}")
+                      ;; (?b "\\textbf{"     "}" "\\mathbf{"     "}")
+                      (?b "\\textbf{"     "}" "\\bm{"     "}")
+                      (?c "\\textsc{"     "}")
+                      (?e "\\emph{"       "}")
+                      (?f "\\textsf{"     "}" "\\mathsf{"     "}")
+                      (?i "\\textit{"     "}" "\\mathit{"     "}")
+                      (?l "\\textulc{"    "}")
+                      (?m "\\textmd{"     "}")
+                      (?n "\\textnormal{" "}" "\\mathnormal{" "}")
+                      (?r "\\textrm{"     "}" "\\mathrm{"     "}")
+                      (?s "\\textsl{"     "}" "\\mathbb{"     "}")
+                      (?t "\\texttt{"     "}" "\\mathtt{"     "}")
+                      (?u "\\textup{"     "}")
+                      (?w "\\textsw{"     "}")
+                      (?d "" "" t)))
+
+
                   ;; Use \bm{} to repace \mathbf{}
-                  (fset 'my-insert-bold-math
-                        [?\C-w ?\\ ?b ?m ?\{ ?\C-y ?\} right])
-                  (local-set-key (kbd "C-c C-x C-b") 'my-insert-bold-math)
+                  ;; (add-to-list 'LaTeX-font-list
+                  ;;              '(m "\\bm{" "}"))
                   ))
 
      ;; Replace LaTeX with latexmk -pvc
@@ -1199,6 +1202,25 @@
 
                   ))
 
+
+     (setq ess-R-font-lock-keywords
+           '((ess-R-fl-keyword:keywords . t)
+             (ess-R-fl-keyword:constants . t)
+             (ess-R-fl-keyword:modifiers . t)
+             (ess-R-fl-keyword:fun-defs . t)
+             (ess-R-fl-keyword:assign-ops . t)
+             (ess-R-fl-keyword:%op% . t)
+             (ess-fl-keyword:fun-calls . t)
+             (ess-fl-keyword:numbers)
+             (ess-fl-keyword:operators)
+             (ess-fl-keyword:delimiters)
+             (ess-fl-keyword:=)
+             (ess-R-fl-keyword:F&T)))
+
+     (setq ess-eldoc-show-on-symbol t)
+     (setq ess-roxy-str "#'")
+     (setq ess-use-flymake nil)
+
      ;; Settings on R shell
      (add-hook 'inferior-ess-mode-hook
                '(lambda ()
@@ -1311,9 +1333,7 @@
 ;;; Language server mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package lsp-mode
-  ;; Optional - enable lsp-mode automatically in scala files
-  :hook  (scala-mode . lsp)
-         (lsp-mode . lsp-lens-mode)
+  :commands (lsp lsp-deferred)
   :config
   ;; Uncomment following section if you would like to tune lsp-mode performance according to
   ;; https://emacs-lsp.github.io/lsp-mode/page/performance/
@@ -1323,6 +1343,7 @@
   ;;       (setq lsp-log-io nil)
   ;;       (setq lsp-completion-provider :capf)
   (setq lsp-server-install-dir (concat my-auto-save-list "/lsp"))
+  (setq lsp-session-file (concat my-auto-save-list "/.lsp-session-v1"))
   (setq lsp-verify-signature nil) ;; Disable to get metals server (key expired) working
   (setq lsp-prefer-flymake nil)
   (setq lsp-headerline-breadcrumb-enable nil)
@@ -1353,24 +1374,25 @@
     ("scala" . scala-mode))
 
 ;; Enable sbt mode for executing sbt commands
-(use-package sbt-mode
-  :commands sbt-start sbt-command
-  :config
-  ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
-  ;; allows using SPACE when in the minibuffer
-  (substitute-key-definition
-   'minibuffer-complete-word
-   'self-insert-command
-   minibuffer-local-completion-map)
-   ;; sbt-supershell kills sbt-mode:  https://github.com/hvesalai/emacs-sbt-mode/issues/152
-   (setq sbt:program-options '("-Dsbt.supershell=false"))
-)
+;; (use-package sbt-mode
+;;   :commands sbt-start sbt-command
+;;   :config
+;;   ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
+;;   ;; allows using SPACE when in the minibuffer
+;;   (substitute-key-definition
+;;    'minibuffer-complete-word
+;;    'self-insert-command
+;;    minibuffer-local-completion-map)
+;;    ;; sbt-supershell kills sbt-mode:  https://github.com/hvesalai/emacs-sbt-mode/issues/152
+;;    (setq sbt:program-options '("-Dsbt.supershell=false"))
+;; )
 
+;; grammerly for lsp
 (use-package lsp-grammarly
   :ensure t
   :hook (text-mode . (lambda ()
                        (require 'lsp-grammarly)
-                       (lsp))))  ; or lsp-deferred
+                       (lsp-deferred)))) ;; or lsp
 
 ;; (use-package lsp-ltex
 ;;   :ensure t
@@ -1413,7 +1435,7 @@
  '(font-lock-function-name-face ((t (:foreground "deep sky blue" :weight normal))))
  '(highlight-doxygen-comment ((t (:inherit highlight))))
  '(line-number ((t (:inherit t :background "unspecified-bg"))))
- '(line-number-current-line ((t (:background "light gray" :slant italic))))
+ '(line-number-current-line ((t (:background "black" :slant italic))))
  '(menu ((t (:inherit t :background "dim gray"))))
  '(minibuffer-prompt ((t (:foreground "red"))))
  '(mode-line ((t (:inherit :background "black"))))
