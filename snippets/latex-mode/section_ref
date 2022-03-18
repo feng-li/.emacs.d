@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: Section \ref{...}
+# key: Sec
+# --
+Section~\ref{$1} $0

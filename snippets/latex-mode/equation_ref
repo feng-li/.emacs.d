@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: Equation \ref{...}
+# key: Eq
+# --
+Equation~\ref{$1} $0

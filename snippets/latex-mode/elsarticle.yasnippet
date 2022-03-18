@@ -29,6 +29,10 @@
 \makeatother
 % Then load BibLaTeX as usual
 \usepackage[style=authoryear-comp, backend=biber, uniquename=false, maxnames=9, maxcitenames=2, natbib=true]{biblatex}
+\renewbibmacro{in:}{%
+  \ifentrytype{article}{}{%
+  \printtext{\bibstring{in}\intitlepunct}}}
+\DeclareNameAlias{sortname}{family-given}
 \addbibresource{references-feng.bib}
 
 \usepackage{longtable,booktabs}

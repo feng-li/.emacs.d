@@ -1,5 +1,5 @@
 # -*- mode: snippet -*-
-# name: \textcite
-# key: c
+# name: \textcite{...}
+# key: ci
 # --
 \textcite[$2]{${1:label$(unless yas/modified-p (reftex-citation 'dont-insert))}}$0

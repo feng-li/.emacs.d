@@ -607,7 +607,7 @@
              "^\\*Ibuffer*" "^\\*ESS-errors*" "^\\*Warnings*" "*TeX Help*"
              "*Pymacs*" "*Flymake log*" "\\.log$" "^\\*.*Completions\\*$" "^\\*Ediff" "^\\*tramp"
              "^\\*cvs-" "_region_" "^TAGS$" "^\\*Ido" "^\\*.*dictem buffer\\*$"
-             "^\\*inferior-lisp*" "^\\*Compile-Log\\*" "*output*" "^.*output\\*$"))
+             "^\\*inferior-lisp*" "^\\*Compile-Log\\*" "*output*" "\.\*output*"))
 
      (defun ido-kill-emacs-hook () (ignore-errors (ido-save-history)))
      ))

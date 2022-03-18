@@ -20,6 +20,10 @@
 
 %% BibTeX
 \usepackage[style=authoryear-comp, backend=biber, natbib=true]{biblatex}
+\renewbibmacro{in:}{%
+  \ifentrytype{article}{}{%
+  \printtext{\bibstring{in}\intitlepunct}}}
+\DeclareNameAlias{sortname}{family-given}
 \addbibresource{references-feng.bib}
 
 \usepackage[unicode=true]{hyperref}

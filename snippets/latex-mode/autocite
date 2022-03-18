@@ -1,5 +1,5 @@
 # -*- mode: snippet -*-
-# name: \autocite{ }
-# key: aut
+# name: \autocite{...}
+# key: ci
 # --
 \autocite[$2]{${1:label$(unless yas/modified-p (reftex-citation 'dont-insert))}}$0

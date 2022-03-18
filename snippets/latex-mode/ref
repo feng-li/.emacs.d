@@ -1,5 +1,5 @@
 # -*- mode: snippet -*-
-# name: \ref{ }
+# name: \ref{...}
 # key: ref
 # --
-\ref{$0}
+\ref{$1} $0

@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: Table \ref{...}
+# key: Tab
+# --
+Table~\ref{$1} $0

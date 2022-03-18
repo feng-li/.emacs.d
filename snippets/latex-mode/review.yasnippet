@@ -20,6 +20,10 @@
 
 %% BibTeX
 \usepackage[style=authoryear-comp, backend=biber, natbib=true, maxcitenames=2, maxbibnames=99]{biblatex}
+\renewbibmacro{in:}{%
+  \ifentrytype{article}{}{%
+  \printtext{\bibstring{in}\intitlepunct}}}
+\DeclareNameAlias{sortname}{family-given}
 \addbibresource{references-feng.bib}
 \usepackage{longtable,booktabs}
 
