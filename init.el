@@ -28,10 +28,10 @@
       '(
         ("melpa" . "https://melpa.org/packages/")
         ("elpa" . "https://elpa.gnu.org/packages/")
-       ;; ("gnu-elpa-cn"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
-       ;; ("melpa-cn" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
-       ("gnu-elpa-cn"   . "http://mirrors.cloud.tencent.com/elpa/gnu/")
-       ("melpa-cn" . "http://mirrors.cloud.tencent.com/elpa/melpa/")
+        ;; ("gnu-elpa-cn"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
+        ;; ("melpa-cn" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
+        ;; ("gnu-elpa-cn"   . "http://mirrors.cloud.tencent.com/elpa/gnu/")
+        ;; ("melpa-cn" . "http://mirrors.cloud.tencent.com/elpa/melpa/")
        ))
 (setq package-user-dir (concat my-auto-save-list "/elpa"))
 (package-initialize)
@@ -188,11 +188,18 @@
 ;; TAB settings
 (setq-default indent-tabs-mode nil)
 
+;; SAVE MY PINK FINGER
+;; Internal swap Ctrl and Alt key. Or use Gnome Tweak "Left Alt as Ctrl, Left Ctrl as Win, Left Win as Alt"
+;; (setq x-ctrl-keysym 'alt)
+;; (setq x-ctrl-keysym 'meta)
+;; (setq x-alt-keysym 'ctrl)
+;; (setq x-meta-keysym 'ctrl)
+
 ;; Switch to previous buffer
 (defun switch-to-previous-buffer ()
   (interactive)
   (switch-to-buffer (other-buffer)))
-(global-set-key (kbd "ESC <f2>") 'switch-to-previous-buffer)
+(global-set-key (kbd "<backtab>") 'switch-to-previous-buffer)
 
 ;;Use y-n for short
 (fset 'yes-or-no-p 'y-or-n-p)
@@ -324,8 +331,9 @@
 (global-set-key (kbd "C-x o") 'next-window-any-frame) ;; Circulate among windows
 ;; Follow mode (dual pages display)
 (global-set-key (kbd "C-<f2>")  'follow-delete-other-windows-and-split)
+
 ;; Control-tab to switch among buffers
-(global-set-key (kbd "C-<tab>") 'next-buffer)
+;; (global-set-key (kbd "<backtab>") 'next-buffer)
 
 ;; Unset 'exchange-point-and-mark' key which may cause conflicts with Fcitx
 (global-unset-key (kbd "C-x C-x"))
@@ -1357,7 +1365,14 @@
   ;; formatting of multiline strings only. You might want to disable it so that
   ;; emacs can use indentation provided by scala-mode.
   (lsp-metals-server-args '("-J-Dmetals.allow-multiline-string-formatting=off"))
-  :hook (scala-mode . lsp))
+
+  :hook (scala-mode . lsp)
+
+  :config
+  (setq lsp-metals-metals-store-path   (concat (getenv "HOME") "/.local/share/coursier/bin/metals"))
+  (setq lsp-metals-coursier-store-path (concat (getenv "HOME") "/.local/share/coursier/bin/coursier"))
+
+  )
 ;; Enable nice rendering of documentation on hover
 ;;   Warning: on some systems this package can reduce your emacs responsiveness significally.
 ;;   (See: https://emacs-lsp.github.io/lsp-mode/page/performance/)
@@ -1392,7 +1407,16 @@
   :ensure t
   :hook (text-mode . (lambda ()
                        (require 'lsp-grammarly)
-                       (lsp-deferred)))) ;; or lsp
+                       (lsp-deferred)))
+
+
+  :config
+  (setq lsp-grammarly-active-modes '(text-mode latex-mode org-mode markdown-mode))
+  (setq lsp-grammarly-auto-activate t)
+  (setq lsp-grammarly-domain "academic")
+  (setq lsp-grammarly-user-words (concat (getenv "HOME") "/.hunspell_en_US"))
+  ) ;; or lsp
+
 
 ;; (use-package lsp-ltex
 ;;   :ensure t
@@ -1425,13 +1449,16 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(company-tooltip ((t (:background "dim gray" :foreground "light gray"))))
+ '(ediff-current-diff-A ((t (:extend t :background "brightblack"))))
+ '(ediff-current-diff-B ((t (:extend t :background "brightred"))))
  '(ediff-even-diff-A ((t (:extend t :background "grey20"))))
  '(ediff-even-diff-B ((t (:extend t (:inherit ediff-even-diff-A)))))
+ '(ediff-fine-diff-B ((t (:background "magenta"))))
  '(ediff-odd-diff-A ((t (:extend t :background "grey40"))))
  '(ediff-odd-diff-B ((t (:extend t (:inherit ediff-odd-diff-A)))))
  '(font-latex-math-face ((t (:foreground "dark orange"))))
  '(font-latex-sectioning-5-face ((t (:foreground "deep sky blue" :weight bold))))
- '(font-latex-sedate-face ((t (:foreground "dark magenta"))))
+ '(font-latex-sedate-face ((t (:foreground "blue"))))
  '(font-lock-function-name-face ((t (:foreground "deep sky blue" :weight normal))))
  '(highlight-doxygen-comment ((t (:inherit highlight))))
  '(line-number ((t (:inherit t :background "unspecified-bg"))))

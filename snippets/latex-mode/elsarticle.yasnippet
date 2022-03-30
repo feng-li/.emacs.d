@@ -28,7 +28,7 @@
 \let\c@author\relax
 \makeatother
 % Then load BibLaTeX as usual
-\usepackage[style=authoryear-comp, backend=biber, uniquename=false, maxnames=9, maxcitenames=2, natbib=true]{biblatex}
+\usepackage[style=authoryear-comp, backend=biber, uniquename=false, maxnames=9, maxcitenames=2, natbib=true, safeinputenc]{biblatex}
 \renewbibmacro{in:}{%
   \ifentrytype{article}{}{%
   \printtext{\bibstring{in}\intitlepunct}}}
