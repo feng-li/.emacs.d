@@ -107,7 +107,7 @@
 (require 'markdown-mode)
 ;(require 'poly-R)
 ;(require 'poly-markdown)
-(require 'flycheck)
+;(require 'flycheck)
 (require 'company)
 (require 'ess-site)
 (require 'julia-mode)
@@ -817,8 +817,14 @@
 ;; FlyCheck
 ;; (add-hook 'after-init-hook #'global-flycheck-mode)
 ;; Enable nice rendering of diagnostics like compile errors.
-;; (use-package flycheck
-;;   :init (global-flycheck-mode))
+(use-package flycheck
+  :ensure t
+  :init (global-flycheck-mode)
+
+  :config
+  (setq flycheck-checker-error-threshold 200)
+  (setq flycheck-check-syntax-automatically '(mode-enabled))
+  )
 
 (eval-after-load "synosaurus"
   '(progn
@@ -1268,15 +1274,15 @@
      (elpy-enable)
      ;; (setq elpy-rpc-virtualenv-path (concat (getenv "HOME") "/.emacs.d/elpy/" system-name "/rpc-venv"))
      ;; (setq elpy-rpc-virtualenv-path (concat (getenv "HOME") "/.cache/elpy/rpc-venv"))
-     (setq elpy-rpc-virtualenv-path (concat (getenv "HOME") "/.local"))
+     (setq elpy-rpc-virtualenv-path (concat (getenv "HOME") "/.local/"))
      (setq elpy-rpc-python-command "python3")
-     (setq elpy-syntax-check-command (concat elpy-rpc-virtualenv-path  "/bin/flake8"))
+     (setq elpy-syntax-check-command (concat elpy-rpc-virtualenv-path  "bin/flake8"))
 
      ;; Disable elpy's flymake, use flycheck
      (remove-hook 'elpy-modules 'elpy-module-flymake)
      (define-key elpy-mode-map (kbd "C-c C-n") nil)
-     (setq flycheck-python-flake8-executable (concat elpy-rpc-virtualenv-path  "bin/python3"))
-     (setq flycheck-python-pylint-executable (concat elpy-rpc-virtualenv-path  "bin/python3"))
+     (setq flycheck-python-flake8-executable (concat elpy-rpc-virtualenv-path  "bin/flake8"))
+     (setq flycheck-python-pylint-executable (concat elpy-rpc-virtualenv-path  "bin/pylint"))
      (setq pylint-command (concat elpy-rpc-virtualenv-path  "bin/pylint3"))
 
      ;; (remove-hook 'elpy-modules 'elpy-module-pyvenv)
@@ -1458,7 +1464,7 @@
  '(ediff-odd-diff-B ((t (:extend t (:inherit ediff-odd-diff-A)))))
  '(font-latex-math-face ((t (:foreground "dark orange"))))
  '(font-latex-sectioning-5-face ((t (:foreground "deep sky blue" :weight bold))))
- '(font-latex-sedate-face ((t (:foreground "blue"))))
+ '(font-latex-sedate-face ((t (:foreground "light slate blue"))))
  '(font-lock-function-name-face ((t (:foreground "deep sky blue" :weight normal))))
  '(highlight-doxygen-comment ((t (:inherit highlight))))
  '(line-number ((t (:inherit t :background "unspecified-bg"))))
@@ -1472,4 +1478,4 @@
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
 (provide '.emacs)
-;;; .emacs ends here
+;;; init.el ends here
