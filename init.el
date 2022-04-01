@@ -1456,7 +1456,7 @@
  ;; If there is more than one, they won't work right.
  '(company-tooltip ((t (:background "dim gray" :foreground "light gray"))))
  '(ediff-current-diff-A ((t (:extend t :background "brightblack"))))
- '(ediff-current-diff-B ((t (:extend t :background "brightred"))))
+ '(ediff-current-diff-B ((t (:extend t :background "brightcyan"))))
  '(ediff-even-diff-A ((t (:extend t :background "grey20"))))
  '(ediff-even-diff-B ((t (:extend t (:inherit ediff-even-diff-A)))))
  '(ediff-fine-diff-B ((t (:background "magenta"))))
