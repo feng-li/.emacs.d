@@ -276,8 +276,9 @@
 
 ;; auto-fill mode
 (setq-default fill-column 90)
-(dolist (hook '(after-text-mode-hook
-                LaTeX-mode-hook
+(dolist (hook '(
+                after-text-mode-hook
+                ;; LaTeX-mode-hook
                 markdown-mode-hook
                 message-mode-hook
                 org-mode-hook
