@@ -72,7 +72,7 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(keytar lsp-grammarly gnu-elpa-keyring-update lsp-ui lsp-metals use-package lsp-mode ammonite-term-repl scala-mode lexic pandoc-mode wordnut synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode auctex-latexmk neotree format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
+   '(visual-fill-column keytar lsp-grammarly gnu-elpa-keyring-update lsp-ui lsp-metals use-package lsp-mode ammonite-term-repl scala-mode lexic pandoc-mode wordnut synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode auctex-latexmk neotree format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
  '(scroll-conservatively 1)
@@ -252,6 +252,7 @@
 (setq-default adaptive-wrap-extra-indent 0)
 (add-hook 'visual-line-mode-hook #'adaptive-wrap-prefix-mode)
 (global-visual-line-mode t)
+(add-hook 'visual-line-mode-hook #'visual-fill-column-mode)
 
 ;; (add-hook 'prog-mode-hook '(flyspell-prog-mode -t))
 
