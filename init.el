@@ -1420,7 +1420,7 @@
 
   :config
   (setq lsp-grammarly-active-modes '(text-mode latex-mode org-mode markdown-mode))
-  (setq lsp-grammarly-auto-activate t)
+  (setq lsp-grammarly-auto-activate nil)
   (setq lsp-grammarly-domain "academic")
   (setq lsp-grammarly-user-words (concat (getenv "HOME") "/.hunspell_en_US"))
   ) ;; or lsp
