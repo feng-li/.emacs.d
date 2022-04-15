@@ -252,7 +252,7 @@
 (setq-default adaptive-wrap-extra-indent 0)
 (add-hook 'visual-line-mode-hook #'adaptive-wrap-prefix-mode)
 (global-visual-line-mode t)
-(add-hook 'visual-line-mode-hook #'visual-fill-column-mode)
+(add-hook 'text-mode-hook #'visual-fill-column-mode)
 
 ;; (add-hook 'prog-mode-hook '(flyspell-prog-mode -t))
 
@@ -1414,16 +1414,15 @@
 (use-package lsp-grammarly
   :ensure t
   :hook (text-mode . (lambda ()
-                       (require 'lsp-grammarly)
-                       (lsp-deferred)))
-
+                           (require 'lsp-grammarly)
+                           (lsp-deferred)))  ;; or lsp
 
   :config
-  (setq lsp-grammarly-active-modes '(text-mode latex-mode org-mode markdown-mode))
+  ;; (setq lsp-grammarly-active-modes '(latex-mode org-mode markdown-mode))
   (setq lsp-grammarly-auto-activate nil)
   (setq lsp-grammarly-domain "academic")
   (setq lsp-grammarly-user-words (concat (getenv "HOME") "/.hunspell_en_US"))
-  ) ;; or lsp
+  )
 
 
 ;; (use-package lsp-ltex
