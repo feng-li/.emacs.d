@@ -1,6 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Feng Li's .emacs configurations
-;;
+;;; init --- Feng Li's .emacs configurations
 ;; Copyright: Feng Li <http://feng.li/>
 ;;
 ;; Download: https://github.com/feng-li/.emacs.d/
@@ -72,7 +70,7 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(visual-fill-column keytar lsp-grammarly gnu-elpa-keyring-update lsp-ui lsp-metals use-package lsp-mode ammonite-term-repl scala-mode lexic pandoc-mode wordnut synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode auctex-latexmk neotree format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
+   '(visual-fill-column keytar lsp-grammarly gnu-elpa-keyring-update lsp-ui lsp-metals use-package lsp-mode ammonite-term-repl scala-mode lexic pandoc-mode wordnut synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
  '(scroll-conservatively 1)
@@ -118,7 +116,7 @@
 (load "auctex.el" nil t t)
 (require 'company-auctex)
 ;;(load "preview-latex.el" nil t t)
-(require 'langtool)
+;;(require 'langtool)
 (require 'writegood-mode)
 (require 'yasnippet)
 (require 'yasnippet-snippets)
@@ -142,6 +140,7 @@
 
 ;; Environment variables
 (setenv "OMP_NUM_THREADS" "1")
+(setenv "LSP_USE_PLISTS"  "true")
 (setenv "PATH" (concat (concat (getenv "HOME") "/.local/bin:")
                        (concat (getenv "HOME") "/.local/share/coursier/bin:")
                        (getenv "PATH")))
@@ -824,7 +823,7 @@
   :init (global-flycheck-mode)
 
   :config
-  (setq flycheck-checker-error-threshold 200)
+  (setq flycheck-checker-error-threshold 1000)
   (setq flycheck-check-syntax-automatically '(mode-enabled))
   )
 
@@ -1351,18 +1350,17 @@
 (use-package lsp-mode
   :commands (lsp lsp-deferred)
   :config
-  ;; Uncomment following section if you would like to tune lsp-mode performance according to
-  ;; https://emacs-lsp.github.io/lsp-mode/page/performance/
-  ;;       (setq gc-cons-threshold 100000000) ;; 100mb
-  ;;       (setq read-process-output-max (* 1024 1024)) ;; 1mb
-  ;;       (setq lsp-idle-delay 0.500)
-  ;;       (setq lsp-log-io nil)
-  ;;       (setq lsp-completion-provider :capf)
   (setq lsp-server-install-dir (concat my-auto-save-list "/lsp"))
   (setq lsp-session-file (concat my-auto-save-list "/.lsp-session-v1"))
   (setq lsp-verify-signature nil) ;; Disable to get metals server (key expired) working
-  (setq lsp-prefer-flymake nil)
+  (setq lsp-prefer-flymake nil) ;; use flycheck
   (setq lsp-headerline-breadcrumb-enable nil)
+  ;; Performance https://emacs-lsp.github.io/lsp-mode/page/performance/
+  (setq gc-cons-threshold 100000000)
+  (setq read-process-output-max (* 2048 2048)) ;; 2mb
+  (setq lsp-use-plists t) ;; export LSP_USE_PLISTS=true
+  (setq gc-cons-threshold 100000000)
+  (setq lsp-idle-delay 0.500)
   )
 
 ;; Add metals backend for lsp-mode
@@ -1374,7 +1372,7 @@
   ;; emacs can use indentation provided by scala-mode.
   (lsp-metals-server-args '("-J-Dmetals.allow-multiline-string-formatting=off"))
 
-  :hook (scala-mode . lsp)
+  :hook (scala-mode . lsp-deferred)
 
   :config
   (setq lsp-metals-metals-store-path   (concat (getenv "HOME") "/.local/share/coursier/bin/metals"))
@@ -1413,23 +1411,18 @@
 ;; grammerly for lsp
 (use-package lsp-grammarly
   :ensure t
+
+  ;; Comment out to start manually
   :hook (text-mode . (lambda ()
                            (require 'lsp-grammarly)
                            (lsp-deferred)))  ;; or lsp
 
   :config
-  ;; (setq lsp-grammarly-active-modes '(latex-mode org-mode markdown-mode))
+  (setq lsp-grammarly-active-modes '(text-mode latex-mode org-mode markdown-mode))
   (setq lsp-grammarly-auto-activate nil)
   (setq lsp-grammarly-domain "academic")
   (setq lsp-grammarly-user-words (concat (getenv "HOME") "/.hunspell_en_US"))
   )
-
-
-;; (use-package lsp-ltex
-;;   :ensure t
-;;   :hook (text-mode . (lambda ()
-;;                        (require 'lsp-ltex)
-;;                        (lsp))))  ; or lsp-deferred
 
 ;; Use company-capf as a completion provider.
 (use-package company
