@@ -1463,7 +1463,7 @@
  '(highlight-doxygen-comment ((t (:inherit highlight))))
  '(line-number ((t (:inherit t :background "unspecified-bg"))))
  '(line-number-current-line ((t (:background "black" :slant italic))))
- '(menu ((t (:inherit t :background "dim gray"))))
+ '(menu ((t (:inherit :background :background "#303030" :foreground "white" :inverse-video nil))))
  '(minibuffer-prompt ((t (:foreground "red"))))
  '(mode-line ((t (:inherit :background "black"))))
  '(neo-dir-link-face ((t (:inherit t :background font-lock-function-name-face))))
