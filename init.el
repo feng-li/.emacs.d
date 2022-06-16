@@ -1,4 +1,5 @@
-;;; init --- Feng Li's .emacs configurations
+;; init.el --- Feng Li's .emacs configurations
+;;; Commentary:
 ;; Copyright: Feng Li <http://feng.li/>
 ;;
 ;; Download: https://github.com/feng-li/.emacs.d/
@@ -17,6 +18,7 @@
    '(("no_proxy" . "^\\(localhost\\|10\\..*\\|192\\.168\\..*\\)")
      ("http" . "127.0.0.1:41091")
      ("https" . "127.0.0.1:41091")))
+
 ;; Add path for auto saved files
 (defvar my-auto-save-list (concat (getenv "HOME") "/.config/.emacs.d/auto-save-list"))
 (unless (file-directory-p my-auto-save-list) (make-directory my-auto-save-list t))
@@ -70,7 +72,7 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(visual-fill-column keytar lsp-grammarly gnu-elpa-keyring-update lsp-ui lsp-metals use-package lsp-mode ammonite-term-repl scala-mode lexic pandoc-mode wordnut synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
+   '(poly-R visual-fill-column keytar lsp-grammarly gnu-elpa-keyring-update lsp-ui lsp-metals use-package lsp-mode ammonite-term-repl scala-mode lexic pandoc-mode wordnut synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
  '(scroll-conservatively 1)
@@ -248,12 +250,14 @@
 (setq x-alt-keysym 'meta)
 
 ;; Global visual line mode with better indentation
+;; (global-visual-line-mode t)
+(dolist (hook '(message-mode-hook org-mode-hook mail-mode-hook LaTeX-mode-hook markdown-mode-hook))
+  (add-hook hook '(lambda () (visual-line-mode t))))
+(dolist (hook '(message-mode-hook org-mode-hook mail-mode-hook LaTeX-mode-hook markdown-mode-hook))
+  (add-hook hook '(lambda () (visual-fill-column-mode t))))
+
 (setq-default adaptive-wrap-extra-indent 0)
 (add-hook 'visual-line-mode-hook #'adaptive-wrap-prefix-mode)
-(global-visual-line-mode t)
-(add-hook 'text-mode-hook #'visual-fill-column-mode)
-
-;; (add-hook 'prog-mode-hook '(flyspell-prog-mode -t))
 
 ;; shift selection
 (setq shift-select-mode t)
@@ -275,10 +279,11 @@
 
 ;; auto-fill mode
 (setq-default fill-column 90)
+
 (dolist (hook '(
                 after-text-mode-hook
                 ;; LaTeX-mode-hook
-                markdown-mode-hook
+                ;; markdown-mode-hook
                 message-mode-hook
                 org-mode-hook
 	        mail-mode-hook
@@ -289,9 +294,18 @@
 ;; paragraphs in that region. It is the contrary of fill-region.
 (eval-after-load "unfill"
   '(progn
-     (define-key global-map (kbd "C-M-q") 'unfill-region)
+     (define-key global-map (kbd "C-M-q") 'unfill-paragraph)
      ))
 
+;; https://www.reddit.com/r/emacs/comments/kwl0mc/lspdescribethingatpoint_config_improvement/
+(add-to-list 'display-buffer-alist
+             '((lambda (buffer _) (with-current-buffer buffer
+                                    (seq-some (lambda (mode)
+                                                (derived-mode-p mode))
+                                              '(help-mode))))
+               (display-buffer-reuse-window display-buffer-below-selected)
+               (reusable-frames . visible)
+               (window-height . 0.4)))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Global key bindings
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -422,12 +436,7 @@
 ;; Hide and Show code blocks
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(dolist (hook '(after-text-mode-hook
-                c-mode-hook
-                org-mode-hook
-                python-mode-hook
-	        mail-mode-hook
-                ess-mode-hook))
+(dolist (hook '(after-text-mode-hook c-mode-hook org-mode-hook python-mode-hook mail-mode-hook ess-mode-hook))
   (add-hook hook '(lambda () (hs-minor-mode))))
 (global-set-key (kbd "M-+") 'hs-toggle-hiding)
 (global-set-key (kbd "M-*") 'hs-show-all)
@@ -442,11 +451,7 @@
 ;; (global-set-key "\"" 'skeleton-pair-insert-maybe)
 ;; (global-set-key "\'" 'skeleton-pair-insert-maybe)
 
-(dolist (hook '(python-mode-hook
-                c-mode-hook
-                c++-mode-hook
-                LaTeX-mode-hook
-                ess-r-mode-hook))
+(dolist (hook '(python-mode-hook c-mode-hook c++-mode-hook LaTeX-mode-hook ess-r-mode-hook))
   (add-hook hook '(lambda () (electric-operator-mode 1))))
 (apply #'electric-operator-add-rules-for-mode 'inferior-python-mode
        (electric-operator-get-rules-for-mode 'python-mode))
@@ -829,17 +834,12 @@
 
 (eval-after-load "synosaurus"
   '(progn
-     (dolist (hook '(text-mode-hook
-                     latex-mode-hook
-                     LaTeX-mode-hook
-                     prog-mode-hook
-                     org-mode-hook
-                     markdown-mode-hook))
+     (dolist (hook '(text-mode-hook latex-mode-hook LaTeX-mode-hook prog-mode-hook org-mode-hook markdown-mode-hook))
        (add-hook hook (lambda () (synosaurus-mode))))
 
      (setq synosaurus-choose-method 'popup) ; popup, ido
      ;; (setq synosaurus-backend  'Wordnet) ; apt install wordnet
-     (define-key synosaurus-mode-map (kbd "<f4>") 'synosaurus-choose-and-replace)
+     (define-key synosaurus-mode-map (kbd "<f4> t") 'synosaurus-choose-and-replace)
      )
   )
 
@@ -849,11 +849,9 @@
 (setq flyspell-issue-message-flag nil)
 
 ;; Fly spell mode for major mode
-(dolist (hook '(text-mode-hook
-                latex-mode-hook
-                markdown-mode-hook))
+(dolist (hook '(text-mode-hook LaTeX-mode-hook markdown-mode-hook))
   (add-hook hook (lambda () (flyspell-mode 1))))
-(add-hook 'tex-mode-hook (function (lambda () (setq ispell-parser 'tex))))
+(add-hook 'LaTeX-mode-hook (function (lambda () (setq ispell-parser 'tex))))
 
 ;; Disable flyspell for special modes
 (dolist (hook '(change-log-mode-hook log-edit-mode-hook))
@@ -913,12 +911,7 @@
         "~/code/TAGS/PYTHON/"
         "~/code/TAGS/C/"
         "~/code/TAGS/FORTRAN/"))
-(dolist (hook '(after-text-mode-hook
-                ess-mode-hook
-	        python-mode-hook
-	        c-mode-hook
-	        c++-mode-hook
-                inferior-ess-mode-hook))
+(dolist (hook '(after-text-mode-hook ess-mode-hook python-mode-hook c-mode-hook c++-mode-hook inferior-ess-mode-hook))
   (add-hook hook '(lambda () (xref-etags-mode))))
 
 ;; highlight-indent-guides-mode, can make emacs slow with large files
@@ -935,10 +928,7 @@
 
 ;; Highlight doxygen mode
 (highlight-doxygen-global-mode 1)
-(dolist (hook '(c-mode-hook
-                c++-mode-hook
-                python-mode-hook
-                ess-r-mode-hook))
+(dolist (hook '(c-mode-hook c++-mode-hook python-mode-hook ess-r-mode-hook))
   (add-hook hook '(lambda () (highlight-doxygen-mode))))
 
 ;; (add-hook 'prog-mode-hook 'highlight-doxygen-mode)
@@ -973,22 +963,13 @@
 
      ))
 
-     (dolist (hook '(text-mode-hook
-                     latex-mode-hook
-                     LaTeX-mode-hook
-                     prog-mode-hook
-                     org-mode-hook
-                     markdown-mode-hook))
+     (dolist (hook '(text-mode-hook latex-mode-hook LaTeX-mode-hook prog-mode-hook org-mode-hook markdown-mode-hook))
        (add-hook hook (lambda () (synosaurus-mode))))
 
 
 (eval-after-load "pandoc"
   '(progn
-     (dolist (hook '(text-mode-hook
-                     latex-mode-hook
-                     LaTeX-mode-hook
-                     org-mode-hook
-                     markdown-mode-hook))
+     (dolist (hook '(text-mode-hook LaTeX-mode-hook org-mode-hook markdown-mode-hook))
        (add-hook hook (lambda () (pandoc-mode))))
      (add-hook 'pandoc-mode-hook
                (lambda ()
@@ -1361,6 +1342,12 @@
   (setq lsp-use-plists t) ;; export LSP_USE_PLISTS=true
   (setq gc-cons-threshold 100000000)
   (setq lsp-idle-delay 0.500)
+
+  ;; lsp-treemacs
+  (setq lsp-treemacs-sync-mode t)
+  (setq lsp-treemacs-errors-position-params '((side . right)))
+  (define-key lsp-mode-map (kbd "<f4> <f4>") 'lsp-describe-thing-at-point)
+  (define-key lsp-mode-map (kbd "<f4> e") 'lsp-treemacs-errors-list)
   )
 
 ;; Add metals backend for lsp-mode
@@ -1460,6 +1447,7 @@
  '(font-latex-sectioning-5-face ((t (:foreground "deep sky blue" :weight bold))))
  '(font-latex-sedate-face ((t (:foreground "light slate blue"))))
  '(font-lock-function-name-face ((t (:foreground "deep sky blue" :weight normal))))
+ '(highlight ((t (:background "red" :foreground "#c6c6c6"))))
  '(highlight-doxygen-comment ((t (:inherit highlight))))
  '(line-number ((t (:inherit t :background "unspecified-bg"))))
  '(line-number-current-line ((t (:background "black" :slant italic))))
