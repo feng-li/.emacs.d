@@ -206,7 +206,7 @@
 (fset 'yes-or-no-p 'y-or-n-p)
 
 ;; Set Fonts
-(add-to-list 'default-frame-alist '(font . "M+ 1mn-9.5")) ;
+(add-to-list 'default-frame-alist '(font . "M+ 1mn-10")) ;
 ;; (when (display-graphic-p)
 ;;   (if (> (display-pixel-height) 1080) ;; HDPi
 ;;       (progn
@@ -1437,7 +1437,7 @@
  ;; If there is more than one, they won't work right.
  '(company-tooltip ((t (:background "dim gray" :foreground "light gray"))))
  '(ediff-current-diff-A ((t (:extend t :background "brightblack"))))
- '(ediff-current-diff-B ((t (:extend t :background "brightcyan"))))
+ '(ediff-current-diff-B ((t (:extend t :background "brightblack"))))
  '(ediff-even-diff-A ((t (:extend t :background "grey20"))))
  '(ediff-even-diff-B ((t (:extend t (:inherit ediff-even-diff-A)))))
  '(ediff-fine-diff-B ((t (:background "magenta"))))
