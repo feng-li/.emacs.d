@@ -1,34 +1,34 @@
 # -*- mode: snippet -*-
 # contributor: Feng Li <m@feng.li>
-# key: coverletter
+# key: letter
 # group: skeleton
-# name: <coverletter to journals> ...
+# name: <letterhead to ...> ...
 # --
 \documentclass[a4paper,11pt]{article}
 
-%%%%%%%%%%%%%%%%%% Non-Latin Languages Support %%%%%%%%%%%%%%%%%%%%%%%
-%\usepackage[adobefonts,nocap]{ctex}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[garamond]{mathdesign} % Garamond Math Font
+\usepackage[no-math]{fontspec}% LuaLaTeX or XeLaTeX only
+\setmainfont{Garamond Premier Pro}
+%\setmonofont{Noto Mono}
+\usepackage{fontawesome}
 
 \usepackage[twoside]{geometry}
-\geometry{verbose,tmargin=2.0cm,bmargin=5.5cm,lmargin=2.0cm,rmargin=2.0cm}
+\geometry{verbose,tmargin=1.0cm,bmargin=3.5cm,lmargin=2.0cm,rmargin=2.0cm}
 %\usepackage[raggedright]{titlesec}
 
 \usepackage{graphicx}
 \usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  citecolor=blue,
+  urlcolor=blue}
+
 \usepackage{multirow}
 
 %% Line spacing
 \usepackage{setspace}
-\onehalfspace
-
-%% Fancy symbols
-\usepackage{marvosym}
-
-
-%% Fonts
-\usepackage[ugaramond]{mathdesign}
-%\usepackage{inconsolata}
+\linespread{1.25}
 
 %% Fancy header and footer
 \usepackage{fancyhdr}
@@ -39,32 +39,29 @@
 \renewcommand{\headrulewidth}{0pt}
 \renewcommand{\footrulewidth}{0.4pt}
 
-\fancyfoot[L]{ \texttt{School of Statistics and Mathematics\\\\ Central University of
+\fancyfoot[L]{School of Statistics and Mathematics\\\\ Central University of
     Finance and Economics\\\\ Shahe University Park, 102206 Beijing,
-    China}}
+    China}
 
-\fancyfoot[C]{\vspace{2.0cm} \thepage~/~\pageref{LastPage}}
+%\fancyfoot[C]{\vspace{2.0cm} \thepage~/~\pageref{LastPage}}
 
-\fancyfoot[R]{\texttt{http://sam.cufe.edu.cn\\\\ http://www.cufe.edu.cn\\\\ Tel: +86 10 6177 6189}}
+\fancyfoot[R]{\url{http://sam.cufe.edu.cn}\\\\ \url{http://www.cufe.edu.cn}\\\\Tel: +86 10 6177 6189}
 
 
 \begin{document} \thispagestyle{fancy}
 
 \begin{tabular}{ll}
-\multirow{7}{*}{\hspace{4cm}\hspace{0.18\textwidth}}
+\multirow{7}{*}{\hspace{5cm}\hspace{0.18\textwidth}}
  & Feng Li, Ph.D.                              \\\\
  & School of Statistics and Mathematics        \\\\
  & Central University of Finance and Economics \\\\
- & 102206 Beijing, China                       \\\\
- & \Email~\texttt{feng.li@cufe.edu.cn}         \\\\
- & \Pointinghand~\texttt{http://feng.li/}      \\\\
+ & Beijing 102206, China                       \\\\
+ & \faEnvelope~~\href{mailto:feng.li@cufe.edu.cn}{\texttt{feng.li@cufe.edu.cn}}         \\\\
+ & \faHome~~\url{http://feng.li/}      \\\\
  &                                             \\\\
- & \today
 \end{tabular}
-
+\noindent\today
 \vspace{1.5cm}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 \noindent Dear XXX,
