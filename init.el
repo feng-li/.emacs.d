@@ -1025,17 +1025,25 @@
      ;; Set default TeX engine
      (setq TeX-PDF-mode t)
      (setq-default TeX-engine 'xetex) ;this can be set locally
+     (setq TeX-engine-alist '((pdflatex "PDFLaTeX" "pdflatex" "pdflatex" "pdflatex"))) ; Add PDFLaTeX as engine option
 
+     ;; LATEXMK integration
      (require 'auctex-latexmk)
      ;; (auctex-latexmk-setup) ; not needed auctex-latexmk-pvc already called.
-     (require 'auctex-latexmk-pvc)
+     (require 'auctex-latexmk-pvc) ; provide LatexMkPvc command
      (auctex-latexmk-pvc-setup)
 
-     ;; Use latexmkpvc as the main command
+     ;; Use LatexMkPvc as the main command
      (defun TeX-command-run-latexmkpvc ()
        (interactive)
        (TeX-save-document (TeX-master-file))
        (TeX-command "LatexMkPvc" 'TeX-master-file -1))
+
+     ;; Replace LaTeX with latexmk -pvc
+     (setcdr (assoc "LaTeX" TeX-command-list)
+             '("latexmk -pvc -pv- %(-PDF)%S%(mode) %(file-line-error) %(extraopts) %t" TeX-run-latexmk-pvc nil
+               :help "Run LaTeX with `latexmk -pvc`"))
+
 
      (add-hook 'LaTeX-mode-hook
                '(lambda ()
@@ -1076,11 +1084,6 @@
                   ;; (add-to-list 'LaTeX-font-list
                   ;;              '(m "\\bm{" "}"))
                   ))
-
-     ;; Replace LaTeX with latexmk -pvc
-     (setcdr (assoc "LaTeX" TeX-command-list)
-             '("latexmk -pvc -pv- %(-PDF)%S%(mode) %(file-line-error) %(extraopts) %t" TeX-run-latexmk-pvc nil
-               :help "Run LaTeX with `latexmk -pvc`"))
 
      ;; Translate key § to ` so both can be used as a math abbreviation
      ;; Drawback, could not type § anymore. Make it locally?
