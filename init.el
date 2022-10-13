@@ -73,6 +73,7 @@
  '(org-support-shift-select t)
  '(package-selected-packages
    '(poly-R visual-fill-column keytar lsp-grammarly gnu-elpa-keyring-update lsp-ui lsp-metals use-package lsp-mode ammonite-term-repl scala-mode lexic pandoc-mode wordnut synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
+ '(safe-local-variable-values '((TeX-engine . pdflatex)))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
  '(scroll-conservatively 1)
@@ -1346,6 +1347,10 @@
   (setq gc-cons-threshold 100000000)
   (setq lsp-idle-delay 0.500)
 
+  ;; Only enable certain LSP client and do not ask for server install.
+  (setq lsp-enabled-clients '(lsp-metals lsp-grammarly))
+  (setq lsp-warn-no-matched-clients t)
+
   ;; lsp-treemacs
   (setq lsp-treemacs-sync-mode t)
   (setq lsp-treemacs-errors-position-params '((side . right)))
@@ -1441,6 +1446,7 @@
  '(company-tooltip ((t (:background "dim gray" :foreground "light gray"))))
  '(ediff-current-diff-A ((t (:extend t :background "brightblack"))))
  '(ediff-current-diff-B ((t (:extend t :background "brightblack"))))
+ '(ediff-current-diff-C ((t (:extend t :background "dark green"))))
  '(ediff-even-diff-A ((t (:extend t :background "grey20"))))
  '(ediff-even-diff-B ((t (:extend t (:inherit ediff-even-diff-A)))))
  '(ediff-fine-diff-B ((t (:background "magenta"))))
