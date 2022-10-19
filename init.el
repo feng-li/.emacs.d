@@ -14,10 +14,10 @@
 ;; MELPA repository
 ;;; Code:
 
-(setq url-proxy-services
-   '(("no_proxy" . "^\\(localhost\\|10\\..*\\|192\\.168\\..*\\)")
-     ("http" . "127.0.0.1:41091")
-     ("https" . "127.0.0.1:41091")))
+;; (setq url-proxy-services
+;;    '(("no_proxy" . "^\\(localhost\\|10\\..*\\|192\\.168\\..*\\)")
+;;      ("http" . "127.0.0.1:41091")
+;;      ("https" . "127.0.0.1:41091")))
 
 ;; Add path for auto saved files
 (defvar my-auto-save-list (concat (getenv "HOME") "/.config/.emacs.d/auto-save-list"))
@@ -26,10 +26,10 @@
 (require 'package)
 (setq package-archives
       '(
-        ("melpa" . "https://melpa.org/packages/")
-        ("elpa" . "https://elpa.gnu.org/packages/")
-        ;; ("gnu-elpa-cn"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
-        ;; ("melpa-cn" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
+        ;; ("melpa" . "https://melpa.org/packages/")
+        ;; ("elpa" . "https://elpa.gnu.org/packages/")
+        ("gnu-elpa-cn"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
+        ("melpa-cn" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
         ;; ("gnu-elpa-cn"   . "http://mirrors.cloud.tencent.com/elpa/gnu/")
         ;; ("melpa-cn" . "http://mirrors.cloud.tencent.com/elpa/melpa/")
        ))
@@ -123,7 +123,7 @@
 (require 'writegood-mode)
 (require 'yasnippet)
 (require 'yasnippet-snippets)
-(require 'goldendict)
+;; (require 'goldendict)
 (require 'electric-operator)
 (require 'iedit)
 (require 'magit)
@@ -1348,8 +1348,8 @@
   (setq lsp-idle-delay 0.500)
 
   ;; Only enable certain LSP client and do not ask for server install.
-  (setq lsp-enabled-clients '(lsp-metals lsp-grammarly))
-  (setq lsp-warn-no-matched-clients t)
+  (setq lsp-enabled-clients '(metals grammarly-ls rmark marksman unified))
+  (setq lsp-warn-no-matched-clients nil)
 
   ;; lsp-treemacs
   (setq lsp-treemacs-sync-mode t)
@@ -1408,12 +1408,12 @@
   :ensure t
 
   ;; Comment out to start manually
-  :hook (text-mode . (lambda ()
-                           (require 'lsp-grammarly)
-                           (lsp-deferred)))  ;; or lsp
+  :hook ((text-mode markdown-mode gfm-mode) . (lambda ()
+                       (require 'lsp-grammarly)
+                       (lsp-deferred)))  ;; or lsp
 
   :config
-  (setq lsp-grammarly-active-modes '(text-mode latex-mode org-mode markdown-mode))
+  (setq lsp-grammarly-active-modes '(text-mode latex-mode org-mode markdown-mode gfm-mode))
   (setq lsp-grammarly-auto-activate nil)
   (setq lsp-grammarly-domain "academic")
   (setq lsp-grammarly-user-words (concat (getenv "HOME") "/.hunspell_en_US"))
