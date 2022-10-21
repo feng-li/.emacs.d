@@ -18,7 +18,7 @@ Installation
 * Clone the repository
 
         cd ~
-        git clone https://github.com/feng-li/dlsa.git
+        git clone https://github.com/feng-li/.emacs.d.git
         cd ~/.emacs.d/
         git submodule update --init --recursive
 
