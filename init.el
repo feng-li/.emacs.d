@@ -20,7 +20,7 @@
 ;;      ("https" . "127.0.0.1:41091")))
 
 ;; Add path for auto saved files
-(defvar my-auto-save-list (concat (getenv "HOME") "/.config/emacs/auto-save-list/" (getenv "HOSTNAME"))) ;; host-specified
+(defvar my-auto-save-list (concat (getenv "HOME") "/.config/emacs/auto-save-list/" (system-name))) ;; host-specified
 (unless (file-directory-p my-auto-save-list) (make-directory my-auto-save-list t))
 
 (require 'package)
@@ -210,7 +210,7 @@
 (fset 'yes-or-no-p 'y-or-n-p)
 
 ;; Set Fonts
-(add-to-list 'default-frame-alist '(font . "M+ 1mn-10")) ;
+(add-to-list 'default-frame-alist '(font . "Mplus Code 50 Light-10")) ;
 ;; (when (display-graphic-p)
 ;;   (if (> (display-pixel-height) 1080) ;; HDPi
 ;;       (progn
