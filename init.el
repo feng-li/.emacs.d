@@ -210,7 +210,7 @@
 (fset 'yes-or-no-p 'y-or-n-p)
 
 ;; Set Fonts
-(add-to-list 'default-frame-alist '(font . "Mplus Code 50 Light-10")) ;
+(add-to-list 'default-frame-alist '(font . "Mplus Code 50 Regular-10")) ;
 ;; (when (display-graphic-p)
 ;;   (if (> (display-pixel-height) 1080) ;; HDPi
 ;;       (progn
@@ -1338,8 +1338,8 @@
 (use-package lsp-mode
   :commands (lsp lsp-deferred)
   :config
-  (setq lsp-server-install-dir (concat my-auto-save-list "/lsp"))
-  (setq lsp-session-file (concat my-auto-save-list "/.lsp-session-v1"))
+  (setq lsp-server-install-dir (concat (getenv "HOME") "/.config/emacs/auto-save-list/lsp-server"))
+  (setq lsp-session-file (concat my-auto-save-list "/lsp-session-v1"))
   (setq lsp-verify-signature nil) ;; Disable to get metals server (key expired) working
   (setq lsp-prefer-flymake nil) ;; use flycheck
   (setq lsp-headerline-breadcrumb-enable nil)
