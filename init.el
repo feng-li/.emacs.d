@@ -36,6 +36,9 @@
 (setq package-user-dir (concat (getenv "HOME") "/.config/emacs/auto-save-list/elpa")) ;; Global
 (package-initialize)
 
+;; Local server socket dir. Some server does not allow to use the default
+(setq server-socket-dir (concat my-auto-save-list "/server"))
+
 ;; Add personal load path recursively in front of the default load path if it exists.
 (defvar my-site-lisp (concat user-emacs-directory "site-lisp"))
 (if (file-directory-p my-site-lisp)
