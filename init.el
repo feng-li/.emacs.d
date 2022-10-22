@@ -20,7 +20,7 @@
 ;;      ("https" . "127.0.0.1:41091")))
 
 ;; Add path for auto saved files
-(defvar my-auto-save-list (concat (getenv "HOME") "/.config/.emacs.d/auto-save-list"))
+(defvar my-auto-save-list (concat (getenv "HOME") "/.config/emacs/auto-save-list/" (getenv "HOSTNAME"))) ;; host-specified
 (unless (file-directory-p my-auto-save-list) (make-directory my-auto-save-list t))
 
 (require 'package)
@@ -33,7 +33,7 @@
         ;; ("gnu-elpa-cn"   . "http://mirrors.cloud.tencent.com/elpa/gnu/")
         ;; ("melpa-cn" . "http://mirrors.cloud.tencent.com/elpa/melpa/")
        ))
-(setq package-user-dir (concat my-auto-save-list "/elpa"))
+(setq package-user-dir (concat (getenv "HOME") "/.config/emacs/auto-save-list/elpa")) ;; Global
 (package-initialize)
 
 ;; Add personal load path recursively in front of the default load path if it exists.
