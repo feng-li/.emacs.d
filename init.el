@@ -81,7 +81,7 @@
  '(scroll-bar-mode nil)
  '(scroll-conservatively 1)
  '(send-mail-function 'mailclient-send-it)
- '(session-use-package t nil (session))
+ ;; '(session-use-package t nil (session))
  '(show-paren-mode t nil (paren))
  '(tool-bar-mode nil)
  '(warning-suppress-types '((undo discard-info))))
@@ -101,7 +101,7 @@
       auto-save-file-name-transforms `((".*" ,temporary-file-directory t)))
 
 (require 'iso-transl) ;; keyboard input definitions for ISO 8859/1
-(require 'session)
+;; (require 'session)
 (require 'dired-x)
 (require 'ispell)
 (require 'ibuffer)
@@ -426,13 +426,13 @@
 
 
 ;;Session (keep sections with different machines)
-(eval-after-load "session"
-  '(progn
-     (setq session-use-package nil)
-     (add-hook 'after-init-hook 'session-initialize)
-     ;; Save sessions with customization
-     (setq session-save-file (concat my-auto-save-list "/session-save-file.el"))
-     ))
+;; (eval-after-load "session"
+;;   '(progn
+;;      (setq session-use-package nil)
+;;      (add-hook 'after-init-hook 'session-initialize)
+;;      ;; Save sessions with customization
+;;      (setq session-save-file (concat my-auto-save-list "/session-save-file.el"))
+;;      ))
 
 ;; Eshell
 (setq eshell-directory-name (concat my-auto-save-list "/eshell"))
