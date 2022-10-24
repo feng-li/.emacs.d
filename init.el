@@ -206,8 +206,12 @@
   (switch-to-buffer (other-buffer)))
 (global-set-key (kbd "<backtab>") 'switch-to-previous-buffer)
 
-;;Use y-n for short
+;; Use y-n for short
 (fset 'yes-or-no-p 'y-or-n-p)
+
+;; Redraw-display when focused
+(add-hook 'focus-in-hook 'redraw-display)
+(global-set-key (kbd "<f5>") 'redraw-display)
 
 ;; Set Fonts
 (add-to-list 'default-frame-alist '(font . "Mplus Code 50 Regular-10")) ;
