@@ -19,6 +19,7 @@ elpy/
 tutorial/
 eshell/
 tags/
+eln-cache/
 url/
 snippet/
 site-lisp/yasnippet/
