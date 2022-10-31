@@ -1,4 +1,4 @@
-;; init.el --- Feng Li's .emacs configurations
+;; init.el --- Feng Li's .emacs configurations  -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;; Copyright: Feng Li <http://feng.li/>
 ;;
@@ -214,7 +214,7 @@
 (global-set-key (kbd "<f5>") 'redraw-display)
 
 ;; Set Fonts
-(add-to-list 'default-frame-alist '(font . "Mplus Code 50 Regular-10")) ;
+(add-to-list 'default-frame-alist '(font . "Mplus Code 50-11")) ;
 ;; (when (display-graphic-p)
 ;;   (if (> (display-pixel-height) 1080) ;; HDPi
 ;;       (progn
