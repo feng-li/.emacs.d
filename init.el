@@ -81,7 +81,6 @@
  '(scroll-bar-mode nil)
  '(scroll-conservatively 1)
  '(send-mail-function 'mailclient-send-it)
- ;; '(session-use-package t nil (session))
  '(show-paren-mode t nil (paren))
  '(tool-bar-mode nil)
  '(warning-suppress-types '((undo discard-info))))
@@ -155,12 +154,13 @@
 (setq auto-save-list-file-prefix (concat my-auto-save-list "/.saves-"))
 
 ;; Term
-(add-to-list 'term-file-aliases '("dumb" . "xterm-256color"))
+(setenv "TERM" "screen-256color")
+(add-to-list 'term-file-aliases '("dumb" . "screen-256color"))
 ;; Allow shift-arrow keys and control-arrow keys under different tty
 ;; Set export TERM="xterm" in .bashrc and
 ;; term "xterm" in .screenrc.
-(defadvice terminal-init-xterm (after select-shift-up activate)
-  (define-key input-decode-map "\e[1;2A" [S-up]))
+;; (defadvice terminal-init-xterm (after select-shift-up activate)
+;;   (define-key input-decode-map "\e[1;2A" [S-up]))
 
 ;; Theme
 (defun on-after-init ()
@@ -289,7 +289,7 @@
 (setq-default fill-column 90)
 
 (dolist (hook '(
-                after-text-mode-hook
+                prog-mode-hook
                 ;; LaTeX-mode-hook
                 ;; markdown-mode-hook
                 message-mode-hook
@@ -837,7 +837,7 @@
 
   :config
   (setq flycheck-checker-error-threshold 1000)
-  (setq flycheck-check-syntax-automatically '(mode-enabled))
+  (setq flycheck-check-syntax-automatically '(mode-enabled save))
   )
 
 (eval-after-load "synosaurus"
@@ -1281,8 +1281,8 @@
      ;; (remove-hook 'elpy-modules 'elpy-module-pyvenv)
      (remove-hook 'elpy-modules 'elpy-module-highlight-indentation)
 
-     (define-key elpy-mode-map (kbd "C-c C-f") 'elpy-shell-send-defun-and-step-and-go)
-     (define-key elpy-mode-map (kbd "C-c C-r") 'elpy-shell-send-region-or-buffer-and-step-and-go)
+     (define-key elpy-mode-map (kbd "C-c C-f") 'elpy-shell-send-statement-and-step)
+     (define-key elpy-mode-map (kbd "C-c C-r") 'elpy-shell-send-region-or-buffer-and-step)
 
 
      (require 'pydoc)
@@ -1361,6 +1361,7 @@
   ;; lsp-treemacs
   (setq lsp-treemacs-sync-mode t)
   (setq lsp-treemacs-errors-position-params '((side . right)))
+  (defvar treemacs-no-load-time-warnings t)
   (define-key lsp-mode-map (kbd "<f4> <f4>") 'lsp-describe-thing-at-point)
   (define-key lsp-mode-map (kbd "<f4> e") 'lsp-treemacs-errors-list)
   )
