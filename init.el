@@ -37,7 +37,7 @@
 (package-initialize)
 
 ;; Local server socket dir. Some server does not allow to use the default
-(setq server-socket-dir (concat my-auto-save-list "/server"))
+(setq server-use-tcp t)
 
 ;; Add personal load path recursively in front of the default load path if it exists.
 (defvar my-site-lisp (concat user-emacs-directory "site-lisp"))
@@ -83,7 +83,7 @@
  '(send-mail-function 'mailclient-send-it)
  '(show-paren-mode t nil (paren))
  '(tool-bar-mode nil)
- '(warning-suppress-types '((undo discard-info))))
+ '(warning-suppress-types '((comp) (undo discard-info))))
 
 (unless package-archive-contents
   (package-refresh-contents))
@@ -214,7 +214,7 @@
 (global-set-key (kbd "<f5>") 'redraw-display)
 
 ;; Set Fonts
-(add-to-list 'default-frame-alist '(font . "Mplus Code 50-11")) ;
+(add-to-list 'default-frame-alist '(font . "M PLUS 1 Code-11")) ;
 ;; (when (display-graphic-p)
 ;;   (if (> (display-pixel-height) 1080) ;; HDPi
 ;;       (progn
@@ -1355,7 +1355,9 @@
   (setq lsp-idle-delay 0.500)
 
   ;; Only enable certain LSP client and do not ask for server install.
-  (setq lsp-enabled-clients '(metals grammarly-ls rmark marksman unified))
+  ;; (setq lsp-enabled-clients '(metals grammarly-ls rmark marksman unified))
+  (setq lsp-enabled-clients '(metals grammarly-ls))
+  (setq lsp-auto-guess-root nil)
   (setq lsp-warn-no-matched-clients nil)
 
   ;; lsp-treemacs
