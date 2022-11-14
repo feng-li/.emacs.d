@@ -1267,8 +1267,8 @@
      (elpy-enable)
      ;; (setq elpy-rpc-virtualenv-path (concat (getenv "HOME") "/.emacs.d/elpy/" system-name "/rpc-venv"))
      ;; (setq elpy-rpc-virtualenv-path (concat (getenv "HOME") "/.cache/elpy/rpc-venv"))
-     (setq elpy-rpc-virtualenv-path (concat (getenv "HOME") "/.local/"))
-     (setq elpy-rpc-python-command "python3")
+     (setq elpy-rpc-virtualenv-path (concat (getenv "HOME") "/.virtualenvs/elpy/"))
+     (setq elpy-rpc-python-command "python3.9")
      (setq elpy-syntax-check-command (concat elpy-rpc-virtualenv-path  "bin/flake8"))
 
      ;; Disable elpy's flymake, use flycheck
@@ -1289,7 +1289,7 @@
      (define-key elpy-mode-map (kbd "C-c C-v") 'pydoc)
      ;; (local-set-key (kbd "C-c C-v") 'pydoc) ; C-c C-v was bounded to elpy-check
 
-     (setq python-shell-interpreter "python3")
+     (setq python-shell-interpreter "python3.9")
      (setq python-shell-completion-native-enable nil)
 
      (add-hook 'python-mode-hook
