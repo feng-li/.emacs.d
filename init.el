@@ -1281,7 +1281,7 @@
      ;; (remove-hook 'elpy-modules 'elpy-module-pyvenv)
      (remove-hook 'elpy-modules 'elpy-module-highlight-indentation)
 
-     (define-key elpy-mode-map (kbd "C-c C-f") 'elpy-shell-send-statement-and-step)
+     (define-key elpy-mode-map (kbd "C-c C-c") 'elpy-shell-send-statement-and-step)
      (define-key elpy-mode-map (kbd "C-c C-r") 'elpy-shell-send-region-or-buffer-and-step)
 
 
