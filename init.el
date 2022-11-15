@@ -78,7 +78,7 @@
 
 ;; (unless package-archive-contents
 ;;   (package-refresh-contents))
-(package-install-selected-packages)
+;; (package-install-selected-packages)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Basic Preferences
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -117,7 +117,10 @@
 ;; (unless (display-graphic-p)
 ;;   (set-face-background 'default "black" nil)
 ;;   )
-(load-theme 'dracula t)
+(use-package dracula-theme
+  :config
+  (load-theme 'dracula t)
+  )
 
 ;; The scratch settings
 (setq initial-scratch-message nil) ;; Disable scratch information
