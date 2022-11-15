@@ -3,17 +3,10 @@
 ;; Copyright: Feng Li <http://feng.li/>
 ;;
 ;; Download: https://github.com/feng-li/.emacs.d/
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Load all required packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Added by Package.el.  This must come before configurations of installed packages.
-;; Don't delete this line.  If you don't want it, just comment it out by adding a
-;; semicolon to the start of the line.  You may delete these explanatory comments.  Add
-;; MELPA repository
-;;; Code:
-
 ;; (setq url-proxy-services
 ;;    '(("no_proxy" . "^\\(localhost\\|10\\..*\\|192\\.168\\..*\\)")
 ;;      ("http" . "127.0.0.1:41091")
@@ -23,7 +16,6 @@
 (defvar my-auto-save-list (concat (getenv "HOME") "/.config/emacs/auto-save-list/" (system-name))) ;; host-specified
 (unless (file-directory-p my-auto-save-list) (make-directory my-auto-save-list t))
 
-(require 'package)
 (setq package-archives
       '(
         ;; ("melpa" . "https://melpa.org/packages/")
@@ -33,8 +25,7 @@
         ;; ("gnu-elpa-cn"   . "http://mirrors.cloud.tencent.com/elpa/gnu/")
         ;; ("melpa-cn" . "http://mirrors.cloud.tencent.com/elpa/melpa/")
        ))
-(setq package-user-dir (concat (getenv "HOME") "/.config/emacs/auto-save-list/elpa")) ;; Global
-(package-initialize)
+;; (package-initialize)
 
 ;; Local server socket dir. Some server does not allow to use the default
 (setq server-use-tcp t)
@@ -75,7 +66,7 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(poly-R visual-fill-column keytar lsp-grammarly gnu-elpa-keyring-update lsp-ui lsp-metals use-package lsp-mode ammonite-term-repl scala-mode lexic pandoc-mode wordnut synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math goldendict writegood-mode highlight-symbol color-theme-solarized popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
+   '(poly-R visual-fill-column keytar lsp-grammarly gnu-elpa-keyring-update lsp-ui lsp-metals use-package lsp-mode scala-mode lexic pandoc-mode wordnut synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math writegood-mode highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
  '(safe-local-variable-values '((TeX-engine . pdflatex)))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
@@ -85,55 +76,9 @@
  '(tool-bar-mode nil)
  '(warning-suppress-types '((comp) (undo discard-info))))
 
-(unless package-archive-contents
-  (package-refresh-contents))
+;; (unless package-archive-contents
+;;   (package-refresh-contents))
 (package-install-selected-packages)
-
-;; Additional library loaded during start up.
-;; (setq tramp-ssh-controlmaster-options nil)
-(require 'use-package)
-;; Enable defer and ensure by default for use-package
-;; Keep auto-save/backup files separate from source code:  https://github.com/scalameta/metals/issues/1027
-(setq use-package-always-defer t
-      use-package-always-ensure t
-      backup-directory-alist `((".*" . ,temporary-file-directory))
-      auto-save-file-name-transforms `((".*" ,temporary-file-directory t)))
-
-(require 'iso-transl) ;; keyboard input definitions for ISO 8859/1
-;; (require 'session)
-(require 'dired-x)
-(require 'ispell)
-(require 'ibuffer)
-(require 'ido)
-;(require 'comint)
-(require 'org)
-(require 'markdown-mode)
-;(require 'poly-R)
-;(require 'poly-markdown)
-;(require 'flycheck)
-(require 'company)
-(require 'ess-site)
-(require 'julia-mode)
-(require 'flycheck-julia)
-(require 'python)
-;; (require 'flymake-python-pyflakes)
-
-(load "auctex.el" nil t t)
-(require 'company-auctex)
-;;(load "preview-latex.el" nil t t)
-;;(require 'langtool)
-(require 'writegood-mode)
-(require 'yasnippet)
-(require 'yasnippet-snippets)
-;; (require 'goldendict)
-(require 'electric-operator)
-(require 'iedit)
-(require 'magit)
-(require 'yaml-mode)
-(require 'synosaurus)
-(require 'mw-thesaurus)
-(require 'lexic)
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Basic Preferences
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -300,10 +245,10 @@
 
 ;; Unfilling a region joins all the lines in a paragraph into a single line for each
 ;; paragraphs in that region. It is the contrary of fill-region.
-(eval-after-load "unfill"
-  '(progn
+(use-package unfill
+  :config
      (define-key global-map (kbd "C-M-q") 'unfill-paragraph)
-     ))
+     )
 
 ;; https://www.reddit.com/r/emacs/comments/kwl0mc/lspdescribethingatpoint_config_improvement/
 (add-to-list 'display-buffer-alist
@@ -430,7 +375,7 @@
 
 
 ;;Session (keep sections with different machines)
-;; (eval-after-load "session"
+;; (use-package session"
 ;;   '(progn
 ;;      (setq session-use-package nil)
 ;;      (add-hook 'after-init-hook 'session-initialize)
@@ -451,23 +396,19 @@
 
 
 ;; Electric operators
-(electric-pair-mode t)
-;; (setq skeleton-pair t)
-;; (global-set-key "(" 'skeleton-pair-insert-maybe)
-;; (global-set-key "[" 'skeleton-pair-insert-maybe)
-;; (global-set-key "{" 'skeleton-pair-insert-maybe)
-;; (global-set-key "\"" 'skeleton-pair-insert-maybe)
-;; (global-set-key "\'" 'skeleton-pair-insert-maybe)
+(use-package electric-operator
+  :config
+  (electric-pair-mode t)
 
-(dolist (hook '(python-mode-hook c-mode-hook c++-mode-hook LaTeX-mode-hook ess-r-mode-hook))
-  (add-hook hook '(lambda () (electric-operator-mode 1))))
-(apply #'electric-operator-add-rules-for-mode 'inferior-python-mode
-       (electric-operator-get-rules-for-mode 'python-mode))
-(setq electric-operator-R-named-argument-style "spaced")
-(electric-operator-add-rules-for-mode 'prog-mode (cons "*" nil))
-(electric-operator-add-rules-for-mode 'prog-mode (cons "/" nil))
-(electric-operator-add-rules-for-mode 'prog-mode (cons "?" nil))
-
+  (dolist (hook '(python-mode-hook c-mode-hook c++-mode-hook LaTeX-mode-hook ess-r-mode-hook))
+    (add-hook hook '(lambda () (electric-operator-mode 1))))
+  (apply #'electric-operator-add-rules-for-mode 'inferior-python-mode
+         (electric-operator-get-rules-for-mode 'python-mode))
+  (setq electric-operator-R-named-argument-style "spaced")
+  (electric-operator-add-rules-for-mode 'prog-mode (cons "*" nil))
+  (electric-operator-add-rules-for-mode 'prog-mode (cons "/" nil))
+  (electric-operator-add-rules-for-mode 'prog-mode (cons "?" nil))
+  )
 
 ;; Goto matched parenthesis
 (global-set-key (kbd "?") 'goto-match-paren) ;;
@@ -488,19 +429,20 @@
 ;; Let m-file connected with octave mode.
 (setq auto-mode-alist (cons '("\\.m$" . octave-mode) auto-mode-alist))
 
-(eval-after-load "yaml-mode"
-  '(progn
+(use-package yaml-mode
+  :config
      (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
      )
-  )
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Language and writing https://languagetool.org/
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; LanguageTool https://languagetool.org/download/
-(eval-after-load "langtool"
-  '(progn
+(use-package langtool
+  :disabled t
+  :config
      (setq langtool-language-tool-jar "~/.APP/LanguageTool/languagetool-commandline.jar")
      (setq langtool-default-language "en-US")
 
@@ -517,25 +459,25 @@
            (let ((msg (langtool-details-error-message overlays)))
              (popup-tip msg)))))
      (setq langtool-autoshow-message-function
-           'langtool-autoshow-detail-popup)))
+           'langtool-autoshow-detail-popup))
 
-(eval-after-load "writegood-mode"
-  '(progn
-     (global-set-key (kbd "<f9> w") 'writegood-mode)))
+(use-package writegood-mode
+  :config
+     (global-set-key (kbd "<f9> w") 'writegood-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; General IDE settings
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; iedit mode
-(eval-after-load "iedit"
-  '(progn
+(use-package iedit
+  :config
      (global-set-key (kbd "C-c i") 'iedit-mode)
-     ))
+     )
 
 ;; Ibuffer mode
-(eval-after-load "ibuffer"
-  '(progn
+(use-package ibuffer
+  :config
      (global-set-key (kbd "C-x C-b") 'ibuffer)
      (global-set-key (kbd "<f9> i") 'ibuffer)
 
@@ -583,8 +525,8 @@
                         (mode . bibtex-mode)
                         (mode . org-mode)))
               ("Config" (or
-                       (mode . yaml-mode)
-                       (mode . conf-unix-mode)))
+                         (mode . yaml-mode)
+                         (mode . conf-unix-mode)))
 
               ("Proc" (or
                        (mode . inferior-ess-mode)))
@@ -602,37 +544,37 @@
               ))))
      (add-hook 'ibuffer-mode-hook
                (lambda ()
-                 (ibuffer-switch-to-saved-filter-groups "default")))))
+                 (ibuffer-switch-to-saved-filter-groups "default"))))
 
 ;; Ido mode
-(eval-after-load "ido"
-  '(progn
-     (ido-mode t)
-     (setq ido-use-virtual-buffers nil)
-     (setq ido-enable-flex-matching nil)
-     (setq ido-ignore-extensions t)
-     (setq ido-save-directory-list-file (concat my-auto-save-list "/ido-save-directory-list-file.el"))
-     (setq ido-ignore-files ; this also works with directories with c-x c-f
-           '("\\.Rc$" "\\.dvi$" "\\.pdf$" "\\.ps$" "\\.out$" "\\.fls$" "\\.spl$" "\\.fff$"
-             "\\.ttt$" "\\.log$" "\\.ods$" "\\.eps$" "\\#$" "\\.png$" "\\~$" "\\.RData$"
-             "\\.nav$" "\\.snm$" "\\`\\.\\./" "\\`\\./" "\\.synctex.gz$" "\\.fdb_latexmk$"
-             "\\.tar.gz$" "\\.zip$" "\\.o$" "\\.tar$" "\\.Rproj$" "\\.Rcheck$" "\\.doc$"
-             "\\.docx$" "\\.Rhistory$" "auto/" "__pycache__/" "\\.bcf$" "\\.run.xml$" "_region_.tex$"
-             "\\.xdv$" "\\.DS_Store$" "\\.cfg$" "\\.bak$" "\\.gitignore" "\\.tmp$"))
+(use-package ido
+  :config
+  (ido-mode t)
+  (setq ido-use-virtual-buffers nil)
+  (setq ido-enable-flex-matching nil)
+  (setq ido-ignore-extensions t)
+  (setq ido-save-directory-list-file (concat my-auto-save-list "/ido-save-directory-list-file.el"))
+  (setq ido-ignore-files ; this also works with directories with c-x c-f
+        '("\\.Rc$" "\\.dvi$" "\\.pdf$" "\\.ps$" "\\.out$" "\\.fls$" "\\.spl$" "\\.fff$"
+          "\\.ttt$" "\\.log$" "\\.ods$" "\\.eps$" "\\#$" "\\.png$" "\\~$" "\\.RData$"
+          "\\.nav$" "\\.snm$" "\\`\\.\\./" "\\`\\./" "\\.synctex.gz$" "\\.fdb_latexmk$"
+          "\\.tar.gz$" "\\.zip$" "\\.o$" "\\.tar$" "\\.Rproj$" "\\.Rcheck$" "\\.doc$"
+          "\\.docx$" "\\.Rhistory$" "auto/" "__pycache__/" "\\.bcf$" "\\.run.xml$" "_region_.tex$"
+          "\\.xdv$" "\\.DS_Store$" "\\.cfg$" "\\.bak$" "\\.gitignore" "\\.tmp$"))
 
-     (setq  ido-ignore-directories ; only works with ido-dired
-            '("\\`auto/" "\\.prv/" "\\`CVS/" "\\`.git/" "\\`.ropeproject/" "\\`\\.\\./"
-              "\\`\\./" "\\`_bookdown_files/" "__pycache__/"))
+  (setq  ido-ignore-directories ; only works with ido-dired
+         '("\\`auto/" "\\.prv/" "\\`CVS/" "\\`.git/" "\\`.ropeproject/" "\\`\\.\\./"
+           "\\`\\./" "\\`_bookdown_files/" "__pycache__/"))
 
-     (setq ido-ignore-buffers
-           '("\\` " "^\\*ESS\\*" "^\\*Messages\\*" "^\\*Help\\*" "^\\*Buffer" "*scratch*"
-             "^\\*Ibuffer*" "^\\*ESS-errors*" "^\\*Warnings*" "*TeX Help*"
-             "*Pymacs*" "*Flymake log*" "\\.log$" "^\\*.*Completions\\*$" "^\\*Ediff" "^\\*tramp"
-             "^\\*cvs-" "_region_" "^TAGS$" "^\\*Ido" "^\\*.*dictem buffer\\*$"
-             "^\\*inferior-lisp*" "^\\*Compile-Log\\*" "*output*" "\.\*output*"))
+  (setq ido-ignore-buffers
+        '("\\` " "^\\*ESS\\*" "^\\*Messages\\*" "^\\*Help\\*" "^\\*Buffer" "*scratch*"
+          "^\\*Ibuffer*" "^\\*ESS-errors*" "^\\*Warnings*" "*TeX Help*"
+          "*Pymacs*" "*Flymake log*" "\\.log$" "^\\*.*Completions\\*$" "^\\*Ediff" "^\\*tramp"
+          "^\\*cvs-" "_region_" "^TAGS$" "^\\*Ido" "^\\*.*dictem buffer\\*$"
+          "^\\*inferior-lisp*" "^\\*Compile-Log\\*" "*output*" "\.\*output*"))
 
-     (defun ido-kill-emacs-hook () (ignore-errors (ido-save-history)))
-     ))
+  (defun ido-kill-emacs-hook () (ignore-errors (ido-save-history)))
+  )
 
 ;; ElDoc mode
 (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
@@ -640,100 +582,100 @@
 (add-hook 'ielm-mode-hook 'turn-on-eldoc-mode)
 
 ;; Comint for input history and  scrolling
-(eval-after-load "comint"
-  '(progn
-     (define-key
-       comint-mode-map (kbd "C-<up>")'comint-previous-matching-input-from-input)
-     (define-key
-       comint-mode-map (kbd "C-<down>") 'comint-next-matching-input-from-input)
-     (define-key
-       comint-mode-map (kbd "C-k") 'comint-kill-input)
+(use-package comint
+  :config
+  (define-key
+    comint-mode-map (kbd "C-<up>")'comint-previous-matching-input-from-input)
+  (define-key
+    comint-mode-map (kbd "C-<down>") 'comint-next-matching-input-from-input)
+  (define-key
+    comint-mode-map (kbd "C-k") 'comint-kill-input)
 
-     ;; Comint history length
-     (setq comint-input-ring-size 5000)
-     (setq comint-read-input-ring t)
+  ;; Comint history length
+  (setq comint-input-ring-size 5000)
+  (setq comint-read-input-ring t)
 
-     ;; Comint scroll output
-     (setq comint-scroll-to-bottom-on-output 'others)
-     (setq comint-scroll-show-maximum-output t)
-     (setq comint-scroll-to-bottom-on-input 'this)
-     (setq comint-scroll-to-bottom-on-input t)
-     (setq comint-move-point-for-output t)
+  ;; Comint scroll output
+  (setq comint-scroll-to-bottom-on-output 'others)
+  (setq comint-scroll-show-maximum-output t)
+  (setq comint-scroll-to-bottom-on-input 'this)
+  (setq comint-scroll-to-bottom-on-input t)
+  (setq comint-move-point-for-output t)
 
-     ;; Clear buffer output
-     ;; Emacs 25's new default function was bound to (C-C, C-O)
-     (define-key comint-mode-map (kbd "C-l") 'comint-clear-buffer)
-     ))
+  ;; Clear buffer output
+  ;; Emacs 25's new default function was bound to (C-C, C-O)
+  (define-key comint-mode-map (kbd "C-l") 'comint-clear-buffer)
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Auto completion settings (company mode, yasnippet)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(eval-after-load "yasnippet"
-  '(progn
-     (yas-global-mode 1)
-     ;; (setq yas-snippet-dirs
-     ;;       '(;; personal snippets
-     ;;         "~/.emacs.d/snippets"
-     ;;         ;; snippet collection
-     ;;         ;; "~/.emacs.d/site-lisp/yasnippet-snippets/snippets"
-     ;;         ))
-     )
+(use-package yasnippet
+  :config
+  (yas-global-mode 1)
+  ;; (setq yas-snippet-dirs
+  ;;       '(;; personal snippets
+  ;;         "~/.emacs.d/snippets"
+  ;;         ;; snippet collection
+  ;;         ;; "~/.emacs.d/site-lisp/yasnippet-snippets/snippets"
+  ;;         ))
   )
 
-(eval-after-load "company"
-  '(progn
-     (add-hook 'after-init-hook 'global-company-mode)
-     (setq company-minimum-prefix-length 2)
 
-     ;; Preserve initial cases
-     (setq company-dabbrev-downcase nil)
-     (setq company-dabbrev-ignore-case nil)
+(use-package company
+  :config
+  (add-hook 'after-init-hook 'global-company-mode)
+  (setq company-minimum-prefix-length 2)
 
-     ;; Add yasnippet support for all company backends
-     ;; https://github.com/syl20bnr/spacemacs/pull/179
-     (defvar company-mode/enable-yas t
-       "Enable yasnippet for all backends.")
-     (defun company-mode/backend-with-yas (backend)
-       (if (or (not company-mode/enable-yas) (and (listp backend) (member 'company-yasnippet backend)))
-           backend
-         (append (if (consp backend) backend (list backend))
-                 '(:with company-yasnippet))))
-     (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
+  ;; Preserve initial cases
+  (setq company-dabbrev-downcase nil)
+  (setq company-dabbrev-ignore-case nil)
 
-     ;; Use company quick access number to select candidates. The key want binded to M-numbers.
-     ;;https://github.com/abo-abo/oremacs/blob/d2b2cd8371b94f35a42000debef1c2b644cb9472/modes/ora-company.el#L22
-     (setq company-show-quick-access t)
-     (defun ora-company-number ()
-       "Forward to `company-complete-number'.
+  ;; Add yasnippet support for all company backends
+  ;; https://github.com/syl20bnr/spacemacs/pull/179
+  (defvar company-mode/enable-yas t
+    "Enable yasnippet for all backends.")
+  (defun company-mode/backend-with-yas (backend)
+    (if (or (not company-mode/enable-yas) (and (listp backend) (member 'company-yasnippet backend)))
+        backend
+      (append (if (consp backend) backend (list backend))
+              '(:with company-yasnippet))))
+  (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
+
+  ;; Use company quick access number to select candidates. The key want binded to M-numbers.
+  ;;https://github.com/abo-abo/oremacs/blob/d2b2cd8371b94f35a42000debef1c2b644cb9472/modes/ora-company.el#L22
+  (setq company-show-quick-access t)
+  (defun ora-company-number ()
+    "Forward to `company-complete-number'.
      Unless the number is potentially part of the candidate.  In
      that case, insert the number."
-       (interactive)
-       (let* ((k (this-command-keys))
-              (re (concat "^" company-prefix k)))
-         (if (or (cl-find-if (lambda (s) (string-match re s))
-                             company-candidates)
-                 (> (string-to-number k)
-                    (length company-candidates))
-                 (looking-back "[0-9]+\\.[0-9]*" (line-beginning-position)))
-             (self-insert-command 1)
-           (company-complete-number
-            (if (equal k "0")
-                10
-              (string-to-number k))))))
-     ;;https://github.com/abo-abo/oremacs/blob/d2b2cd8371b94f35a42000debef1c2b644cb9472/init.el#L28
-     (defun ora-advice-add (&rest args)
-       (when (fboundp 'advice-add)
-         (apply #'advice-add args)))
-     (defun ora--company-good-prefix-p (orig-fn prefix)
-       (unless (and (stringp prefix) (string-match-p "\\`[0-9]+\\'" prefix))
-         (funcall orig-fn prefix)))
-     (ora-advice-add 'company--good-prefix-p :around #'ora--company-good-prefix-p)
+    (interactive)
+    (let* ((k (this-command-keys))
+           (re (concat "^" company-prefix k)))
+      (if (or (cl-find-if (lambda (s) (string-match re s))
+                          company-candidates)
+              (> (string-to-number k)
+                 (length company-candidates))
+              (looking-back "[0-9]+\\.[0-9]*" (line-beginning-position)))
+          (self-insert-command 1)
+        (company-complete-number
+         (if (equal k "0")
+             10
+           (string-to-number k))))))
+  ;;https://github.com/abo-abo/oremacs/blob/d2b2cd8371b94f35a42000debef1c2b644cb9472/init.el#L28
+  (defun ora-advice-add (&rest args)
+    (when (fboundp 'advice-add)
+      (apply #'advice-add args)))
+  (defun ora--company-good-prefix-p (orig-fn prefix)
+    (unless (and (stringp prefix) (string-match-p "\\`[0-9]+\\'" prefix))
+      (funcall orig-fn prefix)))
+  (ora-advice-add 'company--good-prefix-p :around #'ora--company-good-prefix-p)
 
-     (let ((map company-active-map))
-       (mapc (lambda (x) (define-key map (format "%d" x) 'ora-company-number))
-             (number-sequence 0 9)))
-     ))
+  (let ((map company-active-map))
+    (mapc (lambda (x) (define-key map (format "%d" x) 'ora-company-number))
+          (number-sequence 0 9)))
+  )
 
 (add-hook 'prog-mode-hook 'flyspell-prog-mode)
 
@@ -741,11 +683,12 @@
 (global-font-lock-mode t)
 (setq font-lock-maximum-decoration t) ;; Highlight parentheses
 
-(eval-after-load "highlight-parentheses"
-  '(progn
-     (define-globalized-minor-mode global-highlight-parentheses-mode
-       highlight-parentheses-mode (lambda () (highlight-parentheses-mode t)))
-     (global-highlight-parentheses-mode t))) ;; Highlight symbols
+(use-package highlight-parentheses
+  :disabled t
+  :config
+  (define-globalized-minor-mode global-highlight-parentheses-mode
+    highlight-parentheses-mode (lambda () (highlight-parentheses-mode t)))
+  (global-highlight-parentheses-mode t)) ;; Highlight symbols
 
 ;; parentheses mode
 (show-paren-mode t)
@@ -755,10 +698,10 @@
 (global-set-key (kbd "M-3") 'comment-or-uncomment-region)
 
 ;; Add extra info path
-(eval-after-load "info-look"
-  '(progn
-     (add-to-list
-      'Info-default-directory-list (concat user-emacs-directory "info"))))
+(use-package info-look
+  :config
+  (add-to-list
+   'Info-default-directory-list (concat user-emacs-directory "info")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Version Control and Diff
@@ -776,21 +719,21 @@
   )
 (setq vc-follow-symlinks nil)
 
-(eval-after-load "magit"
-  '(progn
-     ;; Save transient file with customization
-     (setq transient-history-file (concat my-auto-save-list "/transient-history-file.el"))
+(use-package magit
+  :config
+  ;; Save transient file with customization
+  (setq transient-history-file (concat my-auto-save-list "/transient-history-file.el"))
 
-     ;; magit with-editor support
-     (define-key (current-global-map)
-       [remap async-shell-command] 'with-editor-async-shell-command)
-     (define-key (current-global-map)
-       [remap shell-command] 'with-editor-shell-command)
+  ;; magit with-editor support
+  (define-key (current-global-map)
+    [remap async-shell-command] 'with-editor-async-shell-command)
+  (define-key (current-global-map)
+    [remap shell-command] 'with-editor-shell-command)
 
-     (define-key with-editor-mode-map (kbd "C-c C-c") nil)
+  (define-key with-editor-mode-map (kbd "C-c C-c") nil)
 
-     )
   )
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -798,28 +741,28 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Spelling Check
-(eval-after-load "ispell"
-  '(progn
-     ;; (setq ispell-dictionary "american")
+(use-package ispell
+  :config
+  ;; (setq ispell-dictionary "american")
 
-     ;; Hunspell 1.7 is broken with emacs 26.1
-     (defun ispell-get-coding-system () 'utf-8)
-     (setq ispell-use-framepop-p t)
+  ;; Hunspell 1.7 is broken with emacs 26.1
+  (defun ispell-get-coding-system () 'utf-8)
+  (setq ispell-use-framepop-p t)
 
-     ;; Prefer hunspell if exits
-     (if (locate-file "hunspell" exec-path)
-         (progn
-           (setq ispell-program-name "hunspell")
-           (setq ispell-really-hunspell t)
-           (setenv "DICPATH" (concat user-emacs-directory "dicts/hunspell"))
-           (setq ispell-local-dictionary "en_US")
-           (setq ispell-local-dictionary-alist
-                 '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil
-                    ("-d" "en_US,en_GB") nil UTF-8)))
-           )
-       )
+  ;; Prefer hunspell if exits
+  (if (locate-file "hunspell" exec-path)
+      (progn
+        (setq ispell-program-name "hunspell")
+        (setq ispell-really-hunspell t)
+        (setenv "DICPATH" (concat user-emacs-directory "dicts/hunspell"))
+        (setq ispell-local-dictionary "en_US")
+        (setq ispell-local-dictionary-alist
+              '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil
+                 ("-d" "en_US,en_GB") nil UTF-8)))
+        )
+    )
 
-     (global-set-key (kbd "<f9> 4") 'ispell-word)))
+  (global-set-key (kbd "<f9> 4") 'ispell-word))
 
 ;; Auto correct spelling mistakes
 (global-set-key (kbd "<f9> c") 'flyspell-auto-correct-word)
@@ -840,15 +783,13 @@
   (setq flycheck-check-syntax-automatically '(mode-enabled save))
   )
 
-(eval-after-load "synosaurus"
-  '(progn
-     (dolist (hook '(text-mode-hook latex-mode-hook LaTeX-mode-hook prog-mode-hook org-mode-hook markdown-mode-hook))
-       (add-hook hook (lambda () (synosaurus-mode))))
-
-     (setq synosaurus-choose-method 'popup) ; popup, ido
-     ;; (setq synosaurus-backend  'Wordnet) ; apt install wordnet
-     (define-key synosaurus-mode-map (kbd "<f4> t") 'synosaurus-choose-and-replace)
-     )
+(use-package synosaurus
+  :config
+  (dolist (hook '(text-mode-hook latex-mode-hook LaTeX-mode-hook prog-mode-hook org-mode-hook markdown-mode-hook))
+    (add-hook hook (lambda () (synosaurus-mode))))
+  (setq synosaurus-choose-method 'popup) ; popup, ido
+  ;; (setq synosaurus-backend  'Wordnet) ; apt install wordnet
+  (define-key synosaurus-mode-map (kbd "<f4> t") 'synosaurus-choose-and-replace)
   )
 
 
@@ -878,35 +819,25 @@
 ;; (setq synonyms-cache-file  "~/.emacs.d/hunspell/mobythesaurus/mthesaur.txt.cache")
 ;; (require 'synonyms)
 
-;; Golden Dictionary
-;; (eval-after-load "goldendict"
-;;   '(progn
-;;      (global-set-key (kbd "C-c d") 'goldendict-dwim)))
-
 ;; StarDict
 ;; apt install sdcv
 ;; https://github.com/Dushistov/sdcv
-(eval-after-load "lexic"
-  '(progn
-     (setq lexic-dictionary-path (concat user-emacs-directory "dict/sdcv/"))
-     (setq lexic-dictionary-list
-           '(;; "Soule's Dictionary of English Synonyms (En-En)"
-             "Merriam-Webster's Collegiate Thesaurus (En-En)"
-             "Merriam-Webster's Advanced Learner's Dictionary (En-En)"
-             "Longman Dictionary of Common Errors (En-En)"))
-     (global-set-key (kbd "<f9> d") 'lexic-search)
-     ))
-
-(eval-after-load "mw-thesaurus"
-  '(progn
-     (setq mw-thesaurus--api-key "23ed2cad-ce64-4ab1-abd9-774760e6842d")
-     (global-set-key (kbd "<f9> t") 'mw-thesaurus-lookup-dwim)
-     )
+(use-package lexic
+  :config
+  (setq lexic-dictionary-path (concat user-emacs-directory "dict/sdcv/"))
+  (setq lexic-dictionary-list
+        '(;; "Soule's Dictionary of English Synonyms (En-En)"
+          "Merriam-Webster's Collegiate Thesaurus (En-En)"
+          "Merriam-Webster's Advanced Learner's Dictionary (En-En)"
+          "Longman Dictionary of Common Errors (En-En)"))
+  (global-set-key (kbd "<f9> d") 'lexic-search)
   )
 
-
-(add-hook 'c-mode-common-hook
-          (lambda () (define-key c-mode-base-map (kbd "<f5>") 'compile)))
+(use-package mw-thesaurus
+  :config
+  (setq mw-thesaurus--api-key "23ed2cad-ce64-4ab1-abd9-774760e6842d")
+  (global-set-key (kbd "<f9> t") 'mw-thesaurus-lookup-dwim)
+  )
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -923,7 +854,7 @@
   (add-hook hook '(lambda () (xref-etags-mode))))
 
 ;; highlight-indent-guides-mode, can make emacs slow with large files
-;; (eval-after-load "highlight-indent-guides"
+;; (use-package highlight-indent-guides"
 ;;   '(progn
 ;;      (add-hook 'python-mode-hook 'highlight-indent-guides-mode)
 ;;      (setq highlight-indent-guides-method 'character)
@@ -960,29 +891,25 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Markdown mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(eval-after-load "markdown-mode"
-  '(progn
-     (setq auto-mode-alist (cons '("\\.md" . markdown-mode) auto-mode-alist))
-     ;; (setq auto-mode-alist (cons '("\\.Rmd" . markdown-mode) auto-mode-alist))
+(use-package markdown-mode
+  :config
+  (setq auto-mode-alist (cons '("\\.md" . markdown-mode) auto-mode-alist))
+  ;; (setq auto-mode-alist (cons '("\\.Rmd" . markdown-mode) auto-mode-alist))
 
-     (autoload 'gfm-mode "markdown-mode"
-       "Major mode for editing GitHub Flavored Markdown files" t)
-     (add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode))
+  (autoload 'gfm-mode "markdown-mode"
+    "Major mode for editing GitHub Flavored Markdown files" t)
+  (add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode))
 
-     ))
+  )
 
-     (dolist (hook '(text-mode-hook latex-mode-hook LaTeX-mode-hook prog-mode-hook org-mode-hook markdown-mode-hook))
-       (add-hook hook (lambda () (synosaurus-mode))))
-
-
-(eval-after-load "pandoc"
-  '(progn
-     (dolist (hook '(text-mode-hook LaTeX-mode-hook org-mode-hook markdown-mode-hook))
-       (add-hook hook (lambda () (pandoc-mode))))
-     (add-hook 'pandoc-mode-hook
-               (lambda ()
-                 (local-set-key (kbd "C-c p") 'pandoc-main-hydra/body)))
-     ))
+(use-package pandoc-mode
+  :config
+  (dolist (hook '(text-mode-hook LaTeX-mode-hook org-mode-hook markdown-mode-hook))
+    (add-hook hook (lambda () (pandoc-mode))))
+  (add-hook 'pandoc-mode-hook
+            (lambda ()
+              (local-set-key (kbd "C-c p") 'pandoc-main-hydra/body)))
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Org-mode
@@ -1015,141 +942,143 @@
 (advice-add 'bibtex-clean-entry :around #'bibtex-reset-fill-prefix)
 
 ;; AUCTEX
-(eval-after-load "auctex.el"
-  '(progn
+(use-package tex
+  :ensure auctex
+  :config
 
-     (setq TeX-save-query  nil )
+  (setq TeX-save-query  nil )
 
-     ;; LaTeX AUCTex features
-     (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
-     (setq LaTeX-math-menu-unicode t)
+  ;; LaTeX AUCTex features
+  (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
+  (setq LaTeX-math-menu-unicode t)
 
-     ;; Special Environment
-     (setq LaTeX-document-regexp "document\\|refsection\\|frontmatter")
-     ;; Add listings to verbatim environments
-     (eval-after-load "latex"
-       '(add-to-list 'LaTeX-verbatim-environments "lstlisting"))
+  ;; Special Environment
+  (setq LaTeX-document-regexp "document\\|refsection\\|frontmatter")
+  ;; Add listings to verbatim environments
+  ;; (add-to-list 'LaTeX-verbatim-environments "lstlisting")
 
-     ;; Set default TeX engine
-     (setq TeX-PDF-mode t)
-     (setq-default TeX-engine 'xetex) ;this can be set locally
-     (setq TeX-engine-alist '((pdflatex "PDFLaTeX" "pdflatex" "pdflatex" "pdflatex"))) ; Add PDFLaTeX as engine option
+  ;; Set default TeX engine
+  (setq TeX-PDF-mode t)
+  (setq-default TeX-engine 'xetex) ;this can be set locally
+  (setq TeX-engine-alist '((pdflatex "PDFLaTeX" "pdflatex" "pdflatex" "pdflatex"))) ; Add PDFLaTeX as engine option
 
-     ;; LATEXMK integration
-     (require 'auctex-latexmk)
-     ;; (auctex-latexmk-setup) ; not needed auctex-latexmk-pvc already called.
-     (require 'auctex-latexmk-pvc) ; provide LatexMkPvc command
-     (auctex-latexmk-pvc-setup)
+  ;; LATEXMK integration
+  (use-package auctex-latexmk)
+  ;; (auctex-latexmk-setup) ; not needed auctex-latexmk-pvc already called.
+  (use-package auctex-latexmk-pvc
+    :config
+    (auctex-latexmk-pvc-setup)
 
-     ;; Use LatexMkPvc as the main command
-     (defun TeX-command-run-latexmkpvc ()
-       (interactive)
-       (TeX-save-document (TeX-master-file))
-       (TeX-command "LatexMkPvc" 'TeX-master-file -1))
+    ;; Use LatexMkPvc as the main command
+    (defun TeX-command-run-latexmkpvc ()
+      (interactive)
+      (TeX-save-document (TeX-master-file))
+      (TeX-command "LatexMkPvc" 'TeX-master-file -1))
 
-     ;; Replace LaTeX with latexmk -pvc
-     (setcdr (assoc "LaTeX" TeX-command-list)
-             '("latexmk -pvc -pv- %(-PDF)%S%(mode) %(file-line-error) %(extraopts) %t" TeX-run-latexmk-pvc nil
-               :help "Run LaTeX with `latexmk -pvc`"))
-
-
-     (add-hook 'LaTeX-mode-hook
-               '(lambda ()
-
-                  (TeX-fold-mode 1)
-                  ;; Clean all intermediate files, like 'latexmk -c'
-                  (local-unset-key (kbd "C-c C-k"))
-                  (local-set-key (kbd "C-c C-k") (lambda () (interactive) (TeX-clean t)))
-                  (local-set-key (kbd "<f5>") 'TeX-command-run-all)
-
-                  (local-set-key (kbd "<f9> (") (lambda () (interactive) (insert "\\left( \\right)")))
-                  (local-set-key (kbd "<f9> [") (lambda () (interactive) (insert "\\left[ \\right]")))
-                  (local-set-key (kbd "<f9> {") (lambda () (interactive) (insert "\\left\\{ \\right\\}")))
-                  (local-set-key (kbd "<f9> |") (lambda () (interactive) (insert "\\left| \\right|")))
-                  (local-set-key "\$" 'skeleton-pair-insert-maybe)
-
-                  ;; This was `c-c c-f c-a`
-                  (setq LaTeX-font-list
-                    '((?a ""              ""  "\\mathcal{"    "}")
-                      ;; (?b "\\textbf{"     "}" "\\mathbf{"     "}")
-                      (?b "\\textbf{"     "}" "\\bm{"     "}")
-                      (?c "\\textsc{"     "}")
-                      (?e "\\emph{"       "}")
-                      (?f "\\textsf{"     "}" "\\mathsf{"     "}")
-                      (?i "\\textit{"     "}" "\\mathit{"     "}")
-                      (?l "\\textulc{"    "}")
-                      (?m "\\textmd{"     "}")
-                      (?n "\\textnormal{" "}" "\\mathnormal{" "}")
-                      (?r "\\textrm{"     "}" "\\mathrm{"     "}")
-                      (?s "\\textsl{"     "}" "\\mathbb{"     "}")
-                      (?t "\\texttt{"     "}" "\\mathtt{"     "}")
-                      (?u "\\textup{"     "}")
-                      (?w "\\textsw{"     "}")
-                      (?d "" "" t)))
+    ;; Replace LaTeX with latexmk -pvc
+    (setcdr (assoc "LaTeX" TeX-command-list)
+            '("latexmk -pvc -pv- %(-PDF)%S%(mode) %(file-line-error) %(extraopts) %t" TeX-run-latexmk-pvc nil
+              :help "Run LaTeX with `latexmk -pvc`"))
+    ) ; provide LatexMkPvc command
 
 
-                  ;; Use \bm{} to repace \mathbf{}
-                  ;; (add-to-list 'LaTeX-font-list
-                  ;;              '(m "\\bm{" "}"))
-                  ))
+  (add-hook 'LaTeX-mode-hook
+            '(lambda ()
 
-     ;; Translate key § to ` so both can be used as a math abbreviation
-     ;; Drawback, could not type § anymore. Make it locally?
-     (keyboard-translate ?§ ?`)
-     (setq LaTeX-math-abbrev-prefix "`")
+               (TeX-fold-mode 1)
+               ;; Clean all intermediate files, like 'latexmk -c'
+               (local-unset-key (kbd "C-c C-k"))
+               (local-set-key (kbd "C-c C-k") (lambda () (interactive) (TeX-clean t)))
+               (local-set-key (kbd "<f5>") 'TeX-command-run-all)
 
-     ;; Allow company-auctex backends
-     (company-auctex-init)
+               (local-set-key (kbd "<f9> (") (lambda () (interactive) (insert "\\left( \\right)")))
+               (local-set-key (kbd "<f9> [") (lambda () (interactive) (insert "\\left[ \\right]")))
+               (local-set-key (kbd "<f9> {") (lambda () (interactive) (insert "\\left\\{ \\right\\}")))
+               (local-set-key (kbd "<f9> |") (lambda () (interactive) (insert "\\left| \\right|")))
+               (local-set-key "\$" 'skeleton-pair-insert-maybe)
 
-     (setq TeX-source-correlate-mode  t)
-     (setq TeX-source-correlate-start-server nil)
-     (setq TeX-debug-warnings t)
+               ;; This was `c-c c-f c-a`
+               (setq LaTeX-font-list
+                     '((?a ""              ""  "\\mathcal{"    "}")
+                       ;; (?b "\\textbf{"     "}" "\\mathbf{"     "}")
+                       (?b "\\textbf{"     "}" "\\bm{"     "}")
+                       (?c "\\textsc{"     "}")
+                       (?e "\\emph{"       "}")
+                       (?f "\\textsf{"     "}" "\\mathsf{"     "}")
+                       (?i "\\textit{"     "}" "\\mathit{"     "}")
+                       (?l "\\textulc{"    "}")
+                       (?m "\\textmd{"     "}")
+                       (?n "\\textnormal{" "}" "\\mathnormal{" "}")
+                       (?r "\\textrm{"     "}" "\\mathrm{"     "}")
+                       (?s "\\textsl{"     "}" "\\mathbb{"     "}")
+                       (?t "\\texttt{"     "}" "\\mathtt{"     "}")
+                       (?u "\\textup{"     "}")
+                       (?w "\\textsw{"     "}")
+                       (?d "" "" t)))
 
-     ;; Parse on load/save
-     (setq TeX-parse-self t)
-     (setq TeX-auto-save t)
 
-     (setq TeX-source-correlate-method (quote source-specials)) ; only for dvi
-     (setq TeX-source-correlate-method (quote synctex)) ;only for evince
+               ;; Use \bm{} to repace \mathbf{}
+               ;; (add-to-list 'LaTeX-font-list
+               ;;              '(m "\\bm{" "}"))
+               ))
 
-     ;; RefTeX
-     (setq reftex-plug-into-AUCTeX t)
-     (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
-     (setq reftex-toc-follow-mode t)
-     (setq reftex-revisit-to-follow t)
-     (setq reftex-toc-split-windows-horizontally t)
-     (setq reftex-toc-split-windows-fraction 0.3)
+  ;; Translate key § to ` so both can be used as a math abbreviation
+  ;; Drawback, could not type § anymore. Make it locally?
+  (keyboard-translate ?§ ?`)
+  (setq LaTeX-math-abbrev-prefix "`")
 
-     ;; Extra keybinds
-     ;; (setq reftex-extra-bindings t) ;; equavalent as below
-     (add-hook 'reftex-load-hook
-               '(lambda ()
-                  (define-key reftex-mode-map (kbd "C-c t") 'reftex-toc)
-                  (define-key reftex-mode-map (kbd "C-c l") 'reftex-label)
-                  (define-key reftex-mode-map (kbd "C-c r") 'reftex-reference)
-                  (define-key reftex-mode-map (kbd "C-c c") 'reftex-citation)
-                  (define-key reftex-mode-map (kbd "C-c v") 'reftex-view-crossref)
-                  (define-key reftex-mode-map (kbd "C-c s") 'reftex-search-document)
-                  (define-key reftex-mode-map (kbd "C-c g") 'reftex-grep-document)
-                  )
+  ;; Allow company-auctex backends
+  (company-auctex-init)
+
+  (setq TeX-source-correlate-mode  t)
+  (setq TeX-source-correlate-start-server nil)
+  (setq TeX-debug-warnings t)
+
+  ;; Parse on load/save
+  (setq TeX-parse-self t)
+  (setq TeX-auto-save t)
+
+  (setq TeX-source-correlate-method (quote source-specials)) ; only for dvi
+  (setq TeX-source-correlate-method (quote synctex)) ;only for evince
+
+  ;; RefTeX
+  (setq reftex-plug-into-AUCTeX t)
+  (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+  (setq reftex-toc-follow-mode t)
+  (setq reftex-revisit-to-follow t)
+  (setq reftex-toc-split-windows-horizontally t)
+  (setq reftex-toc-split-windows-fraction 0.3)
+
+  ;; Extra keybinds
+  ;; (setq reftex-extra-bindings t) ;; equavalent as below
+  (add-hook 'reftex-load-hook
+            '(lambda ()
+               (define-key reftex-mode-map (kbd "C-c t") 'reftex-toc)
+               (define-key reftex-mode-map (kbd "C-c l") 'reftex-label)
+               (define-key reftex-mode-map (kbd "C-c r") 'reftex-reference)
+               (define-key reftex-mode-map (kbd "C-c c") 'reftex-citation)
+               (define-key reftex-mode-map (kbd "C-c v") 'reftex-view-crossref)
+               (define-key reftex-mode-map (kbd "C-c s") 'reftex-search-document)
+               (define-key reftex-mode-map (kbd "C-c g") 'reftex-grep-document)
                )
+            )
 
-     ;; Allow company-reftex backends
-     (add-hook 'LaTeX-mode-hook
-               '(lambda ()
-                  (make-local-variable 'company-backends)
-                  (setq company-backends (copy-tree company-backends))
-                  (setf (car company-backends)
-                        (append '(company-reftex-labels company-reftex-citations) (car company-backends)))
-                  ))
+  ;; Allow company-reftex backends
+  (add-hook 'LaTeX-mode-hook
+            '(lambda ()
+               (make-local-variable 'company-backends)
+               (setq company-backends (copy-tree company-backends))
+               (setf (car company-backends)
+                     (append '(company-reftex-labels company-reftex-citations) (car company-backends)))
+               ))
 
-     (setq reftex-cite-format 'natbib)
-     (setq reftex-use-external-file-finders t)
-     (setq reftex-external-file-finders
-           '(("tex" . "kpsewhich -format=.tex %f")
-             ("bib" . "kpsewhich -format=.bib %f")
-	     ("bst" . "kpsewhich -format=.bst %f")))
-     ))
+  (setq reftex-cite-format 'natbib)
+  (setq reftex-use-external-file-finders t)
+  (setq reftex-external-file-finders
+        '(("tex" . "kpsewhich -format=.tex %f")
+          ("bib" . "kpsewhich -format=.bib %f")
+	  ("bst" . "kpsewhich -format=.bst %f")))
+  )
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1160,186 +1089,192 @@
 (add-to-list 'auto-mode-alist '("\\.Rmd" . poly-markdown+r-mode))
 
 ;; ESS
-(eval-after-load "ess-site"
-  '(progn
-     ;; ESS tracebug
-     ;; (setq ess-use-tracebug nil)
-     ;; (require 'ess-rutils)
-     ;; (require 'ess-tracebug) ;; ESS tracebug
-     ;; (require 'ess-R-object-tooltip)
+(use-package ess
+  :config
+  ;; ESS tracebug
+  ;; (setq ess-use-tracebug nil)
 
-     ;; Disable flymake, use flycheck instead
-     ;; (add-hook 'ess-mode-hook
-     ;;           (lambda () (flycheck-mode t)))
+  ;; Disable flymake, use flycheck instead
+  ;; (add-hook 'ess-mode-hook
+  ;;           (lambda () (flycheck-mode t)))
 
-     ;; R args at start up
-     (global-set-key (kbd "<f9> <f6>") 'R) ;; The default R
-     (global-set-key (kbd "<f9> r") 'ess-switch-to-end-of-ESS)
-     (setq-default inferior-R-args "--no-save --no-restore-data -q")
+  ;; R args at start up
+  (global-set-key (kbd "<f9> <f6>") 'R) ;; The default R
+  (global-set-key (kbd "<f9> r") 'ess-switch-to-end-of-ESS)
+  (setq-default inferior-R-args "--no-save --no-restore-data -q")
 
-     ;; Let ESS Sweave work with AUCTEX
-     (setq ess-swv-plug-into-AUCTeX-p t)
+  ;; Let ESS Sweave work with AUCTEX
+  (setq ess-swv-plug-into-AUCTeX-p t)
 
-     ;; Let evaluation not viability to nil, cause emacs hang
-     (setq ess-eval-visibly-p nil)
+  ;; Let evaluation not viability to nil, cause emacs hang
+  (setq ess-eval-visibly-p nil)
 
-     ;;ESS key binding
-     (setq ess-ask-for-ess-directory nil)
+  ;;ESS key binding
+  (setq ess-ask-for-ess-directory nil)
 
-     ;; R history files and size
-     (setq ess-history-file "~/.Rhistory")
+  ;; R history files and size
+  (setq ess-history-file "~/.Rhistory")
 
-     ;; Let help on new frame
-     ;; (setq ess-help-own-frame t)
-     (add-hook 'ess-mode-hook
-               '(lambda ()
-                  (fset 'my-R-comment-level-1
-                        (lambda (&optional arg) "Insert level-1 R comment block"
-                          (interactive "p")
-                          (kmacro-exec-ring-item
-                           (quote ([21 55 57 35 return 21 51 35
-                                       return 21 55 57 35 up 32] 0 "%d")) arg)))
-                  (local-set-key (kbd "<f9> 1") 'my-R-comment-level-1)
+  ;; Let help on new frame
+  ;; (setq ess-help-own-frame t)
+  (add-hook 'ess-mode-hook
+            '(lambda ()
+               (fset 'my-R-comment-level-1
+                     (lambda (&optional arg) "Insert level-1 R comment block"
+                       (interactive "p")
+                       (kmacro-exec-ring-item
+                        (quote ([21 55 57 35 return 21 51 35
+                                    return 21 55 57 35 up 32] 0 "%d")) arg)))
+               (local-set-key (kbd "<f9> 1") 'my-R-comment-level-1)
 
-                  ;; Insert three line comments level-2
-                  (fset 'my-R-comment-level-2
-                        [?\C-a ?\C-u ?3 ?# ?\C-u ?7 ?6 ?- return
-                               ?\C-u ?3 ?# return ?\C-a ?\C-u ?3 ?# ?\C-u ?7 ?6 ?- up ? ])
-                  (local-set-key (kbd "<f9> 2") 'my-R-comment-level-2)
+               ;; Insert three line comments level-2
+               (fset 'my-R-comment-level-2
+                     [?\C-a ?\C-u ?3 ?# ?\C-u ?7 ?6 ?- return
+                            ?\C-u ?3 ?# return ?\C-a ?\C-u ?3 ?# ?\C-u ?7 ?6 ?- up ? ])
+               (local-set-key (kbd "<f9> 2") 'my-R-comment-level-2)
 
-                  ))
+               ))
 
 
-     (setq ess-R-font-lock-keywords
-           '((ess-R-fl-keyword:keywords . t)
-             (ess-R-fl-keyword:constants . t)
-             (ess-R-fl-keyword:modifiers . t)
-             (ess-R-fl-keyword:fun-defs . t)
-             (ess-R-fl-keyword:assign-ops . t)
-             (ess-R-fl-keyword:%op% . t)
-             (ess-fl-keyword:fun-calls . t)
-             (ess-fl-keyword:numbers)
-             (ess-fl-keyword:operators)
-             (ess-fl-keyword:delimiters)
-             (ess-fl-keyword:=)
-             (ess-R-fl-keyword:F&T)))
+  (setq ess-R-font-lock-keywords
+        '((ess-R-fl-keyword:keywords . t)
+          (ess-R-fl-keyword:constants . t)
+          (ess-R-fl-keyword:modifiers . t)
+          (ess-R-fl-keyword:fun-defs . t)
+          (ess-R-fl-keyword:assign-ops . t)
+          (ess-R-fl-keyword:%op% . t)
+          (ess-fl-keyword:fun-calls . t)
+          (ess-fl-keyword:numbers)
+          (ess-fl-keyword:operators)
+          (ess-fl-keyword:delimiters)
+          (ess-fl-keyword:=)
+          (ess-R-fl-keyword:F&T)))
 
-     (setq ess-eldoc-show-on-symbol t)
-     (setq ess-roxy-str "#'")
-     (setq ess-use-flymake nil)
+  (setq ess-eldoc-show-on-symbol t)
+  (setq ess-roxy-str "#'")
+  (setq ess-use-flymake nil)
 
-     ;; Settings on R shell
-     (add-hook 'inferior-ess-mode-hook
-               '(lambda ()
-                  (define-key inferior-ess-mode-map (kbd "C-c `") 'ess-parse-errors)
-                  (define-key inferior-ess-mode-map (kbd "C-c d") 'ess-change-directory)
-                  ;; (define-key inferior-ess-mode-map (kbd "C-c l") 'ess-rutils-load-wkspc))
-                  ))
+  ;; Settings on R shell
+  (add-hook 'inferior-ess-mode-hook
+            '(lambda ()
+               (define-key inferior-ess-mode-map (kbd "C-c `") 'ess-parse-errors)
+               (define-key inferior-ess-mode-map (kbd "C-c d") 'ess-change-directory)
+               ;; (define-key inferior-ess-mode-map (kbd "C-c l") 'ess-rutils-load-wkspc))
+               ))
 
-     ;; ESS Code styles
-     (defun ess-code-style ()
-       (local-set-key (kbd "<f9> *") (lambda () (interactive) (insert " %*% ")))
-       (local-set-key (kbd "<f9> x") (lambda () (interactive) (insert " %x% ")))
-       (local-set-key (kbd "<f9> n") (lambda () (interactive) (insert " %in% "))))
-     (add-hook 'ess-mode-hook 'ess-code-style)
-     (add-hook 'inferior-ess-mode-hook 'ess-code-style))
-  )
+  ;; ESS Code styles
+  (defun ess-code-style ()
+    (local-set-key (kbd "<f9> *") (lambda () (interactive) (insert " %*% ")))
+    (local-set-key (kbd "<f9> x") (lambda () (interactive) (insert " %x% ")))
+    (local-set-key (kbd "<f9> n") (lambda () (interactive) (insert " %in% "))))
+  (add-hook 'ess-mode-hook 'ess-code-style)
+  (add-hook 'inferior-ess-mode-hook 'ess-code-style))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Julia mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(eval-after-load "julia-mode"
-  '(progn
-     (flycheck-julia-setup)
-     ;; (add-to-list 'flycheck-global-modes 'julia-mode)
-     ;; (add-to-list 'flycheck-global-modes 'ess-julia-mode)
-     )
+(use-package julia-mode
+  :config
+  (flycheck-julia-setup)
+  ;; (add-to-list 'flycheck-global-modes 'julia-mode)
+  ;; (add-to-list 'flycheck-global-modes 'ess-julia-mode)
   )
+
+
+
+(add-hook 'c-mode-common-hook
+          (lambda () (define-key c-mode-base-map (kbd "<f5>") 'compile)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Python IDE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(use-package python
+  :config
 
-(eval-after-load "python"
-  '(progn
+  (elpy-enable)
+  ;; (setq elpy-rpc-virtualenv-path (concat (getenv "HOME") "/.emacs.d/elpy/" system-name "/rpc-venv"))
+  ;; (setq elpy-rpc-virtualenv-path (concat (getenv "HOME") "/.cache/elpy/rpc-venv"))
+  (setq elpy-rpc-virtualenv-path (concat (getenv "HOME") "/.virtualenvs/elpy/"))
+  (setq elpy-rpc-python-command "python3.9")
+  (setq elpy-syntax-check-command (concat elpy-rpc-virtualenv-path  "bin/flake8"))
 
-     (elpy-enable)
-     ;; (setq elpy-rpc-virtualenv-path (concat (getenv "HOME") "/.emacs.d/elpy/" system-name "/rpc-venv"))
-     ;; (setq elpy-rpc-virtualenv-path (concat (getenv "HOME") "/.cache/elpy/rpc-venv"))
-     (setq elpy-rpc-virtualenv-path (concat (getenv "HOME") "/.virtualenvs/elpy/"))
-     (setq elpy-rpc-python-command "python3.9")
-     (setq elpy-syntax-check-command (concat elpy-rpc-virtualenv-path  "bin/flake8"))
+  ;; Disable elpy's flymake, use flycheck
+  (remove-hook 'elpy-modules 'elpy-module-flymake)
+  (define-key elpy-mode-map (kbd "C-c C-n") nil)
+  (setq flycheck-python-flake8-executable (concat elpy-rpc-virtualenv-path  "bin/flake8"))
+  (setq flycheck-python-pylint-executable (concat elpy-rpc-virtualenv-path  "bin/pylint"))
+  (setq pylint-command (concat elpy-rpc-virtualenv-path  "bin/pylint3"))
 
-     ;; Disable elpy's flymake, use flycheck
-     (remove-hook 'elpy-modules 'elpy-module-flymake)
-     (define-key elpy-mode-map (kbd "C-c C-n") nil)
-     (setq flycheck-python-flake8-executable (concat elpy-rpc-virtualenv-path  "bin/flake8"))
-     (setq flycheck-python-pylint-executable (concat elpy-rpc-virtualenv-path  "bin/pylint"))
-     (setq pylint-command (concat elpy-rpc-virtualenv-path  "bin/pylint3"))
+  ;; (remove-hook 'elpy-modules 'elpy-module-pyvenv)
+  (remove-hook 'elpy-modules 'elpy-module-highlight-indentation)
 
-     ;; (remove-hook 'elpy-modules 'elpy-module-pyvenv)
-     (remove-hook 'elpy-modules 'elpy-module-highlight-indentation)
+  (define-key elpy-mode-map (kbd "C-c C-c") 'elpy-shell-send-statement-and-step)
+  (define-key elpy-mode-map (kbd "C-c C-r") 'elpy-shell-send-region-or-buffer-and-step)
 
-     (define-key elpy-mode-map (kbd "C-c C-c") 'elpy-shell-send-statement-and-step)
-     (define-key elpy-mode-map (kbd "C-c C-r") 'elpy-shell-send-region-or-buffer-and-step)
+  (use-package pydoc)
+  (define-key elpy-mode-map (kbd "C-c C-v") 'pydoc)
+  ;; (local-set-key (kbd "C-c C-v") 'pydoc) ; C-c C-v was bounded to elpy-check
 
+  (setq python-shell-interpreter "python3.9")
+  (setq python-shell-completion-native-enable nil)
 
-     (require 'pydoc)
-     (define-key elpy-mode-map (kbd "C-c C-v") 'pydoc)
-     ;; (local-set-key (kbd "C-c C-v") 'pydoc) ; C-c C-v was bounded to elpy-check
+  (add-hook 'python-mode-hook
+            '(lambda ()
+               ;; (setq python-python-command "python3")
 
-     (setq python-shell-interpreter "python3.9")
-     (setq python-shell-completion-native-enable nil)
+               ;; Enable flycheck mode
+               (flycheck-mode t)
 
-     (add-hook 'python-mode-hook
-               '(lambda ()
-                  ;; (setq python-python-command "python3")
+               ;; Enter to indent in python.el
+               (define-key python-mode-map (kbd "C-m") 'newline-and-indent)
 
-                  ;; Enable flycheck mode
-                  (flycheck-mode t)
+               (define-key python-mode-map (kbd "C-c M-r") 'python-shell-send-region)
 
-                  ;; Enter to indent in python.el
-                  (define-key python-mode-map (kbd "C-m") 'newline-and-indent)
-
-                  (define-key python-mode-map (kbd "C-c M-r") 'python-shell-send-region)
-
-                  (defun my-python-send-line-and-step (beg end)
-                    (interactive "r")
-                    (if (eq beg end)
-                        (python-shell-send-region (point-at-bol) (point-at-eol))
-                      (python-shell-send-region beg end))
-                    (next-line))
-                  (local-set-key (kbd "C-c C-n") 'my-python-send-line-and-step)
+               (defun my-python-send-line-and-step (beg end)
+                 (interactive "r")
+                 (if (eq beg end)
+                     (python-shell-send-region (point-at-bol) (point-at-eol))
+                   (python-shell-send-region beg end))
+                 (next-line))
+               (local-set-key (kbd "C-c C-n") 'my-python-send-line-and-step)
 
 
-                  ;; ElDoc for Python in the minor buffer
-                  (add-hook 'python-mode-hook 'turn-on-eldoc-mode)
+               ;; ElDoc for Python in the minor buffer
+               (add-hook 'python-mode-hook 'turn-on-eldoc-mode)
 
-                  (defun python-add-breakpoint ()
-                    (interactive)
-                    (newline-and-indent)
-                    (insert "import pdb; pdb.set_trace()"))
-                  (add-hook
-                   'python-mode-hook
-                   '(lambda ()
-                      (define-key python-mode-map
-                        (kbd "C-c C-t") 'python-add-breakpoint)))
+               (defun python-add-breakpoint ()
+                 (interactive)
+                 (newline-and-indent)
+                 (insert "import pdb; pdb.set_trace()"))
+               (add-hook
+                'python-mode-hook
+                '(lambda ()
+                   (define-key python-mode-map
+                     (kbd "C-c C-t") 'python-add-breakpoint)))
 
-                  ;; Font-Lock
-                  (make-face 'font-lock-special-macro-face)
-                  (set-face-background 'font-lock-special-macro-face "magenta")
-                  (set-face-foreground 'font-lock-special-macro-face "white")
+               ;; Font-Lock
+               (make-face 'font-lock-special-macro-face)
+               (set-face-background 'font-lock-special-macro-face "magenta")
+               (set-face-foreground 'font-lock-special-macro-face "white")
 
-                  ))
-     )
+               ))
   )
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Language server mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package lsp-mode
+  :init
+  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+  (setq lsp-keymap-prefix "C-c l")
+  :commands lsp)
+
+(use-package lsp-mode
+  :init
   :commands (lsp lsp-deferred)
   :config
   (setq lsp-server-install-dir (concat (getenv "HOME") "/.config/emacs/auto-save-list/lsp-server"))
@@ -1347,6 +1282,8 @@
   (setq lsp-verify-signature nil) ;; Disable to get metals server (key expired) working
   (setq lsp-prefer-flymake nil) ;; use flycheck
   (setq lsp-headerline-breadcrumb-enable nil)
+  (setq lsp-ui-doc-show-with-cursor nil) ;; disable cursor hover (keep mouse hover)
+
   ;; Performance https://emacs-lsp.github.io/lsp-mode/page/performance/
   (setq gc-cons-threshold 100000000)
   (setq read-process-output-max (* 2048 2048)) ;; 2mb
@@ -1360,11 +1297,17 @@
   (setq lsp-auto-guess-root nil)
   (setq lsp-warn-no-matched-clients nil)
 
-  ;; lsp-treemacs
+  (define-key lsp-mode-map (kbd "<f4> <f4>") 'lsp-describe-thing-at-point)
+  )
+
+
+;; lsp-treemacs
+(use-package lsp-treemacs
+  :commands lsp-treemacs-errors-list
+  :config
   (setq lsp-treemacs-sync-mode t)
   (setq lsp-treemacs-errors-position-params '((side . right)))
   (defvar treemacs-no-load-time-warnings t)
-  (define-key lsp-mode-map (kbd "<f4> <f4>") 'lsp-describe-thing-at-point)
   (define-key lsp-mode-map (kbd "<f4> e") 'lsp-treemacs-errors-list)
   )
 
@@ -1397,7 +1340,7 @@
 ;; Enable scala-mode for highlighting, indentation and motion commands
 (use-package scala-mode
   :interpreter
-    ("scala" . scala-mode))
+  ("scala" . scala-mode))
 
 ;; Enable sbt mode for executing sbt commands
 ;; (use-package sbt-mode
@@ -1419,8 +1362,8 @@
 
   ;; Comment out to start manually
   :hook ((text-mode markdown-mode gfm-mode) . (lambda ()
-                       (require 'lsp-grammarly)
-                       (lsp-deferred)))  ;; or lsp
+                                                (require 'lsp-grammarly)
+                                                (lsp-deferred)))  ;; or lsp
 
   :config
   (setq lsp-grammarly-active-modes '(text-mode latex-mode org-mode markdown-mode gfm-mode))
