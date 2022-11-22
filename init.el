@@ -24,7 +24,7 @@
         ("melpa-cn" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
         ;; ("gnu-elpa-cn"   . "http://mirrors.cloud.tencent.com/elpa/gnu/")
         ;; ("melpa-cn" . "http://mirrors.cloud.tencent.com/elpa/melpa/")
-       ))
+        ))
 ;; (package-initialize)
 
 ;; Local server socket dir. Some server does not allow to use the default
@@ -110,7 +110,7 @@
 ;; Theme
 (defun on-after-init ()
   (unless (display-graphic-p (selected-frame))
-    (set-face-background 'default "unspecified-bg" (selected-frame))))
+    (set-face-background 'default "#1d1f21" (selected-frame))))
 (add-hook 'window-setup-hook 'on-after-init)
 
 ;; (setq dracula-use-24-bit-colors-on-256-colors-terms t)
@@ -250,8 +250,8 @@
 ;; paragraphs in that region. It is the contrary of fill-region.
 (use-package unfill
   :config
-     (define-key global-map (kbd "C-M-q") 'unfill-paragraph)
-     )
+  (define-key global-map (kbd "C-M-q") 'unfill-paragraph)
+  )
 
 ;; https://www.reddit.com/r/emacs/comments/kwl0mc/lspdescribethingatpoint_config_improvement/
 (add-to-list 'display-buffer-alist
@@ -433,9 +433,10 @@
 (setq auto-mode-alist (cons '("\\.m$" . octave-mode) auto-mode-alist))
 
 (use-package yaml-mode
+  :defer t
   :config
-     (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
-     )
+  (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
+  )
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -445,28 +446,29 @@
 ;; LanguageTool https://languagetool.org/download/
 (use-package langtool
   :disabled t
+  :defer t
   :config
-     (setq langtool-language-tool-jar "~/.APP/LanguageTool/languagetool-commandline.jar")
-     (setq langtool-default-language "en-US")
+  (setq langtool-language-tool-jar "~/.APP/LanguageTool/languagetool-commandline.jar")
+  (setq langtool-default-language "en-US")
 
-     (global-set-key (kbd "<f9> l") 'langtool-check)
-     (global-set-key (kbd "<f9> L") 'langtool-check-done)
+  (global-set-key (kbd "<f9> l") 'langtool-check)
+  (global-set-key (kbd "<f9> L") 'langtool-check-done)
 
-     ;; Show LanguageTool report automatically by popup
-     (defun langtool-autoshow-detail-popup (overlays)
-       (when (require 'popup nil t)
-         ;; Do not interrupt current popup
-         (unless (or popup-instances
-                     ;; suppress popup after type `C-g` .
-                     (memq last-command '(keyboard-quit)))
-           (let ((msg (langtool-details-error-message overlays)))
-             (popup-tip msg)))))
-     (setq langtool-autoshow-message-function
-           'langtool-autoshow-detail-popup))
+  ;; Show LanguageTool report automatically by popup
+  (defun langtool-autoshow-detail-popup (overlays)
+    (when (require 'popup nil t)
+      ;; Do not interrupt current popup
+      (unless (or popup-instances
+                  ;; suppress popup after type `C-g` .
+                  (memq last-command '(keyboard-quit)))
+        (let ((msg (langtool-details-error-message overlays)))
+          (popup-tip msg)))))
+  (setq langtool-autoshow-message-function
+        'langtool-autoshow-detail-popup))
 
 (use-package writegood-mode
   :config
-     (global-set-key (kbd "<f9> w") 'writegood-mode))
+  (global-set-key (kbd "<f9> w") 'writegood-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; General IDE settings
@@ -475,79 +477,79 @@
 ;; iedit mode
 (use-package iedit
   :config
-     (global-set-key (kbd "C-c i") 'iedit-mode)
-     )
+  (global-set-key (kbd "C-c i") 'iedit-mode)
+  )
 
 ;; Ibuffer mode
 (use-package ibuffer
   :config
-     (global-set-key (kbd "C-x C-b") 'ibuffer)
-     (global-set-key (kbd "<f9> i") 'ibuffer)
+  (global-set-key (kbd "C-x C-b") 'ibuffer)
+  (global-set-key (kbd "<f9> i") 'ibuffer)
 
-     (setq dired-omit-mode t)
-     (add-hook 'dired-mode-hook
-               (lambda ()
-                 (setq dired-omit-files "^\\.[a-z|A-Z]+\\|^\\.?#\\|^\\.$")
-                 (setq dired-omit-extensions
-                       '(".pyc" "CVS/" "~" ".o" ".bin" ".bak" ".obj" ".map" ".a"
-                         ".ln" ".blg" ".bbl" ".elc" ".lof" ".glo" ".idx" ".lot"
-                         ".dvi" ".fmt" ".tfm" ".class" ".fas" ".lib" ".x86f"
-                         ".sparcf" ".lo" ".la" ".toc" ".aux" ".cp" ".fn" ".ky"
-                         ".pg" ".tp" ".vr" ".cps" ".fns" ".kys" ".pgs" ".tps"
-                         ".vrs" ".idx" ".lof" ".lot" ".glo" ".blg" ".cp" ".cps"
-                         ".fn" ".fns" ".ky" ".kys" ".pg" ".pgs" ".tp" ".tps"
-                         ".vr" ".vrs" ".Rc" ))
-                 (setq dired-listing-switches "-hla")
-                 (setq directory-free-space-args "-h")
-                 (define-key dired-mode-map (kbd "<return>")
-                   'dired-find-alternate-file) ; was dired-advertised-find-file
-                 (define-key dired-mode-map (kbd "<delete>") 'dired-do-delete)
-                 (define-key dired-mode-map (kbd "<f9> DEL")
-                   (lambda () (interactive) (find-alternate-file "..")))
-                 (dired-omit-mode 1)
-                 (local-set-key (kbd "<f9> h") 'dired-omit-mode)))
-     (put 'dired-find-alternate-file 'disabled nil)
+  (setq dired-omit-mode t)
+  (add-hook 'dired-mode-hook
+            (lambda ()
+              (setq dired-omit-files "^\\.[a-z|A-Z]+\\|^\\.?#\\|^\\.$")
+              (setq dired-omit-extensions
+                    '(".pyc" "CVS/" "~" ".o" ".bin" ".bak" ".obj" ".map" ".a"
+                      ".ln" ".blg" ".bbl" ".elc" ".lof" ".glo" ".idx" ".lot"
+                      ".dvi" ".fmt" ".tfm" ".class" ".fas" ".lib" ".x86f"
+                      ".sparcf" ".lo" ".la" ".toc" ".aux" ".cp" ".fn" ".ky"
+                      ".pg" ".tp" ".vr" ".cps" ".fns" ".kys" ".pgs" ".tps"
+                      ".vrs" ".idx" ".lof" ".lot" ".glo" ".blg" ".cp" ".cps"
+                      ".fn" ".fns" ".ky" ".kys" ".pg" ".pgs" ".tp" ".tps"
+                      ".vr" ".vrs" ".Rc" ))
+              (setq dired-listing-switches "-hla")
+              (setq directory-free-space-args "-h")
+              (define-key dired-mode-map (kbd "<return>")
+                'dired-find-alternate-file) ; was dired-advertised-find-file
+              (define-key dired-mode-map (kbd "<delete>") 'dired-do-delete)
+              (define-key dired-mode-map (kbd "<f9> DEL")
+                (lambda () (interactive) (find-alternate-file "..")))
+              (dired-omit-mode 1)
+              (local-set-key (kbd "<f9> h") 'dired-omit-mode)))
+  (put 'dired-find-alternate-file 'disabled nil)
 
 
-     (setq ibuffer-saved-filter-groups
-           (quote
-            (("default"
-              ("Scripts" (or
-                          (mode . ess-mode)
-                          (mode . prog-mode)
-                          (mode . shell-script-mode)
-                          (mode . sh-mode)
-                          (mode . python-mode)
-                          (mode . makefile-mode)
-                          (mode . snippet-mode)
-                          (mode . emacs-lisp-mode)))
-              ("Files" (or
-                        (mode . LaTeX-mode)
-                        (mode . latex-mode)
-                        (mode . markdown-mode)
-                        (mode . bibtex-mode)
-                        (mode . org-mode)))
-              ("Config" (or
-                         (mode . yaml-mode)
-                         (mode . conf-unix-mode)))
+  (setq ibuffer-saved-filter-groups
+        (quote
+         (("default"
+           ("Scripts" (or
+                       (mode . ess-mode)
+                       (mode . prog-mode)
+                       (mode . shell-script-mode)
+                       (mode . sh-mode)
+                       (mode . python-mode)
+                       (mode . makefile-mode)
+                       (mode . snippet-mode)
+                       (mode . emacs-lisp-mode)))
+           ("Files" (or
+                     (mode . LaTeX-mode)
+                     (mode . latex-mode)
+                     (mode . markdown-mode)
+                     (mode . bibtex-mode)
+                     (mode . org-mode)))
+           ("Config" (or
+                      (mode . yaml-mode)
+                      (mode . conf-unix-mode)))
 
-              ("Proc" (or
-                       (mode . inferior-ess-mode)))
-              ("Help" (or
-                       (mode . help-mode)
-                       (mode . lexic-mode)
-                       (mode . ess-help-mode)
-                       (mode . Info-mode)))
-              ("Messages" (or
-                           (name . "^\\*scratch\\*$")
-                           (name . "^\\*Bookmark List\\*$")
-                           (name . "^\\*Messages\\*$")
-                           (name . "^\\*Completions\\*$")
-                           (mode . fundamental-mode)))
-              ))))
-     (add-hook 'ibuffer-mode-hook
-               (lambda ()
-                 (ibuffer-switch-to-saved-filter-groups "default"))))
+           ("Proc" (or
+                    (mode . inferior-ess-mode)))
+           ("Help" (or
+                    (mode . help-mode)
+                    (mode . lexic-mode)
+                    (mode . ess-help-mode)
+                    (mode . Info-mode)))
+           ("Messages" (or
+                        (name . "^\\*scratch\\*$")
+                        (name . "^\\*Bookmark List\\*$")
+                        (name . "^\\*Messages\\*$")
+                        (name . "^\\*Completions\\*$")
+                        (mode . fundamental-mode)))
+           ))))
+  (add-hook 'ibuffer-mode-hook
+            (lambda ()
+              (ibuffer-switch-to-saved-filter-groups "default"))))
 
 ;; Ido mode
 (use-package ido
@@ -723,6 +725,7 @@
 (setq vc-follow-symlinks nil)
 
 (use-package magit
+  :defer t
   :config
   ;; Save transient file with customization
   (setq transient-history-file (concat my-auto-save-list "/transient-history-file.el"))
@@ -826,6 +829,7 @@
 ;; apt install sdcv
 ;; https://github.com/Dushistov/sdcv
 (use-package lexic
+  :defer t
   :config
   (setq lexic-dictionary-path (concat user-emacs-directory "dict/sdcv/"))
   (setq lexic-dictionary-list
@@ -837,6 +841,7 @@
   )
 
 (use-package mw-thesaurus
+  :defer t
   :config
   (setq mw-thesaurus--api-key "23ed2cad-ce64-4ab1-abd9-774760e6842d")
   (global-set-key (kbd "<f9> t") 'mw-thesaurus-lookup-dwim)
@@ -946,6 +951,7 @@
 
 ;; AUCTEX
 (use-package tex
+  :defer t
   :ensure auctex
   :config
 
@@ -1093,6 +1099,7 @@
 
 ;; ESS
 (use-package ess
+  :defer t
   :config
   ;; ESS tracebug
   ;; (setq ess-use-tracebug nil)
@@ -1306,6 +1313,7 @@
 
 ;; lsp-treemacs
 (use-package lsp-treemacs
+  :defer t
   :commands lsp-treemacs-errors-list
   :config
   (setq lsp-treemacs-sync-mode t)
@@ -1316,6 +1324,7 @@
 
 ;; Add metals backend for lsp-mode
 (use-package lsp-metals
+  :defer t
   :ensure t
   :custom
   ;; Metals claims to support range formatting by default but it supports range
@@ -1361,6 +1370,7 @@
 
 ;; grammerly for lsp
 (use-package lsp-grammarly
+  :defer t
   :ensure t
 
   ;; Comment out to start manually
@@ -1414,7 +1424,7 @@
  '(font-lock-function-name-face ((t (:foreground "deep sky blue" :weight normal))))
  '(highlight ((t (:background "red" :foreground "#c6c6c6"))))
  '(highlight-doxygen-comment ((t (:inherit highlight))))
- '(line-number ((t (:inherit t :background "unspecified-bg"))))
+ '(line-number ((t (:inherit t :background "#1d1f21"))))
  '(line-number-current-line ((t (:background "black" :slant italic))))
  '(menu ((t (:inherit :background :background "#303030" :foreground "white" :inverse-video nil))))
  '(minibuffer-prompt ((t (:foreground "red"))))
