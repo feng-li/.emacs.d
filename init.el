@@ -937,6 +937,7 @@
 ;; BibTeX
 (setq bibtex-align-at-equal-sign t)
 (setq bibtex-maintain-sorted-entries t)
+(setq bibtex-autoadd-commas t)
 (defun bibtex-mode-setup ()
   (setq-local fill-prefix ""))
 (add-hook 'bibtex-mode-hook #'bibtex-mode-setup)
