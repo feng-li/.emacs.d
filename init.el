@@ -74,7 +74,7 @@
  '(send-mail-function 'mailclient-send-it)
  '(show-paren-mode t nil (paren))
  '(tool-bar-mode nil)
- '(warning-suppress-types '((comp) (undo discard-info))))
+ '(warning-suppress-types '((comp) (comp) (undo discard-info))))
 
 ;; (unless package-archive-contents
 ;;   (package-refresh-contents))
@@ -148,7 +148,7 @@
 ;; (setq x-alt-keysym 'ctrl)
 ;; (setq x-meta-keysym 'ctrl)
 
-;; Switch to previous buffer
+;; Switch to previous buffer with Shift-Tab
 (defun switch-to-previous-buffer ()
   (interactive)
   (switch-to-buffer (other-buffer)))
