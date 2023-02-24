@@ -28,7 +28,7 @@
 ;; (package-initialize)
 
 ;; Local server socket dir. Some server does not allow to use the default
-(setq server-use-tcp t)
+;; (setq server-use-tcp t)
 
 ;; Add personal load path recursively in front of the default load path if it exists.
 (defvar my-site-lisp (concat user-emacs-directory "site-lisp"))
@@ -66,7 +66,7 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(poly-R visual-fill-column keytar lsp-grammarly gnu-elpa-keyring-update lsp-ui lsp-metals use-package lsp-mode scala-mode lexic pandoc-mode wordnut synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math writegood-mode highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
+   '(eglot-grammarly eglot tree-sitter-langs tree-sitter notmuch poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode wordnut synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math writegood-mode highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
  '(safe-local-variable-values '((TeX-engine . pdflatex)))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
@@ -74,11 +74,14 @@
  '(send-mail-function 'mailclient-send-it)
  '(show-paren-mode t nil (paren))
  '(tool-bar-mode nil)
- '(warning-suppress-types '((comp) (comp) (undo discard-info))))
+ '(warning-suppress-types '(((tar link)) (comp) (comp) (undo discard-info))))
 
-;; (unless package-archive-contents
-;;   (package-refresh-contents))
-;; (package-install-selected-packages)
+;; Automatically install emacs packages
+(package-initialize)
+(unless package-archive-contents
+  (package-refresh-contents))
+(package-install-selected-packages)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Basic Preferences
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -245,6 +248,19 @@
 	        mail-mode-hook
                 ess-mode-hook))
   (add-hook hook '(lambda () (auto-fill-mode 1))))
+
+
+;; Tree-sitter mode
+(use-package tree-sitter
+  :config
+  (global-tree-sitter-mode)
+  )
+(use-package tree-sitter-langs
+  :config
+  )
+
+(add-to-list 'tree-sitter-major-mode-language-alist '(latex-mode . latex))
+
 
 ;; Unfilling a region joins all the lines in a paragraph into a single line for each
 ;; paragraphs in that region. It is the contrary of fill-region.
@@ -707,6 +723,13 @@
   :config
   (add-to-list
    'Info-default-directory-list (concat user-emacs-directory "info")))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Mail
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(add-to-list 'auto-mode-alist '("neomutt" . message-mode))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Version Control and Diff
@@ -1278,68 +1301,69 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Language server mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(use-package lsp-mode
-  :init
-  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
-  (setq lsp-keymap-prefix "C-c l")
-  :commands lsp)
+;; (use-package lsp-mode
+;;   :init
+;;   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+;;   (setq lsp-keymap-prefix "C-c l")
+;;   :commands lsp)
 
-(use-package lsp-mode
-  :init
-  :commands (lsp lsp-deferred)
-  :config
-  (setq lsp-server-install-dir (concat (getenv "HOME") "/.config/emacs/auto-save-list/lsp-server"))
-  (setq lsp-session-file (concat my-auto-save-list "/lsp-session-v1"))
-  (setq lsp-verify-signature nil) ;; Disable to get metals server (key expired) working
-  (setq lsp-prefer-flymake nil) ;; use flycheck
-  (setq lsp-headerline-breadcrumb-enable nil)
-  (setq lsp-ui-doc-show-with-cursor nil) ;; disable cursor hover (keep mouse hover)
+;; (use-package lsp-mode
+;;   :init
+;;   :commands (lsp lsp-deferred)
+;;   :config
+;;   (setq lsp-server-install-dir (concat (getenv "HOME") "/.config/emacs/auto-save-list/lsp-server"))
+;;   (setq lsp-session-file (concat my-auto-save-list "/lsp-session-v1"))
+;;   (setq lsp-restart 'ignore)  ;; How server-exited events must be handled.
+;;   (setq lsp-verify-signature nil) ;; Disable to get metals server (key expired) working
+;;   (setq lsp-prefer-flymake nil) ;; use flycheck
+;;   (setq lsp-headerline-breadcrumb-enable nil)
+;;   (setq lsp-ui-doc-show-with-cursor nil) ;; disable cursor hover (keep mouse hover)
 
-  ;; Performance https://emacs-lsp.github.io/lsp-mode/page/performance/
-  (setq gc-cons-threshold 100000000)
-  (setq read-process-output-max (* 2048 2048)) ;; 2mb
-  (setq lsp-use-plists t) ;; export LSP_USE_PLISTS=true
-  (setq gc-cons-threshold 100000000)
-  (setq lsp-idle-delay 0.500)
+;;   ;; Performance https://emacs-lsp.github.io/lsp-mode/page/performance/
+;;   (setq gc-cons-threshold 100000000)
+;;   (setq read-process-output-max (* 2048 2048)) ;; 2mb
+;;   (setq lsp-use-plists t) ;; export LSP_USE_PLISTS=true
+;;   (setq gc-cons-threshold 100000000)
+;;   (setq lsp-idle-delay 0.500)
 
-  ;; Only enable certain LSP client and do not ask for server install.
-  ;; (setq lsp-enabled-clients '(metals grammarly-ls rmark marksman unified))
-  (setq lsp-enabled-clients '(metals grammarly-ls))
-  (setq lsp-auto-guess-root nil)
-  (setq lsp-warn-no-matched-clients nil)
+;;   ;; Only enable certain LSP client and do not ask for server install.
+;;   ;; (setq lsp-enabled-clients '(metals grammarly-ls rmark marksman unified))
+;;   (setq lsp-enabled-clients '(metals grammarly-ls))
+;;   (setq lsp-auto-guess-root nil)
+;;   (setq lsp-warn-no-matched-clients nil)
 
-  (define-key lsp-mode-map (kbd "<f4> <f4>") 'lsp-describe-thing-at-point)
-  )
+;;   (define-key lsp-mode-map (kbd "<f4> <f4>") 'lsp-describe-thing-at-point)
+;;   )
 
 
 ;; lsp-treemacs
-(use-package lsp-treemacs
-  :defer t
-  :commands lsp-treemacs-errors-list
-  :config
-  (setq lsp-treemacs-sync-mode t)
-  (setq lsp-treemacs-errors-position-params '((side . right)))
-  (defvar treemacs-no-load-time-warnings t)
-  (define-key lsp-mode-map (kbd "<f4> e") 'lsp-treemacs-errors-list)
-  )
+;; (use-package lsp-treemacs
+;;   :defer t
+;;   :commands lsp-treemacs-errors-list
+;;   :config
+;;   (setq lsp-treemacs-sync-mode t)
+;;   (setq lsp-treemacs-errors-position-params '((side . right)))
+;;   (defvar treemacs-no-load-time-warnings t)
+;;   (define-key lsp-mode-map (kbd "<f4> e") 'lsp-treemacs-errors-list)
+;;   )
 
 ;; Add metals backend for lsp-mode
-(use-package lsp-metals
-  :defer t
-  :ensure t
-  :custom
-  ;; Metals claims to support range formatting by default but it supports range
-  ;; formatting of multiline strings only. You might want to disable it so that
-  ;; emacs can use indentation provided by scala-mode.
-  (lsp-metals-server-args '("-J-Dmetals.allow-multiline-string-formatting=off"))
+;; (use-package lsp-metals
+;;   :defer t
+;;   :ensure t
+;;   :custom
+;;   ;; Metals claims to support range formatting by default but it supports range
+;;   ;; formatting of multiline strings only. You might want to disable it so that
+;;   ;; emacs can use indentation provided by scala-mode.
+;;   (lsp-metals-server-args '("-J-Dmetals.allow-multiline-string-formatting=off"))
 
-  :hook (scala-mode . lsp-deferred)
+;;   :hook (scala-mode . lsp-deferred)
 
-  :config
-  (setq lsp-metals-metals-store-path   (concat (getenv "HOME") "/.local/share/coursier/bin/metals"))
-  (setq lsp-metals-coursier-store-path (concat (getenv "HOME") "/.local/share/coursier/bin/coursier"))
+;;   :config
+;;   (setq lsp-metals-metals-store-path   (concat (getenv "HOME") "/.local/share/coursier/bin/metals"))
+;;   (setq lsp-metals-coursier-store-path (concat (getenv "HOME") "/.local/share/coursier/bin/coursier"))
 
-  )
+;;   )
 ;; Enable nice rendering of documentation on hover
 ;;   Warning: on some systems this package can reduce your emacs responsiveness significally.
 ;;   (See: https://emacs-lsp.github.io/lsp-mode/page/performance/)
@@ -1370,27 +1394,33 @@
 ;; )
 
 ;; grammerly for lsp
-(use-package lsp-grammarly
-  :defer t
-  :ensure t
+;; (use-package lsp-grammarly
+;;   :defer t
+;;   :ensure t
 
-  ;; Comment out to start manually
-  :hook ((text-mode markdown-mode gfm-mode) . (lambda ()
-                                                (require 'lsp-grammarly)
-                                                (lsp-deferred)))  ;; or lsp
+;;   ;; Comment out to start manually
+;;   :hook ((text-mode markdown-mode gfm-mode message-mode) . (lambda ()
+;;                                                 (require 'lsp-grammarly)
+;;                                                 (lsp-deferred)))  ;; or lsp
 
-  :config
-  (setq lsp-grammarly-active-modes '(text-mode latex-mode org-mode markdown-mode gfm-mode))
-  (setq lsp-grammarly-auto-activate nil)
-  (setq lsp-grammarly-domain "academic")
-  (setq lsp-grammarly-user-words (concat (getenv "HOME") "/.hunspell_en_US"))
-  )
+;;   :config
+;;   (setq lsp-grammarly-active-modes '(text-mode latex-mode org-mode markdown-mode gfm-mode))
+;;   (setq lsp-grammarly-auto-activate nil)
+;;   (setq lsp-grammarly-domain "academic")
+;;   (setq lsp-grammarly-user-words (concat (getenv "HOME") "/.hunspell_en_US"))
+;;   )
+
+(use-package eglot-grammarly
+  :hook (text-mode . (lambda ()
+                       (require 'eglot-grammarly)
+                       (call-interactively #'eglot))))
 
 ;; Use company-capf as a completion provider.
 (use-package company
   :hook (scala-mode . company-mode)
   :config
-  (setq lsp-completion-provider :capf))
+  ;; (setq lsp-completion-provider :capf)
+  )
 
 ;; Use the Debug Adapter Protocol for running tests and debugging
 (use-package posframe
