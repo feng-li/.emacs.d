@@ -56,7 +56,6 @@
  '(custom-safe-themes
    '("81c3de64d684e23455236abde277cda4b66509ef2c28f66e059aa925b8b12534" default))
  '(doc-view-continuous t)
- '(global-display-line-numbers-mode t)
  '(global-font-lock-mode t nil (font-lock))
  '(highlight-doxygen-commend-start-regexp
    "\\(/\\*\\(!\\|\\*[^*]\\)\\|#\\('\\)\\|##\\('\\)\\|//\\(!\\|'\\|/[^/
@@ -91,13 +90,6 @@
 (setq user-full-name "Feng Li")
 (setq user-mail-address "m@feng.li")
 
-;; Environment variables
-(setenv "OMP_NUM_THREADS" "1")
-(setenv "LSP_USE_PLISTS"  "true")
-(setenv "PATH" (concat (concat (getenv "HOME") "/.local/bin:")
-                       (concat (getenv "HOME") "/.local/share/coursier/bin:")
-                       (getenv "PATH")))
-
 ;; Auto-save list file prefix
 (setq auto-save-list-file-prefix (concat my-auto-save-list "/.saves-"))
 
@@ -114,7 +106,7 @@
 (defun on-after-init ()
   (unless (display-graphic-p (selected-frame))
     (set-face-background 'default "#1d1f21" (selected-frame))))
-(add-hook 'window-setup-hook 'on-after-init)
+(add-hook 'window-setup-hook #'on-after-init)
 
 ;; (setq dracula-use-24-bit-colors-on-256-colors-terms t)
 ;; (unless (display-graphic-p)
@@ -161,7 +153,7 @@
 (fset 'yes-or-no-p 'y-or-n-p)
 
 ;; Redraw-display when focused
-(add-hook 'focus-in-hook 'redraw-display)
+(add-hook 'focus-in-hook #'redraw-display)
 (global-set-key (kbd "<f5>") 'redraw-display)
 
 ;; Set Fonts
@@ -201,19 +193,38 @@
   (global-set-key [?\e ?\e escape] 'keyboard-escape-quit)
   )
 
-(global-display-line-numbers-mode)
-
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
+(add-hook 'before-save-hook #'delete-trailing-whitespace)
 
 ;; Let Alt key be the meta key
 (setq x-alt-keysym 'meta)
 
 ;; Global visual line mode with better indentation
 ;; (global-visual-line-mode t)
-(dolist (hook '(message-mode-hook org-mode-hook mail-mode-hook LaTeX-mode-hook markdown-mode-hook))
-  (add-hook hook '(lambda () (visual-line-mode t))))
-(dolist (hook '(message-mode-hook org-mode-hook mail-mode-hook LaTeX-mode-hook markdown-mode-hook))
-  (add-hook hook '(lambda () (visual-fill-column-mode t))))
+(dolist (hook '(message-mode-hook
+                prog-mode-hook
+                org-mode-hook
+                mail-mode-hook
+                text-mode-hook))
+  (add-hook hook #'(lambda ()
+                    (display-line-numbers-mode t)
+                    (visual-line-mode t)
+                    (setq word-wrap-by-category t) ; Better CJK wrap support
+                    (visual-fill-column-mode)
+                    )))
+;; (dolist (hook '(message-mode-hook
+;;                 org-mode-hook
+;;                 mail-mode-hook
+;;                 LaTeX-mode-hook
+;;                 tex-mode-hook
+;;                 reftex-mode-hook
+;;                 text-mode-hook
+;;                 markdown-mode-hook))
+;;   (add-hook hook '(lambda () (visual-fill-column-mode t))))
+
+;; Indicator for visual-line-mode
+(setq-default fringe-indicator-alist
+      '((truncation nil nil)
+        (continuation nil nil)))
 
 (setq-default adaptive-wrap-extra-indent 0)
 (add-hook 'visual-line-mode-hook #'adaptive-wrap-prefix-mode)
@@ -238,17 +249,19 @@
 
 ;; auto-fill mode
 (setq-default fill-column 90)
+(set-fringe-mode 0)
+
 
 (dolist (hook '(
                 prog-mode-hook
+                text-mode-hook
                 ;; LaTeX-mode-hook
                 ;; markdown-mode-hook
                 message-mode-hook
                 org-mode-hook
 	        mail-mode-hook
                 ess-mode-hook))
-  (add-hook hook '(lambda () (auto-fill-mode 1))))
-
+  (add-hook hook #'(lambda () (auto-fill-mode 1))))
 
 ;; Tree-sitter mode
 (use-package tree-sitter
@@ -271,7 +284,7 @@
 
 ;; https://www.reddit.com/r/emacs/comments/kwl0mc/lspdescribethingatpoint_config_improvement/
 (add-to-list 'display-buffer-alist
-             '((lambda (buffer _) (with-current-buffer buffer
+             #'((lambda (buffer _) (with-current-buffer buffer
                                     (seq-some (lambda (mode)
                                                 (derived-mode-p mode))
                                               '(help-mode))))
@@ -288,7 +301,7 @@
 
 ;; Keybind to browse the kill ring
 (global-set-key (kbd "C-c y")
-                '(lambda ()
+                #'(lambda ()
                    (interactive)
                    (popup-menu 'yank-menu)))
 (setq ring-bell-function (lambda ()  t))
@@ -409,7 +422,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (dolist (hook '(after-text-mode-hook c-mode-hook org-mode-hook python-mode-hook mail-mode-hook ess-mode-hook))
-  (add-hook hook '(lambda () (hs-minor-mode))))
+  (add-hook hook #'(lambda () (hs-minor-mode))))
 (global-set-key (kbd "M-+") 'hs-toggle-hiding)
 (global-set-key (kbd "M-*") 'hs-show-all)
 
@@ -420,7 +433,7 @@
   (electric-pair-mode t)
 
   (dolist (hook '(python-mode-hook c-mode-hook c++-mode-hook LaTeX-mode-hook ess-r-mode-hook))
-    (add-hook hook '(lambda () (electric-operator-mode 1))))
+    (add-hook hook #'(lambda () (electric-operator-mode 1))))
   (apply #'electric-operator-add-rules-for-mode 'inferior-python-mode
          (electric-operator-get-rules-for-mode 'python-mode))
   (setq electric-operator-R-named-argument-style "spaced")
@@ -599,9 +612,9 @@
   )
 
 ;; ElDoc mode
-(add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
-(add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
-(add-hook 'ielm-mode-hook 'turn-on-eldoc-mode)
+(add-hook 'emacs-lisp-mode-hook #'turn-on-eldoc-mode)
+(add-hook 'lisp-interaction-mode-hook #'turn-on-eldoc-mode)
+(add-hook 'ielm-mode-hook #'turn-on-eldoc-mode)
 
 ;; Comint for input history and  scrolling
 (use-package comint
@@ -647,7 +660,7 @@
 
 (use-package company
   :config
-  (add-hook 'after-init-hook 'global-company-mode)
+  (add-hook 'after-init-hook #'global-company-mode)
   (setq company-minimum-prefix-length 2)
 
   ;; Preserve initial cases
@@ -699,7 +712,7 @@
           (number-sequence 0 9)))
   )
 
-(add-hook 'prog-mode-hook 'flyspell-prog-mode)
+(add-hook 'prog-mode-hook #'flyspell-prog-mode)
 
 ;; Font lock
 (global-font-lock-mode t)
@@ -804,6 +817,12 @@
 ;; FlyCheck
 ;; (add-hook 'after-init-hook #'global-flycheck-mode)
 ;; Enable nice rendering of diagnostics like compile errors.
+
+;; Remove flymake mode and using flycheck mode
+(remove-hook 'prog-mode-hook #'flymake-mode)
+(remove-hook 'text-mode-hook #'flymake-mode)
+(remove-hook 'LaTeX-mode-hook #'flymake-mode)
+
 (use-package flycheck
   :ensure t
   :init (global-flycheck-mode)
@@ -883,7 +902,7 @@
         "~/code/TAGS/C/"
         "~/code/TAGS/FORTRAN/"))
 (dolist (hook '(after-text-mode-hook ess-mode-hook python-mode-hook c-mode-hook c++-mode-hook inferior-ess-mode-hook))
-  (add-hook hook '(lambda () (xref-etags-mode))))
+  (add-hook hook #'(lambda () (xref-etags-mode))))
 
 ;; highlight-indent-guides-mode, can make emacs slow with large files
 ;; (use-package highlight-indent-guides"
@@ -900,9 +919,7 @@
 ;; Highlight doxygen mode
 (highlight-doxygen-global-mode 1)
 (dolist (hook '(c-mode-hook c++-mode-hook python-mode-hook ess-r-mode-hook))
-  (add-hook hook '(lambda () (highlight-doxygen-mode))))
-
-;; (add-hook 'prog-mode-hook 'highlight-doxygen-mode)
+  (add-hook hook #'(lambda () (highlight-doxygen-mode))))
 
 ;; Add font lock keywords
 (mapc (lambda (mode)
@@ -947,7 +964,7 @@
 ;; Org-mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (add-hook 'org-mode-hook
-          '(lambda ()
+          #'(lambda ()
              (setq org-file-apps
                    (quote
                     ((auto-mode . emacs)
@@ -966,7 +983,7 @@
   (setq-local fill-prefix ""))
 (add-hook 'bibtex-mode-hook #'bibtex-mode-setup)
 (add-hook 'bibtex-mode-hook
-          '(lambda ()
+          #'(lambda ()
              (local-set-key (kbd "C-M-\\") 'bibtex-reformat)))
 
 (defun bibtex-reset-fill-prefix (orig-func &rest args)
@@ -982,8 +999,8 @@
 
   (setq TeX-save-query  nil )
 
-  ;; LaTeX AUCTex features
-  (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
+  ;; LaTeX AUCTeX features
+  (add-hook 'LaTeX-mode-hook #'LaTeX-math-mode)
   (setq LaTeX-math-menu-unicode t)
 
   ;; Special Environment
@@ -1017,7 +1034,11 @@
 
 
   (add-hook 'LaTeX-mode-hook
-            '(lambda ()
+            #'(lambda ()
+
+
+               ;; (display-line-numbers-mode)
+               ;; (visual-fill-column-mode)
 
                (TeX-fold-mode 1)
                ;; Clean all intermediate files, like 'latexmk -c'
@@ -1077,7 +1098,10 @@
 
   ;; RefTeX
   (setq reftex-plug-into-AUCTeX t)
-  (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+  (add-hook 'LaTeX-mode-hook #'turn-on-reftex)
+  (add-hook 'reftex-toc-mode-hook #'visual-line-mode)
+  (remove-hook 'reftex-mode #'display-line-numbers-mode)
+  (add-hook 'reftex-toc-mode-hook #'visual-fill-column-mode)
   (setq reftex-toc-follow-mode t)
   (setq reftex-revisit-to-follow t)
   (setq reftex-toc-split-windows-horizontally t)
@@ -1086,7 +1110,7 @@
   ;; Extra keybinds
   ;; (setq reftex-extra-bindings t) ;; equavalent as below
   (add-hook 'reftex-load-hook
-            '(lambda ()
+            #'(lambda ()
                (define-key reftex-mode-map (kbd "C-c t") 'reftex-toc)
                (define-key reftex-mode-map (kbd "C-c l") 'reftex-label)
                (define-key reftex-mode-map (kbd "C-c r") 'reftex-reference)
@@ -1099,7 +1123,7 @@
 
   ;; Allow company-reftex backends
   (add-hook 'LaTeX-mode-hook
-            '(lambda ()
+            #'(lambda ()
                (make-local-variable 'company-backends)
                (setq company-backends (copy-tree company-backends))
                (setf (car company-backends)
@@ -1153,7 +1177,7 @@
   ;; Let help on new frame
   ;; (setq ess-help-own-frame t)
   (add-hook 'ess-mode-hook
-            '(lambda ()
+            #'(lambda ()
                (fset 'my-R-comment-level-1
                      (lambda (&optional arg) "Insert level-1 R comment block"
                        (interactive "p")
@@ -1191,7 +1215,7 @@
 
   ;; Settings on R shell
   (add-hook 'inferior-ess-mode-hook
-            '(lambda ()
+            #'(lambda ()
                (define-key inferior-ess-mode-map (kbd "C-c `") 'ess-parse-errors)
                (define-key inferior-ess-mode-map (kbd "C-c d") 'ess-change-directory)
                ;; (define-key inferior-ess-mode-map (kbd "C-c l") 'ess-rutils-load-wkspc))
@@ -1202,8 +1226,8 @@
     (local-set-key (kbd "<f9> *") (lambda () (interactive) (insert " %*% ")))
     (local-set-key (kbd "<f9> x") (lambda () (interactive) (insert " %x% ")))
     (local-set-key (kbd "<f9> n") (lambda () (interactive) (insert " %in% "))))
-  (add-hook 'ess-mode-hook 'ess-code-style)
-  (add-hook 'inferior-ess-mode-hook 'ess-code-style))
+  (add-hook 'ess-mode-hook #'ess-code-style)
+  (add-hook 'inferior-ess-mode-hook #'ess-code-style))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1236,14 +1260,14 @@
   (setq elpy-syntax-check-command (concat elpy-rpc-virtualenv-path  "bin/flake8"))
 
   ;; Disable elpy's flymake, use flycheck
-  (remove-hook 'elpy-modules 'elpy-module-flymake)
+  (remove-hook 'elpy-modules #'elpy-module-flymake)
   (define-key elpy-mode-map (kbd "C-c C-n") nil)
   (setq flycheck-python-flake8-executable (concat elpy-rpc-virtualenv-path  "bin/flake8"))
   (setq flycheck-python-pylint-executable (concat elpy-rpc-virtualenv-path  "bin/pylint"))
   (setq pylint-command (concat elpy-rpc-virtualenv-path  "bin/pylint3"))
 
   ;; (remove-hook 'elpy-modules 'elpy-module-pyvenv)
-  (remove-hook 'elpy-modules 'elpy-module-highlight-indentation)
+  (remove-hook 'elpy-modules #'elpy-module-highlight-indentation)
 
   (define-key elpy-mode-map (kbd "C-c C-c") 'elpy-shell-send-statement-and-step)
   (define-key elpy-mode-map (kbd "C-c C-r") 'elpy-shell-send-region-or-buffer-and-step)
@@ -1256,7 +1280,7 @@
   (setq python-shell-completion-native-enable nil)
 
   (add-hook 'python-mode-hook
-            '(lambda ()
+            #'(lambda ()
                ;; (setq python-python-command "python3")
 
                ;; Enable flycheck mode
@@ -1277,17 +1301,16 @@
 
 
                ;; ElDoc for Python in the minor buffer
-               (add-hook 'python-mode-hook 'turn-on-eldoc-mode)
+               (add-hook 'python-mode-hook #'turn-on-eldoc-mode)
 
                (defun python-add-breakpoint ()
                  (interactive)
                  (newline-and-indent)
                  (insert "import pdb; pdb.set_trace()"))
-               (add-hook
-                'python-mode-hook
-                '(lambda ()
-                   (define-key python-mode-map
-                     (kbd "C-c C-t") 'python-add-breakpoint)))
+               (add-hook 'python-mode-hook
+                         #'(lambda ()
+                             (define-key python-mode-map
+                               (kbd "C-c C-t") 'python-add-breakpoint)))
 
                ;; Font-Lock
                (make-face 'font-lock-special-macro-face)
@@ -1302,39 +1325,39 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Language server mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; (use-package lsp-mode
-;;   :init
-;;   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
-;;   (setq lsp-keymap-prefix "C-c l")
-;;   :commands lsp)
+(use-package lsp-mode
+  :init
+  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+  (setq lsp-keymap-prefix "C-c l")
+  :commands lsp)
 
-;; (use-package lsp-mode
-;;   :init
-;;   :commands (lsp lsp-deferred)
-;;   :config
-;;   (setq lsp-server-install-dir (concat (getenv "HOME") "/.config/emacs/auto-save-list/lsp-server"))
-;;   (setq lsp-session-file (concat my-auto-save-list "/lsp-session-v1"))
-;;   (setq lsp-restart 'ignore)  ;; How server-exited events must be handled.
-;;   (setq lsp-verify-signature nil) ;; Disable to get metals server (key expired) working
-;;   (setq lsp-prefer-flymake nil) ;; use flycheck
-;;   (setq lsp-headerline-breadcrumb-enable nil)
-;;   (setq lsp-ui-doc-show-with-cursor nil) ;; disable cursor hover (keep mouse hover)
+(use-package lsp-mode
+  :init
+  :commands (lsp lsp-deferred)
+  :config
+  (setq lsp-server-install-dir (concat (getenv "HOME") "/.config/emacs/auto-save-list/lsp-server"))
+  (setq lsp-session-file (concat my-auto-save-list "/lsp-session-v1"))
+  (setq lsp-restart 'ignore)  ;; How server-exited events must be handled.
+  (setq lsp-verify-signature nil) ;; Disable to get metals server (key expired) working
+  (setq lsp-prefer-flymake nil) ;; use flycheck
+  (setq lsp-headerline-breadcrumb-enable nil)
+  (setq lsp-ui-doc-show-with-cursor nil) ;; disable cursor hover (keep mouse hover)
 
-;;   ;; Performance https://emacs-lsp.github.io/lsp-mode/page/performance/
-;;   (setq gc-cons-threshold 100000000)
-;;   (setq read-process-output-max (* 2048 2048)) ;; 2mb
-;;   (setq lsp-use-plists t) ;; export LSP_USE_PLISTS=true
-;;   (setq gc-cons-threshold 100000000)
-;;   (setq lsp-idle-delay 0.500)
+  ;; Performance https://emacs-lsp.github.io/lsp-mode/page/performance/
+  (setq gc-cons-threshold 100000000)
+  (setq read-process-output-max (* 2048 2048)) ;; 2mb
+  (setq lsp-use-plists t) ;; export LSP_USE_PLISTS=true
+  (setq gc-cons-threshold 100000000)
+  (setq lsp-idle-delay 0.500)
 
-;;   ;; Only enable certain LSP client and do not ask for server install.
-;;   ;; (setq lsp-enabled-clients '(metals grammarly-ls rmark marksman unified))
-;;   (setq lsp-enabled-clients '(metals grammarly-ls))
-;;   (setq lsp-auto-guess-root nil)
-;;   (setq lsp-warn-no-matched-clients nil)
+  ;; Only enable certain LSP client and do not ask for server install.
+  ;; (setq lsp-enabled-clients '(metals grammarly-ls rmark marksman unified))
+  (setq lsp-enabled-clients '(metals grammarly-ls))
+  (setq lsp-auto-guess-root nil)
+  (setq lsp-warn-no-matched-clients nil)
 
-;;   (define-key lsp-mode-map (kbd "<f4> <f4>") 'lsp-describe-thing-at-point)
-;;   )
+  (define-key lsp-mode-map (kbd "<f4> <f4>") 'lsp-describe-thing-at-point)
+  )
 
 
 ;; lsp-treemacs
@@ -1349,22 +1372,22 @@
 ;;   )
 
 ;; Add metals backend for lsp-mode
-;; (use-package lsp-metals
-;;   :defer t
-;;   :ensure t
-;;   :custom
-;;   ;; Metals claims to support range formatting by default but it supports range
-;;   ;; formatting of multiline strings only. You might want to disable it so that
-;;   ;; emacs can use indentation provided by scala-mode.
-;;   (lsp-metals-server-args '("-J-Dmetals.allow-multiline-string-formatting=off"))
+(use-package lsp-metals
+  :defer t
+  :ensure t
+  :custom
+  ;; Metals claims to support range formatting by default but it supports range
+  ;; formatting of multiline strings only. You might want to disable it so that
+  ;; emacs can use indentation provided by scala-mode.
+  (lsp-metals-server-args '("-J-Dmetals.allow-multiline-string-formatting=off"))
 
-;;   :hook (scala-mode . lsp-deferred)
+  :hook (scala-mode . lsp-deferred)
 
-;;   :config
-;;   (setq lsp-metals-metals-store-path   (concat (getenv "HOME") "/.local/share/coursier/bin/metals"))
-;;   (setq lsp-metals-coursier-store-path (concat (getenv "HOME") "/.local/share/coursier/bin/coursier"))
+  :config
+  (setq lsp-metals-metals-store-path   (concat (getenv "HOME") "/.local/share/coursier/bin/metals"))
+  (setq lsp-metals-coursier-store-path (concat (getenv "HOME") "/.local/share/coursier/bin/coursier"))
 
-;;   )
+  )
 ;; Enable nice rendering of documentation on hover
 ;;   Warning: on some systems this package can reduce your emacs responsiveness significally.
 ;;   (See: https://emacs-lsp.github.io/lsp-mode/page/performance/)
@@ -1395,26 +1418,29 @@
 ;; )
 
 ;; grammerly for lsp
-;; (use-package lsp-grammarly
-;;   :defer t
-;;   :ensure t
+(use-package lsp-grammarly
+  :defer t
+  :ensure t
 
-;;   ;; Comment out to start manually
-;;   :hook ((text-mode markdown-mode gfm-mode message-mode) . (lambda ()
-;;                                                 (require 'lsp-grammarly)
-;;                                                 (lsp-deferred)))  ;; or lsp
+  ;; Comment out to start manually
+  :hook ((text-mode markdown-mode gfm-mode message-mode) . (lambda ()
+                                                (require 'lsp-grammarly)
+                                                (lsp-deferred)))  ;; or lsp
 
-;;   :config
-;;   (setq lsp-grammarly-active-modes '(text-mode latex-mode org-mode markdown-mode gfm-mode))
-;;   (setq lsp-grammarly-auto-activate nil)
-;;   (setq lsp-grammarly-domain "academic")
-;;   (setq lsp-grammarly-user-words (concat (getenv "HOME") "/.hunspell_en_US"))
-;;   )
+  :config
+  (setq lsp-grammarly-active-modes '(text-mode latex-mode org-mode markdown-mode gfm-mode))
+  (setq lsp-grammarly-auto-activate nil)
+  (setq lsp-grammarly-domain "academic")
+  (setq lsp-grammarly-user-words (concat (getenv "HOME") "/.hunspell_en_US"))
+  )
 
-(use-package eglot-grammarly
-  :hook (text-mode . (lambda ()
-                       (require 'eglot-grammarly)
-                       (call-interactively #'eglot))))
+;; (use-package eglot-grammarly
+;;   :hook (text-mode . (lambda ()
+;;                        (require 'eglot-grammarly)
+;;                        (call-interactively #'eglot)))
+  :config
+  ;; (add-to-list 'eglot-server-programs `(,eglot-grammarly-active-modes . ,(list 'eglot-grammarly-server (concat (getenv "HOME") "/.local/bin/grammarly-languageserver") "--stdio")))
+;; )
 
 ;; Use company-capf as a completion provider.
 (use-package company
@@ -1424,14 +1450,14 @@
   )
 
 ;; Use the Debug Adapter Protocol for running tests and debugging
-(use-package posframe
-  ;; Posframe is a pop-up tool that must be manually installed for dap-mode
-  )
-(use-package dap-mode
-  :hook
-  (lsp-mode . dap-mode)
-  (lsp-mode . dap-ui-mode)
-  )
+;; (use-package posframe
+;;   ;; Posframe is a pop-up tool that must be manually installed for dap-mode
+;;   )
+;; (use-package dap-mode
+;;   :hook
+;;   (lsp-mode . dap-mode)
+;;   (lsp-mode . dap-ui-mode)
+;;   )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customize faces
