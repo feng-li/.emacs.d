@@ -65,7 +65,7 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(eglot-grammarly eglot tree-sitter-langs tree-sitter notmuch poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode wordnut synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math writegood-mode highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
+   '(lsp-grammarly lsp-metals eglot-grammarly eglot tree-sitter-langs tree-sitter notmuch poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode wordnut synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math writegood-mode highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
  '(safe-local-variable-values '((TeX-engine . pdflatex)))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
