@@ -157,7 +157,7 @@
 (global-set-key (kbd "<f5>") 'redraw-display)
 
 ;; Set Fonts
-(add-to-list 'default-frame-alist '(font . "M PLUS 1 Code-11")) ;
+(add-to-list 'default-frame-alist '(font . "M PLUS Code Latin 50-11")) ;
 ;; (when (display-graphic-p)
 ;;   (if (> (display-pixel-height) 1080) ;; HDPi
 ;;       (progn
@@ -200,17 +200,19 @@
 
 ;; Global visual line mode with better indentation
 ;; (global-visual-line-mode t)
+(setq-default fill-column 90)
+(setq visual-fill-column-width 90)
 (dolist (hook '(message-mode-hook
                 prog-mode-hook
                 org-mode-hook
                 mail-mode-hook
                 text-mode-hook))
   (add-hook hook #'(lambda ()
-                    (display-line-numbers-mode t)
-                    (visual-line-mode t)
-                    (setq word-wrap-by-category t) ; Better CJK wrap support
-                    (visual-fill-column-mode)
-                    )))
+                     (display-line-numbers-mode t)
+                     (visual-line-mode t)
+                     (setq word-wrap-by-category t) ; Better CJK wrap support
+                     (visual-fill-column-mode)
+                     )))
 ;; (dolist (hook '(message-mode-hook
 ;;                 org-mode-hook
 ;;                 mail-mode-hook
@@ -222,9 +224,9 @@
 ;;   (add-hook hook '(lambda () (visual-fill-column-mode t))))
 
 ;; Indicator for visual-line-mode
-(setq-default fringe-indicator-alist
-      '((truncation nil nil)
-        (continuation nil nil)))
+;; (setq-default fringe-indicator-alist
+;;               '((truncation nil nil)
+;;                 (continuation nil nil)))
 
 (setq-default adaptive-wrap-extra-indent 0)
 (add-hook 'visual-line-mode-hook #'adaptive-wrap-prefix-mode)
@@ -248,13 +250,8 @@
 (setq kill-ring-max 150)
 
 ;; auto-fill mode
-(setq-default fill-column 90)
-(set-fringe-mode 0)
-
-
-(dolist (hook '(
-                prog-mode-hook
-                text-mode-hook
+(dolist (hook '(prog-mode-hook
+                ;; text-mode-hook
                 ;; LaTeX-mode-hook
                 ;; markdown-mode-hook
                 message-mode-hook
@@ -285,12 +282,12 @@
 ;; https://www.reddit.com/r/emacs/comments/kwl0mc/lspdescribethingatpoint_config_improvement/
 (add-to-list 'display-buffer-alist
              #'((lambda (buffer _) (with-current-buffer buffer
-                                    (seq-some (lambda (mode)
-                                                (derived-mode-p mode))
-                                              '(help-mode))))
-               (display-buffer-reuse-window display-buffer-below-selected)
-               (reusable-frames . visible)
-               (window-height . 0.4)))
+                                     (seq-some (lambda (mode)
+                                                 (derived-mode-p mode))
+                                               '(help-mode))))
+                (display-buffer-reuse-window display-buffer-below-selected)
+                (reusable-frames . visible)
+                (window-height . 0.4)))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Global key bindings
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -302,8 +299,8 @@
 ;; Keybind to browse the kill ring
 (global-set-key (kbd "C-c y")
                 #'(lambda ()
-                   (interactive)
-                   (popup-menu 'yank-menu)))
+                    (interactive)
+                    (popup-menu 'yank-menu)))
 (setq ring-bell-function (lambda ()  t))
 
 ;; Disable capitalize-key, conflict with tmux prefix ESC.
@@ -965,11 +962,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (add-hook 'org-mode-hook
           #'(lambda ()
-             (setq org-file-apps
-                   (quote
-                    ((auto-mode . emacs)
-                     ("\\.x?html?\\'" . default)
-                     ("\\.pdf\\'" . "evince %s"))))))
+              (setq org-file-apps
+                    (quote
+                     ((auto-mode . emacs)
+                      ("\\.x?html?\\'" . default)
+                      ("\\.pdf\\'" . "evince %s"))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; LaTeX
@@ -984,7 +981,7 @@
 (add-hook 'bibtex-mode-hook #'bibtex-mode-setup)
 (add-hook 'bibtex-mode-hook
           #'(lambda ()
-             (local-set-key (kbd "C-M-\\") 'bibtex-reformat)))
+              (local-set-key (kbd "C-M-\\") 'bibtex-reformat)))
 
 (defun bibtex-reset-fill-prefix (orig-func &rest args)
   (let ((fill-prefix (make-string (1+ bibtex-text-indentation) ? )))
@@ -1032,50 +1029,50 @@
               :help "Run LaTeX with `latexmk -pvc`"))
     ) ; provide LatexMkPvc command
 
+  ;; Other settings
+  (remove-hook 'LaTeX-mode-hook #'auto-fill-mode)
 
+  ;; LaTeX-mode-hook
   (add-hook 'LaTeX-mode-hook
             #'(lambda ()
 
+                (TeX-fold-mode 1)
 
-               ;; (display-line-numbers-mode)
-               ;; (visual-fill-column-mode)
+                ;; Clean all intermediate files, like 'latexmk -c'
+                (local-unset-key (kbd "C-c C-k"))
+                (local-set-key (kbd "C-c C-k") (lambda () (interactive) (TeX-clean t)))
+                (local-set-key (kbd "<f5>") 'TeX-command-run-all)
 
-               (TeX-fold-mode 1)
-               ;; Clean all intermediate files, like 'latexmk -c'
-               (local-unset-key (kbd "C-c C-k"))
-               (local-set-key (kbd "C-c C-k") (lambda () (interactive) (TeX-clean t)))
-               (local-set-key (kbd "<f5>") 'TeX-command-run-all)
+                (local-set-key (kbd "<f9> (") (lambda () (interactive) (insert "\\left( \\right)")))
+                (local-set-key (kbd "<f9> [") (lambda () (interactive) (insert "\\left[ \\right]")))
+                (local-set-key (kbd "<f9> {") (lambda () (interactive) (insert "\\left\\{ \\right\\}")))
+                (local-set-key (kbd "<f9> |") (lambda () (interactive) (insert "\\left| \\right|")))
+                (local-set-key "\$" 'skeleton-pair-insert-maybe)
 
-               (local-set-key (kbd "<f9> (") (lambda () (interactive) (insert "\\left( \\right)")))
-               (local-set-key (kbd "<f9> [") (lambda () (interactive) (insert "\\left[ \\right]")))
-               (local-set-key (kbd "<f9> {") (lambda () (interactive) (insert "\\left\\{ \\right\\}")))
-               (local-set-key (kbd "<f9> |") (lambda () (interactive) (insert "\\left| \\right|")))
-               (local-set-key "\$" 'skeleton-pair-insert-maybe)
-
-               ;; This was `c-c c-f c-a`
-               (setq LaTeX-font-list
-                     '((?a ""              ""  "\\mathcal{"    "}")
-                       ;; (?b "\\textbf{"     "}" "\\mathbf{"     "}")
-                       (?b "\\textbf{"     "}" "\\bm{"     "}")
-                       (?c "\\textsc{"     "}")
-                       (?e "\\emph{"       "}")
-                       (?f "\\textsf{"     "}" "\\mathsf{"     "}")
-                       (?i "\\textit{"     "}" "\\mathit{"     "}")
-                       (?l "\\textulc{"    "}")
-                       (?m "\\textmd{"     "}")
-                       (?n "\\textnormal{" "}" "\\mathnormal{" "}")
-                       (?r "\\textrm{"     "}" "\\mathrm{"     "}")
-                       (?s "\\textsl{"     "}" "\\mathbb{"     "}")
-                       (?t "\\texttt{"     "}" "\\mathtt{"     "}")
-                       (?u "\\textup{"     "}")
-                       (?w "\\textsw{"     "}")
-                       (?d "" "" t)))
+                ;; This was `c-c c-f c-a`
+                (setq LaTeX-font-list
+                      '((?a ""              ""  "\\mathcal{"    "}")
+                        ;; (?b "\\textbf{"     "}" "\\mathbf{"     "}")
+                        (?b "\\textbf{"     "}" "\\bm{"     "}")
+                        (?c "\\textsc{"     "}")
+                        (?e "\\emph{"       "}")
+                        (?f "\\textsf{"     "}" "\\mathsf{"     "}")
+                        (?i "\\textit{"     "}" "\\mathit{"     "}")
+                        (?l "\\textulc{"    "}")
+                        (?m "\\textmd{"     "}")
+                        (?n "\\textnormal{" "}" "\\mathnormal{" "}")
+                        (?r "\\textrm{"     "}" "\\mathrm{"     "}")
+                        (?s "\\textsl{"     "}" "\\mathbb{"     "}")
+                        (?t "\\texttt{"     "}" "\\mathtt{"     "}")
+                        (?u "\\textup{"     "}")
+                        (?w "\\textsw{"     "}")
+                        (?d "" "" t)))
 
 
-               ;; Use \bm{} to repace \mathbf{}
-               ;; (add-to-list 'LaTeX-font-list
-               ;;              '(m "\\bm{" "}"))
-               ))
+                ;; Use \bm{} to repace \mathbf{}
+                ;; (add-to-list 'LaTeX-font-list
+                ;;              '(m "\\bm{" "}"))
+                ))
 
   ;; Translate key § to ` so both can be used as a math abbreviation
   ;; Drawback, could not type § anymore. Make it locally?
@@ -1107,28 +1104,28 @@
   (setq reftex-toc-split-windows-horizontally t)
   (setq reftex-toc-split-windows-fraction 0.3)
 
-  ;; Extra keybinds
+  ;; Extra keybinds for RefTeX
   ;; (setq reftex-extra-bindings t) ;; equavalent as below
   (add-hook 'reftex-load-hook
             #'(lambda ()
-               (define-key reftex-mode-map (kbd "C-c t") 'reftex-toc)
-               (define-key reftex-mode-map (kbd "C-c l") 'reftex-label)
-               (define-key reftex-mode-map (kbd "C-c r") 'reftex-reference)
-               (define-key reftex-mode-map (kbd "C-c c") 'reftex-citation)
-               (define-key reftex-mode-map (kbd "C-c v") 'reftex-view-crossref)
-               (define-key reftex-mode-map (kbd "C-c s") 'reftex-search-document)
-               (define-key reftex-mode-map (kbd "C-c g") 'reftex-grep-document)
-               )
+                (define-key reftex-mode-map (kbd "C-c t") 'reftex-toc)
+                (define-key reftex-mode-map (kbd "C-c l") 'reftex-label)
+                (define-key reftex-mode-map (kbd "C-c r") 'reftex-reference)
+                (define-key reftex-mode-map (kbd "C-c c") 'reftex-citation)
+                (define-key reftex-mode-map (kbd "C-c v") 'reftex-view-crossref)
+                (define-key reftex-mode-map (kbd "C-c s") 'reftex-search-document)
+                (define-key reftex-mode-map (kbd "C-c g") 'reftex-grep-document)
+                )
             )
 
   ;; Allow company-reftex backends
   (add-hook 'LaTeX-mode-hook
             #'(lambda ()
-               (make-local-variable 'company-backends)
-               (setq company-backends (copy-tree company-backends))
-               (setf (car company-backends)
-                     (append '(company-reftex-labels company-reftex-citations) (car company-backends)))
-               ))
+                (make-local-variable 'company-backends)
+                (setq company-backends (copy-tree company-backends))
+                (setf (car company-backends)
+                      (append '(company-reftex-labels company-reftex-citations) (car company-backends)))
+                ))
 
   (setq reftex-cite-format 'natbib)
   (setq reftex-use-external-file-finders t)
@@ -1178,21 +1175,21 @@
   ;; (setq ess-help-own-frame t)
   (add-hook 'ess-mode-hook
             #'(lambda ()
-               (fset 'my-R-comment-level-1
-                     (lambda (&optional arg) "Insert level-1 R comment block"
-                       (interactive "p")
-                       (kmacro-exec-ring-item
-                        (quote ([21 55 57 35 return 21 51 35
-                                    return 21 55 57 35 up 32] 0 "%d")) arg)))
-               (local-set-key (kbd "<f9> 1") 'my-R-comment-level-1)
+                (fset 'my-R-comment-level-1
+                      (lambda (&optional arg) "Insert level-1 R comment block"
+                        (interactive "p")
+                        (kmacro-exec-ring-item
+                         (quote ([21 55 57 35 return 21 51 35
+                                     return 21 55 57 35 up 32] 0 "%d")) arg)))
+                (local-set-key (kbd "<f9> 1") 'my-R-comment-level-1)
 
-               ;; Insert three line comments level-2
-               (fset 'my-R-comment-level-2
-                     [?\C-a ?\C-u ?3 ?# ?\C-u ?7 ?6 ?- return
-                            ?\C-u ?3 ?# return ?\C-a ?\C-u ?3 ?# ?\C-u ?7 ?6 ?- up ? ])
-               (local-set-key (kbd "<f9> 2") 'my-R-comment-level-2)
+                ;; Insert three line comments level-2
+                (fset 'my-R-comment-level-2
+                      [?\C-a ?\C-u ?3 ?# ?\C-u ?7 ?6 ?- return
+                             ?\C-u ?3 ?# return ?\C-a ?\C-u ?3 ?# ?\C-u ?7 ?6 ?- up ? ])
+                (local-set-key (kbd "<f9> 2") 'my-R-comment-level-2)
 
-               ))
+                ))
 
 
   (setq ess-R-font-lock-keywords
@@ -1216,10 +1213,10 @@
   ;; Settings on R shell
   (add-hook 'inferior-ess-mode-hook
             #'(lambda ()
-               (define-key inferior-ess-mode-map (kbd "C-c `") 'ess-parse-errors)
-               (define-key inferior-ess-mode-map (kbd "C-c d") 'ess-change-directory)
-               ;; (define-key inferior-ess-mode-map (kbd "C-c l") 'ess-rutils-load-wkspc))
-               ))
+                (define-key inferior-ess-mode-map (kbd "C-c `") 'ess-parse-errors)
+                (define-key inferior-ess-mode-map (kbd "C-c d") 'ess-change-directory)
+                ;; (define-key inferior-ess-mode-map (kbd "C-c l") 'ess-rutils-load-wkspc))
+                ))
 
   ;; ESS Code styles
   (defun ess-code-style ()
@@ -1281,43 +1278,43 @@
 
   (add-hook 'python-mode-hook
             #'(lambda ()
-               ;; (setq python-python-command "python3")
+                ;; (setq python-python-command "python3")
 
-               ;; Enable flycheck mode
-               (flycheck-mode t)
+                ;; Enable flycheck mode
+                (flycheck-mode t)
 
-               ;; Enter to indent in python.el
-               (define-key python-mode-map (kbd "C-m") 'newline-and-indent)
+                ;; Enter to indent in python.el
+                (define-key python-mode-map (kbd "C-m") 'newline-and-indent)
 
-               (define-key python-mode-map (kbd "C-c M-r") 'python-shell-send-region)
+                (define-key python-mode-map (kbd "C-c M-r") 'python-shell-send-region)
 
-               (defun my-python-send-line-and-step (beg end)
-                 (interactive "r")
-                 (if (eq beg end)
-                     (python-shell-send-region (point-at-bol) (point-at-eol))
-                   (python-shell-send-region beg end))
-                 (next-line))
-               (local-set-key (kbd "C-c C-n") 'my-python-send-line-and-step)
+                (defun my-python-send-line-and-step (beg end)
+                  (interactive "r")
+                  (if (eq beg end)
+                      (python-shell-send-region (point-at-bol) (point-at-eol))
+                    (python-shell-send-region beg end))
+                  (next-line))
+                (local-set-key (kbd "C-c C-n") 'my-python-send-line-and-step)
 
 
-               ;; ElDoc for Python in the minor buffer
-               (add-hook 'python-mode-hook #'turn-on-eldoc-mode)
+                ;; ElDoc for Python in the minor buffer
+                (add-hook 'python-mode-hook #'turn-on-eldoc-mode)
 
-               (defun python-add-breakpoint ()
-                 (interactive)
-                 (newline-and-indent)
-                 (insert "import pdb; pdb.set_trace()"))
-               (add-hook 'python-mode-hook
-                         #'(lambda ()
-                             (define-key python-mode-map
-                               (kbd "C-c C-t") 'python-add-breakpoint)))
+                (defun python-add-breakpoint ()
+                  (interactive)
+                  (newline-and-indent)
+                  (insert "import pdb; pdb.set_trace()"))
+                (add-hook 'python-mode-hook
+                          #'(lambda ()
+                              (define-key python-mode-map
+                                (kbd "C-c C-t") 'python-add-breakpoint)))
 
-               ;; Font-Lock
-               (make-face 'font-lock-special-macro-face)
-               (set-face-background 'font-lock-special-macro-face "magenta")
-               (set-face-foreground 'font-lock-special-macro-face "white")
+                ;; Font-Lock
+                (make-face 'font-lock-special-macro-face)
+                (set-face-background 'font-lock-special-macro-face "magenta")
+                (set-face-foreground 'font-lock-special-macro-face "white")
 
-               ))
+                ))
   )
 
 
@@ -1424,8 +1421,8 @@
 
   ;; Comment out to start manually
   :hook ((text-mode markdown-mode gfm-mode message-mode) . (lambda ()
-                                                (require 'lsp-grammarly)
-                                                (lsp-deferred)))  ;; or lsp
+                                                             (require 'lsp-grammarly)
+                                                             (lsp-deferred)))  ;; or lsp
 
   :config
   (setq lsp-grammarly-active-modes '(text-mode latex-mode org-mode markdown-mode gfm-mode))
@@ -1438,8 +1435,8 @@
 ;;   :hook (text-mode . (lambda ()
 ;;                        (require 'eglot-grammarly)
 ;;                        (call-interactively #'eglot)))
-  :config
-  ;; (add-to-list 'eglot-server-programs `(,eglot-grammarly-active-modes . ,(list 'eglot-grammarly-server (concat (getenv "HOME") "/.local/bin/grammarly-languageserver") "--stdio")))
+:config
+;; (add-to-list 'eglot-server-programs `(,eglot-grammarly-active-modes . ,(list 'eglot-grammarly-server (concat (getenv "HOME") "/.local/bin/grammarly-languageserver") "--stdio")))
 ;; )
 
 ;; Use company-capf as a completion provider.
