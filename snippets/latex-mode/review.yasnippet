@@ -12,7 +12,6 @@
 \setmainfont{Garamond Premier Pro}
 \setmonofont[Scale=0.9]{Garamond Premier Pro}
 
-
 \usepackage{amssymb,amsmath}
 
 %% Page margin and linspacing
@@ -22,12 +21,20 @@
 \spacing{1.1}
 
 %% BibTeX
-\usepackage[style=authoryear-comp, backend=biber, natbib=true, maxcitenames=2, maxbibnames=99, safeinputenc]{biblatex}
+\usepackage[style=authoryear-comp, backend=biber, natbib=true, maxcitenames=2,date=year,maxbibnames=99, safeinputenc]{biblatex}
 \renewbibmacro{in:}{%
   \ifentrytype{article}{}{%
-  \printtext{\bibstring{in}\intitlepunct}}}
-\DeclareNameAlias{sortname}{family-given}
-\addbibresource{references-feng.bib}
+      \printtext{\bibstring{in}\intitlepunct}}}
+  \DeclareNameAlias{sortname}{family-given}
+  \addbibresource{references-feng.bib}
+% Remove addendum entry.
+\AtEveryBibitem{%
+  \clearfield{addendum}%
+  \clearfield{url}%
+  \clearlist{language}%
+  \clearfield{issn}%
+  \clearfield{urlyear}%
+}
 
 \usepackage{longtable,booktabs}
 
@@ -42,21 +49,21 @@
 \renewcommand{\thetable}{S.\arabic{table}}
 \renewcommand{\thefigure}{S.\arabic{figure}}
 
-\usepackage[compact,center]{titlesec}
-\titlespacing{\section}{0pt}{0ex}{0ex}
-\titlespacing{\subsection}{0pt}{0ex}{0ex}
-\titlespacing{\subsubsection}{0pt}{0ex}{0ex}
-\usepackage{titling}
-\setlength{\droptitle}{-2cm}
-\predate{}
-\postdate{}
-% \pretitile{}
-% \posttitle{}
-% \preauthor{\\}
-% \postauthor{}
-\usepackage{enumitem}
-\setlist[enumerate,itemize]{listparindent=\parindent,leftmargin=*}% Indented paragraphs within lists
-\setlength{\itemsep}{0.0pt}
+  \usepackage[compact,center]{titlesec}
+  \titlespacing{\section}{0pt}{0ex}{0ex}
+  \titlespacing{\subsection}{0pt}{0ex}{0ex}
+  \titlespacing{\subsubsection}{0pt}{0ex}{0ex}
+  \usepackage{titling}
+  \setlength{\droptitle}{-2cm}
+  \predate{}
+  \postdate{}
+  % \pretitile{}
+  % \posttitle{}
+  % \preauthor{\}
+  % \postauthor{}
+  \usepackage{enumitem}
+  \setlist[enumerate,itemize]{listparindent=\parindent,leftmargin=*}% Indented paragraphs within lists
+  \setlength{\itemsep}{0.0pt}
 
 \begin{document}
 \title{\bf\Large Review report for manuscript
