@@ -201,7 +201,7 @@
 ;; Global visual line mode with better indentation
 ;; (global-visual-line-mode t)
 (setq-default fill-column 90)
-(setq visual-fill-column-width 90)
+(setq visual-fill-column-width 98)
 (dolist (hook '(message-mode-hook
                 prog-mode-hook
                 org-mode-hook
