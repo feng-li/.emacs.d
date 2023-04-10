@@ -267,9 +267,9 @@
   )
 (use-package tree-sitter-langs
   :config
+  (add-to-list 'tree-sitter-major-mode-language-alist '(latex-mode . latex))
   )
 
-(add-to-list 'tree-sitter-major-mode-language-alist '(latex-mode . latex))
 
 
 ;; Unfilling a region joins all the lines in a paragraph into a single line for each
