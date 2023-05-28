@@ -65,7 +65,7 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(lsp-grammarly lsp-metals eglot-grammarly eglot tree-sitter-langs tree-sitter notmuch poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode wordnut synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math writegood-mode highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
+   '(lsp-grammarly lsp-metals eglot-grammarly tree-sitter-langs tree-sitter notmuch poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode wordnut synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math writegood-mode highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
  '(safe-local-variable-values '((TeX-engine . pdflatex)))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
@@ -470,27 +470,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; LanguageTool https://languagetool.org/download/
-(use-package langtool
-  :disabled t
-  :defer t
-  :config
-  (setq langtool-language-tool-jar "~/.APP/LanguageTool/languagetool-commandline.jar")
-  (setq langtool-default-language "en-US")
-
-  (global-set-key (kbd "<f9> l") 'langtool-check)
-  (global-set-key (kbd "<f9> L") 'langtool-check-done)
-
-  ;; Show LanguageTool report automatically by popup
-  (defun langtool-autoshow-detail-popup (overlays)
-    (when (require 'popup nil t)
-      ;; Do not interrupt current popup
-      (unless (or popup-instances
-                  ;; suppress popup after type `C-g` .
-                  (memq last-command '(keyboard-quit)))
-        (let ((msg (langtool-details-error-message overlays)))
-          (popup-tip msg)))))
-  (setq langtool-autoshow-message-function
-        'langtool-autoshow-detail-popup))
+(use-package flycheck-languagetool
+  :ensure t
+  :hook (text-mode . flycheck-languagetool-setup)
+  :init
+  (setq flycheck-languagetool-server-jar
+        (concat (getenv "HOME") "/.APP/LanguageTool/languagetool-server.jar"))
+  )
 
 (use-package writegood-mode
   :config
