@@ -65,7 +65,7 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(lsp-grammarly lsp-metals eglot-grammarly tree-sitter-langs tree-sitter notmuch poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode wordnut synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math writegood-mode highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
+   '(flycheck-languagetool lsp-grammarly lsp-metals eglot-grammarly tree-sitter-langs tree-sitter notmuch poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode wordnut synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math writegood-mode highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
  '(safe-local-variable-values '((TeX-engine . pdflatex)))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
@@ -1421,7 +1421,7 @@
 ;;   :hook (text-mode . (lambda ()
 ;;                        (require 'eglot-grammarly)
 ;;                        (call-interactively #'eglot)))
-:config
+;; :config
 ;; (add-to-list 'eglot-server-programs `(,eglot-grammarly-active-modes . ,(list 'eglot-grammarly-server (concat (getenv "HOME") "/.local/bin/grammarly-languageserver") "--stdio")))
 ;; )
 
