@@ -12,7 +12,6 @@
 \usepackage{threeparttable}
 \usepackage[scaled]{helvet}
 \usepackage{lmodern}
-\usepackage{natbib}
 \usepackage{booktabs}
 \usepackage{amsfonts}
 \usefonttheme[onlymath]{serif}
@@ -35,6 +34,33 @@
 \setbeamercolor{framesubtitle}{fg=violet}
 %% \setlength{\leftmargini}{5pt}
 
+%% BibLaTeX
+\usepackage[backend=biber, style=authoryear, sorting=ydnt, url=false, dashed=none, maxcitenames=2, maxbibnames=99, giveninits=true, hyperref=true,alldates=year, natbib=true, uniquelist=false, uniquename=false]{biblatex}
+\renewbibmacro{in:}{%
+  \ifentrytype{article}{}{%
+  \printtext{\bibstring{in}\intitlepunct}}}
+\DeclareNameAlias{sortname}{family-given}
+\DeclareFieldFormat[article]{number}{(#1)}
+% Remove addendum entry.
+\AtEveryBibitem{%
+  \clearfield{doi}%
+  \clearfield{addendum}%
+  \clearfield{eventtitle}%
+  \clearfield{eprint}%
+  \clearfield{issn}%
+  \clearlist{language}%
+}
+\renewcommand*{\bibfont}{\scriptsize} % Reference font size
+
+% Caption font size
+\usepackage{caption}
+\captionsetup[figure]{font=tiny, labelfont=tiny}
+
+% replace and with &
+\renewcommand*\finalnamedelim{\addspace\&\space}
+\addbibresource{references-feng.bib}
+
+
 \hypersetup{
   colorlinks=true,
   linkcolor=blue,
@@ -44,9 +70,7 @@
 
 \title[ XXX ]{\textbf{ XXX }}
 
-\author[Feng Li]{\includegraphics[height=2cm]{cufelogo}\\
-  \vspace{0.5cm}\textbf{Feng Li}\\
-\includegraphics[height=0.35cm]{twitter}@f3ngli}
+\author[Feng Li]{\textbf{Feng Li}}
 
 \institute[\url{https://feng.li/}]{\footnotesize{\textbf{School of Statistics and
       Mathematics\\\\ Central University of Finance and Economics}}}
@@ -61,6 +85,22 @@
   \vspace{-1cm}
 \end{frame}
 
+% \begin{frame}
+%   \frametitle{Authors}
+%   \begin{block}{}
+%     \centering
+%     % \begin{tabular}{p{6cm}ccc}
+%     \begin{tabular}{cc}
+%       \includegraphics[height=0.3\textheight]{figures/XiaowenMa} & \includegraphics[height=0.3\textheight]{figures/FengLi}\\
+%       \footnotesize Xiaowen Ma & \footnotesize Feng Li \\
+%       \multicolumn{2}{c}{\footnotesize{(Central University of Finance and Economics)}} \\
+%       \\
+%       \includegraphics[height=0.3\textheight]{figures/SuneKarlsson} & \includegraphics[height=0.3\textheight]{figures/YanfeiKang}\\
+%       \footnotesize Sune Karlsson (\"Orebro Uni.) & \footnotesize Yanfei Kang (Beihang Uni.)  \\
+%     \end{tabular}
+%   \end{block}
+
+% \end{frame}
 
 
 \section*{Outline}
@@ -92,10 +132,8 @@
 
 \end{frame}
 
-\begin{frame}%[allowframebreaks]
+\begin{frame}% [allowframebreaks]
   \frametitle{References}
-  \footnotesize
-  \bibliography{references-feng}
-  \bibliographystyle{agsm}
+  \printbibliography[heading=none]
 \end{frame}
 \end{document}
