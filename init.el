@@ -267,8 +267,9 @@
   )
 (use-package tree-sitter-langs
   :config
-  (add-to-list 'tree-sitter-major-mode-language-alist '(latex-mode . latex))
+  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
   )
+
 
 
 
