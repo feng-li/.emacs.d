@@ -477,6 +477,7 @@
   :init
   (setq flycheck-languagetool-server-jar
         (concat (getenv "HOME") "/.APP/LanguageTool/languagetool-server.jar"))
+  (setq flycheck-languagetool-server-port 8082)
   )
 
 (use-package writegood-mode
