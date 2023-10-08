@@ -857,7 +857,7 @@
 ;; apt install sdcv
 ;; https://github.com/Dushistov/sdcv
 (use-package lexic
-  :defer t
+  :defer nil
   :config
   (setq lexic-dictionary-path (concat user-emacs-directory "dict/sdcv/"))
   (setq lexic-dictionary-list
