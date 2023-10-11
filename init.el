@@ -7,12 +7,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Load all required packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; (setq url-proxy-services
-;;    '(("no_proxy" . "^\\(localhost\\|10\\..*\\|192\\.168\\..*\\)")
-;;      ("http" . "127.0.0.1:41091")
-;;      ("https" . "127.0.0.1:41091")))
+(setq url-proxy-services
+   '(("no_proxy" . "^\\(localhost\\|10\\..*\\|192\\.168\\..*\\)")
+     ("http" . "127.0.0.1:7890")
+     ("https" . "127.0.0.1:7890")))
 
 ;; Add path for auto saved files
+;;; Code:
 (defvar my-auto-save-list (concat (getenv "HOME") "/.config/emacs/auto-save-list/" (system-name))) ;; host-specified
 (unless (file-directory-p my-auto-save-list) (make-directory my-auto-save-list t))
 
@@ -65,7 +66,7 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(flycheck-languagetool lsp-grammarly lsp-metals eglot-grammarly tree-sitter-langs tree-sitter notmuch poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode wordnut synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math writegood-mode highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
+   '(use-proxy flycheck-languagetool lsp-grammarly lsp-metals eglot-grammarly tree-sitter-langs tree-sitter notmuch poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode wordnut synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math writegood-mode highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
  '(safe-local-variable-values '((TeX-engine . pdflatex)))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
@@ -73,6 +74,7 @@
  '(send-mail-function 'mailclient-send-it)
  '(show-paren-mode t nil (paren))
  '(tool-bar-mode nil)
+ ;; '(url-proxy-services '(("https" . "127.0.0.1:7890") ("http" . "127.0.0.1:7890")))
  '(warning-suppress-types '(((tar link)) (comp) (comp) (undo discard-info))))
 
 ;; Automatically install emacs packages
@@ -117,10 +119,19 @@
   (load-theme 'dracula t)
   )
 
+
+(use-package use-proxy
+  :config
+  (global-set-key (kbd "C-c C-p") 'use-proxy-toggle-proto-proxy)
+  (global-set-key (kbd "C-c C-g") 'use-proxy-toggle-proxies-global)
+  )
+
+
+
 ;; The scratch settings
 (setq initial-scratch-message nil) ;; Disable scratch information
 (setq inhibit-startup-message t) ;;stop start up message
-(setq fundamental-mode 'text-mode)
+;; (setq fundamental-mode 'text-mode)
 (setq initial-major-mode 'text-mode) ;; text mode in scratch
 (setq major-mode 'text-mode)
 
@@ -1452,28 +1463,15 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(company-tooltip ((t (:background "dim gray" :foreground "light gray"))))
- '(ediff-current-diff-A ((t (:extend t :background "brightblack"))))
- '(ediff-current-diff-B ((t (:extend t :background "brightblack"))))
- '(ediff-current-diff-C ((t (:extend t :background "dark green"))))
  '(ediff-even-diff-A ((t (:extend t :background "grey20"))))
  '(ediff-even-diff-B ((t (:extend t (:inherit ediff-even-diff-A)))))
- '(ediff-fine-diff-B ((t (:background "magenta"))))
  '(ediff-odd-diff-A ((t (:extend t :background "grey40"))))
  '(ediff-odd-diff-B ((t (:extend t (:inherit ediff-odd-diff-A)))))
  '(font-latex-math-face ((t (:foreground "dark orange"))))
  '(font-latex-sectioning-5-face ((t (:foreground "deep sky blue" :weight bold))))
  '(font-latex-sedate-face ((t (:foreground "light slate blue"))))
- '(font-lock-function-name-face ((t (:foreground "deep sky blue" :weight normal))))
- '(highlight ((t (:background "red" :foreground "#c6c6c6"))))
  '(highlight-doxygen-comment ((t (:inherit highlight))))
- '(line-number ((t (:inherit t :background "#1d1f21"))))
  '(line-number-current-line ((t (:background "black" :slant italic))))
- '(menu ((t (:inherit :background :background "#303030" :foreground "white" :inverse-video nil))))
- '(minibuffer-prompt ((t (:foreground "red"))))
- '(mode-line ((t (:inherit :background "black"))))
- '(neo-dir-link-face ((t (:inherit t :background font-lock-function-name-face))))
- '(region ((t (:background "dim gray" :foreground "light gray"))))
  '(tty-menu-enabled-face ((t (:background "dim gray" :foreground "white" :weight bold)))))
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
