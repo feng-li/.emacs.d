@@ -60,6 +60,12 @@
 \renewcommand*\finalnamedelim{\addspace\&\space}
 \addbibresource{references-feng.bib}
 
+% Logo
+\newcommand\AtPagemyUpperLeft[1]{\AtPageLowerLeft{%
+\put(\LenToUnit{0.93\paperwidth},\LenToUnit{0.89\paperheight}){#1}}}
+\logo{\AddToShipoutPictureFG{
+    \AtPagemyUpperLeft{{\includegraphics[width=1cm,keepaspectratio]{cufelogoblue}}}
+}}
 
 \hypersetup{
   colorlinks=true,
@@ -70,10 +76,12 @@
 
 \title[ XXX ]{\textbf{ XXX }}
 
-\author[Feng Li]{\textbf{Feng Li}}
+\author[Feng Li]{\includegraphics[width=2cm]{cufelogo}\\
+  \vspace{0.5cm}\textbf{Feng Li}\\
+  \url{feng.li@cufe.edu.cn}\\\url{http://feng.li/}}
 
-\institute[\url{https://feng.li/}]{\footnotesize{\textbf{School of Statistics and
-      Mathematics\\\\ Central University of Finance and Economics}}}
+\institute[SAM.CUFE.EDU.CN]{\footnotesize{\textbf{School of Statistics and Mathematics
+      \\Central University of Finance and Economics}}}
 
 \date{}
 %\date{ISBA 2021 Conference}
