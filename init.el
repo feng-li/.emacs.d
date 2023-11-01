@@ -7,10 +7,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Load all required packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(setq url-proxy-services
-   '(("no_proxy" . "^\\(localhost\\|10\\..*\\|192\\.168\\..*\\)")
-     ("http" . "127.0.0.1:7890")
-     ("https" . "127.0.0.1:7890")))
+;; (setq url-proxy-services
+;;    '(("no_proxy" . "^\\(localhost\\|10\\..*\\|192\\.168\\..*\\)")
+;;      ("http" . "127.0.0.1:7890")
+;;      ("https" . "127.0.0.1:7890")))
 
 ;; Add path for auto saved files
 ;;; Code:
@@ -59,8 +59,7 @@
  '(doc-view-continuous t)
  '(global-font-lock-mode t nil (font-lock))
  '(highlight-doxygen-commend-start-regexp
-   "\\(/\\*\\(!\\|\\*[^*]\\)\\|#\\('\\)\\|##\\('\\)\\|//\\(!\\|'\\|/[^/
-]\\)\\)")
+   "\\(/\\*\\(!\\|\\*[^*]\\)\\|#\\('\\)\\|##\\('\\)\\|//\\(!\\|'\\|/[^/\12]\\)\\)")
  '(hl-paren-background-colors '("light gray" "steel blue" "lime green" "orange1"))
  '(indicate-empty-lines nil)
  '(neo-window-width 40)
@@ -74,7 +73,10 @@
  '(send-mail-function 'mailclient-send-it)
  '(show-paren-mode t nil (paren))
  '(tool-bar-mode nil)
- ;; '(url-proxy-services '(("https" . "127.0.0.1:7890") ("http" . "127.0.0.1:7890")))
+ '(url-proxy-services
+   '(("no_proxy" . "^\\(localhost\\|10\\..*\\|192\\.168\\..*\\)")
+     ("https" . "127.0.0.1:7890")
+     ("http" . "127.0.0.1:7890")))
  '(warning-suppress-types '(((tar link)) (comp) (comp) (undo discard-info))))
 
 ;; Automatically install emacs packages
