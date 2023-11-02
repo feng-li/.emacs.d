@@ -7,10 +7,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Load all required packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; (setq url-proxy-services
-;;    '(("no_proxy" . "^\\(localhost\\|10\\..*\\|192\\.168\\..*\\)")
-;;      ("http" . "127.0.0.1:7890")
-;;      ("https" . "127.0.0.1:7890")))
+(setq url-proxy-services
+   '(("no_proxy" . "^\\(localhost\\|10\\..*\\|192\\.168\\..*\\)")
+     ("http" . "127.0.0.1:7890")
+     ("https" . "127.0.0.1:7890")))
 
 ;; Add path for auto saved files
 ;;; Code:
@@ -21,12 +21,9 @@
       '(
         ;; ("melpa" . "https://melpa.org/packages/")
         ;; ("elpa" . "https://elpa.gnu.org/packages/")
-        ("gnu-elpa-cn"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
-        ("melpa-cn" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
-        ;; ("gnu-elpa-cn"   . "http://mirrors.cloud.tencent.com/elpa/gnu/")
-        ;; ("melpa-cn" . "http://mirrors.cloud.tencent.com/elpa/melpa/")
+        ("elpa-cn"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
+        ("melpa-cn"      . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
         ))
-;; (package-initialize)
 
 ;; Local server socket dir. Some server does not allow to use the default
 ;; (setq server-use-tcp t)
@@ -65,7 +62,7 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(use-proxy flycheck-languagetool lsp-grammarly lsp-metals eglot-grammarly tree-sitter-langs tree-sitter notmuch poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode wordnut synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math writegood-mode highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
+   '(ht flycheck-grammarly use-proxy flycheck-languagetool lsp-grammarly lsp-metals eglot-grammarly tree-sitter-langs tree-sitter notmuch poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode wordnut synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math writegood-mode highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
  '(safe-local-variable-values '((TeX-engine . pdflatex)))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
@@ -73,18 +70,12 @@
  '(send-mail-function 'mailclient-send-it)
  '(show-paren-mode t nil (paren))
  '(tool-bar-mode nil)
- '(url-proxy-services
-   '(("no_proxy" . "^\\(localhost\\|10\\..*\\|192\\.168\\..*\\)")
-     ("https" . "127.0.0.1:7890")
-     ("http" . "127.0.0.1:7890")))
  '(warning-suppress-types '(((tar link)) (comp) (comp) (undo discard-info))))
 
 ;; Automatically install emacs packages
-;; (package-initialize)
-;; (unless package-archive-contents
-;;   (package-refresh-contents))
-;; (package-install-selected-packages)
-
+(unless package-archive-contents
+  (package-refresh-contents))
+(package-install-selected-packages)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Basic Preferences
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -122,11 +113,11 @@
   )
 
 
-(use-package use-proxy
-  :config
-  (global-set-key (kbd "C-c C-p") 'use-proxy-toggle-proto-proxy)
-  (global-set-key (kbd "C-c C-g") 'use-proxy-toggle-proxies-global)
-  )
+;; (use-package use-proxy
+;;   :config
+;;   (global-set-key (kbd "C-c C-p") 'use-proxy-toggle-proto-proxy)
+;;   (global-set-key (kbd "C-c C-g") 'use-proxy-toggle-proxies-global)
+;;   )
 
 
 
@@ -660,57 +651,18 @@
   :config
   (add-hook 'after-init-hook #'global-company-mode)
   (setq company-minimum-prefix-length 2)
+  (setq company-files-exclusions '(".git/" ".DS_Store"))
 
   ;; Preserve initial cases
   (setq company-dabbrev-downcase nil)
   (setq company-dabbrev-ignore-case nil)
 
   ;; Add yasnippet support for all company backends
-  ;; https://github.com/syl20bnr/spacemacs/pull/179
-  (defvar company-mode/enable-yas t
-    "Enable yasnippet for all backends.")
-  (defun company-mode/backend-with-yas (backend)
-    (if (or (not company-mode/enable-yas) (and (listp backend) (member 'company-yasnippet backend)))
-        backend
-      (append (if (consp backend) backend (list backend))
-              '(:with company-yasnippet))))
-  (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
+  (setq company-backends '((company-capf :with company-yasnippet)))
 
-  ;; Use company quick access number to select candidates. The key want binded to M-numbers.
-  ;;https://github.com/abo-abo/oremacs/blob/d2b2cd8371b94f35a42000debef1c2b644cb9472/modes/ora-company.el#L22
-  (setq company-show-quick-access t)
-  (defun ora-company-number ()
-    "Forward to `company-complete-number'.
-     Unless the number is potentially part of the candidate.  In
-     that case, insert the number."
-    (interactive)
-    (let* ((k (this-command-keys))
-           (re (concat "^" company-prefix k)))
-      (if (or (cl-find-if (lambda (s) (string-match re s))
-                          company-candidates)
-              (> (string-to-number k)
-                 (length company-candidates))
-              (looking-back "[0-9]+\\.[0-9]*" (line-beginning-position)))
-          (self-insert-command 1)
-        (company-complete-number
-         (if (equal k "0")
-             10
-           (string-to-number k))))))
-  ;;https://github.com/abo-abo/oremacs/blob/d2b2cd8371b94f35a42000debef1c2b644cb9472/init.el#L28
-  (defun ora-advice-add (&rest args)
-    (when (fboundp 'advice-add)
-      (apply #'advice-add args)))
-  (defun ora--company-good-prefix-p (orig-fn prefix)
-    (unless (and (stringp prefix) (string-match-p "\\`[0-9]+\\'" prefix))
-      (funcall orig-fn prefix)))
-  (ora-advice-add 'company--good-prefix-p :around #'ora--company-good-prefix-p)
-
-  (let ((map company-active-map))
-    (mapc (lambda (x) (define-key map (format "%d" x) 'ora-company-number))
-          (number-sequence 0 9)))
+  (setq company-tooltip-limit 10)
   )
 
-(add-hook 'prog-mode-hook #'flyspell-prog-mode)
 
 ;; Font lock
 (global-font-lock-mode t)
@@ -813,7 +765,6 @@
   )
 
 ;; FlyCheck
-;; (add-hook 'after-init-hook #'global-flycheck-mode)
 ;; Enable nice rendering of diagnostics like compile errors.
 
 ;; Remove flymake mode and using flycheck mode
@@ -845,6 +796,7 @@
 (setq flyspell-issue-message-flag nil)
 
 ;; Fly spell mode for major mode
+(add-hook 'prog-mode-hook #'flyspell-prog-mode)
 (dolist (hook '(text-mode-hook LaTeX-mode-hook markdown-mode-hook))
   (add-hook hook (lambda () (flyspell-mode 1))))
 (add-hook 'LaTeX-mode-hook (function (lambda () (setq ispell-parser 'tex))))
@@ -852,19 +804,6 @@
 ;; Disable flyspell for special modes
 (dolist (hook '(change-log-mode-hook log-edit-mode-hook))
   (add-hook hook (lambda () (flyspell-mode -1))))
-
-;; Fly spell check comments for a programmer
-;; (dolist (hook '(emacs-lisp-mode-hook
-;;                 c-mode-hook
-;;                 c++-mode-hook
-;;                 ess-mode-hook
-;;                 python-mode-hook))
-;;   (add-hook hook (lambda () (flyspell-prog-mode))))
-
-;; Moby Thesaurus II
-;; (setq synonyms-file        "~/.emacs.d/hunspell/mobythesaurus/mthesaur.txt")
-;; (setq synonyms-cache-file  "~/.emacs.d/hunspell/mobythesaurus/mthesaur.txt.cache")
-;; (require 'synonyms)
 
 ;; StarDict
 ;; apt install sdcv
@@ -901,18 +840,6 @@
         "~/code/TAGS/FORTRAN/"))
 (dolist (hook '(after-text-mode-hook ess-mode-hook python-mode-hook c-mode-hook c++-mode-hook inferior-ess-mode-hook))
   (add-hook hook #'(lambda () (xref-etags-mode))))
-
-;; highlight-indent-guides-mode, can make emacs slow with large files
-;; (use-package highlight-indent-guides"
-;;   '(progn
-;;      (add-hook 'python-mode-hook 'highlight-indent-guides-mode)
-;;      (setq highlight-indent-guides-method 'character)
-;;      (setq highlight-indent-guides-character ?\│)
-;;      (setq highlight-indent-guides-auto-odd-face-perc 30)
-;;      (setq highlight-indent-guides-auto-even-face-perc 30)
-;;      (setq highlight-indent-guides-auto-character-face-perc 40)
-;;      )
-;;   )
 
 ;; Highlight doxygen mode
 (highlight-doxygen-global-mode 1)
@@ -1081,7 +1008,7 @@
   (setq LaTeX-math-abbrev-prefix "`")
 
   ;; Allow company-auctex backends
-  (company-auctex-init)
+  ;; (company-auctex-init)
 
   (setq TeX-source-correlate-mode  t)
   (setq TeX-source-correlate-start-server nil)
@@ -1119,7 +1046,7 @@
                 )
             )
 
-  ;; Allow company-reftex backends
+  ;; Add company-reftex backends
   (add-hook 'LaTeX-mode-hook
             #'(lambda ()
                 (make-local-variable 'company-backends)
@@ -1418,7 +1345,7 @@
 ;; grammerly for lsp
 (use-package lsp-grammarly
   :defer t
-  :ensure t
+  :ensure nil
 
   ;; Comment out to start manually
   :hook ((text-mode markdown-mode gfm-mode message-mode) . (lambda ()
@@ -1441,11 +1368,11 @@
 ;; )
 
 ;; Use company-capf as a completion provider.
-(use-package company
-  :hook (scala-mode . company-mode)
-  :config
-  ;; (setq lsp-completion-provider :capf)
-  )
+;; (use-package company
+;;   :hook (scala-mode . company-mode)
+;;   :config
+;; (setq lsp-completion-provider :capf)
+;; )
 
 ;; Use the Debug Adapter Protocol for running tests and debugging
 ;; (use-package posframe
