@@ -659,6 +659,14 @@
 
   ;; Add yasnippet support for all company backends
   (setq company-backends '((company-capf :with company-yasnippet)))
+  (defun my-text-mode-hook ()
+    (setq-local company-backends
+                '((company-yasnippet
+                   company-dabbrev
+                   company-ispell :separate)
+                  company-files)))
+
+  (add-hook 'text-mode-hook #'my-text-mode-hook)
 
   (setq company-tooltip-limit 10)
   )
