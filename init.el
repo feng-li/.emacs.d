@@ -665,10 +665,47 @@
                    company-dabbrev
                    company-ispell :separate)
                   company-files)))
-
   (add-hook 'text-mode-hook #'my-text-mode-hook)
-
   (setq company-tooltip-limit 10)
+
+  ;; https://github.com/abo-abo/oremacs/issues/38#issuecomment-948472184
+  (setq company-show-quick-access t)
+  (defun hz-company-complete-number ()
+    "Convert the company-quick-access-keys to the candidates' row NUMBER visible on the
+  tooltip, and then feed it to `company-complete-number' to quickly select and insert
+  company candidates.  If the currently entered character is belongs to
+  company-quick-access-keys and a part of the candidate simultaneously, append it to the
+  currently entered string to construct new company-prefix."
+    (interactive)
+    (let* ((k (this-command-keys))
+           (re (concat "^" company-prefix k)))
+
+      (if (cl-find-if (lambda (s) (string-match re s))
+                      company-candidates)
+	  (self-insert-command 1)
+	(company-complete-number
+	 (cond
+	  ((equal k "1") 1)
+	  ((equal k "2") 2)
+	  ((equal k "3") 3)
+	  ((equal k "4") 4)
+	  ((equal k "5") 5)
+	  ((equal k "6") 6)
+	  ((equal k "7") 7)
+	  ((equal k "8") 8)
+	  ((equal k "9") 9)
+	  ((equal k "0") 10)
+	  )
+	 ))))
+  (let ((c-a-map company-active-map)
+	(c-s-map company-search-map))
+    (mapc (lambda (x)
+	    (define-key c-a-map (format "%s" x) #'hz-company-complete-number))
+	  '(1 2 3 4 5 6 7 8 9 0))
+    (mapc (lambda (x)
+	    (define-key c-s-map (format "%s" x) #'hz-company-complete-number))
+	  '(1 2 3 4 5 6 7 8 9 0)))
+
   )
 
 
