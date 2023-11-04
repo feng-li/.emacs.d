@@ -1,5 +1,5 @@
 (setq package-enable-at-startup t)
-(setq package-user-dir (concat (getenv "HOME") "/.config/emacs/auto-save-list/elpa")) ;; Global
+(setq package-user-dir (concat (getenv "HOME") "/.config/emacs/elpa")) ;; Global
 
 ;; Environment variables
 (setenv "OMP_NUM_THREADS" "1")

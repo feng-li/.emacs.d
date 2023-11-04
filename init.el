@@ -14,7 +14,7 @@
 
 ;; Add path for auto saved files
 ;;; Code:
-(defvar my-auto-save-list (concat (getenv "HOME") "/.config/emacs/auto-save-list/" (system-name))) ;; host-specified
+(defvar my-auto-save-list (concat (getenv "HOME") "/.config/emacs/" (system-name))) ;; host-specified
 (unless (file-directory-p my-auto-save-list) (make-directory my-auto-save-list t))
 
 (setq package-archives
@@ -73,8 +73,8 @@
  '(warning-suppress-types '(((tar link)) (comp) (comp) (undo discard-info))))
 
 ;; Automatically install emacs packages
-(unless package-archive-contents
-  (package-refresh-contents))
+;; (unless package-archive-contents
+;;   (package-refresh-contents))
 (package-install-selected-packages)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Basic Preferences
@@ -157,7 +157,6 @@
 (fset 'yes-or-no-p 'y-or-n-p)
 
 ;; Redraw-display when focused
-(add-hook 'focus-in-hook #'redraw-display)
 (global-set-key (kbd "<f5>") 'redraw-display)
 
 ;; Set Fonts
@@ -518,7 +517,6 @@
                       ".fn" ".fns" ".ky" ".kys" ".pg" ".pgs" ".tp" ".tps"
                       ".vr" ".vrs" ".Rc" ))
               (setq dired-listing-switches "-hla")
-              (setq directory-free-space-args "-h")
               (define-key dired-mode-map (kbd "<return>")
                 'dired-find-alternate-file) ; was dired-advertised-find-file
               (define-key dired-mode-map (kbd "<delete>") 'dired-do-delete)
@@ -683,7 +681,7 @@
       (if (cl-find-if (lambda (s) (string-match re s))
                       company-candidates)
 	  (self-insert-command 1)
-	(company-complete-number
+	(company-complete-tooltip-row
 	 (cond
 	  ((equal k "1") 1)
 	  ((equal k "2") 2)
@@ -824,6 +822,11 @@
   :config
   (setq flycheck-checker-error-threshold 1000)
   (setq flycheck-check-syntax-automatically '(mode-enabled save))
+
+  ;; FlyCheck grammarly
+  (flycheck-grammarly-setup)
+  (setq flycheck-grammarly-check-time 0.8)
+
   )
 
 (use-package synosaurus
@@ -1148,14 +1151,6 @@
   ;; (setq ess-help-own-frame t)
   (add-hook 'ess-mode-hook
             #'(lambda ()
-                (fset 'my-R-comment-level-1
-                      (lambda (&optional arg) "Insert level-1 R comment block"
-                        (interactive "p")
-                        (kmacro-exec-ring-item
-                         (quote ([21 55 57 35 return 21 51 35
-                                     return 21 55 57 35 up 32] 0 "%d")) arg)))
-                (local-set-key (kbd "<f9> 1") 'my-R-comment-level-1)
-
                 ;; Insert three line comments level-2
                 (fset 'my-R-comment-level-2
                       [?\C-a ?\C-u ?3 ?# ?\C-u ?7 ?6 ?- return
@@ -1264,7 +1259,7 @@
                 (defun my-python-send-line-and-step (beg end)
                   (interactive "r")
                   (if (eq beg end)
-                      (python-shell-send-region (point-at-bol) (point-at-eol))
+                      (python-shell-send-region (line-beginning-position) (line-end-position))
                     (python-shell-send-region beg end))
                   (next-line))
                 (local-set-key (kbd "C-c C-n") 'my-python-send-line-and-step)
@@ -1305,7 +1300,7 @@
   :init
   :commands (lsp lsp-deferred)
   :config
-  (setq lsp-server-install-dir (concat (getenv "HOME") "/.config/emacs/auto-save-list/lsp-server"))
+  (setq lsp-server-install-dir (concat (getenv "HOME") "/.config/emacs/lsp-server"))
   (setq lsp-session-file (concat my-auto-save-list "/lsp-session-v1"))
   (setq lsp-restart 'ignore)  ;; How server-exited events must be handled.
   (setq lsp-verify-signature nil) ;; Disable to get metals server (key expired) working
@@ -1393,41 +1388,17 @@
   :ensure nil
 
   ;; Comment out to start manually
-  :hook ((text-mode markdown-mode gfm-mode message-mode) . (lambda ()
-                                                             (require 'lsp-grammarly)
-                                                             (lsp-deferred)))  ;; or lsp
+  :hook ((latex-mode org-mode) . (lambda ()
+                          (require 'lsp-grammarly)
+                          (lsp-deferred)))  ;; or lsp
 
   :config
-  (setq lsp-grammarly-active-modes '(text-mode latex-mode org-mode markdown-mode gfm-mode))
+  (setq lsp-grammarly-active-modes '(latex-mode org-mode))
   (setq lsp-grammarly-auto-activate nil)
   (setq lsp-grammarly-domain "academic")
   (setq lsp-grammarly-user-words (concat (getenv "HOME") "/.hunspell_en_US"))
   )
 
-;; (use-package eglot-grammarly
-;;   :hook (text-mode . (lambda ()
-;;                        (require 'eglot-grammarly)
-;;                        (call-interactively #'eglot)))
-;; :config
-;; (add-to-list 'eglot-server-programs `(,eglot-grammarly-active-modes . ,(list 'eglot-grammarly-server (concat (getenv "HOME") "/.local/bin/grammarly-languageserver") "--stdio")))
-;; )
-
-;; Use company-capf as a completion provider.
-;; (use-package company
-;;   :hook (scala-mode . company-mode)
-;;   :config
-;; (setq lsp-completion-provider :capf)
-;; )
-
-;; Use the Debug Adapter Protocol for running tests and debugging
-;; (use-package posframe
-;;   ;; Posframe is a pop-up tool that must be manually installed for dap-mode
-;;   )
-;; (use-package dap-mode
-;;   :hook
-;;   (lsp-mode . dap-mode)
-;;   (lsp-mode . dap-ui-mode)
-;;   )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customize faces
