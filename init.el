@@ -62,7 +62,7 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(ht flycheck-grammarly use-proxy flycheck-languagetool lsp-grammarly lsp-metals eglot-grammarly tree-sitter-langs tree-sitter notmuch poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode wordnut synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math writegood-mode highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
+   '(counsel swiper ivy ht flycheck-grammarly use-proxy flycheck-languagetool lsp-grammarly lsp-metals eglot-grammarly tree-sitter-langs tree-sitter notmuch poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode wordnut synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math writegood-mode highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
  '(safe-local-variable-values '((TeX-engine . pdflatex)))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
@@ -73,9 +73,9 @@
  '(warning-suppress-types '(((tar link)) (comp) (comp) (undo discard-info))))
 
 ;; Automatically install emacs packages
-;; (unless package-archive-contents
-;;   (package-refresh-contents))
-(package-install-selected-packages)
+(unless (file-directory-p package-user-dir)
+  (package-install-selected-packages)
+  )
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Basic Preferences
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -108,6 +108,7 @@
 ;;   (set-face-background 'default "black" nil)
 ;;   )
 (use-package dracula-theme
+  :ensure t
   :config
   (load-theme 'dracula t)
   )
@@ -118,8 +119,6 @@
 ;;   (global-set-key (kbd "C-c C-p") 'use-proxy-toggle-proto-proxy)
 ;;   (global-set-key (kbd "C-c C-g") 'use-proxy-toggle-proxies-global)
 ;;   )
-
-
 
 ;; The scratch settings
 (setq initial-scratch-message nil) ;; Disable scratch information
@@ -216,20 +215,6 @@
                      (setq word-wrap-by-category t) ; Better CJK wrap support
                      (visual-fill-column-mode)
                      )))
-;; (dolist (hook '(message-mode-hook
-;;                 org-mode-hook
-;;                 mail-mode-hook
-;;                 LaTeX-mode-hook
-;;                 tex-mode-hook
-;;                 reftex-mode-hook
-;;                 text-mode-hook
-;;                 markdown-mode-hook))
-;;   (add-hook hook '(lambda () (visual-fill-column-mode t))))
-
-;; Indicator for visual-line-mode
-;; (setq-default fringe-indicator-alist
-;;               '((truncation nil nil)
-;;                 (continuation nil nil)))
 
 (setq-default adaptive-wrap-extra-indent 0)
 (add-hook 'visual-line-mode-hook #'adaptive-wrap-prefix-mode)
@@ -265,20 +250,20 @@
 
 ;; Tree-sitter mode
 (use-package tree-sitter
+  :ensure t
   :config
   (global-tree-sitter-mode)
   )
 (use-package tree-sitter-langs
+  :ensure t
   :config
   (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
   )
 
-
-
-
 ;; Unfilling a region joins all the lines in a paragraph into a single line for each
 ;; paragraphs in that region. It is the contrary of fill-region.
 (use-package unfill
+  :ensure t
   :config
   (define-key global-map (kbd "C-M-q") 'unfill-paragraph)
   )
@@ -418,6 +403,7 @@
 
 ;; Eshell
 (setq eshell-directory-name (concat my-auto-save-list "/eshell"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Hide and Show code blocks
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -430,6 +416,7 @@
 
 ;; Electric operators
 (use-package electric-operator
+  :ensure t
   :config
   (electric-pair-mode t)
 
@@ -463,6 +450,7 @@
 (setq auto-mode-alist (cons '("\\.m$" . octave-mode) auto-mode-alist))
 
 (use-package yaml-mode
+  :ensure t
   :defer t
   :config
   (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
@@ -484,21 +472,53 @@
   )
 
 (use-package writegood-mode
+  :ensure t
   :config
   (global-set-key (kbd "<f9> w") 'writegood-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; General IDE settings
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(use-package ivy
+  :ensure t
+
+  :config
+  (ivy-mode)
+  (setq ivy-use-virtual-buffers t)
+  (setq enable-recursive-minibuffers t)
+  ;; enable this if you want `swiper' to use it
+  ;; (setq search-default-mode #'char-fold-to-regexp)
+  (global-set-key "\C-s" 'swiper)
+  (global-set-key (kbd "C-c C-r") 'ivy-resume)
+  (global-set-key (kbd "<f6>") 'ivy-resume)
+  (global-set-key (kbd "M-x") 'counsel-M-x)
+  (global-set-key (kbd "C-x C-f") 'counsel-find-file)
+  ;; (global-set-key (kbd "<f1> f") 'counsel-describe-function)
+  ;; (global-set-key (kbd "<f1> v") 'counsel-describe-variable)
+  ;; (global-set-key (kbd "<f1> o") 'counsel-describe-symbol)
+  ;; (global-set-key (kbd "<f1> l") 'counsel-find-library)
+  ;; (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
+  ;; (global-set-key (kbd "<f2> u") 'counsel-unicode-char)
+  (global-set-key (kbd "C-c g") 'counsel-git)
+  (global-set-key (kbd "C-c j") 'counsel-git-grep)
+  (global-set-key (kbd "C-c k") 'counsel-ag)
+  (global-set-key (kbd "C-x l") 'counsel-locate)
+  (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
+  (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
+
+  )
+
 
 ;; iedit mode
 (use-package iedit
+  :ensure t
   :config
   (global-set-key (kbd "C-c i") 'iedit-mode)
   )
 
 ;; Ibuffer mode
 (use-package ibuffer
+  :ensure t
   :config
   (global-set-key (kbd "C-x C-b") 'ibuffer)
   (global-set-key (kbd "<f9> i") 'ibuffer)
@@ -569,6 +589,7 @@
 
 ;; Ido mode
 (use-package ido
+  :ensure t
   :config
   (ido-mode t)
   (setq ido-use-virtual-buffers nil)
@@ -605,13 +626,11 @@
 
 ;; Comint for input history and  scrolling
 (use-package comint
+  :ensure nil
   :config
-  (define-key
-    comint-mode-map (kbd "C-<up>")'comint-previous-matching-input-from-input)
-  (define-key
-    comint-mode-map (kbd "C-<down>") 'comint-next-matching-input-from-input)
-  (define-key
-    comint-mode-map (kbd "C-k") 'comint-kill-input)
+  (define-key comint-mode-map (kbd "C-<up>")'comint-previous-matching-input-from-input)
+  (define-key comint-mode-map (kbd "C-<down>") 'comint-next-matching-input-from-input)
+  (define-key comint-mode-map (kbd "C-k") 'comint-kill-input)
 
   ;; Comint history length
   (setq comint-input-ring-size 5000)
@@ -634,6 +653,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package yasnippet
+  :ensure t
   :config
   (yas-global-mode 1)
   ;; (setq yas-snippet-dirs
@@ -643,9 +663,8 @@
   ;;         ;; "~/.emacs.d/site-lisp/yasnippet-snippets/snippets"
   ;;         ))
   )
-
-
 (use-package company
+  :ensure t
   :config
   (add-hook 'after-init-hook #'global-company-mode)
   (setq company-minimum-prefix-length 2)
@@ -712,6 +731,7 @@
 (setq font-lock-maximum-decoration t) ;; Highlight parentheses
 
 (use-package highlight-parentheses
+  :ensure t
   :disabled t
   :config
   (define-globalized-minor-mode global-highlight-parentheses-mode
@@ -727,6 +747,7 @@
 
 ;; Add extra info path
 (use-package info-look
+  :ensure t
   :config
   (add-to-list
    'Info-default-directory-list (concat user-emacs-directory "info")))
@@ -755,6 +776,7 @@
 (setq vc-follow-symlinks nil)
 
 (use-package magit
+  :ensure t
   :defer t
   :config
   ;; Save transient file with customization
@@ -778,6 +800,7 @@
 
 ;; Spelling Check
 (use-package ispell
+  :ensure t
   :config
   ;; (setq ispell-dictionary "american")
 
@@ -914,6 +937,7 @@
 ;; Markdown mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package markdown-mode
+  :ensure t
   :config
   (setq auto-mode-alist (cons '("\\.md" . markdown-mode) auto-mode-alist))
   ;; (setq auto-mode-alist (cons '("\\.Rmd" . markdown-mode) auto-mode-alist))
@@ -925,6 +949,7 @@
   )
 
 (use-package pandoc-mode
+  :ensure t
   :config
   (dolist (hook '(text-mode-hook LaTeX-mode-hook org-mode-hook markdown-mode-hook))
     (add-hook hook (lambda () (pandoc-mode))))
@@ -990,6 +1015,7 @@
   (use-package auctex-latexmk)
   ;; (auctex-latexmk-setup) ; not needed auctex-latexmk-pvc already called.
   (use-package auctex-latexmk-pvc
+    :ensure nil
     :config
     (auctex-latexmk-pvc-setup)
 
@@ -1121,6 +1147,7 @@
 
 ;; ESS
 (use-package ess
+  :ensure t
   :defer t
   :config
   ;; ESS tracebug
@@ -1200,6 +1227,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package julia-mode
+  :ensure t
   :config
   (flycheck-julia-setup)
   ;; (add-to-list 'flycheck-global-modes 'julia-mode)
@@ -1215,6 +1243,7 @@
 ;;; Python IDE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package python
+  :ensure t
   :config
 
   (elpy-enable)
@@ -1290,16 +1319,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Language server mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(use-package lsp-mode
-  :init
-  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
-  (setq lsp-keymap-prefix "C-c l")
-  :commands lsp)
 
 (use-package lsp-mode
+  :ensure t
   :init
   :commands (lsp lsp-deferred)
   :config
+  (setq lsp-keymap-prefix "C-c l")
   (setq lsp-server-install-dir (concat (getenv "HOME") "/.config/emacs/lsp-server"))
   (setq lsp-session-file (concat my-auto-save-list "/lsp-session-v1"))
   (setq lsp-restart 'ignore)  ;; How server-exited events must be handled.
@@ -1327,6 +1353,7 @@
 
 ;; lsp-treemacs
 ;; (use-package lsp-treemacs
+;;   :ensure t
 ;;   :defer t
 ;;   :commands lsp-treemacs-errors-list
 ;;   :config
@@ -1338,8 +1365,8 @@
 
 ;; Add metals backend for lsp-mode
 (use-package lsp-metals
-  :defer t
   :ensure t
+  :defer t
   :custom
   ;; Metals claims to support range formatting by default but it supports range
   ;; formatting of multiline strings only. You might want to disable it so that
@@ -1365,6 +1392,7 @@
 
 ;; Enable scala-mode for highlighting, indentation and motion commands
 (use-package scala-mode
+  :ensure t
   :interpreter
   ("scala" . scala-mode))
 
@@ -1384,8 +1412,8 @@
 
 ;; grammerly for lsp
 (use-package lsp-grammarly
+  :ensure t
   :defer t
-  :ensure nil
 
   ;; Comment out to start manually
   :hook ((latex-mode org-mode) . (lambda ()
