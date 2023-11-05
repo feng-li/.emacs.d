@@ -479,7 +479,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; General IDE settings
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(use-package ivy
+(use-package counsel
   :ensure t
 
   :config
@@ -506,6 +506,13 @@
   (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
   (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
 
+
+  (setq counsel-find-file-ignore-regexp
+        (concat
+         ;; File names beginning with # or .
+         "\\(?:\\`[#.]\\)"
+         ;; File names ending with # or ~
+         "\\|\\(?:\\`.+?[#~]\\'\\)"))
   )
 
 
