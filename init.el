@@ -784,7 +784,7 @@
 
 (use-package magit
   :ensure t
-  :defer t
+  :defer nil
   :config
   ;; Save transient file with customization
   (setq transient-history-file (concat my-auto-save-list "/transient-history-file.el"))
@@ -794,9 +794,6 @@
     [remap async-shell-command] 'with-editor-async-shell-command)
   (define-key (current-global-map)
     [remap shell-command] 'with-editor-shell-command)
-
-  (define-key with-editor-mode-map (kbd "C-c C-c") nil)
-
   )
 
 
