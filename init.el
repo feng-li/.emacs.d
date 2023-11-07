@@ -187,13 +187,13 @@
 (set-face-foreground 'vertical-border (face-background 'mode-line))
 
 ;; Remove weird ESC ESC key
-(if (display-graphic-p)
-    (progn
-      ;; Do nothing with window system
-      )
-  (global-unset-key [?\e ?\e ?\e])
-  (global-set-key [?\e ?\e escape] 'keyboard-escape-quit)
-  )
+;; (if (display-graphic-p)
+;;     (progn
+;;       ;; Do nothing with window system
+;;       )
+;;   (global-unset-key [?\e ?\e ?\e])
+;;   (global-set-key [?\e ?\e escape] 'keyboard-escape-quit)
+;;   )
 
 (add-hook 'before-save-hook #'delete-trailing-whitespace)
 
