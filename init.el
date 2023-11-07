@@ -62,7 +62,7 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(counsel swiper ivy ht flycheck-grammarly use-proxy flycheck-languagetool lsp-grammarly lsp-metals eglot-grammarly tree-sitter-langs tree-sitter notmuch poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode wordnut synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math writegood-mode highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
+   '(multiple-cursors pinyinlib company counsel swiper ivy ht flycheck-grammarly use-proxy flycheck-languagetool lsp-grammarly lsp-metals eglot-grammarly tree-sitter-langs tree-sitter notmuch poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode wordnut synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math writegood-mode highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
  '(safe-local-variable-values '((TeX-engine . pdflatex)))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
@@ -199,6 +199,14 @@
 
 ;; Let Alt key be the meta key
 (setq x-alt-keysym 'meta)
+
+;; Mirror "C-x -> C-", and "M-x -> M-,"
+(define-key global-map (kbd "C-,") ctl-x-map)
+(define-key global-map (kbd "M-,") 'execute-extended-command)
+
+;; Paste behavior
+(define-key global-map (kbd "C-S-v") 'yank) ; Shift-Ctr-v to paste, same as terminal behavior
+(define-key global-map (kbd "<mouse-3>") 'yank) ; Right click to paste
 
 ;; Global visual line mode with better indentation
 ;; (global-visual-line-mode t)
@@ -486,6 +494,7 @@
   (ivy-mode)
   (setq ivy-use-virtual-buffers t)
   (setq enable-recursive-minibuffers t)
+
   ;; enable this if you want `swiper' to use it
   ;; (setq search-default-mode #'char-fold-to-regexp)
   (global-set-key "\C-s" 'swiper)
@@ -506,14 +515,61 @@
   (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
   (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
 
-
+  ;; Ignore hidden files.
   (setq counsel-find-file-ignore-regexp
         (concat
          ;; File names beginning with # or .
          "\\(?:\\`[#.]\\)"
          ;; File names ending with # or ~
          "\\|\\(?:\\`.+?[#~]\\'\\)"))
+
   )
+
+
+
+;; let `ivy-read' support chinese pinyin, toggle with `
+(use-package pinyinlib
+  :ensure t
+  :config
+  (defvar-local my-pinyin-search-prefix "`")
+  (defun re-builder-pinyin (str)
+    (or (pinyin-to-utf8 str)
+        (ivy--regex-plus str)
+        (ivy--regex-ignore-order)
+        ))
+  (setq ivy-re-builders-alist
+        '(
+          (t . re-builder-pinyin)
+          ))
+  (defun my-pinyinlib-build-regexp-string (str)
+    (progn
+      (cond ((equal str ".*")
+             ".*")
+            (t
+             (pinyinlib-build-regexp-string str t))))
+    )
+  (defun my-pinyin-regexp-helper (str)
+    (cond ((equal str " ")
+           ".*")
+          ((equal str "")
+           nil)
+          (t
+           str)))
+  (defun pinyin-to-utf8 (str)
+    (cond ((equal 0 (length str))
+           nil)
+          ((equal (substring str 0 1) my-pinyin-search-prefix)
+           (mapconcat 'my-pinyinlib-build-regexp-string
+                      (remove nil (mapcar 'my-pinyin-regexp-helper
+                                          (split-string (replace-regexp-in-string my-pinyin-search-prefix "" str) "")))
+                      ""))
+          nil))
+)
+;; ;; ;;; this function can remove `pinyin' match
+;; (defun pinyin-to-utf8 (str)
+;;   nil)
+
+
 
 
 ;; iedit mode
@@ -522,6 +578,16 @@
   :config
   (global-set-key (kbd "C-c i") 'iedit-mode)
   )
+
+(use-package multiple-cursors
+  :ensure t
+
+  :config
+  (global-set-key (kbd "C-c a") 'mc/mark-all-like-this)
+  (global-set-key (kbd "C->") 'mc/mark-next-like-this)
+  (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+  )
+
 
 ;; Ibuffer mode
 (use-package ibuffer
