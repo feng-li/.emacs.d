@@ -2,7 +2,7 @@
 # contributor: Feng Li <m@feng.li>
 # key: letter
 # group: skeleton
-# name: <letterhead to ...> ...
+# name: <letterhead to ...> .. .
 # --
 \documentclass[a4paper,11pt]{article}
 
@@ -45,19 +45,22 @@
 
 %\fancyfoot[C]{\vspace{2.0cm} \thepage~/~\pageref{LastPage}}
 
-\fancyfoot[R]{\url{http://sam.cufe.edu.cn}\\\\ \url{http://www.cufe.edu.cn}\\\\Tel: +86 10 6177 6189}
+\fancyfoot[R]{\url{http://sam.cufe.edu.cn}\\\\ \url{http://www.cufe.edu.cn}\\\\ }
 
 
 \begin{document} \thispagestyle{fancy}
 
 \begin{tabular}{ll}
-\multirow{7}{*}{\hspace{5cm}\hspace{0.18\textwidth}}
+\multirow{7}{*}{
+% \hspace{5cm}\hspace{0.18\textwidth}
+\includegraphics[width=0.25\textwidth]{cufelogo}\hspace{0.2\textwidth}
+}
  & Feng Li, Ph.D.                              \\\\
  & School of Statistics and Mathematics        \\\\
  & Central University of Finance and Economics \\\\
  & Beijing 102206, China                       \\\\
  & \faEnvelope~~\href{mailto:feng.li@cufe.edu.cn}{\texttt{feng.li@cufe.edu.cn}}         \\\\
- & \faHome~~\url{http://feng.li/}      \\\\
+ & \faHome~~\url{https://feng.li/}             \\\\
  &                                             \\\\
 \end{tabular}
 

@@ -1,10 +1,10 @@
 # -*- mode: snippet -*-
 # contributor: Feng Li <m@feng.li>
-# key: review
+# key: article
 # group: skeleton
-# name: <review letter> ...
+# name: \documentclass{article} ...
 # --
-\documentclass[12pt,a4paper]{article}
+\documentclass[a4paper]{article}
 
 %% Fonts
 % \usepackage[garamond]{mathdesign} % Garamond Math Font
@@ -69,31 +69,23 @@ maxcitenames=2, date=year, maxbibnames=99, safeinputenc]{biblatex}
   \setlength{\itemsep}{0.0pt}
 
 \begin{document}
-\title{\bf\Large Review report for \`\`
-      XXX
-      ''}
+\title{Teaching Philosophy Statement}
 
-\author{ Manuscript ID }
+\author{ Feng Li }
 \date{}
 \maketitle
 
-\section*{Major comments}
-\begin{enumerate}
+\section{Introduction}
+\label{sec:intro}
 
-\item
 
-\end{enumerate}
 
-\section*{Minor comments}
 
-I noticed some styling issues in the paper, and please correct them before the next
-submission.
+\section*{Acknowledgements}
+\label{acknowledgements}
 
-\begin{enumerate}
 
-\item
 
-\end{enumerate}
-
+%\newpage
 \printbibliography
 \end{document}
