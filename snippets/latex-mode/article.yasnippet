@@ -3,6 +3,7 @@
 # key: article
 # group: skeleton
 # name: \documentclass{article} ...
+# expand-env: ((yas-indent-line nil))
 # --
 \documentclass[a4paper]{article}
 
@@ -15,6 +16,7 @@
 % \setmonofont[Scale=0.9]{Garamond Premier Pro}
 
 \usepackage{amssymb,amsmath}
+\usepackage{graphicx}
 
 %% Page margin and line spacing
 \usepackage{geometry}
@@ -23,7 +25,7 @@
 \spacing{1.1}
 
 %% BibTeX
-\usepackage[style=authoryear-comp, backend=biber, natbib=true, firstinits=true,
+\usepackage[style=authoryear-comp, backend=biber, natbib=true, giveninits=true,
 maxcitenames=2, date=year, maxbibnames=99, safeinputenc]{biblatex}
 \renewbibmacro{in:}{%
   \ifentrytype{article}{}{%

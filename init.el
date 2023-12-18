@@ -62,7 +62,7 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(multiple-cursors pinyinlib company counsel swiper ivy ht flycheck-grammarly use-proxy flycheck-languagetool lsp-grammarly lsp-metals eglot-grammarly tree-sitter-langs tree-sitter notmuch poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode wordnut synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math writegood-mode highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
+   '(company-prescient ivy-prescient prescient multiple-cursors pinyinlib company counsel swiper ivy ht flycheck-grammarly use-proxy flycheck-languagetool lsp-grammarly lsp-metals eglot-grammarly tree-sitter-langs tree-sitter notmuch poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode wordnut synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math writegood-mode highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
  '(safe-local-variable-values '((TeX-engine . pdflatex)))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
@@ -515,6 +515,11 @@
   (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
   (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
 
+  ;; Use C-j for immediate termination with the current value, and RET for continuing
+  ;; completion for that directory. This is the ido behaviour.
+  (define-key ivy-minibuffer-map (kbd "C-j") #'ivy-immediate-done)
+  (define-key ivy-minibuffer-map (kbd "RET") #'ivy-alt-done)
+
   ;; Ignore hidden files.
   (setq counsel-find-file-ignore-regexp
         (concat
@@ -525,7 +530,14 @@
 
   )
 
+(use-package prescient
+  :ensure t
 
+  :config
+  (setq ivy-prescient-mode t)
+  (setq company-prescient-mode t)
+
+ )
 
 ;; let `ivy-read' support chinese pinyin, toggle with `
 (use-package pinyinlib
