@@ -28,7 +28,7 @@
 \let\c@author\relax
 \makeatother
 % Then load BibLaTeX as usual
-\usepackage[style=authoryear-comp, backend=biber, uniquename=false, maxnames=9, url=false, giveninits=true, alldates=year, maxcitenames=2, natbib=true, safeinputenc]{biblatex}
+\usepackage[style=authoryear-comp, backend=biber, maxnames=9, url=false, giveninits=true, uniquename=init, alldates=year, maxcitenames=2, natbib=true, safeinputenc]{biblatex}
 \renewbibmacro{in:}{%
   \ifentrytype{article}{}{%
   \printtext{\bibstring{in}\intitlepunct}}}
@@ -103,8 +103,8 @@
 
 
 
-\section*{Acknowledgements}
-\label{acknowledgements}
+\section*{Acknowledgments}
+\label{acknowledgments}
 
 
 

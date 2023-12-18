@@ -36,7 +36,8 @@
 %% \setlength{\leftmargini}{5pt}
 
 %% BibLaTeX
-\usepackage[backend=biber, style=authoryear, sorting=ydnt, url=false, dashed=none, maxcitenames=2, maxbibnames=99, giveninits=true, hyperref=true,alldates=year, natbib=true, uniquelist=false, uniquename=false]{biblatex}
+\usepackage[backend=biber, style=authoryear, sorting=ydnt, url=false, dashed=none,
+maxcitenames=2, maxbibnames=99, giveninits=true, uniquename=init, hyperref=true,alldates=year, natbib=true, uniquelist=false]{biblatex}
 \renewbibmacro{in:}{%
   \ifentrytype{article}{}{%
   \printtext{\bibstring{in}\intitlepunct}}}
