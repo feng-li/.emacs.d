@@ -40,6 +40,9 @@ giveninits=true, uniquename=init, maxcitenames=2, date=year, maxbibnames=99, saf
   \clearfield{issn}%
   \clearfield{urlyear}%
 }
+% Define color for citations. Could also add "autopunct=false" in biblatex option
+\usepackage{xcolor}
+\AtEveryCite{\color{blue}}
 
 \usepackage{longtable,booktabs}
 
