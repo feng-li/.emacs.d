@@ -31,4 +31,5 @@ ido.last
 .cache/**
 .dap*
 .lsp*
+.mc-lists.el
 tramp
