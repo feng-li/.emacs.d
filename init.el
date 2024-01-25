@@ -7,10 +7,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Load all required packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(setq url-proxy-services
-   '(("no_proxy" . "^\\(localhost\\|10\\..*\\|192\\.168\\..*\\)")
-     ("http" . "127.0.0.1:7890")
-     ("https" . "127.0.0.1:7890")))
+;; (setq url-proxy-services
+;;    '(("no_proxy" . "^\\(localhost\\|10\\..*\\|192\\.168\\..*\\)")
+;;      ("http" . "127.0.0.1:7890")
+;;      ("https" . "127.0.0.1:7890")))
 
 ;; Add path for auto saved files
 ;;; Code:
@@ -74,6 +74,7 @@
 
 ;; Automatically install emacs packages
 (unless (file-directory-p package-user-dir)
+  (package-refresh-contents)
   (package-install-selected-packages)
   )
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -211,7 +212,6 @@
 ;; Global visual line mode with better indentation
 ;; (global-visual-line-mode t)
 (setq-default fill-column 90)
-(setq visual-fill-column-width 98)
 (dolist (hook '(message-mode-hook
                 prog-mode-hook
                 org-mode-hook
@@ -221,11 +221,29 @@
                      (display-line-numbers-mode t)
                      (visual-line-mode t)
                      (setq word-wrap-by-category t) ; Better CJK wrap support
-                     (visual-fill-column-mode)
                      )))
 
-(setq-default adaptive-wrap-extra-indent 0)
-(add-hook 'visual-line-mode-hook #'adaptive-wrap-prefix-mode)
+(use-package visual-fill-column
+  :ensure t
+  :config
+  (dolist (hook '(message-mode-hook
+                  prog-mode-hook
+                  org-mode-hook
+                  mail-mode-hook
+                  text-mode-hook
+                  reftex-toc-mode-hook))
+    (add-hook hook #'(lambda ()
+                     (visual-fill-column-mode)
+                     )))
+  )
+
+(use-package adaptive-wrap
+  :ensure t
+  :config
+  (setq-default adaptive-wrap-extra-indent 0)
+  (add-hook 'visual-line-mode-hook #'adaptive-wrap-prefix-mode)
+  )
+
 
 ;; shift selection
 (setq shift-select-mode t)
@@ -1180,9 +1198,8 @@
   ;; RefTeX
   (setq reftex-plug-into-AUCTeX t)
   (add-hook 'LaTeX-mode-hook #'turn-on-reftex)
-  (add-hook 'reftex-toc-mode-hook #'visual-line-mode)
   (remove-hook 'reftex-mode #'display-line-numbers-mode)
-  (add-hook 'reftex-toc-mode-hook #'visual-fill-column-mode)
+  (add-hook 'reftex-toc-mode-hook #'visual-line-mode)
   (setq reftex-toc-follow-mode t)
   (setq reftex-revisit-to-follow t)
   (setq reftex-toc-split-windows-horizontally t)
