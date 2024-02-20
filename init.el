@@ -492,9 +492,10 @@
   :ensure t
   :hook (text-mode . flycheck-languagetool-setup)
   :init
-  (setq flycheck-languagetool-server-jar
-        (concat (getenv "HOME") "/.APP/LanguageTool/languagetool-server.jar"))
-  (setq flycheck-languagetool-server-port 8082)
+  ;; (setq flycheck-languagetool-server-jar
+  ;;      (concat (getenv "HOME") "/.APP/LanguageTool/languagetool-server.jar"))
+  (setq flycheck-languagetool-url  "http://localhost:8081")
+  ;; (setq flycheck-languagetool-server-port 8082)
   )
 
 (use-package writegood-mode
