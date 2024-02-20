@@ -62,7 +62,7 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(company-prescient ivy-prescient prescient multiple-cursors pinyinlib company counsel swiper ivy ht flycheck-grammarly use-proxy flycheck-languagetool lsp-grammarly lsp-metals eglot-grammarly tree-sitter-langs tree-sitter notmuch poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode wordnut synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math writegood-mode highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
+   '(writegood-mode multiple-cursors pinyinlib company counsel swiper ivy ht flycheck-languagetool lsp-grammarly lsp-metals eglot-grammarly tree-sitter-langs tree-sitter notmuch poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
  '(safe-local-variable-values '((TeX-engine . pdflatex)))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
@@ -548,15 +548,6 @@
 
   )
 
-(use-package prescient
-  :ensure t
-
-  :config
-  (setq ivy-prescient-mode t)
-  (setq company-prescient-mode t)
-
- )
-
 ;; let `ivy-read' support chinese pinyin, toggle with `
 (use-package pinyinlib
   :ensure t
@@ -947,8 +938,8 @@
   (setq flycheck-check-syntax-automatically '(mode-enabled save))
 
   ;; FlyCheck grammarly
-  (flycheck-grammarly-setup)
-  (setq flycheck-grammarly-check-time 0.8)
+  ;; (flycheck-grammarly-setup)
+  ;; (setq flycheck-grammarly-check-time 0.8)
 
   )
 
@@ -1272,6 +1263,10 @@
 
   ;; R history files and size
   (setq ess-history-file "~/.Rhistory")
+
+  ;; Add autoloads for R-mode and opening *.R files
+  (autoload 'R-mode "ess-site.el" "Major mode for editing R source." t)
+  (add-to-list 'auto-mode-alist '("\\.R$" . R-mode))
 
   ;; Let help on new frame
   ;; (setq ess-help-own-frame t)
