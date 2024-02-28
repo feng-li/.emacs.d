@@ -950,7 +950,7 @@
     (add-hook hook (lambda () (synosaurus-mode))))
   (setq synosaurus-choose-method 'popup) ; popup, ido
   ;; (setq synosaurus-backend  'Wordnet) ; apt install wordnet
-  (define-key synosaurus-mode-map (kbd "<f4> t") 'synosaurus-choose-and-replace)
+  (define-key synosaurus-mode-map (kbd "<f9> s") 'synosaurus-choose-and-replace)
   )
 
 
@@ -984,7 +984,7 @@
   )
 
 (use-package mw-thesaurus
-  :defer t
+  :defer nil
   :config
   (setq mw-thesaurus--api-key "23ed2cad-ce64-4ab1-abd9-774760e6842d")
   (global-set-key (kbd "<f9> t") 'mw-thesaurus-lookup-dwim)
@@ -1337,19 +1337,20 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Python IDE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(use-package python
+(use-package elpy
   :ensure t
   :config
 
   (elpy-enable)
-  ;; (setq elpy-rpc-virtualenv-path (concat (getenv "HOME") "/.emacs.d/elpy/" system-name "/rpc-venv"))
-  ;; (setq elpy-rpc-virtualenv-path (concat (getenv "HOME") "/.cache/elpy/rpc-venv"))
   (setq elpy-rpc-virtualenv-path (concat (getenv "HOME") "/.virtualenvs/elpy/"))
   (setq elpy-rpc-python-command "python3")
   (setq elpy-syntax-check-command (concat elpy-rpc-virtualenv-path  "bin/flake8"))
 
   ;; Disable elpy's flymake, use flycheck
-  (remove-hook 'elpy-modules #'elpy-module-flymake)
+  ;; (remove-hook 'elpy-modules #'elpy-module-flymake)
+  (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+
+  ;; elpy rpc
   (define-key elpy-mode-map (kbd "C-c C-n") nil)
   (setq flycheck-python-flake8-executable (concat elpy-rpc-virtualenv-path  "bin/flake8"))
   (setq flycheck-python-pylint-executable (concat elpy-rpc-virtualenv-path  "bin/pylint"))
@@ -1361,12 +1362,31 @@
   (define-key elpy-mode-map (kbd "C-c C-c") 'elpy-shell-send-statement-and-step)
   (define-key elpy-mode-map (kbd "C-c C-r") 'elpy-shell-send-region-or-buffer-and-step)
 
+  ;; Alternatives to elpy-goto-definition and fallback to rgrep
+  (defun elpy-goto-definition-or-rgrep ()
+    "Go to the definition of the symbol at point, if found. Otherwise, run `elpy-rgrep-symbol'."
+    (interactive)
+    (if (version< emacs-version "25.1")
+        (ring-insert find-tag-marker-ring (point-marker))
+      (xref-push-marker-stack))
+    (condition-case nil (elpy-goto-definition)
+      (error (elpy-rgrep-symbol
+              (concat "\\(def\\|class\\)\s" (thing-at-point 'symbol) "(")))))
+  (define-key elpy-mode-map (kbd "M-.") 'elpy-goto-definition-or-rgrep)
+
+
   (use-package pydoc)
   (define-key elpy-mode-map (kbd "C-c C-v") 'pydoc)
   ;; (local-set-key (kbd "C-c C-v") 'pydoc) ; C-c C-v was bounded to elpy-check
 
   (setq python-shell-interpreter "python3")
+  (setq python-shell-interpreter-args "-i")
   (setq python-shell-completion-native-enable nil)
+
+  ;; auto-format your code with "C-c C-r f" on save
+  ;; (add-hook 'elpy-mode-hook (lambda ()
+  ;;                             (add-hook 'before-save-hook
+  ;;                                       'elpy-format-code nil t)))
 
   (add-hook 'python-mode-hook
             #'(lambda ()
@@ -1377,6 +1397,10 @@
 
                 ;; Enter to indent in python.el
                 (define-key python-mode-map (kbd "C-m") 'newline-and-indent)
+
+                ;; Tab and Shift-Tab indent/unindent
+                (define-key python-mode-map (kbd "<tab>") 'python-indent-shift-right)
+                (define-key python-mode-map (kbd "S-<tab>") 'python-indent-shift-left)
 
                 (define-key python-mode-map (kbd "C-c M-r") 'python-shell-send-region)
 
