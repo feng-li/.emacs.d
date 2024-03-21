@@ -1264,7 +1264,7 @@
 
   ;; Add autoloads for R-mode and opening *.R files
   (autoload 'R-mode "ess-site.el" "Major mode for editing R source." t)
-  (add-to-list 'auto-mode-alist '("\\.R$" . R-mode))
+  (add-to-list 'auto-mode-alist '("\\.R$" . ess-mode))
 
   ;; Let help on new frame
   ;; (setq ess-help-own-frame t)
