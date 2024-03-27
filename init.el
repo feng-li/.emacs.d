@@ -1334,6 +1334,80 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Python IDE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Virtual environment
+;; (use-package pyvenv
+;;   :init
+;;   (setenv "WORKON_HOME" "~/.virtualenvs")
+;;   ;https://lists.gnu.org/archive/html/help-gnu-emacs/2021-09/msg00535.html
+;;   (defun try/pyvenv-workon ()
+;;     (when (buffer-file-name)
+;;       (let* ((python-version ".python-version")
+;;              (project-dir (locate-dominating-file (buffer-file-name) python-version)))
+;;         (when project-dir
+;;           (pyvenv-workon
+;;             (with-temp-buffer
+;;               (insert-file-contents (expand-file-name python-version project-dir))
+;;               (car (split-string (buffer-string)))))))))
+
+;;   (pyvenv-mode 1)
+;;   (setq pyvenv-post-deactivate-hooks
+;;         (list (lambda ()
+;;                 (setq python-shell-interpreter "python3")))))
+
+;; (use-package python-mode
+;;   :hook (python-mode . try/pyvenv-workon))
+
+(use-package python
+  :config
+
+  (setq python-shell-interpreter "python3")
+  (setq python-shell-interpreter-args "-i")
+  (setq python-shell-completion-native-enable nil)
+
+  (add-hook 'python-mode-hook
+            #'(lambda ()
+                ;; Enable flycheck mode
+                (flycheck-mode t)
+
+                ;; Enter to indent in python.el
+                (define-key python-mode-map (kbd "C-m") 'newline-and-indent)
+
+                ;; Tab and Shift-Tab indent/unindent
+                (define-key python-mode-map (kbd "<tab>") 'python-indent-shift-right)
+                (define-key python-mode-map (kbd "S-<tab>") 'python-indent-shift-left)
+
+                (define-key python-mode-map (kbd "C-c M-r") 'python-shell-send-region)
+
+                (defun my-python-send-line-and-step (beg end)
+                  (interactive "r")
+                  (if (eq beg end)
+                      (python-shell-send-region (line-beginning-position) (line-end-position))
+                    (python-shell-send-region beg end))
+                  (next-line))
+                (local-set-key (kbd "C-c C-n") 'my-python-send-line-and-step)
+
+
+                ;; ElDoc for Python in the minor buffer
+                (add-hook 'python-mode-hook #'turn-on-eldoc-mode)
+
+                (defun python-add-breakpoint ()
+                  (interactive)
+                  (newline-and-indent)
+                  (insert "import pdb; pdb.set_trace()"))
+                (add-hook 'python-mode-hook
+                          #'(lambda ()
+                              (define-key python-mode-map
+                                          (kbd "C-c C-t") 'python-add-breakpoint)))
+
+                ;; Font-Lock
+                ;; (make-face 'font-lock-special-macro-face)
+                ;; (set-face-background 'font-lock-special-macro-face "magenta")
+                ;; (set-face-foreground 'font-lock-special-macro-face "white")
+                ))
+  )
+
+
 (use-package elpy
   :ensure t
   :config
@@ -1372,66 +1446,18 @@
   (define-key elpy-mode-map (kbd "M-.") 'elpy-goto-definition-or-rgrep)
 
 
-  (use-package pydoc)
-  (define-key elpy-mode-map (kbd "C-c C-v") 'pydoc)
+  (use-package pydoc
+    :config
+    (define-key elpy-mode-map (kbd "C-c C-v") 'pydoc)
+    )
   ;; (local-set-key (kbd "C-c C-v") 'pydoc) ; C-c C-v was bounded to elpy-check
-
-  (setq python-shell-interpreter "python3")
-  (setq python-shell-interpreter-args "-i")
-  (setq python-shell-completion-native-enable nil)
 
   ;; auto-format your code with "C-c C-r f" on save
   ;; (add-hook 'elpy-mode-hook (lambda ()
   ;;                             (add-hook 'before-save-hook
   ;;                                       'elpy-format-code nil t)))
 
-  (add-hook 'python-mode-hook
-            #'(lambda ()
-                ;; (setq python-python-command "python3")
-
-                ;; Enable flycheck mode
-                (flycheck-mode t)
-
-                ;; Enter to indent in python.el
-                (define-key python-mode-map (kbd "C-m") 'newline-and-indent)
-
-                ;; Tab and Shift-Tab indent/unindent
-                (define-key python-mode-map (kbd "<tab>") 'python-indent-shift-right)
-                (define-key python-mode-map (kbd "S-<tab>") 'python-indent-shift-left)
-
-                (define-key python-mode-map (kbd "C-c M-r") 'python-shell-send-region)
-
-                (defun my-python-send-line-and-step (beg end)
-                  (interactive "r")
-                  (if (eq beg end)
-                      (python-shell-send-region (line-beginning-position) (line-end-position))
-                    (python-shell-send-region beg end))
-                  (next-line))
-                (local-set-key (kbd "C-c C-n") 'my-python-send-line-and-step)
-
-
-                ;; ElDoc for Python in the minor buffer
-                (add-hook 'python-mode-hook #'turn-on-eldoc-mode)
-
-                (defun python-add-breakpoint ()
-                  (interactive)
-                  (newline-and-indent)
-                  (insert "import pdb; pdb.set_trace()"))
-                (add-hook 'python-mode-hook
-                          #'(lambda ()
-                              (define-key python-mode-map
-                                (kbd "C-c C-t") 'python-add-breakpoint)))
-
-                ;; Font-Lock
-                (make-face 'font-lock-special-macro-face)
-                (set-face-background 'font-lock-special-macro-face "magenta")
-                (set-face-foreground 'font-lock-special-macro-face "white")
-
-                ))
   )
-
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Language server mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1459,13 +1485,35 @@
 
   ;; Only enable certain LSP client and do not ask for server install.
   ;; (setq lsp-enabled-clients '(metals grammarly-ls rmark marksman unified))
-  (setq lsp-enabled-clients '(metals grammarly-ls))
+  (setq lsp-enabled-clients '(metals grammarly-ls pylsp))
+
+
+  ;;(setq lsp-clients-pylsp-library-directories "~/.virtualenvs/elpy/")
+  (setq lsp-pylsp-server-command "~/.virtualenvs/elpy/bin/pylsp")
+
+
   (setq lsp-auto-guess-root nil)
   (setq lsp-warn-no-matched-clients nil)
 
   (define-key lsp-mode-map (kbd "<f4> <f4>") 'lsp-describe-thing-at-point)
   )
 
+
+
+;; (use-package eglot
+;;   :ensure t
+;;   :config
+;;   ;; a workaround for error fontifying hover info
+;;   ;; https://github.com/joaotavora/eglot/discussions/1356
+;;   (setq eglot-prefer-plaintext t)
+;;   )
+
+;; ;; Using flycheck to replace flymake in eglot
+;; (use-package flycheck-eglot
+;;   :ensure t
+;;   :after (flycheck eglot)
+;;   :config
+;;   (global-flycheck-eglot-mode 1))
 
 ;; lsp-treemacs
 ;; (use-package lsp-treemacs
