@@ -63,7 +63,7 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(lean-mode treesit-auto writegood-mode multiple-cursors pinyinlib company counsel swiper ivy ht flycheck-languagetool lsp-grammarly lsp-metals notmuch poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen company-reftex electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
+   '(lsp-latex lean-mode treesit-auto writegood-mode multiple-cursors pinyinlib company counsel swiper ivy ht flycheck-languagetool lsp-grammarly lsp-metals notmuch poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
  '(safe-local-variable-values '((TeX-engine . pdflatex)))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
@@ -760,6 +760,9 @@
   :config
   (add-hook 'after-init-hook #'global-company-mode)
   (setq company-minimum-prefix-length 2)
+  (setq company-idle-delay
+        (lambda () (if (company-in-string-or-comment) nil 0.5)))
+
   (setq company-files-exclusions '(".git/" ".DS_Store"))
 
   ;; Preserve initial cases
@@ -1209,6 +1212,12 @@
             )
 
   ;; Add company-reftex backends
+  (use-package company-reftex)
+
+  ;; disable reftex-parse-all for labels
+  ;; https://github.com/TheBB/company-reftex/pull/13
+  (setq company-reftex-labels-parse-all nil) ;; speed up
+
   (add-hook 'LaTeX-mode-hook
             #'(lambda ()
                 (make-local-variable 'company-backends)
@@ -1218,6 +1227,11 @@
                 ))
 
   (setq reftex-cite-format 'natbib)
+
+  (setq reftex-enable-partial-scans t
+        reftex-save-parse-info t
+        reftex-use-multiple-selection-buffers t)
+
   (setq reftex-use-external-file-finders t)
   (setq reftex-external-file-finders
         '(("tex" . "kpsewhich -format=.tex %f")
@@ -1485,8 +1499,8 @@
 
   ;; Only enable certain LSP client and do not ask for server install.
   ;; (setq lsp-enabled-clients '(metals grammarly-ls rmark marksman unified))
-  (setq lsp-enabled-clients '(metals grammarly-ls pylsp))
-
+  ;; (setq lsp-enabled-clients '(metals grammarly-ls pylsp))
+  (setq lsp-enabled-clients '(metals pylsp texlab grammarly-ls))
 
   ;;(setq lsp-clients-pylsp-library-directories "~/.virtualenvs/elpy/")
   (setq lsp-pylsp-server-command "~/.virtualenvs/elpy/bin/pylsp")
@@ -1574,15 +1588,26 @@
 ;;    (setq sbt:program-options '("-Dsbt.supershell=false"))
 ;; )
 
+
+;; lsp with texlab
+(use-package lsp-latex
+  :ensure t
+  :defer t
+  :hook (latex-mode . (lambda ()
+                       (require 'lsp-latex)
+                       (lsp-deferred)))  ; or lsp
+  )
+
 ;; grammerly for lsp
 (use-package lsp-grammarly
   :ensure t
   :defer t
 
   ;; Comment out to start manually
-  :hook ((latex-mode org-mode) . (lambda ()
-                          (require 'lsp-grammarly)
-                          (lsp-deferred)))  ;; or lsp
+  :hook ((latex-mode org-mode markdown-mode)
+         . (lambda ()
+             (require 'lsp-grammarly)
+             (lsp-deferred)))  ;; or lsp
 
   :config
   (setq lsp-grammarly-active-modes '(latex-mode org-mode))
