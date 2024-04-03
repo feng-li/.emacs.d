@@ -63,7 +63,7 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(lsp-latex lean-mode treesit-auto writegood-mode multiple-cursors pinyinlib company counsel swiper ivy ht flycheck-languagetool lsp-grammarly lsp-metals notmuch poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
+   '(flycheck-grammarly lsp-latex lean-mode treesit-auto writegood-mode multiple-cursors pinyinlib company counsel swiper ivy ht flycheck-languagetool lsp-grammarly lsp-metals notmuch poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
  '(safe-local-variable-values '((TeX-engine . pdflatex)))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
@@ -86,6 +86,7 @@
 (setq frame-title-format "%b")
 (setq user-full-name "Feng Li")
 (setq user-mail-address "m@feng.li")
+(setq gc-cons-threshold (* 1000 1024 1024)) ; 1000 MB
 
 ;; Auto-save list file prefix
 (setq auto-save-list-file-prefix (concat my-auto-save-list "/.saves-"))
@@ -932,16 +933,24 @@
 
 (use-package flycheck
   :ensure t
-  :init (global-flycheck-mode)
-
   :config
   (setq flycheck-checker-error-threshold 1000)
   (setq flycheck-check-syntax-automatically '(mode-enabled save))
+  (global-flycheck-mode)
 
-  ;; FlyCheck grammarly
-  ;; (flycheck-grammarly-setup)
-  ;; (setq flycheck-grammarly-check-time 0.8)
+  )
 
+(use-package flycheck-grammarly
+  :config
+  (setq flycheck-grammarly-check-time 1)
+  (setq flycheck-grammarly-active-modes '(text-mode latex-mode org-mode markdown-mode))
+
+  ;; Automatic select checkers
+  (dolist (hook '(text-mode-hook markdown-mode-hook))
+    (add-hook hook (lambda ()
+                     (flycheck-select-checker 'grammarly)
+                     )))
+  (flycheck-grammarly-setup)
   )
 
 (use-package synosaurus
@@ -1034,9 +1043,8 @@
   (setq auto-mode-alist (cons '("\\.md" . markdown-mode) auto-mode-alist))
   ;; (setq auto-mode-alist (cons '("\\.Rmd" . markdown-mode) auto-mode-alist))
 
-  (autoload 'gfm-mode "markdown-mode"
-    "Major mode for editing GitHub Flavored Markdown files" t)
-  (add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode))
+  ;; (autoload 'gfm-mode "markdown-mode" "Major mode for editing GitHub Flavored Markdown files" t)
+  ;; (add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode))
 
   )
 
@@ -1604,7 +1612,7 @@
   :defer t
 
   ;; Comment out to start manually
-  :hook ((latex-mode org-mode markdown-mode)
+  :hook ((latex-mode org-mode)
          . (lambda ()
              (require 'lsp-grammarly)
              (lsp-deferred)))  ;; or lsp
