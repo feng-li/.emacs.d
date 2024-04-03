@@ -938,6 +938,14 @@
   (setq flycheck-check-syntax-automatically '(mode-enabled save))
   (global-flycheck-mode)
 
+
+  ;; Automatic select checkers
+  (dolist (hook '(LaTeX-mode-hook))
+    (add-hook hook (lambda ()
+                     (flycheck-select-checker 'tex-chktex)
+                     )))
+
+
   )
 
 (use-package flycheck-grammarly
@@ -946,7 +954,7 @@
   (setq flycheck-grammarly-active-modes '(text-mode latex-mode org-mode markdown-mode))
 
   ;; Automatic select checkers
-  (dolist (hook '(text-mode-hook markdown-mode-hook))
+  (dolist (hook '(markdown-mode-hook))
     (add-hook hook (lambda ()
                      (flycheck-select-checker 'grammarly)
                      )))
