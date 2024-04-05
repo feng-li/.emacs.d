@@ -1141,6 +1141,9 @@
                 (local-set-key (kbd "<f9> |") (lambda () (interactive) (insert "\\left| \\right|")))
                 (local-set-key "\$" 'skeleton-pair-insert-maybe)
 
+                ;; Shift-Return Insert \item
+                (local-set-key (kbd "S-<return>") 'latex-insert-item)
+
                 ;; This was `c-c c-f c-a`
                 (setq LaTeX-font-list
                       '((?a ""              ""  "\\mathcal{"    "}")
@@ -1472,8 +1475,11 @@
   (setq lsp-use-plists t) ;; export LSP_USE_PLISTS=true
   (setq lsp-idle-delay 0.500)
 
+  ;; (setq lsp-completion-provider :none)
+
   ;; Only enable certain LSP client and do not ask for server install.
   ;; (setq lsp-enabled-clients '(metals pylsp texlab2 grammarly-ls))
+  (setq lsp-enabled-clients '(metals pylsp grammarly-ls))
 
   ;;(setq lsp-clients-pylsp-library-directories "~/.virtualenvs/elpy/")
   (setq lsp-pylsp-server-command "~/.virtualenvs/elpy/bin/pylsp")
