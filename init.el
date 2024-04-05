@@ -156,18 +156,7 @@
 
 ;; Set Fonts
 (add-to-list 'default-frame-alist '(font . "M PLUS Code Latin 50-11")) ;
-;; (when (display-graphic-p)
-;;   (if (> (display-pixel-height) 1080) ;; HDPi
-;;       (progn
-;;         (add-to-list 'default-frame-alist '(font . "Noto Sans Mono CJK SC")) ;
-;;         ;; (add-to-list 'default-frame-alist '(font . "M+ 1mn-9")) ;
-;;         )
-;;     (add-to-list 'default-frame-alist '(font . "Noto Sans Mono CJK SC")) ;
-;;     ;; (add-to-list 'default-frame-alist '(font . "M+ 1mn-10")) ;
-;;     )
-;;   ;; (setq face-font-rescale-alist '(("Noto Sans CJK SC". 1.2)))
-;;   ;; (set-fontset-font "fontset-default" 'unicode '("Microsoft YaHei" . "unicode-bmp"))
-;;   )
+
 ;; Menu bar
 (menu-bar-mode t)
 
@@ -214,7 +203,6 @@
                 text-mode-hook))
   (add-hook hook #'(lambda ()
                      (display-line-numbers-mode t)
-                     (visual-line-mode t)
                      (setq word-wrap-by-category t) ; Better CJK wrap support
                      )))
 
@@ -222,12 +210,13 @@
   :ensure t
   :config
   (dolist (hook '(message-mode-hook
-                  prog-mode-hook
+                  ;; prog-mode-hook
                   org-mode-hook
                   mail-mode-hook
                   text-mode-hook
                   reftex-toc-mode-hook))
     (add-hook hook #'(lambda ()
+                     (visual-line-mode t)
                      (visual-fill-column-mode)
                      )))
   )
@@ -259,14 +248,15 @@
 (setq kill-ring-max 150)
 
 ;; auto-fill mode
-(dolist (hook '(prog-mode-hook
+(dolist (hook '(;;prog-mode-hook
                 ;; text-mode-hook
                 ;; LaTeX-mode-hook
                 ;; markdown-mode-hook
                 message-mode-hook
                 org-mode-hook
 	        mail-mode-hook
-                ess-mode-hook))
+                ;; ess-mode-hook
+                ))
   (add-hook hook #'(lambda () (auto-fill-mode 1))))
 
 ;; Tree-sitter mode
@@ -473,26 +463,6 @@
   (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
   )
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Language and writing https://languagetool.org/
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; LanguageTool https://languagetool.org/download/
-(use-package flycheck-languagetool
-  :ensure t
-  :hook (text-mode . flycheck-languagetool-setup)
-  :init
-  ;; (setq flycheck-languagetool-server-jar
-  ;;      (concat (getenv "HOME") "/.APP/LanguageTool/languagetool-server.jar"))
-  (setq flycheck-languagetool-url  "http://localhost:8081")
-  ;; (setq flycheck-languagetool-server-port 8082)
-  )
-
-(use-package writegood-mode
-  :ensure t
-  :config
-  (global-set-key (kbd "<f9> w") 'writegood-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; General IDE settings
@@ -941,10 +911,29 @@
 
   )
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Language and writing https://languagetool.org/
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; LanguageTool https://languagetool.org/download/
+(use-package flycheck-languagetool
+  :custom
+  (flycheck-languagetool-active-modes
+   '(text-mode latex-mode LaTeX-mode org-mode markdown-mode gfm-mode))
+  :config
+  ;; (setq flycheck-languagetool-active-modes '(LaTeX-mode org-mode markdown-mode))
+  (setq flycheck-languagetool-url  "http://localhost:8081")
+  (flycheck-languagetool-setup)
+  )
+
+
 (use-package flycheck-grammarly
+  :custom
+  (flycheck-grammarly-active-modes
+   '(text-mode latex-mode LaTeX-mode org-mode markdown-mode gfm-mode))
   :config
   (setq flycheck-grammarly-check-time 1)
-  (setq flycheck-grammarly-active-modes '(text-mode latex-mode org-mode markdown-mode))
 
   ;; Automatic select checkers
   (dolist (hook '(markdown-mode-hook))
@@ -1465,6 +1454,9 @@
   :after company
   :ensure t
   :commands (lsp lsp-deferred)
+  :custom
+  (lsp-diagnostics-provider :none)
+
   :config
   (setq lsp-keymap-prefix "C-c l")
   (setq lsp-server-install-dir (concat (getenv "HOME") "/.config/emacs/lsp-server"))
