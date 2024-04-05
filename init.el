@@ -116,13 +116,6 @@
   (load-theme 'dracula t)
   )
 
-
-;; (use-package use-proxy
-;;   :config
-;;   (global-set-key (kbd "C-c C-p") 'use-proxy-toggle-proto-proxy)
-;;   (global-set-key (kbd "C-c C-g") 'use-proxy-toggle-proxies-global)
-;;   )
-
 ;; The scratch settings
 (setq initial-scratch-message nil) ;; Disable scratch information
 (setq inhibit-startup-message t) ;;stop start up message
@@ -1357,7 +1350,6 @@
   )
 
 
-
 (add-hook 'c-mode-common-hook
           (lambda () (define-key c-mode-base-map (kbd "<f5>") 'compile)))
 
@@ -1365,32 +1357,9 @@
 ;;; Python IDE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Virtual environment
-;; (use-package pyvenv
-;;   :init
-;;   (setenv "WORKON_HOME" "~/.virtualenvs")
-;;   ;https://lists.gnu.org/archive/html/help-gnu-emacs/2021-09/msg00535.html
-;;   (defun try/pyvenv-workon ()
-;;     (when (buffer-file-name)
-;;       (let* ((python-version ".python-version")
-;;              (project-dir (locate-dominating-file (buffer-file-name) python-version)))
-;;         (when project-dir
-;;           (pyvenv-workon
-;;             (with-temp-buffer
-;;               (insert-file-contents (expand-file-name python-version project-dir))
-;;               (car (split-string (buffer-string)))))))))
-
-;;   (pyvenv-mode 1)
-;;   (setq pyvenv-post-deactivate-hooks
-;;         (list (lambda ()
-;;                 (setq python-shell-interpreter "python3")))))
-
-;; (use-package python-mode
-;;   :hook (python-mode . try/pyvenv-workon))
-
 (use-package python
-  :config
 
+  :config
   (setq python-shell-interpreter "python3")
   (setq python-shell-interpreter-args "-i")
   (setq python-shell-completion-native-enable nil)
@@ -1493,8 +1462,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package lsp-mode
+  :after company
   :ensure t
-  :init
   :commands (lsp lsp-deferred)
   :config
   (setq lsp-keymap-prefix "C-c l")
@@ -1507,16 +1476,12 @@
   (setq lsp-ui-doc-show-with-cursor nil) ;; disable cursor hover (keep mouse hover)
 
   ;; Performance https://emacs-lsp.github.io/lsp-mode/page/performance/
-  (setq gc-cons-threshold 100000000)
   (setq read-process-output-max (* 2048 2048)) ;; 2mb
   (setq lsp-use-plists t) ;; export LSP_USE_PLISTS=true
-  (setq gc-cons-threshold 100000000)
   (setq lsp-idle-delay 0.500)
 
   ;; Only enable certain LSP client and do not ask for server install.
-  ;; (setq lsp-enabled-clients '(metals grammarly-ls rmark marksman unified))
-  ;; (setq lsp-enabled-clients '(metals grammarly-ls pylsp))
-  (setq lsp-enabled-clients '(metals pylsp texlab grammarly-ls))
+  ;; (setq lsp-enabled-clients '(metals pylsp texlab2 grammarly-ls))
 
   ;;(setq lsp-clients-pylsp-library-directories "~/.virtualenvs/elpy/")
   (setq lsp-pylsp-server-command "~/.virtualenvs/elpy/bin/pylsp")
@@ -1527,8 +1492,6 @@
 
   (define-key lsp-mode-map (kbd "<f4> <f4>") 'lsp-describe-thing-at-point)
   )
-
-
 
 ;; (use-package eglot
 ;;   :ensure t
@@ -1574,11 +1537,6 @@
   (setq lsp-metals-coursier-store-path (concat (getenv "HOME") "/.local/share/coursier/bin/coursier"))
 
   )
-;; Enable nice rendering of documentation on hover
-;;   Warning: on some systems this package can reduce your emacs responsiveness significally.
-;;   (See: https://emacs-lsp.github.io/lsp-mode/page/performance/)
-;;   In that case you have to not only disable this but also remove from the packages since
-;;   lsp-mode can activate it automatically.
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; SCALA IDE
@@ -1604,21 +1562,20 @@
 ;;    (setq sbt:program-options '("-Dsbt.supershell=false"))
 ;; )
 
-
 ;; lsp with texlab
-(use-package lsp-latex
-  :ensure t
-  :defer t
-  :hook (latex-mode . (lambda ()
-                       (require 'lsp-latex)
-                       (lsp-deferred)))  ; or lsp
-  )
+;;; (use-package lsp-latex
+;;;   :after company
+;;;   :ensure t
+;;;   :defer t
+;;;   :hook (latex-mode . (lambda ()
+;;;                        (require 'lsp-latex)
+;;;                        (lsp-deferred)))  ; or lsp
+;;;   )
 
 ;; grammerly for lsp
 (use-package lsp-grammarly
   :ensure t
   :defer t
-
   ;; Comment out to start manually
   :hook ((latex-mode org-mode)
          . (lambda ()
