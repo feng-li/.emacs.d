@@ -902,11 +902,11 @@
   (global-flycheck-mode)
 
 
-  ;; Automatic select checkers
-  (dolist (hook '(LaTeX-mode-hook))
-    (add-hook hook (lambda ()
-                     (flycheck-select-checker 'tex-chktex)
-                     )))
+  ;; Automatic select checkers or via lsp
+  ;; (dolist (hook '(LaTeX-mode-hook))
+  ;;   (add-hook hook (lambda ()
+  ;;                    (flycheck-select-checker 'tex-chktex)
+  ;;                    )))
 
 
   )
@@ -933,7 +933,7 @@
   (flycheck-grammarly-active-modes
    '(text-mode latex-mode LaTeX-mode org-mode markdown-mode gfm-mode))
   :config
-  (setq flycheck-grammarly-check-time 1)
+  (setq flycheck-grammarly-check-time 0.8)
 
   ;; Automatic select checkers
   (dolist (hook '(markdown-mode-hook))
