@@ -63,7 +63,7 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(flycheck-grammarly lsp-latex lean-mode treesit-auto writegood-mode multiple-cursors pinyinlib company counsel swiper ivy ht flycheck-languagetool lsp-grammarly lsp-metals notmuch poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
+   '(imenu-list flycheck-grammarly lsp-latex lean-mode treesit-auto writegood-mode multiple-cursors pinyinlib company counsel swiper ivy ht flycheck-languagetool lsp-grammarly lsp-metals notmuch poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
  '(safe-local-variable-values '((TeX-engine . pdflatex)))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
@@ -1031,11 +1031,21 @@
   :ensure t
   :config
   (setq auto-mode-alist (cons '("\\.md" . markdown-mode) auto-mode-alist))
-  ;; (setq auto-mode-alist (cons '("\\.Rmd" . markdown-mode) auto-mode-alist))
+  (add-hook 'markdown-mode-hook 'imenu-add-menubar-index)
+  (setq imenu-auto-rescan t)
 
+  ;; (setq auto-mode-alist (cons '("\\.Rmd" . markdown-mode) auto-mode-alist))
   ;; (autoload 'gfm-mode "markdown-mode" "Major mode for editing GitHub Flavored Markdown files" t)
   ;; (add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode))
+  )
 
+
+(use-package imenu-list
+  :ensure t
+  :config
+  (setq imenu-list-focus-after-activation t
+        imenu-list-auto-resize nil)
+  (global-set-key (kbd "C-c t") 'imenu-list-smart-toggle)
   )
 
 (use-package pandoc-mode
