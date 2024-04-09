@@ -12,3 +12,15 @@ source ${elpy}/bin/activate
 python3 -m pip install pip -U -i ${pip_index_url}
 python3 -m pip install 'python-lsp-server[all]' -U -i ${pip_index_url}
 python3 -m pip install flake8 jedi autopep8 black -U -i ${pip_index_url}
+
+
+echo -e "
+... Installing Rust and Cargo
+"
+curl https://sh.rustup.rs -sSf | sh
+
+echo -e "
+... Installing ripgrep (https://github.com/BurntSushi/ripgrep)
+
+"
+cargo install ripgrep
