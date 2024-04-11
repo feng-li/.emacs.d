@@ -922,10 +922,10 @@
   (setq flycheck-grammarly-check-time 0.8)
 
   ;; Automatic select checkers
-  (dolist (hook '(markdown-mode-hook))
-    (add-hook hook (lambda ()
-                     (flycheck-select-checker 'grammarly)
-                     )))
+  ;; (dolist (hook '(markdown-mode-hook))
+  ;;   (add-hook hook (lambda ()
+  ;;                    (flycheck-select-checker 'grammarly)
+  ;;                    )))
   (flycheck-grammarly-setup)
   )
 
@@ -1136,9 +1136,6 @@
                 (local-set-key (kbd "<f9> {") (lambda () (interactive) (insert "\\left\\{ \\right\\}")))
                 (local-set-key (kbd "<f9> |") (lambda () (interactive) (insert "\\left| \\right|")))
                 (local-set-key "\$" 'skeleton-pair-insert-maybe)
-
-                ;; Shift-Return Insert \item
-                (local-set-key (kbd "S-<return>") 'latex-insert-item)
 
                 ;; This was `c-c c-f c-a`
                 (setq LaTeX-font-list
