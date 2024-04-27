@@ -11,6 +11,7 @@
 (setenv "OMP_NUM_THREADS" "1")
 (setenv "LSP_USE_PLISTS"  "true")
 (setenv "PATH" (concat (concat (getenv "HOME") "/.local/bin:")
+                       (concat (getenv "HOME") "/.cargo/bin:")
                        (concat (getenv "HOME") "/.local/share/coursier/bin:")
                        (getenv "PATH")))
 
