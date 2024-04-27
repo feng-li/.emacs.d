@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: \sum\nolimits_{ }^{ }
+# key: \sum
+# --
+\sum\nolimits_{$0}^{$1}

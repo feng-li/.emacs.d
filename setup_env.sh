@@ -17,7 +17,11 @@ python3 -m pip install flake8 jedi autopep8 black -U -i ${pip_index_url}
 echo -e "
 ... Installing Rust and Cargo
 "
+if [ ! "command -v cargo" ]; then
+
 curl https://sh.rustup.rs -sSf | sh
+
+fi
 
 echo -e "
 ... Installing ripgrep (https://github.com/BurntSushi/ripgrep)
