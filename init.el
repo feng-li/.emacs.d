@@ -463,7 +463,6 @@
   (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
   )
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; General IDE settings
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -471,7 +470,7 @@
   :ensure t
   :custom
   (counsel-rg-base-command
-   '("rg" "--max-columns" "2400" "--with-filename" "--no-heading" "--line-number" "--color" "never" "%s"))
+   '("rg" "--max-columns" "1600" "--with-filename" "--no-heading" "--line-number" "--color" "never" "%s"))
 
   :config
   (ivy-mode)
@@ -487,6 +486,7 @@
   (global-set-key (kbd "C-c G") 'counsel-git-grep)
   (global-set-key (kbd "C-c g") 'counsel-rg)
   (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
+  (define-key ivy-minibuffer-map (kbd "C-c C-v") 'ivy-occur)
 
   ;; Use C-j for immediate termination with the current value, and RET for continuing
   ;; completion for that directory. This is the ido behaviour.
@@ -640,24 +640,26 @@
   (setq ido-ignore-extensions t)
   (setq ido-save-directory-list-file (concat my-auto-save-list "/ido-save-directory-list-file.el"))
   (setq ido-ignore-files ; this also works with directories with c-x c-f
-        '("\\.Rc$" "\\.dvi$" "\\.pdf$" "\\.ps$" "\\.out$" "\\.fls$" "\\.spl$" "\\.fff$"
-          "\\.ttt$" "\\.log$" "\\.ods$" "\\.eps$" "\\#$" "\\.png$" "\\~$" "\\.RData$"
-          "\\.nav$" "\\.snm$" "\\`\\.\\./" "\\`\\./" "\\.synctex.gz$" "\\.fdb_latexmk$"
-          "\\.tar.gz$" "\\.zip$" "\\.o$" "\\.tar$" "\\.Rproj$" "\\.Rcheck$" "\\.doc$"
-          "\\.docx$" "\\.Rhistory$" "auto/" "__pycache__/" "\\.bcf$" "\\.run.xml$" "_region_.tex$"
-          "\\.xdv$" "\\.DS_Store$" "\\.cfg$" "\\.bak$" "\\.gitignore" "\\.tmp$"))
+        '("\\.Rc$" "\\.dvi$" "\\.pdf$" "\\.ps$" "\\.out$" "\\.fls$" "\\.spl$"
+          "\\.fff$" "\\.ttt$" "\\.log$" "\\.ods$" "\\.eps$" "\\#$" "\\.png$" "\\~$"
+          "\\.RData$" "\\.nav$" "\\.snm$" "\\`\\.\\./" "\\`\\./" "\\.synctex.gz$"
+          "\\.fdb_latexmk$" "\\.tar.gz$" "\\.zip$" "\\.o$" "\\.tar$" "\\.Rproj$"
+          "\\.Rcheck$" "\\.doc$" "\\.docx$" "\\.Rhistory$" "auto/" "__pycache__/"
+          "\\.bcf$" "\\.run.xml$" "_region_.tex$" "\\.xdv$" "\\.DS_Store$"
+          "\\.cfg$" "\\.bak$" "\\.gitignore" "\\.tmp$"))
 
   (setq  ido-ignore-directories ; only works with ido-dired
          '("\\`auto/" "\\.prv/" "\\`CVS/" "\\`.git/" "\\`.ropeproject/" "\\`\\.\\./"
            "\\`\\./" "\\`_bookdown_files/" "__pycache__/"))
 
   (setq ido-ignore-buffers
-        '("\\` " "^\\*ESS\\*" "^\\*Messages\\*" "^\\*Help\\*" "^\\*Buffer" "*scratch*"
-          "^\\*Ibuffer*" "^\\*ESS-errors*" "^\\*Warnings*" "*TeX Help*"
-          "*Pymacs*" "*Flymake log*" "\\.log$" "^\\*.*Completions\\*$" "^\\*Ediff" "^\\*tramp"
-          "^\\*cvs-" "_region_" "^TAGS$" "^\\*Ido" "^\\*.*dictem buffer\\*$"
-          "^\\*inferior-lisp*" "^\\*Compile-Log\\*" "*output*" "\.\*output*"
-          "^\\*EGLOT*" ))
+        '("\\` " "^\\*ESS\\*" "^\\*Messages\\*" "^\\*Help\\*" "^\\*Buffer"
+          "*scratch*" "^\\*Ibuffer*" "^\\*ESS-errors*" "^\\*Warnings*" "*TeX Help*"
+          "*Pymacs*" "*Flymake log*" "\\.log$" "^\\*.*Completions\\*$" "^\\*Ediff"
+          "^\\*tramp" "^\\*cvs-" "_region_" "^TAGS$" "^\\*Ido"
+          "^\\*.*dictem buffer\\*$" "^\\*inferior-lisp*" "^\\*Compile-Log\\*"
+          "*output*" "\.\*output*" "^\\*EGLOT*" "^\\*Async-native-compile-log*"
+          "^\\*lsp-log*" "^\\*grammarly-ls::stderr*" "^\\*grammarly-ls*"))
 
   (defun ido-kill-emacs-hook () (ignore-errors (ido-save-history)))
   )
@@ -883,10 +885,11 @@
 
 (use-package flycheck
   :ensure t
-  :config
-  (setq flycheck-checker-error-threshold 1000)
-  (setq flycheck-check-syntax-automatically '(mode-enabled save))
-  (global-flycheck-mode)
+  :custom
+  (flycheck-checker-error-threshold 400)
+  (flycheck-check-syntax-automatically (quote (idle-change mode-enabled))) ; save
+  (flycheck-idle-change-delay 3) ;; Set delay based on what suits you the best
+  (global-flycheck-mode t)
 
   ;; Automatic select checkers or via lsp
   ;; (dolist (hook '(LaTeX-mode-hook))
@@ -915,9 +918,10 @@
 
 
 (use-package flycheck-grammarly
+  :defer nil
   :custom
   (flycheck-grammarly-active-modes
-   '(text-mode latex-mode LaTeX-mode org-mode markdown-mode gfm-mode))
+   '(LaTeX-mode org-mode markdown-mode gfm-mode))
   :config
   (setq flycheck-grammarly-check-time 0.8)
 
@@ -1443,7 +1447,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Language server mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 (use-package lsp-mode
   :after company
   :ensure t
