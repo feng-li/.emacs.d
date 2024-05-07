@@ -27,21 +27,38 @@
 \makeatletter
 \let\c@author\relax
 \makeatother
+
 % Then load BibLaTeX as usual
-\usepackage[style=authoryear-comp, backend=biber, maxnames=9, url=false, giveninits=true, uniquename=init, alldates=year, maxcitenames=2, natbib=true, safeinputenc]{biblatex}
+\usepackage[style=authoryear-comp, backend=biber, natbib=true,
+giveninits=true, uniquename=init, maxcitenames=2, date=year, maxbibnames=6, safeinputenc]{biblatex}
+
+% Remove "in:"
 \renewbibmacro{in:}{%
   \ifentrytype{article}{}{%
-  \printtext{\bibstring{in}\intitlepunct}}}
+      \printtext{\bibstring{in}\intitlepunct}}}
+
 \DeclareNameAlias{sortname}{family-given}
-% Remove unused entries
+
+% Remove addendum entry.
 \AtEveryBibitem{%
-  \clearfield{doi}%
   \clearfield{addendum}%
-  \clearfield{eventtitle}%
-  \clearfield{eprint}%
-  \clearfield{issn}%
+  \clearfield{url}%
   \clearlist{language}%
+  \clearfield{issn}%
+  \clearfield{pubstate}%
+  \clearfield{urlyear}%
 }
+
+% volume (number) style
+\renewbibmacro*{volume+number+eid}{%
+  \printfield{volume}%
+%  \setunit*{\adddot}% DELETED
+  \setunit*{\addnbspace}% NEW (optional); there's also \addnbthinspace
+  \printfield{number}%
+  \setunit{\addcomma\space}%
+  \printfield{eid}}
+\DeclareFieldFormat[article]{number}{\mkbibparens{#1}}
+
 % Define color for citations. Could also add "autopunct=false" in biblatex option
 \usepackage{xcolor}
 \AtEveryCite{\color{blue}}

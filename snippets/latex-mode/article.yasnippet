@@ -25,24 +25,40 @@
 
 %% BibTeX
 \usepackage[style=authoryear-comp, backend=biber, natbib=true,
-giveninits=true, uniquename=init, maxcitenames=2, date=year, maxbibnames=99, safeinputenc]{biblatex}
+giveninits=true, uniquename=init, maxcitenames=2, date=year, maxbibnames=6, safeinputenc]{biblatex}
+
+% Remove "in:"
 \renewbibmacro{in:}{%
   \ifentrytype{article}{}{%
       \printtext{\bibstring{in}\intitlepunct}}}
-  \DeclareNameAlias{sortname}{family-given}
-  \addbibresource{references-feng.bib}
+
+\DeclareNameAlias{sortname}{family-given}
+
 % Remove addendum entry.
 \AtEveryBibitem{%
   \clearfield{addendum}%
   \clearfield{url}%
   \clearlist{language}%
   \clearfield{issn}%
-  \clearfield{urlyear}%
   \clearfield{pubstate}%
+  \clearfield{urlyear}%
 }
+
+% volume (number) style
+\renewbibmacro*{volume+number+eid}{%
+  \printfield{volume}%
+%  \setunit*{\adddot}% DELETED
+  \setunit*{\addnbspace}% NEW (optional); there's also \addnbthinspace
+  \printfield{number}%
+  \setunit{\addcomma\space}%
+  \printfield{eid}}
+\DeclareFieldFormat[article]{number}{\mkbibparens{#1}}
+
 % Define color for citations. Could also add "autopunct=false" in biblatex option
 \usepackage{xcolor}
 \AtEveryCite{\color{blue}}
+
+\addbibresource{references-feng.bib}
 
 \usepackage{longtable,booktabs}
 
