@@ -5,7 +5,7 @@ elpy=${HOME}/.virtualenvs/elpy
 pip_index_url=https://pypi.tuna.tsinghua.edu.cn/simple
 
 ## Create a virtualenv
-virtualenv --python ${python} ${elpy} --always-copy --clear
+virtualenv --python ${python} ${elpy} --clear
 
 ## Activate and install packages
 source ${elpy}/bin/activate
