@@ -1,6 +1,8 @@
 #! /usr/bin/env bash
 
-python=python3.12
+# Python 3.12 dropped distutils which failed elpy
+python=python3.11
+
 elpy=${HOME}/.virtualenvs/elpy
 pip_index_url=https://pypi.tuna.tsinghua.edu.cn/simple
 
