@@ -1575,6 +1575,7 @@
  '(font-latex-math-face ((t (:foreground "dark orange"))))
  '(font-latex-sectioning-5-face ((t (:foreground "deep sky blue" :weight bold))))
  '(font-latex-sedate-face ((t (:foreground "light slate blue"))))
+ '(highlight ((t (:background "cyan" :foreground "black"))))
  '(highlight-doxygen-comment ((t (:inherit highlight))))
  '(line-number-current-line ((t (:background "black" :slant italic))))
  '(tty-menu-enabled-face ((t (:background "dim gray" :foreground "white" :weight bold)))))
