@@ -891,12 +891,11 @@
   (flycheck-idle-change-delay 3) ;; Set delay based on what suits you the best
   (global-flycheck-mode t)
 
-  ;; Automatic select checkers or via lsp
-  ;; (dolist (hook '(LaTeX-mode-hook))
-  ;;   (add-hook hook (lambda ()
-  ;;                    (flycheck-select-checker 'tex-chktex)
-  ;;                    )))
-
+  ;; Checkers for Python
+  (setq flycheck-python-flake8-executable "flake8")
+  (setq flycheck-python-pylint-executable "pylint")
+  ;; make python-pylint run after python-flake8
+  (flycheck-add-next-checker 'python-flake8 'python-pylint)
 
   )
 
@@ -1393,30 +1392,25 @@
                 ))
   )
 
-
 (use-package elpy
   :ensure t
   :config
 
   (elpy-enable)
-  (setq elpy-rpc-virtualenv-path (concat (getenv "HOME") "/.virtualenvs/elpy/"))
-  (setq elpy-rpc-python-command "python3")
-  (setq elpy-syntax-check-command (concat elpy-rpc-virtualenv-path  "bin/flake8"))
 
   ;; Disable elpy's flymake, use flycheck
-  ;; (remove-hook 'elpy-modules #'elpy-module-flymake)
   (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
 
   ;; elpy rpc
-  (define-key elpy-mode-map (kbd "C-c C-n") nil)
-  (setq flycheck-python-flake8-executable (concat elpy-rpc-virtualenv-path  "bin/flake8"))
-  (setq flycheck-python-pylint-executable (concat elpy-rpc-virtualenv-path  "bin/pylint"))
-  (setq pylint-command (concat elpy-rpc-virtualenv-path  "bin/pylint3"))
+  (setq elpy-rpc-virtualenv-path (concat (getenv "HOME") "/.virtualenvs/elpy/"))
+  (setq elpy-rpc-python-command "python3")
+  ;; (setq elpy-syntax-check-command "flake8")
 
   ;; (remove-hook 'elpy-modules 'elpy-module-pyvenv)
   (remove-hook 'elpy-modules #'elpy-module-highlight-indentation)
 
-  (define-key elpy-mode-map (kbd "C-c C-c") 'elpy-shell-send-statement-and-step)
+  (define-key elpy-mode-map (kbd "C-c C-n") nil)
+  (define-key elpy-mode-map (kbd "C-c C-c") 'elpy-shell-send-group-and-step)
   (define-key elpy-mode-map (kbd "C-c C-r") 'elpy-shell-send-region-or-buffer-and-step)
 
   ;; Alternatives to elpy-goto-definition and fallback to rgrep
@@ -1436,7 +1430,6 @@
     :config
     (define-key elpy-mode-map (kbd "C-c C-v") 'pydoc)
     )
-  ;; (local-set-key (kbd "C-c C-v") 'pydoc) ; C-c C-v was bounded to elpy-check
 
   ;; auto-format your code with "C-c C-r f" on save
   ;; (add-hook 'elpy-mode-hook (lambda ()
@@ -1484,21 +1477,6 @@
 
   (define-key lsp-mode-map (kbd "<f4> <f4>") 'lsp-describe-thing-at-point)
   )
-
-;; (use-package eglot
-;;   :ensure t
-;;   :config
-;;   ;; a workaround for error fontifying hover info
-;;   ;; https://github.com/joaotavora/eglot/discussions/1356
-;;   (setq eglot-prefer-plaintext t)
-;;   )
-
-;; ;; Using flycheck to replace flymake in eglot
-;; (use-package flycheck-eglot
-;;   :ensure t
-;;   :after (flycheck eglot)
-;;   :config
-;;   (global-flycheck-eglot-mode 1))
 
 ;; lsp-treemacs
 ;; (use-package lsp-treemacs
