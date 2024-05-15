@@ -1344,26 +1344,24 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package python
-
   :config
   (setq python-shell-interpreter "python3")
   (setq python-shell-interpreter-args "-i")
   (setq python-shell-completion-native-enable nil)
 
+  ;; Enter to indent in python.el
+  (define-key python-mode-map (kbd "C-m") 'newline-and-indent)
+
+  ;; Indent/unindent
+  (define-key python-mode-map (kbd "C-c >") 'python-indent-shift-right)
+  (define-key python-mode-map (kbd "C-c <") 'python-indent-shift-left)
+
+  (define-key python-mode-map (kbd "C-c M-r") 'python-shell-send-region)
+
   (add-hook 'python-mode-hook
             #'(lambda ()
                 ;; Enable flycheck mode
                 (flycheck-mode t)
-
-                ;; Enter to indent in python.el
-                (define-key python-mode-map (kbd "C-m") 'newline-and-indent)
-
-                ;; Tab and Shift-Tab indent/unindent
-                (define-key python-mode-map (kbd "<tab>") 'python-indent-shift-right)
-                (define-key python-mode-map (kbd "S-<tab>") 'python-indent-shift-left)
-
-                (define-key python-mode-map (kbd "C-c M-r") 'python-shell-send-region)
-
                 (defun my-python-send-line-and-step (beg end)
                   (interactive "r")
                   (if (eq beg end)
@@ -1385,10 +1383,6 @@
                               (define-key python-mode-map
                                           (kbd "C-c C-t") 'python-add-breakpoint)))
 
-                ;; Font-Lock
-                ;; (make-face 'font-lock-special-macro-face)
-                ;; (set-face-background 'font-lock-special-macro-face "magenta")
-                ;; (set-face-foreground 'font-lock-special-macro-face "white")
                 ))
   )
 
