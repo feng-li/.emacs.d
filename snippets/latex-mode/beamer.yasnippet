@@ -5,39 +5,50 @@
 # name: \documentclass{beamer} ...
 # expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil))
 # --
-\documentclass[11pt,aspectratio=169]{beamer}
+\documentclass[10pt,aspectratio=169]{beamer}
 
+%% Fonts
 \usepackage{multicol}
 \usepackage{multirow}
 \usepackage{mathabx}
 \usepackage{threeparttable}
 \usepackage[scaled]{helvet}
 \usepackage{lmodern}
+% \usepackage{eulervm}
+% \usepackage{natbib}
 \usepackage{booktabs}
 \usepackage{amsfonts}
-\usefonttheme[onlymath]{serif}
-% \usefonttheme{professionalfonts}
-\usefonttheme{structurebold}
+%\usefonttheme[onlymath]{serif}
+%\usefonttheme{professionalfonts}
+%\usefonttheme{structurebold}
 \usepackage{bm}
 \usepackage{xurl}
 
 %% Color & Theme
+\definecolor{PKUred}{RGB}{139,0,18}
 \definecolor{SUblue}{RGB}{0,0,180}
-\usecolortheme[RGB={0,0,180}]{structure}
-\usetheme{Boadilla}
+%\usecolortheme[RGB={0,0,180}]{structure}
+\usetheme{CambridgeUS}
+\setbeamertemplate{headline}{}
 \setbeamertemplate{navigation symbols}{}
 \setbeamertemplate{itemize items}[circle]
 \setbeamertemplate{enumerate items}[circle]
-\setbeamerfont{title}{size=\large}
-\setbeamerfont{frametitle}{size=\large}
-\setbeamerfont{framesubtitle}{size=\large,shape =$\color{violet}{\looparrowdownright}~$}
-\setbeamercolor{title}{fg=white, bg= SUblue!75!green}
+\setbeamerfont{title}{size=\large,series=\bfseries}
+\setbeamerfont{frametitle}{size=\large,series=\bfseries}
+\setbeamerfont{framesubtitle}{size=\large,series=\bfseries,shape =$\color{violet}{\looparrowdownright}~$}
+\setbeamercolor{title}{fg=white, bg=PKUred}
+\setbeamercolor{frametitle}{fg=PKUred}
 \setbeamercolor{framesubtitle}{fg=violet}
-%% \setlength{\leftmargini}{5pt}
+% \setlength{\leftmargini}{5pt}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=SUblue,
+  citecolor=SUblue,
+  urlcolor=SUblue}
 
 %% BibLaTeX
-\usepackage[backend=biber, style=authoryear, sorting=ydnt, url=false, dashed=none,
-maxcitenames=2, maxbibnames=99, giveninits=true, uniquename=init, hyperref=true,alldates=year, natbib=true, uniquelist=false]{biblatex}
+\usepackage[backend=biber, style=authoryear, sorting=ydnt, url=false, dashed=none, maxcitenames=2, maxbibnames=99, giveninits=true, hyperref=true,alldates=year, natbib=true, uniquelist=false, uniquename=false]{biblatex}
 \renewbibmacro{in:}{%
   \ifentrytype{article}{}{%
   \printtext{\bibstring{in}\intitlepunct}}}
@@ -66,12 +77,26 @@ maxcitenames=2, maxbibnames=99, giveninits=true, uniquename=init, hyperref=true,
 \renewcommand*\finalnamedelim{\addspace\&\space}
 \addbibresource{references-feng.bib}
 
+% Define color for citations. Could also add "autopunct=false" in biblatex option
+\AtEveryCite{\color{SUblue}}
+
+\title[Infinite forecast combinations]{Infinite forecast combinations based on Dirichlet process}
+
+\author[Feng Li]{\includegraphics[width=2cm]{pkulogo}\\
+  \vspace{0.5cm}\textbf{Feng Li}\\
+  \url{feng.li@gsm.pku.edu.cn}\\\url{http://feng.li/}}
+
+\institute[gsm.pku.edu.cn]{\footnotesize{\textbf{
+      Guanghua School of Management \\
+      Peking University}}}
+
+
 % Logo
 \usepackage{eso-pic}
 \newcommand\AtPagemyUpperLeft[1]{\AtPageLowerLeft{%
-\put(\LenToUnit{0.93\paperwidth},\LenToUnit{0.89\paperheight}){#1}}}
+\put(\LenToUnit{0.93\paperwidth},\LenToUnit{0.905\paperheight}){#1}}}
 \logo{\AddToShipoutPictureFG{
-    \AtPagemyUpperLeft{{\includegraphics[width=1cm,keepaspectratio]{cufelogoblue}}}
+    \AtPagemyUpperLeft{{\includegraphics[width=0.89cm,keepaspectratio]{pkulogored}}}
 }}
 
 \hypersetup{
@@ -80,6 +105,12 @@ maxcitenames=2, maxbibnames=99, giveninits=true, uniquename=init, hyperref=true,
   citecolor=blue,
   urlcolor=magenta}
 
+\begin{document}
+%% Title page
+\begin{frame}[plain]
+  \addtocounter{framenumber}{-1}
+  \titlepage
+\end{frame}
 
 \title[ XXX ]{\textbf{ XXX }}
 
