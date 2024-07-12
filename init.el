@@ -1181,8 +1181,8 @@
   (setq TeX-parse-self t)
   (setq TeX-auto-save t)
 
-  (setq TeX-source-correlate-method (quote source-specials)) ; only for dvi
   (setq TeX-source-correlate-method (quote synctex)) ;only for evince
+  (setq TeX-view-evince-keep-focus t)
 
   ;; RefTeX
   (setq reftex-plug-into-AUCTeX t)
