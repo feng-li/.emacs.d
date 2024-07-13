@@ -195,7 +195,7 @@
 
 ;; Global visual line mode with better indentation
 ;; (global-visual-line-mode t)
-(setq-default fill-column 90)
+(setq-default fill-column 120)
 (dolist (hook '(message-mode-hook
                 prog-mode-hook
                 org-mode-hook
@@ -484,7 +484,7 @@
   (global-set-key (kbd "M-x") 'counsel-M-x)
   (global-set-key (kbd "C-x C-f") 'counsel-find-file)
   (global-set-key (kbd "C-c G") 'counsel-git-grep)
-  (global-set-key (kbd "C-c g") 'counsel-rg)
+  (global-set-key (kbd "C-c g") 'counsel-ag) ;; find patten within git repository
   (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
   (define-key ivy-minibuffer-map (kbd "C-c C-v") 'ivy-occur)
 
