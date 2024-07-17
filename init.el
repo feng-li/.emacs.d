@@ -1254,6 +1254,18 @@
   ;; (add-hook 'ess-mode-hook
   ;;           (lambda () (flycheck-mode t)))
 
+  ;; ESS company backends with other backends
+  ;; don't auto-insert ess backends
+  (setq ess-use-company nil)
+  ;; If you want all buffers with the same mode then use company-dabbrev
+  (setq company-dabbrev-other-buffers t)
+  (defun my-ess-config ()
+    (make-variable-buffer-local 'company-backends)
+    (add-to-list 'company-backends
+                 '(company-R-library company-R-args company-R-objects company-dabbrev-code :separate)))
+  (add-hook 'ess-mode-hook #'my-ess-config)
+
+
   ;; R args at start up
   (global-set-key (kbd "<f9> <f6>") 'R) ;; The default R
   (global-set-key (kbd "<f9> r") 'ess-switch-to-end-of-ESS)
