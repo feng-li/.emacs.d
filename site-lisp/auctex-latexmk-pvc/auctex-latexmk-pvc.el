@@ -51,14 +51,14 @@
                     ((and (eq TeX-engine 'xetex)
                           TeX-PDF-mode
                           auctex-latexmk-inherit-TeX-PDF-mode)
-                     "-pdf -pdflatex=xelatex ")
+                     "-pdf -pdflatex=xelatex -shell-escape ")
                     ((and (eq TeX-engine 'pdflatex)
                           TeX-PDF-mode
                           auctex-latexmk-inherit-TeX-PDF-mode)
-                     "-pdf -pdflatex=pdflatex ")
-                    ((eq TeX-engine 'xetex) "-pdf -pdflatex=xelatex ")
-                    ((eq TeX-engine 'luatex) "-pdf -pdflatex=lualatex ")
-                    ((eq TeX-engine 'pdflatex) "-pdf -pdflatex=pdflatex ")
+                     "-pdf -pdflatex=pdflatex -shell-escape ")
+                    ((eq TeX-engine 'xetex) "-pdf -pdflatex=xelatex -shell-escape ")
+                    ((eq TeX-engine 'luatex) "-pdf -pdflatex=lualatex -shell-escape ")
+                    ((eq TeX-engine 'pdflatex) "-pdf -pdflatex=pdflatex -shell-escape ")
                     (t "")))))
   (setq-default TeX-command-list
                 (cons
