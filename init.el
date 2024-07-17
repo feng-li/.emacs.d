@@ -723,7 +723,7 @@
   (setq company-dabbrev-ignore-case nil)
 
   ;; Add yasnippet support for all company backends
-  (setq company-backends '((company-capf :with company-yasnippet)))
+  (add-to-list 'company-backends '(company-capf :with company-yasnippet))
   (defun my-text-mode-hook ()
     (setq-local company-backends
                 '((company-yasnippet
