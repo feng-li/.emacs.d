@@ -718,12 +718,17 @@
 
   (setq company-files-exclusions '(".git/" ".DS_Store"))
 
+  (setq company-transformers '(delete-consecutive-dups
+                               company-sort-by-occurrence))
+
   ;; Preserve initial cases
   (setq company-dabbrev-downcase nil)
   (setq company-dabbrev-ignore-case nil)
+  (setq company-dabbrev-other-buffers t)
 
   ;; Add yasnippet support for all company backends
   (add-to-list 'company-backends '(company-capf :with company-yasnippet))
+
   (defun my-text-mode-hook ()
     (setq-local company-backends
                 '((company-yasnippet
@@ -1258,7 +1263,6 @@
   ;; don't auto-insert ess backends
   (setq ess-use-company nil)
   ;; If you want all buffers with the same mode then use company-dabbrev
-  (setq company-dabbrev-other-buffers t)
   (defun my-ess-config ()
     (make-variable-buffer-local 'company-backends)
     (add-to-list 'company-backends
