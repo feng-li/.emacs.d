@@ -3,11 +3,12 @@
 # key: beamer
 # group: skeleton
 # name: \documentclass{beamer} ...
-# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil))
+# expand-env: ((yas-indent-line nil))
 # --
 \documentclass[10pt,aspectratio=169]{beamer}
 
 %% Fonts
+% \usepackage[scheme=plain,fontset=adobe]{ctex} % Chinese fonts support
 \usepackage{multicol}
 \usepackage{multirow}
 \usepackage{mathabx}
@@ -42,7 +43,8 @@
 % \setlength{\leftmargini}{5pt}
 
 %% Code highlight
-\usepackage[outputdir=auto]{minted}
+%% You must invoke LaTeX with the -shell-escape flag
+%% \usepackage[outputdir=auto]{minted}
 
 \hypersetup{
   colorlinks=true,
@@ -91,7 +93,9 @@
     \AtPagemyUpperLeft{{\includegraphics[width=0.89cm,keepaspectratio]{pkulogored}}}
 }}
 
-\title[Infinite forecast combinations]{Infinite forecast combinations based on Dirichlet process}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title[ XXX ]{ XXX }
 
 \author[Feng Li]{\includegraphics[width=2cm]{pkulogo}\\\\
   \vspace{0.5cm}\textbf{Feng Li}\\\\
