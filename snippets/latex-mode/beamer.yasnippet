@@ -5,7 +5,7 @@
 # name: \documentclass{beamer} ...
 # expand-env: ((yas-indent-line nil))
 # --
-\documentclass[10pt,aspectratio=169]{beamer}
+\documentclass[10.5pt,aspectratio=1610,usepdftitle=false]{beamer}
 
 %% Fonts
 % \usepackage[scheme=plain,fontset=adobe]{ctex} % Chinese fonts support
@@ -42,7 +42,7 @@
 \setbeamercolor{framesubtitle}{fg=violet}
 % \setlength{\leftmargini}{5pt}
 
-%% Code highlight
+%% Code highlighting
 %% You must invoke LaTeX with the -shell-escape flag
 %% \usepackage[outputdir=auto]{minted}
 
@@ -93,6 +93,14 @@
     \AtPagemyUpperLeft{{\includegraphics[width=0.89cm,keepaspectratio]{pkulogored}}}
 }}
 
+
+\hypersetup
+{
+  pdfauthor={Feng Li, 李丰},
+  pdfsubject={Feng Li, 李丰 Research Talks},
+  pdftitle={Feng Li, 李丰 Research Talks},
+  pdfkeywords={Feng Li, 李丰, https://feng.li/talks/}
+}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \title[ XXX ]{ XXX }
