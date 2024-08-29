@@ -1361,6 +1361,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package python
+  :ensure t
   :config
   (setq python-shell-interpreter "python3")
   (setq python-shell-interpreter-args "-i")
@@ -1372,6 +1373,10 @@
   ;; Indent/unindent
   (define-key python-mode-map (kbd "C-c >") 'python-indent-shift-right)
   (define-key python-mode-map (kbd "C-c <") 'python-indent-shift-left)
+
+  ;; Disable "python-shell-send-buffer" default binding.
+  (define-key python-mode-map (kbd "C-c C-c") nil)
+  (define-key python-ts-mode-map (kbd "C-c C-c") nil)
 
   (define-key python-mode-map (kbd "C-c M-r") 'python-shell-send-region)
 
@@ -1403,6 +1408,7 @@
                 ))
   )
 
+
 (use-package elpy
   :ensure t
   :config
@@ -1419,8 +1425,8 @@
 
   ;; (remove-hook 'elpy-modules 'elpy-module-pyvenv)
   (remove-hook 'elpy-modules #'elpy-module-highlight-indentation)
-
   (define-key elpy-mode-map (kbd "C-c C-n") nil)
+
   (define-key elpy-mode-map (kbd "C-c C-c") 'elpy-shell-send-group-and-step)
   (define-key elpy-mode-map (kbd "C-c C-r") 'elpy-shell-send-region-or-buffer-and-step)
 
