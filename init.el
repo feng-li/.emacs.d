@@ -263,8 +263,11 @@
 (use-package treesit-auto
   :custom
   (treesit-auto-install 'prompt)
+  (treesit-extra-load-path (list (concat my-base-save-list "tree-sitter/")))
+
   :config
   (treesit-auto-add-to-auto-mode-alist 'all)
+
   (global-treesit-auto-mode))
 
 ;; Unfilling a region joins all the lines in a paragraph into a single line for each
