@@ -801,6 +801,7 @@
 
 ;; Commenting
 (global-set-key (kbd "M-3") 'comment-or-uncomment-region)
+(global-set-key (kbd "M-0") 'comment-or-uncomment-region) ;; mirror
 
 ;; Add extra info path
 (use-package info-look
@@ -1420,7 +1421,8 @@
   (elpy-enable)
 
   ;; Disable elpy's flymake, use flycheck
-  (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+  (remove-hook 'elpy-modules #'elpy-module-flymake)
+  (define-key elpy-mode-map (kbd "C-c C-p") nil)
 
   ;; elpy rpc
   (setq elpy-rpc-virtualenv-path (concat (getenv "HOME") "/.virtualenvs/elpy/"))
