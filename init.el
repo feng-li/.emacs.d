@@ -1274,6 +1274,10 @@
                  '(company-R-library company-R-args company-R-objects company-dabbrev-code :separate)))
   (add-hook 'ess-mode-hook #'my-ess-config)
 
+  ;; disable fancy comments. By default, comments beginning with ‘###’ are aligned to the beginning of the
+  ;; line. Comments beginning with ‘##’ are aligned to the current level of indentation for the block containing the
+  ;; comment. Finally, comments beginning with ‘#’ are aligned to a column on the righ
+  (setq ess-indent-with-fancy-comments nil)
 
   ;; R args at start up
   (global-set-key (kbd "<f9> <f6>") 'R) ;; The default R
