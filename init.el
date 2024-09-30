@@ -268,7 +268,8 @@
   :config
   (treesit-auto-add-to-auto-mode-alist 'all)
 
-  (global-treesit-auto-mode))
+  (global-treesit-auto-mode)
+  )
 
 ;; Unfilling a region joins all the lines in a paragraph into a single line for each
 ;; paragraphs in that region. It is the contrary of fill-region.
@@ -900,12 +901,16 @@
   (flycheck-check-syntax-automatically (quote (idle-change mode-enabled))) ; save
   (flycheck-idle-change-delay 3) ;; Set delay based on what suits you the best
   (global-flycheck-mode t)
+  (flycheck-add-next-checker 'python-flake8 'python-pylint)
+  (flycheck-flake8rc '(".flake8" "setup.cfg" "tox.ini"
+                       "~/.config/flake8/setup.cfg"
+                       "~/.config/flake8/tox.ini"))
 
+  :config
   ;; Checkers for Python
   (setq flycheck-python-flake8-executable "flake8")
   (setq flycheck-python-pylint-executable "pylint")
   ;; make python-pylint run after python-flake8
-  (flycheck-add-next-checker 'python-flake8 'python-pylint)
 
   )
 
