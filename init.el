@@ -999,11 +999,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; TAGS
-(setq tags-table-list
-      '("~/code/TAGS/R/"
-        "~/code/TAGS/PYTHON/"
-        "~/code/TAGS/C/"
-        "~/code/TAGS/FORTRAN/"))
+;; (setq tags-table-list
+;;       '("~/code/TAGS/R/"
+;;         "~/code/TAGS/PYTHON/"
+;;         "~/code/TAGS/C/"
+;;         "~/code/TAGS/FORTRAN/"))
+
 (dolist (hook '(after-text-mode-hook ess-mode-hook python-mode-hook c-mode-hook c++-mode-hook inferior-ess-mode-hook))
   (add-hook hook #'(lambda () (xref-etags-mode))))
 
@@ -1426,7 +1427,6 @@
 (use-package elpy
   :ensure t
   :config
-
   (elpy-enable)
 
   ;; Disable elpy's flymake, use flycheck
@@ -1436,6 +1436,7 @@
   ;; elpy rpc
   (setq elpy-rpc-virtualenv-path (concat (getenv "HOME") "/.virtualenvs/elpy/"))
   (setq elpy-rpc-python-command "python3")
+  (setq elpy-rpc-backend "jedi")
   ;; (setq elpy-syntax-check-command "flake8")
 
   ;; (remove-hook 'elpy-modules 'elpy-module-pyvenv)
@@ -1477,7 +1478,16 @@
   :ensure t
   :commands (lsp lsp-deferred)
   :custom
-  (lsp-diagnostics-provider :none)
+  (lsp-diagnostics-provider :flycheck) ; could be :none
+  (lsp-diagnostics-flycheck-default-level 'warning)
+
+  ;;(lsp-clients-pylsp-library-directories "~/.virtualenvs/elpy/")
+  (lsp-pylsp-server-command "~/.virtualenvs/elpy/bin/pylsp")
+  (lsp-pylsp-plugins-flake8-enabled t)
+  (lsp-pylsp-plugins-flake8-config "~/.config/flake8/tox.ini")
+  (lsp-pylsp-plugins-black-enabled t)
+  (lsp-pylsp-plugins-isort-enabled t) ; auto sort Python imports
+
 
   :config
   (setq lsp-keymap-prefix "C-c l")
@@ -1485,7 +1495,6 @@
   (setq lsp-session-file (concat my-auto-save-list "/lsp-session-v1"))
   (setq lsp-restart 'ignore)  ;; How server-exited events must be handled.
   (setq lsp-verify-signature nil) ;; Disable to get metals server (key expired) working
-  (setq lsp-prefer-flymake nil) ;; use flycheck
   (setq lsp-headerline-breadcrumb-enable nil)
   (setq lsp-ui-doc-show-with-cursor nil) ;; disable cursor hover (keep mouse hover)
 
@@ -1498,11 +1507,7 @@
 
   ;; Only enable certain LSP client and do not ask for server install.
   ;; (setq lsp-enabled-clients '(metals pylsp texlab2 grammarly-ls))
-  (setq lsp-enabled-clients '(metals pylsp grammarly-ls))
-
-  ;;(setq lsp-clients-pylsp-library-directories "~/.virtualenvs/elpy/")
-  (setq lsp-pylsp-server-command "~/.virtualenvs/elpy/bin/pylsp")
-
+  (setq lsp-enabled-clients '(metals pyls pylsp ruff semgrep-ls grammarly-ls))
 
   (setq lsp-auto-guess-root nil)
   (setq lsp-warn-no-matched-clients nil)
