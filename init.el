@@ -259,17 +259,6 @@
                 ))
   (add-hook hook #'(lambda () (auto-fill-mode 1))))
 
-;; Tree-sitter mode
-(use-package treesit-auto
-  :custom
-  (treesit-auto-install 'prompt)
-  (treesit-extra-load-path (list (concat my-base-save-list "tree-sitter/")))
-
-  :config
-  (treesit-auto-add-to-auto-mode-alist 'all)
-
-  (global-treesit-auto-mode)
-  )
 
 ;; Unfilling a region joins all the lines in a paragraph into a single line for each
 ;; paragraphs in that region. It is the contrary of fill-region.
@@ -431,14 +420,25 @@
   :config
   (electric-pair-mode t)
 
-  (dolist (hook '(python-mode-hook c-mode-hook c++-mode-hook LaTeX-mode-hook ess-r-mode-hook))
+  (dolist (hook
+           '(python-mode-hook
+             python-ts-mode
+             c-mode-hook
+             c++-mode-hook
+             LaTeX-mode-hook
+             ess-r-mode-hook))
     (add-hook hook #'(lambda () (electric-operator-mode 1))))
-  (apply #'electric-operator-add-rules-for-mode 'inferior-python-mode
-         (electric-operator-get-rules-for-mode 'python-mode))
+
+  ;; Customize rules
+  (electric-operator-add-rules-for-mode 'python-mode (cons "*" nil))
+  (electric-operator-add-rules-for-mode 'python-mode (cons "/" nil))
+  (electric-operator-add-rules-for-mode 'python-mode (cons "?" nil))
+
+  ;; Add support for various treesitter based modes
+  (apply #'electric-operator-add-rules-for-mode 'inferior-python-mode (electric-operator-get-rules-for-mode 'python-mode))
+  (apply #'electric-operator-add-rules-for-mode 'python-ts-mode (electric-operator-get-rules-for-mode 'python-mode))
+
   (setq electric-operator-R-named-argument-style "spaced")
-  (electric-operator-add-rules-for-mode 'prog-mode (cons "*" nil))
-  (electric-operator-add-rules-for-mode 'prog-mode (cons "/" nil))
-  (electric-operator-add-rules-for-mode 'prog-mode (cons "?" nil))
   )
 
 ;; Goto matched parenthesis
@@ -1509,6 +1509,10 @@
   ;; (setq lsp-enabled-clients '(metals pylsp texlab2 grammarly-ls))
   (setq lsp-enabled-clients '(metals pyls pylsp ruff semgrep-ls grammarly-ls))
 
+  ;;(setq lsp-clients-pylsp-library-directories "~/.virtualenvs/elpy/")
+  (setq lsp-pylsp-server-command "~/.virtualenvs/elpy/bin/pylsp")
+
+
   (setq lsp-auto-guess-root nil)
   (setq lsp-warn-no-matched-clients nil)
 
@@ -1599,6 +1603,18 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Configurations that need to run in the end of init file
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Tree-sitter mode
+(use-package treesit-auto
+  :custom
+  (treesit-auto-install 'prompt)
+  (treesit-extra-load-path (list (concat my-base-save-list "tree-sitter/")))
+
+  :config
+  (treesit-auto-add-to-auto-mode-alist 'all)
+
+  (global-treesit-auto-mode)
+  )
 
 (use-package envrc
   :hook (after-init . envrc-global-mode)
