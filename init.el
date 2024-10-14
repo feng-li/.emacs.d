@@ -246,6 +246,7 @@
 
 ;; set big kill ring
 (setq kill-ring-max 150)
+(global-set-key (kbd "C-k") 'kill-whole-line)
 
 ;; auto-fill mode
 (dolist (hook '(;;prog-mode-hook
@@ -1641,6 +1642,7 @@
  '(highlight ((t (:background "cyan" :foreground "black"))))
  '(highlight-doxygen-comment ((t (:inherit highlight))))
  '(line-number-current-line ((t (:background "black" :slant italic))))
+ '(region ((t (:extend nil :background "brightblack"))))
  '(tty-menu-enabled-face ((t (:background "dim gray" :foreground "white" :weight bold)))))
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
