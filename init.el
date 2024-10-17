@@ -63,7 +63,7 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(envrc imenu-list flycheck-grammarly lsp-latex lean-mode treesit-auto writegood-mode multiple-cursors pinyinlib company counsel swiper ivy ht flycheck-languagetool lsp-grammarly lsp-metals notmuch poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
+   '(jinx envrc imenu-list lsp-latex lean-mode treesit-auto writegood-mode multiple-cursors pinyinlib company counsel swiper ivy ht flycheck-languagetool lsp-metals notmuch poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
  '(safe-local-variable-values '((TeX-engine . pdflatex)))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
@@ -880,12 +880,23 @@
 
   (global-set-key (kbd "<f9> 4") 'ispell-word))
 
+;; jinx directly calling the widely-used API of the Enchant library.
+(use-package jinx
+  :hook (emacs-startup . global-jinx-mode)
+  :bind (("M-4" . jinx-correct)
+	 ("C-M-$" . jinx-languages))
+
+  :config
+  (add-to-list 'jinx-exclude-regexps '(t "\\cc")) ;; Disable Chinese check
+  )
+
 ;; Auto correct spelling mistakes
 (global-set-key (kbd "<f9> c") 'flyspell-auto-correct-word)
 
 (with-eval-after-load 'comint
   (define-key comint-mode-map (kbd "C-d") nil)
   )
+
 
 ;; FlyCheck
 ;; Enable nice rendering of diagnostics like compile errors.
@@ -898,7 +909,7 @@
 (use-package flycheck
   :ensure t
   :custom
-  (flycheck-checker-error-threshold 400)
+  (flycheck-checker-error-threshold 800)
   (flycheck-check-syntax-automatically (quote (idle-change mode-enabled))) ; save
   (flycheck-idle-change-delay 3) ;; Set delay based on what suits you the best
   (global-flycheck-mode t)
@@ -932,21 +943,16 @@
   )
 
 
-(use-package flycheck-grammarly
-  :defer nil
-  :custom
-  (flycheck-grammarly-active-modes
-   '(LaTeX-mode org-mode markdown-mode gfm-mode))
-  :config
-  (setq flycheck-grammarly-check-time 0.8)
+;; (use-package flycheck-grammarly
+;;   :defer nil
+;;   :custom
+;;   (flycheck-grammarly-active-modes
+;;    '(LaTeX-mode org-mode markdown-mode gfm-mode))
+;;   :config
+;;   (setq flycheck-grammarly-check-time 0.8)
 
-  ;; Automatic select checkers
-  ;; (dolist (hook '(markdown-mode-hook))
-  ;;   (add-hook hook (lambda ()
-  ;;                    (flycheck-select-checker 'grammarly)
-  ;;                    )))
-  (flycheck-grammarly-setup)
-  )
+;;   (flycheck-grammarly-setup)
+;;   )
 
 (use-package synosaurus
   :config
@@ -1508,7 +1514,7 @@
 
   ;; Only enable certain LSP client and do not ask for server install.
   ;; (setq lsp-enabled-clients '(metals pylsp texlab2 grammarly-ls))
-  (setq lsp-enabled-clients '(metals pyls pylsp ruff semgrep-ls grammarly-ls))
+  ;; (setq lsp-enabled-clients '(metals pyls pylsp ruff semgrep-ls grammarly-ls))
 
   ;;(setq lsp-clients-pylsp-library-directories "~/.virtualenvs/elpy/")
   (setq lsp-pylsp-server-command "~/.virtualenvs/elpy/bin/pylsp")
@@ -1585,21 +1591,21 @@
 ;;;   )
 
 ;; grammerly for lsp
-(use-package lsp-grammarly
-  :ensure t
-  :defer t
-  ;; Comment out to start manually
-  :hook ((latex-mode org-mode)
-         . (lambda ()
-             (require 'lsp-grammarly)
-             (lsp-deferred)))  ;; or lsp
+;; (use-package lsp-grammarly
+;;   :ensure t
+;;   :defer t
+;;   ;; Comment out to start manually
+;;   :hook ((latex-mode org-mode)
+;;          . (lambda ()
+;;              (require 'lsp-grammarly)
+;;              (lsp-deferred)))  ;; or lsp
 
-  :config
-  (setq lsp-grammarly-active-modes '(latex-mode org-mode))
-  (setq lsp-grammarly-auto-activate nil)
-  (setq lsp-grammarly-domain "academic")
-  (setq lsp-grammarly-user-words (concat (getenv "HOME") "/.hunspell_en_US"))
-  )
+;;   :config
+;;   (setq lsp-grammarly-active-modes '(latex-mode org-mode))
+;;   (setq lsp-grammarly-auto-activate nil)
+;;   (setq lsp-grammarly-domain "academic")
+;;   (setq lsp-grammarly-user-words (concat (getenv "HOME") "/.hunspell_en_US"))
+;;   )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Configurations that need to run in the end of init file
@@ -1642,8 +1648,8 @@
  '(highlight ((t (:background "cyan" :foreground "black"))))
  '(highlight-doxygen-comment ((t (:inherit highlight))))
  '(line-number-current-line ((t (:background "black" :slant italic))))
- '(region ((t (:extend nil :background "brightblack"))))
- '(tty-menu-enabled-face ((t (:background "dim gray" :foreground "white" :weight bold)))))
+ '(region ((t (:extend nil :background "blue"))))
+ '(tty-menu-enabled-face ((t (:background "dimgray" :foreground "white" :weight bold)))))
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
 (provide '.emacs)
