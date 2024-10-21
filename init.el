@@ -63,7 +63,7 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(gptel jinx envrc imenu-list lsp-latex lean-mode treesit-auto writegood-mode multiple-cursors pinyinlib company counsel swiper ivy ht flycheck-languagetool lsp-metals notmuch poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
+   '(proxy-mode gptel jinx envrc imenu-list lsp-latex lean-mode treesit-auto writegood-mode multiple-cursors pinyinlib company counsel swiper ivy ht flycheck-languagetool lsp-metals notmuch poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
  '(safe-local-variable-values '((TeX-engine . pdflatex)))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
@@ -509,7 +509,7 @@
 
   )
 
-;; let `ivy-read' support chinese pinyin, toggle with `
+;; let `ivy-read' support Chinese pinyin, toggle with `
 (use-package pinyinlib
   :ensure t
   :config
@@ -1607,6 +1607,16 @@
 ;;   (setq lsp-grammarly-user-words (concat (getenv "HOME") "/.hunspell_en_US"))
 ;;   )
 
+;; Proxy
+(use-package proxy-mode
+  :ensure t
+  :custom ((proxy-mode-emacs-http-proxy
+            '(("http"  . "127.0.0.1:7890")
+              ("https" . "127.0.0.1:7890")
+              ;; NOTE: don't use `localhost', avoid local server like robe no response
+              ("no_proxy" . "127.0.0.1")))
+           (proxy-mode-emacs-socks-proxy '("Default server" "127.0.0.1" 7890 5)))
+  :commands (proxy-mode))
 
 ;; GPT Interface
 (use-package gptel
