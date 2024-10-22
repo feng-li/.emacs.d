@@ -1625,6 +1625,7 @@
 
   :custom
   (gptel-use-curl nil) ;; Hotfix for a bug
+  (global-set-key (kbd "<f9> c") 'gptel)
   ;; (gptel-stream nil)
 
   )
