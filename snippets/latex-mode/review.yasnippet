@@ -24,7 +24,7 @@
 
 %% BibLaTeX
 \usepackage[style=authoryear-comp, backend=biber, natbib=true,
-giveninits=true, uniquename=init, maxcitenames=2, date=year, maxbibnames=6, safeinputenc]{biblatex}
+giveninits=true, uniquename=false, maxcitenames=2, date=year, maxbibnames=6, safeinputenc]{biblatex}
 
 % Remove "in:"
 \renewbibmacro{in:}{%
@@ -46,7 +46,7 @@ giveninits=true, uniquename=init, maxcitenames=2, date=year, maxbibnames=6, safe
 % volume (number) style
 \renewbibmacro*{volume+number+eid}{%
   \printfield{volume}%
-%  \setunit*{\adddot}% DELETED
+  % \setunit*{\adddot}% DELETED
   \setunit*{\addnbspace}% NEW (optional); there's also \addnbthinspace
   \printfield{number}%
   \setunit{\addcomma\space}%
@@ -69,24 +69,30 @@ giveninits=true, uniquename=init, maxcitenames=2, date=year, maxbibnames=6, safe
   urlcolor=blue}
 
 %% Table numbering
-\renewcommand{\thetable}{S.\arabic{table}}
-\renewcommand{\thefigure}{S.\arabic{figure}}
+\usepackage[compact,center]{titlesec}
+% Customize section sizes
+\titleformat{\section}{\center\large\bfseries}{\thesection}{0em}{}
+\titleformat{\subsection}{\center\normalsize\bfseries}{\thesubsection}{0em}{}
+\titleformat{\subsubsection}{\center\small\itshape}{\thesubsubsection}{0em}{}
 
-  \usepackage[compact,center]{titlesec}
-  \titlespacing{\section}{0pt}{0ex}{0ex}
-  \titlespacing{\subsection}{0pt}{0ex}{0ex}
-  \titlespacing{\subsubsection}{0pt}{0ex}{0ex}
-  \usepackage{titling}
-  \setlength{\droptitle}{-2cm}
-  \predate{}
-  \postdate{}
-  % \pretitile{}
-  % \posttitle{}
-  % \preauthor{\}
-  % \postauthor{}
-  \usepackage{enumitem}
-  \setlist[enumerate,itemize]{listparindent=\parindent,leftmargin=*}% Indented paragraphs within lists
-  \setlength{\itemsep}{0.0pt}
+\titlespacing{\section}{0pt}{0ex}{0ex}
+\titlespacing{\subsection}{0pt}{0ex}{0ex}
+\titlespacing{\subsubsection}{0pt}{0ex}{0ex}
+\usepackage{titling}
+\setlength{\droptitle}{-2cm}
+\predate{}
+\postdate{}
+% \pretitile{}
+% \posttitle{}
+% \preauthor{}
+% \postauthor{}
+\usepackage{enumitem}
+\setlist[enumerate,itemize]{listparindent=\parindent,leftmargin=*}% Indented paragraphs within lists
+\setlength{\itemsep}{0.0pt}
+
+%% Appendix numbering
+%% \renewcommand{\thetable}{S.\arabic{table}}
+%% \renewcommand{\thefigure}{S.\arabic{figure}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
