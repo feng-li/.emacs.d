@@ -1289,16 +1289,16 @@
 
   ;; disable fancy comments. By default, comments beginning with ‘###’ are aligned to the beginning of the
   ;; line. Comments beginning with ‘##’ are aligned to the current level of indentation for the block containing the
-  ;; comment. Finally, comments beginning with ‘#’ are aligned to a column on the righ
-  (setq ess-indent-with-fancy-comments nil)
+  ;; comment. Finally, comments beginning with ‘#’ are aligned to a column on the right.
+  ;; https://github.com/emacs-ess/ESS/issues/1175
+  (setf (cdr (assoc 'ess-indent-with-fancy-comments ess-own-style-list)) nil)
+  (setq ess-indent-with-fancy-comments nil) ;; take effect only if ess-style is DEFAULT
+  (setq ess-style 'OWN)
 
   ;; R args at start up
   (global-set-key (kbd "<f9> <f6>") 'R) ;; The default R
   (global-set-key (kbd "<f9> r") 'ess-switch-to-end-of-ESS)
   (setq-default inferior-R-args "--no-save --no-restore-data -q")
-
-  ;; Let ESS Sweave work with AUCTEX
-  (setq ess-swv-plug-into-AUCTeX-p t)
 
   ;; Let evaluation not viability to nil, cause emacs hang
   (setq ess-eval-visibly-p nil)
@@ -1625,8 +1625,18 @@
 
   :custom
   (gptel-use-curl nil) ;; Hotfix for a bug
-  (global-set-key (kbd "<f9> c") 'gptel)
   ;; (gptel-stream nil)
+
+  :config
+  (global-set-key (kbd "<f9> c") 'gptel)
+
+  ;; Checks if the opened file has a `GPT.md` extension and enables `my-minor-mode` when it does.
+  (defun my-enable-minor-mode ()
+  "Enable my-minor-mode for specific files."
+  (when (string-equal buffer-file-name "GPT.md")
+    (proxy-mode 1)
+    (gptel-mode 1)))  ; Enable minor mode for particular file
+  (add-hook 'find-file-hook 'my-enable-minor-mode)
 
   )
 
