@@ -92,8 +92,8 @@
 (setq auto-save-list-file-prefix (concat my-auto-save-list "/.saves-"))
 
 ;; Term
-(setenv "TERM" "screen-256color")
-(add-to-list 'term-file-aliases '("dumb" . "screen-256color"))
+(setenv "TERM" "xterm-256color")
+(add-to-list 'term-file-aliases '("dumb" . "xterm-256color"))
 ;; Allow shift-arrow keys and control-arrow keys under different tty
 ;; Set export TERM="xterm" in .bashrc and
 ;; term "xterm" in .screenrc.
