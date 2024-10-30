@@ -1123,6 +1123,14 @@
   (setq-default TeX-engine 'xetex) ;this can be set locally
   (setq TeX-engine-alist '((pdflatex "PDFLaTeX" "pdflatex" "pdflatex" "pdflatex"))) ; Add PDFLaTeX as engine option
 
+
+  ;; LaTeX symbols for for TeX mode
+  (defun my-latex-mode-setup ()
+    (setq-local company-backends
+                (append '((company-math-symbols-latex company-latex-commands))
+                        company-backends)))
+  (add-hook 'TeX-mode-hook 'my-latex-mode-setup)
+
   ;; LATEXMK integration
   (use-package auctex-latexmk)
   ;; (auctex-latexmk-setup) ; not needed auctex-latexmk-pvc already called.
@@ -1629,6 +1637,7 @@
 
   :config
   (global-set-key (kbd "<f9> c") 'gptel)
+  (global-set-key (kbd "<f9> w") 'gptel-rewrite-menu)
 
   ;; Checks if the opened file has a `GPT.md` extension and enables `my-minor-mode` when it does.
   (defun my-enable-minor-mode ()

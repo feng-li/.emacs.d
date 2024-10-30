@@ -24,9 +24,10 @@
 %% Page margin and line spacing
 \usepackage{geometry}
 \geometry{margin=1in}
-\linespread{1.25}
+% \linespread{1.25}
+\linespread{1.5}
 
-%% BibTeX
+%% BibLaTeX
 \usepackage[style=authoryear-comp, backend=biber, natbib=true,
 giveninits=true, uniquename=init, maxcitenames=2, date=year, maxbibnames=6, safeinputenc]{biblatex}
 
@@ -75,9 +76,9 @@ giveninits=true, uniquename=init, maxcitenames=2, date=year, maxbibnames=6, safe
 %% Table numbering
 \usepackage[compact,center]{titlesec}
 % Customize section sizes
-\titleformat{\section}{\center\large\bfseries}{\thesection}{0em}{}
-\titleformat{\subsection}{\center\normalsize\bfseries}{\thesubsection}{0em}{}
-\titleformat{\subsubsection}{\center\small\itshape}{\thesubsubsection}{0em}{}
+\titleformat{\section}{\center\large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\center\normalsize\bfseries}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}{\center\small\itshape}{\thesubsubsection}{1em}{}
 
 \titlespacing{\section}{0pt}{0ex}{0ex}
 \titlespacing{\subsection}{0pt}{0ex}{0ex}
