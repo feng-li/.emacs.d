@@ -278,6 +278,13 @@
                 (display-buffer-reuse-window display-buffer-below-selected)
                 (reusable-frames . visible)
                 (window-height . 0.4)))
+
+;; Security
+(setq enable-dir-local-variables t) ;; Trust .dir-locals.el
+(add-hook 'text-mode-hook
+          ;; allow file-local variables in Emacs
+          (lambda () (setq-local enable-local-variables :all)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Global key bindings
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
