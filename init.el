@@ -713,6 +713,12 @@
 (use-package yasnippet
   :ensure t
   :config
+
+  ;; Make yasnippet treat LaTeX-mode as latex-mode
+  (add-hook 'LaTeX-mode-hook
+            (lambda ()
+              (yas-activate-extra-mode 'latex-mode)))
+
   (yas-global-mode 1)
   ;; (setq yas-snippet-dirs
   ;;       '(;; personal snippets
@@ -721,6 +727,7 @@
   ;;         ;; "~/.emacs.d/site-lisp/yasnippet-snippets/snippets"
   ;;         ))
   )
+
 (use-package company
   :ensure t
   :config
@@ -744,6 +751,7 @@
   (setq company-dabbrev-ignore-case nil)
   (setq company-dabbrev-other-buffers t)
 
+
   ;; Add yasnippet support for all company backends
   (add-to-list 'company-backends '(company-capf :with company-yasnippet))
 
@@ -755,9 +763,6 @@
                   company-files)))
   (add-hook 'text-mode-hook #'my-text-mode-hook)
   (setq company-tooltip-limit 10)
-
-  ;; tab to select
-  (company-tng-configure-default)
 
   ;; https://github.com/abo-abo/oremacs/issues/38#issuecomment-948472184
   (setq company-show-quick-access t)
@@ -1122,6 +1127,9 @@
   :ensure auctex
   :config
 
+  ;; Force to enable LaTeX-mode when working with .tex files
+  (add-to-list 'auto-mode-alist '("\\.tex\\'" . LaTeX-mode))
+
   (setq TeX-save-query  nil )
 
   ;; LaTeX AUCTeX features
@@ -1205,7 +1213,6 @@
                         (?w "\\textsw{"     "}")
                         (?d "" "" t)))
 
-
                 ;; Use \bm{} to repace \mathbf{}
                 ;; (add-to-list 'LaTeX-font-list
                 ;;              '(m "\\bm{" "}"))
@@ -1265,6 +1272,7 @@
                 (setq company-backends (copy-tree company-backends))
                 (setf (car company-backends)
                       (append '(company-reftex-labels company-reftex-citations) (car company-backends)))
+
                 ))
 
   (setq reftex-cite-format 'natbib)
