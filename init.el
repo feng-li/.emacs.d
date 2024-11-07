@@ -908,6 +908,7 @@
 
   :config
   (add-to-list 'jinx-exclude-regexps '(t "\\cc")) ;; Disable Chinese check
+
   )
 
 ;; Auto correct spelling mistakes
