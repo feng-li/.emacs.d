@@ -738,13 +738,28 @@
 
   (setq company-files-exclusions '(".git/" ".DS_Store" "auto/"))
 
-  (setq company-transformers '(delete-consecutive-dups
-                               company-sort-by-occurrence))
-
+  ;; Remove duplicate candidates
+  (require 'cl-lib)
   (defun my-company-remove-duplicates (candidates)
-    "Remove duplicate CANDIDATES."
     (cl-remove-duplicates candidates :test #'equal))
-  (add-to-list 'company-transformers 'my-company-remove-duplicates)
+  (defun my-company-prioritize-yasnippet (candidates)
+    "Ensure that yasnippet candidates appear first in the completion list."
+    (let ((yasnippet-candidates (cl-remove-if-not
+                                 (lambda (candidate)
+                                   (get-text-property 0 'yas-annotation candidate))
+                                 candidates))
+          (other-candidates (cl-remove-if
+                             (lambda (candidate)
+                               (get-text-property 0 'yas-annotation candidate))
+                             candidates)))
+      (append yasnippet-candidates other-candidates)))
+
+  (setq company-transformers '(my-company-prioritize-yasnippet
+                               my-company-remove-duplicates
+                               company-sort-by-occurrence
+                               ))
+
+
 
   ;; Preserve initial cases
   (setq company-dabbrev-downcase nil)

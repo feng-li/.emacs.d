@@ -2,4 +2,4 @@
 # name: Equation \ref{...}
 # key: Eq
 # --
-Equation~\ref{$1} $0
+Equation~(\ref{$1}) $0
