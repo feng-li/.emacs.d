@@ -1160,7 +1160,7 @@
   ;; Set default TeX engine
   (setq TeX-PDF-mode t)
   (setq-default TeX-engine 'xetex) ;this can be set locally
-  (setq TeX-engine-alist '((pdflatex "PDFLaTeX" "pdflatex" "pdflatex" "pdflatex"))) ; Add PDFLaTeX as engine option
+  ;; (setq TeX-engine-alist '((pdflatex "PDFLaTeX" "pdflatex" "pdflatex" "pdflatex"))) ; Add PDFLaTeX as engine option
 
 
   ;; LaTeX symbols for for TeX mode
@@ -1183,11 +1183,12 @@
       (interactive)
       (TeX-save-document (TeX-master-file))
       (TeX-command "LatexMkPvc" 'TeX-master-file -1))
+    (define-key LaTeX-mode-map (kbd "C-c C-c") 'TeX-command-run-latexmkpvc)
 
     ;; Replace LaTeX with latexmk -pvc
-    (setcdr (assoc "LaTeX" TeX-command-list)
-            '("latexmk -pvc -pv- %(-PDF)%S%(mode) %(file-line-error) %(extraopts) %t" TeX-run-latexmk-pvc nil
-              :help "Run LaTeX with `latexmk -pvc`"))
+    ;; (setcdr (assoc "LaTeX" TeX-command-list)
+    ;;         '("latexmk -pvc -pv- %(-PDF)%S%(mode) %(file-line-error) %(extraopts) %t" TeX-run-latexmk-pvc nil
+    ;;           :help "Run LaTeX with `latexmk -pvc`"))
     ) ; provide LatexMkPvc command
 
   ;; Other settings
