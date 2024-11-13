@@ -63,7 +63,7 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(proxy-mode gptel jinx envrc imenu-list lsp-latex lean-mode treesit-auto writegood-mode multiple-cursors pinyinlib company counsel swiper ivy ht flycheck-languagetool lsp-metals notmuch poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
+   '(pdf-tools proxy-mode gptel jinx envrc imenu-list lsp-latex lean-mode treesit-auto writegood-mode multiple-cursors pinyinlib company counsel swiper ivy ht flycheck-languagetool lsp-metals notmuch poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
  '(safe-local-variable-values '((TeX-engine . pdflatex)))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
@@ -1185,10 +1185,11 @@
       (TeX-command "LatexMkPvc" 'TeX-master-file -1))
     (define-key LaTeX-mode-map (kbd "C-c C-c") 'TeX-command-run-latexmkpvc)
 
-    ;; Replace LaTeX with latexmk -pvc
-    ;; (setcdr (assoc "LaTeX" TeX-command-list)
-    ;;         '("latexmk -pvc -pv- %(-PDF)%S%(mode) %(file-line-error) %(extraopts) %t" TeX-run-latexmk-pvc nil
-    ;;           :help "Run LaTeX with `latexmk -pvc`"))
+    ;; Replace the "LaTeX" entry in `TeX-command-list` to call `TeX-command-run-latexmkpvc`
+    (setcdr (assoc "LaTeX" TeX-command-list)
+            '(TeX-command-run-latexmkpvc
+              TeX-run-function nil t
+              :help "Run LatexMkPvc"))
     ) ; provide LatexMkPvc command
 
   ;; Other settings
