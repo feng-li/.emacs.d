@@ -1263,7 +1263,14 @@
   (setq reftex-toc-split-windows-horizontally t)
   (setq reftex-toc-split-windows-fraction 0.3)
 
-  ;; Extra keybinds for RefTeX
+  ;; Enable auto-revert-mode for .bib files
+  (add-to-list 'auto-mode-alist
+               '("\\.bib\\'" . (lambda ()
+                                 (bibtex-mode)
+                                 (auto-revert-mode 1))))
+
+
+;; Extra keybinds for RefTeX
   ;; (setq reftex-extra-bindings t) ;; equavalent as below
   (add-hook 'reftex-load-hook
             #'(lambda ()
