@@ -63,7 +63,7 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(pdf-tools proxy-mode gptel jinx envrc imenu-list lsp-latex lean-mode treesit-auto writegood-mode multiple-cursors pinyinlib company counsel swiper ivy ht flycheck-languagetool lsp-metals notmuch poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
+   '(wgrep pdf-tools proxy-mode gptel jinx envrc imenu-list lsp-latex lean-mode treesit-auto writegood-mode multiple-cursors pinyinlib company counsel swiper ivy ht flycheck-languagetool lsp-metals notmuch poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
  '(safe-local-variable-values '((TeX-engine . pdflatex)))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
@@ -94,6 +94,9 @@
 ;; Term
 (setenv "TERM" "xterm-256color")
 (add-to-list 'term-file-aliases '("dumb" . "xterm-256color"))
+
+;; Stop displaying strange symbols in place of the desired colored output
+(add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 ;; Allow shift-arrow keys and control-arrow keys under different tty
 ;; Set export TERM="xterm" in .bashrc and
 ;; term "xterm" in .screenrc.
@@ -196,6 +199,7 @@
 ;; Global visual line mode with better indentation
 ;; (global-visual-line-mode t)
 (setq-default fill-column 120)
+(global-set-key (kbd "M-p") 'fill-paragraph) ;; mirror key for M-q
 (dolist (hook '(message-mode-hook
                 prog-mode-hook
                 org-mode-hook
@@ -208,6 +212,10 @@
 
 (use-package visual-fill-column
   :ensure t
+  :custom
+  (visual-fill-column-extra-text-width nil)
+  (visual-fill-column-width (+ fill-column +6)) ;; fill-column+6
+
   :config
   (dolist (hook '(message-mode-hook
                   ;; prog-mode-hook
@@ -1160,8 +1168,6 @@
   ;; Set default TeX engine
   (setq TeX-PDF-mode t)
   (setq-default TeX-engine 'xetex) ;this can be set locally
-  ;; (setq TeX-engine-alist '((pdflatex "PDFLaTeX" "pdflatex" "pdflatex" "pdflatex"))) ; Add PDFLaTeX as engine option
-
 
   ;; LaTeX symbols for for TeX mode
   (defun my-latex-mode-setup ()
@@ -1181,15 +1187,15 @@
     ;; Use LatexMkPvc as the main command
     (defun TeX-command-run-latexmkpvc ()
       (interactive)
-      (TeX-save-document (TeX-master-file))
       (TeX-command "LatexMkPvc" 'TeX-master-file -1))
     (define-key LaTeX-mode-map (kbd "C-c C-c") 'TeX-command-run-latexmkpvc)
 
-    ;; Replace the "LaTeX" entry in `TeX-command-list` to call `TeX-command-run-latexmkpvc`
-    (setcdr (assoc "LaTeX" TeX-command-list)
-            '(TeX-command-run-latexmkpvc
-              TeX-run-function nil t
-              :help "Run LatexMkPvc"))
+    ;; Replace LaTeX with latexmk -pvc
+    (add-hook 'TeX-mode-hook '(lambda () (setq TeX-command-default "LatexMkPvc")))
+    ;; (setcdr (assoc "LaTeX" TeX-command-list)
+    ;;         '("latexmk -pvc -pv- %(-PDF)%S%(mode) %(file-line-error) %(extraopts) %t" TeX-run-latexmk-pvc nil
+    ;;           :help "Run LaTeX with `latexmk -pvc`"))
+
     ) ; provide LatexMkPvc command
 
   ;; Other settings
