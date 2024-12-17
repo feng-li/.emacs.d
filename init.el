@@ -1679,6 +1679,9 @@
               ;; NOTE: don't use `localhost', avoid local server like robe no response
               ("no_proxy" . "127.0.0.1")))
            (proxy-mode-emacs-socks-proxy '("Default server" "127.0.0.1" 7890 5)))
+
+  :config
+  (setq proxy-mode-proxy-type 'emacs-url-proxy)
   ;; :commands (proxy-mode)
   )
 
