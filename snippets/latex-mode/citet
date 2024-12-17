@@ -1,5 +1,5 @@
 # -*- mode: snippet -*-
 # name: \citet{...}
-# key: ccc
+# key: citet
 # --
 \citet{$1} $0

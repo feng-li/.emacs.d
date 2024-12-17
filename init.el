@@ -63,7 +63,7 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(wgrep pdf-tools proxy-mode gptel jinx envrc imenu-list lsp-latex lean-mode treesit-auto writegood-mode multiple-cursors pinyinlib company counsel swiper ivy ht flycheck-languagetool lsp-metals notmuch poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex company-math highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
+   '(wgrep pdf-tools proxy-mode gptel jinx envrc imenu-list lsp-latex lean-mode treesit-auto writegood-mode multiple-cursors pinyinlib company counsel swiper ivy ht flycheck-languagetool lsp-metals notmuch poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
  '(safe-local-variable-values '((TeX-engine . pdflatex)))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
@@ -92,7 +92,6 @@
 (setq auto-save-list-file-prefix (concat my-auto-save-list "/.saves-"))
 
 ;; Term
-(setenv "TERM" "xterm-256color")
 (add-to-list 'term-file-aliases '("dumb" . "xterm-256color"))
 
 ;; Stop displaying strange symbols in place of the desired colored output
@@ -1166,15 +1165,16 @@
   ;; (add-to-list 'LaTeX-verbatim-environments "lstlisting")
 
   ;; Set default TeX engine
+  (setq TeX-output-extension "pdf") ; Make sure preview is always viable for PDF file.
   (setq TeX-PDF-mode t)
   (setq-default TeX-engine 'xetex) ;this can be set locally
 
   ;; LaTeX symbols for for TeX mode
-  (defun my-latex-mode-setup ()
-    (setq-local company-backends
-                (append '((company-math-symbols-latex company-latex-commands))
-                        company-backends)))
-  (add-hook 'TeX-mode-hook 'my-latex-mode-setup)
+  ;; (defun my-latex-mode-setup ()
+  ;;   (setq-local company-backends
+  ;;               (append '((company-math-symbols-latex company-latex-commands))
+  ;;                       company-backends)))
+  ;; (add-hook 'TeX-mode-hook 'my-latex-mode-setup)
 
   ;; LATEXMK integration
   (use-package auctex-latexmk)
@@ -1185,10 +1185,10 @@
     (auctex-latexmk-pvc-setup)
 
     ;; Use LatexMkPvc as the main command
-    (defun TeX-command-run-latexmkpvc ()
-      (interactive)
-      (TeX-command "LatexMkPvc" 'TeX-master-file -1))
-    (define-key LaTeX-mode-map (kbd "C-c C-c") 'TeX-command-run-latexmkpvc)
+    ;; (defun TeX-command-run-latexmkpvc ()
+    ;;   (interactive)
+    ;;   (TeX-command "LatexMkPvc" 'TeX-master-file -1))
+    ;; (define-key LaTeX-mode-map (kbd "C-c C-c") 'TeX-command-run-latexmkpvc)
 
     ;; Replace LaTeX with latexmk -pvc
     (add-hook 'TeX-mode-hook '(lambda () (setq TeX-command-default "LatexMkPvc")))
@@ -1744,10 +1744,13 @@
  '(font-latex-math-face ((t (:foreground "dark orange"))))
  '(font-latex-sectioning-5-face ((t (:foreground "deep sky blue" :weight bold))))
  '(font-latex-sedate-face ((t (:foreground "light slate blue"))))
+ '(gptel-rewrite-highlight-face ((t (:extend t :background "brightblack"))))
  '(highlight ((t (:background "cyan" :foreground "black"))))
  '(highlight-doxygen-comment ((t (:inherit highlight))))
  '(line-number-current-line ((t (:background "black" :slant italic))))
  '(region ((t (:extend nil :background "blue"))))
+ '(smerge-lower ((t (:extend t :background "green"))))
+ '(smerge-upper ((t (:extend t :background "brightred"))))
  '(tty-menu-enabled-face ((t (:background "dimgray" :foreground "white" :weight bold)))))
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)

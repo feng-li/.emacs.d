@@ -8,6 +8,7 @@
                                user-emacs-directory)))
 
 ;; Environment variables
+(setenv "TERM" "xterm-256color")
 (setenv "OMP_NUM_THREADS" "1")
 (setenv "LSP_USE_PLISTS"  "true")
 (setenv "PATH" (concat (concat (getenv "HOME") "/.local/bin:")
