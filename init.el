@@ -1498,6 +1498,9 @@
   :config
   (elpy-enable)
 
+  ;; Enable elpy for python ts mode.
+  (add-hook 'python-ts-mode-hook 'elpy-enable)
+
   ;; Disable elpy's flymake, use flycheck
   (remove-hook 'elpy-modules #'elpy-module-flymake)
   (define-key elpy-mode-map (kbd "C-c C-p") nil)
@@ -1506,7 +1509,7 @@
   (setq elpy-rpc-virtualenv-path (concat (getenv "HOME") "/.virtualenvs/elpy/"))
   (setq elpy-rpc-python-command "python3")
   (setq elpy-rpc-backend "jedi")
-  ;; (setq elpy-syntax-check-command "flake8")
+  (setq elpy-syntax-check-command "flake8")
 
   ;; (remove-hook 'elpy-modules 'elpy-module-pyvenv)
   (remove-hook 'elpy-modules #'elpy-module-highlight-indentation)
