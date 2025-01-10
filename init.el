@@ -92,6 +92,8 @@
 (setq auto-save-list-file-prefix (concat my-auto-save-list "/.saves-"))
 
 ;; Term
+(setenv "TERM" "xterm-256color")
+(setenv "COLORTERM" "trueclor") ;; Ensure True Color in Systemd
 (add-to-list 'term-file-aliases '("dumb" . "xterm-256color"))
 
 ;; Stop displaying strange symbols in place of the desired colored output
@@ -105,7 +107,8 @@
 ;; Theme
 (defun on-after-init ()
   (unless (display-graphic-p (selected-frame))
-    (set-face-background 'default "#1d1f21" (selected-frame))))
+    (set-face-background 'default "#00000" (selected-frame))))
+    ;; (set-face-background 'default "#1d1f21" (selected-frame))))
 (add-hook 'window-setup-hook #'on-after-init)
 
 ;; (setq dracula-use-24-bit-colors-on-256-colors-terms t)
