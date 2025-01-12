@@ -7,9 +7,18 @@ echo -e "
 "
 
 # Python 3.12 dropped distutils which failed elpy
-python=${HOME}/.local/python3.11/bin/python
-
+python3_ver=3.11
+python_dist_path=$HOME/.local/python${python3_ver}
 elpy=${HOME}/.virtualenvs/elpy
+
+# Python
+python=${python_dist_path}/bin/python
+
+# Install Python using mamba if not exist
+if [ ! -f $python ]; then
+    ${HOME}/.local/miniforge3/bin/mamba create --prefix $python_dist_path python=${python3_ver}
+fi
+
 pip_index_url=https://pypi.tuna.tsinghua.edu.cn/simple
 
 ## Create a virtualenv

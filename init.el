@@ -107,7 +107,7 @@
 ;; Theme
 (defun on-after-init ()
   (unless (display-graphic-p (selected-frame))
-    (set-face-background 'default "#00000" (selected-frame))))
+    (set-face-background 'default "#1d1f21" (selected-frame))))
     ;; (set-face-background 'default "#1d1f21" (selected-frame))))
 (add-hook 'window-setup-hook #'on-after-init)
 
