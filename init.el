@@ -1451,7 +1451,7 @@
   :config
   (setq python-shell-interpreter "python3")
   ;; (setq python-shell-interpreter-args "-i -c 'import sys; print(\"Using \"+sys.executable); print(\"sys.path: \"); [print(p) for p in sys.path]' ")
-  (setq python-shell-interpreter-args "-i -c \"import sys; print(sys.executable)\" ")
+  (setq python-shell-interpreter-args "-i -c \"import sys; print('sys.executable:' ,sys.executable); print('sys.path:',sys.path)\" ")
   (setq python-shell-completion-native-enable nil)
 
   ;; Enter to indent in python.el
