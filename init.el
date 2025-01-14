@@ -105,21 +105,24 @@
 ;;   (define-key input-decode-map "\e[1;2A" [S-up]))
 
 ;; Theme
-(defun on-after-init ()
-  (unless (display-graphic-p (selected-frame))
-    (set-face-background 'default "#1d1f21" (selected-frame))))
-    ;; (set-face-background 'default "#1d1f21" (selected-frame))))
-(add-hook 'window-setup-hook #'on-after-init)
-
-;; (setq dracula-use-24-bit-colors-on-256-colors-terms t)
-;; (unless (display-graphic-p)
-;;   (set-face-background 'default "black" nil)
-;;   )
 (use-package dracula-theme
   :ensure t
   :config
   (load-theme 'dracula t)
+
+  ;; Modify background
+  (unless (display-graphic-p)
+    (set-face-background 'default "#1d1f21" nil)
+    )
   )
+
+;; (defun on-after-init ()
+;;   (unless (display-graphic-p (selected-frame))
+;;     (set-face-background 'default "#1d1f21" (selected-frame))))
+;;     ;; (set-face-background 'default "#1d1f21" (selected-frame))))
+;; (add-hook 'window-setup-hook #'on-after-init)
+;; (setq dracula-use-24-bit-colors-on-256-colors-terms t)
+
 
 ;; The scratch settings
 (setq initial-scratch-message nil) ;; Disable scratch information
@@ -1451,7 +1454,7 @@
   :config
   (setq python-shell-interpreter "python3")
   ;; (setq python-shell-interpreter-args "-i -c 'import sys; print(\"Using \"+sys.executable); print(\"sys.path: \"); [print(p) for p in sys.path]' ")
-  (setq python-shell-interpreter-args "-i -c \"import sys; print('sys.executable:' ,sys.executable); print('sys.path:',sys.path)\" ")
+  (setq python-shell-interpreter-args "-i -c \"import os; print('os.getcwd:', os.getcwd()); import sys; print('sys.executable:' ,sys.executable); print('sys.path:',sys.path)\" ")
   (setq python-shell-completion-native-enable nil)
 
   ;; Enter to indent in python.el
