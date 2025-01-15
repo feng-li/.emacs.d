@@ -1171,7 +1171,6 @@
   ;; (add-to-list 'LaTeX-verbatim-environments "lstlisting")
 
   ;; Set default TeX engine
-  (setq TeX-output-extension "pdf") ; Make sure preview is always viable for PDF file.
   (setq TeX-PDF-mode t)
   (setq-default TeX-engine 'xetex) ;this can be set locally
 
@@ -1212,6 +1211,9 @@
             #'(lambda ()
 
                 (TeX-fold-mode 1)
+
+                ;; Make sure preview is always viable for PDF file.
+                (setq TeX-output-extension "pdf")
 
                 ;; Clean all intermediate files, like 'latexmk -c'
                 (local-unset-key (kbd "C-c C-k"))
@@ -1454,7 +1456,7 @@
   :config
   (setq python-shell-interpreter "python3")
   ;; (setq python-shell-interpreter-args "-i -c 'import sys; print(\"Using \"+sys.executable); print(\"sys.path: \"); [print(p) for p in sys.path]' ")
-  (setq python-shell-interpreter-args "-i -c \"import os; print('os.getcwd:', os.getcwd()); import sys; print('sys.executable:' ,sys.executable); print('sys.path:',sys.path)\" ")
+  (setq python-shell-interpreter-args "-i -c \"import os; print('os.getcwd:', os.getcwd()); import sys; print('sys.executable:' ,sys.executable)\" ")
   (setq python-shell-completion-native-enable nil)
 
   ;; Enter to indent in python.el
