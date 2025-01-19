@@ -751,34 +751,10 @@
 
   (setq company-files-exclusions '(".git/" ".DS_Store" "auto/"))
 
-  ;; Remove duplicate candidates
-  (require 'cl-lib)
-  (defun my-company-remove-duplicates (candidates)
-    (cl-remove-duplicates candidates :test #'equal))
-  (defun my-company-prioritize-yasnippet (candidates)
-    "Ensure that yasnippet candidates appear first in the completion list."
-    (let ((yasnippet-candidates (cl-remove-if-not
-                                 (lambda (candidate)
-                                   (get-text-property 0 'yas-annotation candidate))
-                                 candidates))
-          (other-candidates (cl-remove-if
-                             (lambda (candidate)
-                               (get-text-property 0 'yas-annotation candidate))
-                             candidates)))
-      (append yasnippet-candidates other-candidates)))
-
-  (setq company-transformers '(my-company-prioritize-yasnippet
-                               my-company-remove-duplicates
-                               company-sort-by-occurrence
-                               ))
-
-
-
   ;; Preserve initial cases
   (setq company-dabbrev-downcase nil)
   (setq company-dabbrev-ignore-case nil)
   (setq company-dabbrev-other-buffers t)
-
 
   ;; Add yasnippet support for all company backends
   (add-to-list 'company-backends '(company-capf :with company-yasnippet))
@@ -790,7 +766,6 @@
                    company-ispell :separate)
                   company-files)))
   (add-hook 'text-mode-hook #'my-text-mode-hook)
-  (setq company-tooltip-limit 10)
 
   ;; https://github.com/abo-abo/oremacs/issues/38#issuecomment-948472184
   (setq company-show-quick-access t)

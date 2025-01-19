@@ -68,17 +68,14 @@ giveninits=true, uniquename=false, maxcitenames=2, date=year, maxbibnames=6, saf
   citecolor=blue,
   urlcolor=blue}
 
-%% Table numbering
-\usepackage[compact,center]{titlesec}
-% Customize section sizes
-\titleformat{\section}{\center\large\bfseries}{\thesection}{1em}{}
-\titleformat{\subsection}{\center\normalsize\bfseries}{\thesubsection}{1em}{}
-\titleformat{\subsubsection}{\center\small\itshape}{\thesubsubsection}{1em}{}
-
-\titlespacing{\section}{0pt}{0ex}{0ex}
-\titlespacing{\subsection}{0pt}{0ex}{0ex}
-\titlespacing{\subsubsection}{0pt}{0ex}{0ex}
-\usepackage{titling}
+% Adjust Title
+\usepackage{titling}          % For title placement customization
+\pretitle{\begin{center}\normalfont\bfseries} % Title style
+\posttitle{\par\end{center}\vskip 1em}
+\preauthor{\begin{center}\normalfont\itshape} % Author style
+\postauthor{\par\end{center}\vskip 1em}
+\predate{\begin{center}\small} % Date style
+\postdate{\par\end{center}\vskip 1em}
 \setlength{\droptitle}{-2cm}
 \predate{}
 \postdate{}
@@ -86,8 +83,21 @@ giveninits=true, uniquename=false, maxcitenames=2, date=year, maxbibnames=6, saf
 % \posttitle{}
 % \preauthor{}
 % \postauthor{}
+
+% Adjust Section Styles
+\usepackage{titlesec}         % To style sections
+\titleformat{\section}{\normalfont\scshape\center}{\thesection.}{1em}{}
+\titleformat{\subsection}{\normalfont\itshape}{\thesubsection.}{1em}{}
+\titleformat{\subsubsection}{\normalfont\itshape}{\thesubsubsection}{1em}{}
+
+% %% Table numbering
+\titlespacing{\section}{0pt}{0ex}{0ex}
+\titlespacing{\subsection}{0pt}{0ex}{0ex}
+\titlespacing{\subsubsection}{0pt}{0ex}{0ex}
+% \usepackage{titling}
+
 \usepackage{enumitem}
-\setlist[enumerate,itemize]{listparindent=\parindent,leftmargin=*}% Indented paragraphs within lists
+\setlist[enumerate,itemize]{listparindent=\parindent, leftmargin=*, itemsep=0pt, parsep=0pt} % Indented paragraphs
 \setlength{\itemsep}{0.0pt}
 
 %% Appendix numbering
