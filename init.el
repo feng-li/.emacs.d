@@ -1187,8 +1187,12 @@
 
                 (TeX-fold-mode 1)
 
-                ;; Make sure preview is always viable for PDF file.
+                ;; Make sure preview is always viable for PDF file in LatexMkpvc.
+                (setq TeX-view-program-selection
+                      '((output-pdf "Evince")))
+                (add-to-list 'TeX-view-program-list '("Evince" "evince %o"))
                 (setq TeX-output-extension "pdf")
+                (setq TeX-PDF-mode t)
 
                 ;; Clean all intermediate files, like 'latexmk -c'
                 (local-unset-key (kbd "C-c C-k"))
