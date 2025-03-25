@@ -1,6 +1,3 @@
-[submodule "site-lisp/pydoc"]
-	path = site-lisp/pydoc
-	url = git@github.com:feng-li/pydoc.git
 [submodule "site-lisp/auctex-latexmk"]
 	path = site-lisp/auctex-latexmk
 	url = https://github.com/feng-li/auctex-latexmk.git
