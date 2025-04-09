@@ -63,7 +63,7 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(wgrep pdf-tools proxy-mode gptel jinx envrc imenu-list lsp-latex lean-mode treesit-auto writegood-mode multiple-cursors pinyinlib company counsel swiper ivy ht flycheck-languagetool lsp-metals notmuch poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode company-auctex highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
+   '(company-reftex wgrep pdf-tools proxy-mode gptel jinx envrc imenu-list lsp-latex lean-mode treesit-auto writegood-mode multiple-cursors pinyinlib company counsel swiper ivy ht flycheck-languagetool lsp-metals notmuch poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
  '(safe-local-variable-values '((TeX-engine . pdflatex)))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
@@ -1234,9 +1234,6 @@
   (keyboard-translate ?§ ?`)
   (setq LaTeX-math-abbrev-prefix "`")
 
-  ;; Allow company-auctex backends
-  ;; (company-auctex-init)
-
   (setq TeX-source-correlate-mode  t)
   (setq TeX-source-correlate-start-server nil)
   (setq TeX-debug-warnings t)
@@ -1304,6 +1301,17 @@
         '(("tex" . "kpsewhich -format=.tex %f")
           ("bib" . "kpsewhich -format=.bib %f")
 	  ("bst" . "kpsewhich -format=.bst %f")))
+
+
+  ;; Perform reftex rescan on save
+  (defun my-latex-rescan-on-save ()
+    (interactive)
+    (reftex-reset-mode)
+    (save-buffer))
+
+  (with-eval-after-load 'reftex
+    (define-key reftex-mode-map (kbd "C-x C-s") #'my-latex-rescan-on-save))
+
   )
 
 
@@ -1517,11 +1525,6 @@
               (concat "\\(def\\|class\\)\s" (thing-at-point 'symbol) "(")))))
   (define-key elpy-mode-map (kbd "M-.") 'elpy-goto-definition-or-rgrep)
 
-
-  (use-package pydoc
-    :config
-    (define-key elpy-mode-map (kbd "C-c C-v") 'pydoc)
-    )
 
   ;; auto-format your code with "C-c C-r f" on save
   ;; (add-hook 'elpy-mode-hook (lambda ()
