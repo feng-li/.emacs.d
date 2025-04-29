@@ -56,9 +56,9 @@
                           TeX-PDF-mode
                           auctex-latexmk-inherit-TeX-PDF-mode)
                      "-pdflatex ")
-                    ((eq TeX-engine 'xetex) "-xelatex ")
-                    ((eq TeX-engine 'luatex) "-lualatex ")
-                    ((eq TeX-engine 'pdflatex) "-pdflatex ")
+                    ((eq TeX-engine 'xetex) "-pdf -pdflatex=xelatex ")
+                    ((eq TeX-engine 'luatex) "-pdf -pdflatex=lualatex ")
+                    ((eq TeX-engine 'pdflatex) "-pdf -pdflatex=pdflatex ")
                     (t "")))))
   (setq-default TeX-command-list
                 (cons

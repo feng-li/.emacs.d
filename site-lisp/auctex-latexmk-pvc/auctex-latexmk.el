@@ -106,18 +106,20 @@
                           TeX-PDF-mode
                           auctex-latexmk-inherit-TeX-PDF-mode)
                      "-pdflatex ")
-                    ((eq TeX-engine 'xetex) "-xelatex ")
-                    ((eq TeX-engine 'luatex) "-lualatex ")
-                    ((eq TeX-engine 'pdflatex) "-pdflatex ")
+                    ((eq TeX-engine 'xetex) "-pdf -pdflatex=xelatex ")
+                    ((eq TeX-engine 'luatex) "-pdf -pdflatex=lualatex ")
+                    ((eq TeX-engine 'pdflatex) "-pdf -pdflatex=pdflatex ")
                     (t "")))))
-  (setq-default TeX-command-list
-                (cons
-                 '("LatexMk" "latexmk %(-PDF)%S%(mode) %(file-line-error) %(extraopts) %t" TeX-run-latexmk nil
-                   (plain-tex-mode latex-mode doctex-mode) :help "Run LatexMk")
-                 TeX-command-list)
-                LaTeX-clean-intermediate-suffixes
-                (append LaTeX-clean-intermediate-suffixes
-                        '("\\.fdb_latexmk" "\\.aux.bak" "\\.fls"))))
+  ;; Disable the command use AUCTeX > 13 default latexmk
+  ;; (setq-default TeX-command-list
+  ;;               (cons
+  ;;                '("LatexMk" "latexmk %(-PDF)%S%(mode) %(file-line-error) %(extraopts) %t" TeX-run-latexmk nil
+  ;;                  (plain-tex-mode latex-mode doctex-mode) :help "Run LatexMk")
+  ;;                TeX-command-list)
+  ;;               LaTeX-clean-intermediate-suffixes
+  ;;               (append LaTeX-clean-intermediate-suffixes
+  ;;                       '("\\.fdb_latexmk" "\\.aux.bak" "\\.fls")))
+  )
 
 (defun Latexmk-sentinel (process name)
   (save-excursion
