@@ -99,6 +99,14 @@ giveninits=true, uniquename=init, maxcitenames=2, date=year, maxbibnames=99, saf
 \renewcommand{\thetable}{S.\arabic{table}}
 \renewcommand{\thefigure}{S.\arabic{figure}}
 
+% Review with todonotes
+\usepackage{todonotes}
+\setlength{\marginparwidth}{2.2cm}  % set the margin note width globally
+%\usepackage{xcolor}
+\usepackage{setspace}
+\newcommand\FLI[2][]{\todo[#1]{\sf{\tiny\sffamily\begin{spacing}{0.85}#2\end{spacing}}}} % Margin
+\newcommand{\fli}[1]{\todo[inline]{\tiny\sffamily#1}} % Inline
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{document}

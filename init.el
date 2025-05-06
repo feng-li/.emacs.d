@@ -514,6 +514,13 @@
   (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
   (define-key ivy-minibuffer-map (kbd "C-c C-v") 'ivy-occur)
 
+  (defun my-counsel-rg-in-dir ()
+    "Run `counsel-rg` in a directory of your choice."
+    (interactive)
+    (let ((dir (read-directory-name "Search in directory: ")))
+      (counsel-rg nil dir)))
+  (global-set-key (kbd "C-c r") #'my-counsel-rg-in-dir)
+
   ;; Use C-j for immediate termination with the current value, and RET for continuing
   ;; completion for that directory. This is the ido behaviour.
   (define-key ivy-minibuffer-map (kbd "C-j") #'ivy-immediate-done)
