@@ -921,9 +921,6 @@
 
   )
 
-;; Auto correct spelling mistakes
-(global-set-key (kbd "<f9> c") 'flyspell-auto-correct-word)
-
 (with-eval-after-load 'comint
   (define-key comint-mode-map (kbd "C-d") nil)
   )
@@ -999,15 +996,18 @@
 (setq flyspell-issue-welcome-flag nil)
 (setq flyspell-issue-message-flag nil)
 
-;; Fly spell mode for major mode
-(add-hook 'prog-mode-hook #'flyspell-prog-mode)
-(dolist (hook '(text-mode-hook LaTeX-mode-hook markdown-mode-hook))
-  (add-hook hook (lambda () (flyspell-mode 1))))
-(add-hook 'LaTeX-mode-hook (function (lambda () (setq ispell-parser 'tex))))
+;; Fly spell mode for major mode, use jinx now.
+;; (add-hook 'prog-mode-hook #'flyspell-prog-mode)
+;; (dolist (hook '(text-mode-hook LaTeX-mode-hook markdown-mode-hook))
+;;   (add-hook hook (lambda () (flyspell-mode 1))))
+;; (add-hook 'LaTeX-mode-hook (function (lambda () (setq ispell-parser 'tex))))
 
 ;; Disable flyspell for special modes
 (dolist (hook '(change-log-mode-hook log-edit-mode-hook))
   (add-hook hook (lambda () (flyspell-mode -1))))
+
+;; Auto correct spelling mistakes
+(global-set-key (kbd "<f9> c") 'flyspell-auto-correct-word)
 
 ;; StarDict
 ;; apt install sdcv
@@ -1171,19 +1171,16 @@
     :config
     (auctex-latexmk-pvc-setup)
 
-    ;; Use LatexMkPvc as the main command
-    ;; (defun TeX-command-run-latexmkpvc ()
-    ;;   (interactive)
-    ;;   (TeX-command "LatexMkPvc" 'TeX-master-file -1))
-    ;; (define-key LaTeX-mode-map (kbd "C-c C-c") 'TeX-command-run-latexmkpvc)
+    ;; Make sure preview is always viable for PDF file in LatexMkpvc.
+    ;; (setq TeX-view-program-selection
+    ;;       '((output-pdf "Evince")))
+    ;; (add-to-list 'TeX-view-program-list '("Evince" "evince %o"))
+    ;; (setq TeX-output-extension "pdf")
+    ;; (setq TeX-PDF-mode t)
 
     ;; Replace LaTeX with latexmk -pvc
     (add-hook 'TeX-mode-hook '(lambda () (setq TeX-command-default "LatexMkPvc")))
-    ;; (setcdr (assoc "LaTeX" TeX-command-list)
-    ;;         '("latexmk -pvc -pv- %(-PDF)%S%(mode) %(file-line-error) %(extraopts) %t" TeX-run-latexmk-pvc nil
-    ;;           :help "Run LaTeX with `latexmk -pvc`"))
-
-    ) ; provide LatexMkPvc command
+    )
 
   ;; Other settings
   (remove-hook 'LaTeX-mode-hook #'auto-fill-mode)
@@ -1193,13 +1190,6 @@
             #'(lambda ()
 
                 (TeX-fold-mode 1)
-
-                ;; Make sure preview is always viable for PDF file in LatexMkpvc.
-                (setq TeX-view-program-selection
-                      '((output-pdf "Evince")))
-                (add-to-list 'TeX-view-program-list '("Evince" "evince %o"))
-                (setq TeX-output-extension "pdf")
-                (setq TeX-PDF-mode t)
 
                 ;; Clean all intermediate files, like 'latexmk -c'
                 (local-unset-key (kbd "C-c C-k"))
