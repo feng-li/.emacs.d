@@ -510,16 +510,23 @@
   (global-set-key (kbd "M-,") 'counsel-M-x) ; mirror of M-x
   (global-set-key (kbd "C-x C-f") 'counsel-find-file)
   (global-set-key (kbd "C-c G") 'counsel-git-grep)
-  (global-set-key (kbd "C-c g") 'counsel-ag) ;; find patten within git repository
+  (global-set-key (kbd "C-c g") 'counsel-rg) ;; find patten within git repository, rg is faster than ag
   (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
   (define-key ivy-minibuffer-map (kbd "C-c C-v") 'ivy-occur)
 
   (defun my-counsel-rg-in-dir ()
     "Run `counsel-rg` in a directory of your choice."
     (interactive)
-    (let ((dir (read-directory-name "Search in directory: ")))
+    (let ((dir (read-directory-name "Find a pattern (rg) in directory: ")))
       (counsel-rg nil dir)))
   (global-set-key (kbd "C-c r") #'my-counsel-rg-in-dir)
+
+  (defun my-counsel-fzf-in-dir ()
+    "Run `counsel-rg` in a directory of your choice."
+    (interactive)
+    (let ((dir (read-directory-name "Find a fine (fzf) in directory: ")))
+      (counsel-fzf nil dir)))
+  (global-set-key (kbd "C-t") #'my-counsel-fzf-in-dir)
 
   ;; Use C-j for immediate termination with the current value, and RET for continuing
   ;; completion for that directory. This is the ido behaviour.
