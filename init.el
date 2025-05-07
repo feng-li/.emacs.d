@@ -1002,12 +1002,18 @@
 ;;   (add-hook hook (lambda () (flyspell-mode 1))))
 ;; (add-hook 'LaTeX-mode-hook (function (lambda () (setq ispell-parser 'tex))))
 
-;; Disable flyspell for special modes
+;; Disable flyspell globally
+(fmakunbound 'flyspell-mode) ;; Disable automatic loading
+(setq-default flyspell-mode nil)
 (dolist (hook '(change-log-mode-hook log-edit-mode-hook))
   (add-hook hook (lambda () (flyspell-mode -1))))
 
+;; Ensure it's not enabled in text or prog modes
+(remove-hook 'text-mode-hook 'flyspell-mode)
+(remove-hook 'prog-mode-hook 'flyspell-prog-mode)
+
 ;; Auto correct spelling mistakes
-(global-set-key (kbd "<f9> c") 'flyspell-auto-correct-word)
+;; (global-set-key (kbd "<f9> c") 'flyspell-auto-correct-word)
 
 ;; StarDict
 ;; apt install sdcv
