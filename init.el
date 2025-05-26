@@ -71,6 +71,7 @@
  '(send-mail-function 'mailclient-send-it)
  '(show-paren-mode t nil (paren))
  '(tool-bar-mode nil)
+ '(ediff-split-window-function 'split-window-horizontally)
  '(warning-suppress-types '(((tar link)) (comp) (comp) (undo discard-info))))
 
 ;; Automatically install emacs packages
@@ -200,6 +201,7 @@
 ;; Paste behavior
 (define-key global-map (kbd "C-S-v") 'yank) ; Shift-Ctr-v to paste, same as terminal behavior
 (define-key global-map (kbd "<mouse-3>") 'yank) ; Right click to paste
+
 
 ;; Global visual line mode with better indentation
 ;; (global-visual-line-mode t)
@@ -524,7 +526,7 @@
   (defun my-counsel-fzf-in-dir ()
     "Run `counsel-rg` in a directory of your choice."
     (interactive)
-    (let ((dir (read-directory-name "Find a fine (fzf) in directory: ")))
+    (let ((dir (read-directory-name "Find a file (fzf) in directory: ")))
       (counsel-fzf nil dir)))
   (global-set-key (kbd "C-t") #'my-counsel-fzf-in-dir)
 
@@ -1691,7 +1693,6 @@
 ;; GPT Interface
 (use-package gptel
   :ensure t
-  :defer t
 
   :custom
   (gptel-rewrite-highlight-face ((t (:extend t :background "brightblack"))))
@@ -1700,7 +1701,21 @@
 
   :config
   (global-set-key (kbd "<f9> c") 'gptel)
-  (global-set-key (kbd "<f9> w") 'gptel-rewrite-menu)
+  (global-set-key (kbd "<f9> w") 'gptel-rewrite)
+
+  ;; Specify an alternative model
+  (gptel-make-openai "GPT-PROXY"
+    :host "s.lconai.com"
+    :endpoint "/v1/chat/completions"
+    :key gptel-api-key ;; ~/.authinfo
+    :stream t
+    :models '(chatgpt-4o-latest deepseek-reasoner))
+
+  ;; Set default options
+  (setq gptel-default-mode 'markdown-mode
+	gptel-backend (gptel-get-backend "GPT-PROXY")
+	gptel-model 'chatgpt-4o-latest)
+
 
   ;; Checks if the opened file has a `GPT.md` extension and enables `my-minor-mode` when it does.
   (defun my-enable-minor-mode ()
