@@ -62,7 +62,7 @@
                     (t "")))))
   (setq-default TeX-command-list
                 (cons
-                 '("LatexMkPvc" "latexmk -pvc -pv- %(-PDF)%S%(mode) %(file-line-error) %(extraopts) %t" TeX-run-latexmk-pvc nil
+                 '("LatexMkPvc" "latexmk -pvc -pv- %(-PDF) %(file-line-error) %(output-dir) %`%(extraopts) %S%(mode)%' %t" TeX-run-latexmk-pvc nil
                    (plain-tex-mode latex-mode doctex-mode) :help "Run LatexMk (-pvc: preview continuously)")
                  TeX-command-list)
                 LaTeX-clean-intermediate-suffixes

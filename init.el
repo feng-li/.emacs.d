@@ -1186,6 +1186,7 @@
     :config
     (auctex-latexmk-pvc-setup)
 
+    (setq TeX-output-dir "auto")
     ;; Make sure preview is always viable for PDF file in LatexMkpvc.
     ;; (setq TeX-view-program-selection
     ;;       '((output-pdf "Evince")))
