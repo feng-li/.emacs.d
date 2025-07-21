@@ -14,7 +14,7 @@
 
 ;; Add path for auto saved files
 ;;; Code:
-(defvar my-base-save-list (concat (getenv "HOME") "/.config/emacs/"))
+(defvar my-base-save-list (concat (getenv "HOME") "/.config/emacs" (number-to-string emacs-major-version)))
 (defvar my-auto-save-list (concat my-base-save-list (system-name))) ;; host-specified
 (unless (file-directory-p my-auto-save-list) (make-directory my-auto-save-list t))
 
@@ -1566,7 +1566,7 @@
 
   :config
   (setq lsp-keymap-prefix "C-c l")
-  (setq lsp-server-install-dir (concat (getenv "HOME") "/.config/emacs/lsp-server"))
+  (setq lsp-server-install-dir (concat (getenv "HOME") "/.config/emacs" (number-to-string emacs-major-version) "/lsp-server"))
   (setq lsp-session-file (concat my-auto-save-list "/lsp-session-v1"))
   (setq lsp-restart 'ignore)  ;; How server-exited events must be handled.
   (setq lsp-verify-signature nil) ;; Disable to get metals server (key expired) working

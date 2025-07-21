@@ -1,10 +1,10 @@
 (setq package-enable-at-startup t)
-(setq package-user-dir (concat (getenv "HOME") "/.config/emacs/elpa")) ;; Global
+(setq package-user-dir (concat (getenv "HOME") "/.config/emacs" (number-to-string emacs-major-version)  "/elpa")) ;; Global
 
 ;; Set eln-cache dir
 (when (boundp 'native-comp-eln-load-path)
   (startup-redirect-eln-cache (expand-file-name
-                               (concat (getenv "HOME") "/.config/emacs/eln-cache")
+                               (concat (getenv "HOME") "/.config/emacs" (number-to-string emacs-major-version) "/eln-cache")
                                user-emacs-directory)))
 
 ;; Environment variables
