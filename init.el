@@ -55,6 +55,7 @@
  '(custom-safe-themes
    '("81c3de64d684e23455236abde277cda4b66509ef2c28f66e059aa925b8b12534" default))
  '(doc-view-continuous t)
+ '(ediff-split-window-function 'split-window-horizontally)
  '(global-font-lock-mode t nil (font-lock))
  '(highlight-doxygen-commend-start-regexp
    "\\(/\\*\\(!\\|\\*[^*]\\)\\|#\\('\\)\\|##\\('\\)\\|//\\(!\\|'\\|/[^/\12]\\)\\)")
@@ -63,7 +64,13 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(company-reftex wgrep pdf-tools proxy-mode gptel jinx envrc imenu-list lsp-latex lean-mode treesit-auto writegood-mode multiple-cursors pinyinlib company counsel swiper ivy ht flycheck-languagetool lsp-metals notmuch poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap highlight-doxygen electric-operator elpy markdown-mode dracula-theme yasnippet-snippets flycheck-julia math-symbol-lists polymode highlight-symbol popup iedit yasnippet magit ess dash auctex with-editor magit-popup))
+   '(company-reftex wgrep pdf-tools proxy-mode gptel jinx envrc imenu-list lsp-latex lean-mode treesit-auto writegood-mode
+                    multiple-cursors pinyinlib company counsel swiper ivy ht flycheck-languagetool lsp-metals notmuch
+                    poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode
+                    synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap
+                    highlight-doxygen electric-operator elpy markdown-mode dracula-theme yasnippet-snippets
+                    flycheck-julia math-symbol-lists polymode highlight-symbol popup iedit yasnippet magit ess dash
+                    auctex with-editor magit-popup))
  '(safe-local-variable-values '((TeX-engine . pdflatex)))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
@@ -71,8 +78,8 @@
  '(send-mail-function 'mailclient-send-it)
  '(show-paren-mode t nil (paren))
  '(tool-bar-mode nil)
- '(ediff-split-window-function 'split-window-horizontally)
- '(warning-suppress-types '(((tar link)) (comp) (comp) (undo discard-info))))
+ '(warning-suppress-types
+   '((native-compiler) ((tar link)) (comp) (comp) (undo discard-info))))
 
 ;; Automatically install emacs packages
 (unless (file-directory-p package-user-dir)
