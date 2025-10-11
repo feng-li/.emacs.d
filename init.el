@@ -1588,7 +1588,7 @@
   ;; (setq lsp-completion-provider :none)
 
   ;; Only enable certain LSP client and do not ask for server install.
-  ;; (setq lsp-enabled-clients '(metals pylsp texlab2 grammarly-ls))
+  (setq lsp-enabled-clients '(pylsp texlab2))
   ;; (setq lsp-enabled-clients '(metals pyls pylsp ruff semgrep-ls grammarly-ls))
 
   ;;(setq lsp-clients-pylsp-library-directories "~/.virtualenvs/elpy/")
