@@ -1567,6 +1567,8 @@
   (lsp-pylsp-server-command "~/.virtualenvs/elpy/bin/pylsp")
   (lsp-pylsp-plugins-flake8-enabled t)
   (lsp-pylsp-plugins-flake8-config "~/.config/flake8/tox.ini")
+  (lsp-pylsp-plugins-pydocstyle-enabled t)
+  (lsp-pylsp-plugins-pydocstyle-ignore ["D100" "D103" "D202" "D212" "D400" "D417" "D413"])
   (lsp-pylsp-plugins-black-enabled t)
   (lsp-pylsp-plugins-isort-enabled t) ; auto sort Python imports
 
