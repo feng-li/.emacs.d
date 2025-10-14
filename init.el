@@ -64,13 +64,12 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(company-reftex wgrep pdf-tools proxy-mode gptel jinx envrc imenu-list lsp-latex lean-mode treesit-auto writegood-mode
-                    multiple-cursors pinyinlib company counsel swiper ivy ht flycheck-languagetool lsp-metals notmuch
-                    poly-R visual-fill-column keytar gnu-elpa-keyring-update use-package scala-mode lexic pandoc-mode
-                    synosaurus yaml-mode mw-thesaurus unfill powerthesaurus julia-mode neotree format-all adaptive-wrap
-                    highlight-doxygen electric-operator elpy markdown-mode dracula-theme yasnippet-snippets
-                    flycheck-julia math-symbol-lists polymode highlight-symbol popup iedit yasnippet magit ess dash
-                    auctex with-editor magit-popup))
+   '(adaptive-wrap auctex company-reftex counsel dracula-theme electric-operator elpy envrc flycheck-julia
+                   flycheck-languagetool format-all gnu-elpa-keyring-update gptel highlight-doxygen highlight-symbol
+                   iedit imenu-list jinx julia-mode keytar lexic lsp-latex lsp-metals magit magit-popup
+                   math-symbol-lists multiple-cursors mw-thesaurus neotree notmuch pandoc-mode pdf-tools pinyinlib
+                   poly-R popup powerthesaurus proxy-mode synosaurus treesit-auto unfill visual-fill-column wgrep
+                   writegood-mode yaml-mode yasnippet-snippets))
  '(safe-local-variable-values '((TeX-engine . pdflatex)))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
@@ -964,8 +963,9 @@
 
   :config
   ;; Checkers for Python
-  (setq flycheck-python-flake8-executable "flake8")
-  (setq flycheck-python-pylint-executable "pylint")
+  (setq flycheck-python-flake8-executable "~/.virtualenvs/elpy/bin/flake8")
+  (setq flycheck-python-ruff-executable   "~/.virtualenvs/elpy/bin/ruff")
+  (setq flycheck-python-pylint-executable "~/.virtualenvs/elpy/bin/pylint")
   ;; make python-pylint run after python-flake8
 
   )
@@ -1466,6 +1466,12 @@
   (setq python-shell-interpreter-args "-i -c \"import os; print('os.getcwd:', os.getcwd()); import sys; print('sys.executable:' ,sys.executable)\" ")
   (setq python-shell-completion-native-enable nil)
 
+  ;; All symlinked files will resolve to their true location → one single pylsp server per project.
+  (setq find-file-visit-truename t)     ;; always resolve symlinks
+  (add-hook 'python-mode-hook
+            (lambda ()
+              (setq-local buffer-file-name (file-truename buffer-file-name))))
+
   ;; Enter to indent in python.el
   (define-key python-mode-map (kbd "C-m") 'newline-and-indent)
 
@@ -1524,7 +1530,7 @@
   (setq elpy-rpc-virtualenv-path (concat (getenv "HOME") "/.virtualenvs/elpy/"))
   (setq elpy-rpc-python-command "python3")
   (setq elpy-rpc-backend "jedi")
-  (setq elpy-syntax-check-command "flake8")
+  (setq elpy-syntax-check-command (concat (getenv "HOME") "/.virtualenvs/elpy/bin/flake8"))
 
   ;; (remove-hook 'elpy-modules 'elpy-module-pyvenv)
   (remove-hook 'elpy-modules #'elpy-module-highlight-indentation)
@@ -1571,6 +1577,9 @@
   (lsp-pylsp-plugins-pydocstyle-ignore ["D100" "D103" "D202" "D212" "D400" "D417" "D413"])
   (lsp-pylsp-plugins-black-enabled t)
   (lsp-pylsp-plugins-isort-enabled t) ; auto sort Python imports
+
+  ;; (lsp-pylsp-plugins-ruff-enabled t)
+  ;; (lsp-pylsp-plugins-ruff-exclude "~/.virtualenvs/elpy/bin/ruff")
 
 
   :config
