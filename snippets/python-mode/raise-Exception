@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: raise Exception()
+# key: ra
+# group: testing
+# --
+raise Exception("$1")
