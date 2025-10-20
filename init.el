@@ -963,9 +963,9 @@
 
   :config
   ;; Checkers for Python
-  (setq flycheck-python-flake8-executable "~/.virtualenvs/elpy/bin/flake8")
-  (setq flycheck-python-ruff-executable   "~/.virtualenvs/elpy/bin/ruff")
-  (setq flycheck-python-pylint-executable "~/.virtualenvs/elpy/bin/pylint")
+  (setq flycheck-python-flake8-executable "flake8")
+  (setq flycheck-python-ruff-executable   "ruff")
+  (setq flycheck-python-pylint-executable "pylint")
   ;; make python-pylint run after python-flake8
 
   )
