@@ -523,10 +523,37 @@
   (global-set-key (kbd "C-c r") #'my-counsel-rg-in-dir)
 
 
-;; Use C-j for immediate termination with the current value, and RET for continuing
-;; completion for that directory. This is the ido behaviour.
-(define-key ivy-minibuffer-map (kbd "C-j") #'ivy-immediate-done)
-(define-key ivy-minibuffer-map (kbd "RET") #'ivy-alt-done)
+  (defun my-counsel-fzf-touch-and-open-file (initial-dir)
+    "Fuzzy select a directory, prompt for a filename with tab completion, create it, and open it. With prefix argument C-u, prompt for initial directory."
+    (interactive
+     (list (if current-prefix-arg
+               (expand-file-name (read-directory-name "Search from directory: "))
+             default-directory)))
+    (ivy-read "Select leaf directory: "
+              (split-string
+               (shell-command-to-string
+                (format "find %s -type d -name .git -prune -o -type d -print 2>/dev/null"
+                        (expand-file-name initial-dir)))
+               "\n" t)
+              :action (lambda (selected-dir)
+                        (let* ((selected-dir (expand-file-name selected-dir))
+                               ;; Use read-file-name for TAB completion
+                               (filepath (read-file-name "Enter filename: " selected-dir nil nil)))
+                          ;; Create the file if it doesn't exist
+                          (unless (file-exists-p filepath)
+                            (with-temp-buffer
+                              (write-file filepath)))
+                          ;; Open the file
+                          (find-file filepath)
+                          (message "File opened: %s" filepath)))
+              :caller 'my-counsel-fzf-touch-and-open-file))
+   (global-set-key (kbd "C-c n") #'my-counsel-fzf-touch-and-open-file)
+
+
+  ;; Use C-j for immediate termination with the current value, and RET for continuing
+  ;; completion for that directory. This is the ido behaviour.
+  (define-key ivy-minibuffer-map (kbd "C-j") #'ivy-immediate-done)
+  (define-key ivy-minibuffer-map (kbd "RET") #'ivy-alt-done)
 
   ;; Ignore hidden files.
   (setq counsel-find-file-ignore-regexp
