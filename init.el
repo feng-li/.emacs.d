@@ -15,7 +15,7 @@
 ;; Add path for auto saved files
 ;;; Code:
 (defvar my-base-save-list (concat (getenv "HOME") "/.config/emacs" (number-to-string emacs-major-version)))
-(defvar my-auto-save-list (concat my-base-save-list (system-name))) ;; host-specified
+(defvar my-auto-save-list (concat my-base-save-list "/" (system-name))) ;; host-specified
 (unless (file-directory-p my-auto-save-list) (make-directory my-auto-save-list t))
 
 (setq package-archives
@@ -420,15 +420,6 @@
   (bookmark-set (buffer-file-name) nil))
 (global-set-key (kbd "<f9> m") 'bookmark-current-file)
 
-
-;;Session (keep sections with different machines)
-;; (use-package session"
-;;   '(progn
-;;      (setq session-use-package nil)
-;;      (add-hook 'after-init-hook 'session-initialize)
-;;      ;; Save sessions with customization
-;;      (setq session-save-file (concat my-auto-save-list "/session-save-file.el"))
-;;      ))
 
 ;; Eshell
 (setq eshell-directory-name (concat my-auto-save-list "/eshell"))
@@ -1581,6 +1572,8 @@
   ;; (lsp-pylsp-plugins-ruff-enabled t)
   ;; (lsp-pylsp-plugins-ruff-exclude "~/.virtualenvs/elpy/bin/ruff")
 
+  :hook
+  (python-mode . lsp)
 
   :config
   (setq lsp-keymap-prefix "C-c l")

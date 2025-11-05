@@ -57,9 +57,14 @@
 % \preauthor{\\}
 % \postauthor{}
 \usepackage{enumitem}
-\setlist[enumerate,itemize]{
-  listparindent=\parindent, % Indented paragraphs within lists
-  label=(\arabic*)          % enumerate as (1), (2)...
+% For enumerate:
+\setlist[enumerate]{%
+  listparindent=\parindent,
+  label=(\arabic*)
+}
+% For itemize:
+\setlist[itemize]{%
+  listparindent=\parindent
 }
 \setlength{\itemsep}{0.0pt}
 
