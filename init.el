@@ -102,6 +102,7 @@
 (setenv "TERM" "xterm-256color")
 (setenv "COLORTERM" "trueclor") ;; Ensure True Color in Systemd
 (add-to-list 'term-file-aliases '("dumb" . "xterm-256color"))
+;; (setenv "ENCHANT_CONFIG_DIR" (concat user-emacs-directory "dict/enchant"))
 
 ;; Stop displaying strange symbols in place of the desired colored output
 (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
@@ -906,7 +907,7 @@
       (progn
         (setq ispell-program-name "hunspell")
         (setq ispell-really-hunspell t)
-        (setenv "DICPATH" (concat user-emacs-directory "dicts/hunspell"))
+        (setenv "DICPATH" (concat user-emacs-directory "dict/hunspell"))
         (setq ispell-local-dictionary "en_US")
         (setq ispell-local-dictionary-alist
               '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil
@@ -923,6 +924,7 @@
 	 ("C-M-$" . jinx-languages))
 
   :config
+
   (add-to-list 'jinx-exclude-regexps '(t "\\cc")) ;; Disable Chinese check
 
   )
