@@ -510,7 +510,8 @@
   (global-set-key (kbd "M-,") 'counsel-M-x) ; mirror of M-x
   (global-set-key (kbd "C-x C-f") 'counsel-find-file)
   (global-set-key (kbd "C-c G") 'counsel-git-grep)
-  (global-set-key (kbd "C-c g") 'counsel-rg) ;; find patten within git repository, rg is faster than ag
+  (global-set-key (kbd "C-c g") 'counsel-rg) ;; find a content pattern default within git repository, using prefix C-u for any git directory. rg is faster than ag
+  (global-set-key (kbd "C-t") 'counsel-fzf)  ;; find a pattern default within git repository, using prefix C-u for any directory.
   (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
   (define-key ivy-minibuffer-map (kbd "C-c C-v") 'ivy-occur)
 
@@ -521,17 +522,11 @@
       (counsel-rg nil dir)))
   (global-set-key (kbd "C-c r") #'my-counsel-rg-in-dir)
 
-  (defun my-counsel-fzf-in-dir ()
-    "Run `counsel-rg` in a directory of your choice."
-    (interactive)
-    (let ((dir (read-directory-name "Find a file (fzf) in directory: ")))
-      (counsel-fzf nil dir)))
-  (global-set-key (kbd "C-t") #'my-counsel-fzf-in-dir)
 
-  ;; Use C-j for immediate termination with the current value, and RET for continuing
-  ;; completion for that directory. This is the ido behaviour.
-  (define-key ivy-minibuffer-map (kbd "C-j") #'ivy-immediate-done)
-  (define-key ivy-minibuffer-map (kbd "RET") #'ivy-alt-done)
+;; Use C-j for immediate termination with the current value, and RET for continuing
+;; completion for that directory. This is the ido behaviour.
+(define-key ivy-minibuffer-map (kbd "C-j") #'ivy-immediate-done)
+(define-key ivy-minibuffer-map (kbd "RET") #'ivy-alt-done)
 
   ;; Ignore hidden files.
   (setq counsel-find-file-ignore-regexp
@@ -945,7 +940,7 @@
 (use-package flycheck
   :ensure t
   :custom
-  (flycheck-checker-error-threshold 800)
+  (flycheck-checker-error-threshold 2000)
   (flycheck-check-syntax-automatically (quote (idle-change mode-enabled))) ; save
   (flycheck-idle-change-delay 3) ;; Set delay based on what suits you the best
   (global-flycheck-mode t)
@@ -979,17 +974,6 @@
   (flycheck-languagetool-setup)
   )
 
-
-;; (use-package flycheck-grammarly
-;;   :defer nil
-;;   :custom
-;;   (flycheck-grammarly-active-modes
-;;    '(LaTeX-mode org-mode markdown-mode gfm-mode))
-;;   :config
-;;   (setq flycheck-grammarly-check-time 0.8)
-
-;;   (flycheck-grammarly-setup)
-;;   )
 
 (use-package synosaurus
   :config
