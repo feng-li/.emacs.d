@@ -539,11 +539,9 @@
 
 
   (defun my-counsel-fzf-touch-and-open-file (initial-dir)
-    "Fuzzy select a directory, prompt for a filename with tab completion, create it, and open it. With prefix argument C-u, prompt for initial directory."
+    "Fuzzy select a directory, prompt for a filename with tab completion, create it, and open it."
     (interactive
-     (list (if current-prefix-arg
-               (expand-file-name (read-directory-name "Search from directory: "))
-             default-directory)))
+     (list (expand-file-name (read-directory-name "Search from directory: "))))
     (ivy-read "Select leaf directory: "
               (split-string
                (shell-command-to-string
@@ -551,19 +549,17 @@
                         (expand-file-name initial-dir)))
                "\n" t)
               :action (lambda (selected-dir)
-                        (let* ((selected-dir (expand-file-name selected-dir))
-                               ;; Use read-file-name for TAB completion
-                               (filepath (read-file-name "Enter filename: " selected-dir nil nil)))
-                          ;; Create the file if it doesn't exist
-                          (unless (file-exists-p filepath)
-                            (with-temp-buffer
-                              (write-file filepath)))
-                          ;; Open the file
-                          (find-file filepath)
-                          (message "File opened: %s" filepath)))
-              :caller 'my-counsel-fzf-touch-and-open-file))
-   (global-set-key (kbd "C-c n") #'my-counsel-fzf-touch-and-open-file)
-
+                        (setq selected-dir (expand-file-name selected-dir))
+                        ;; Use a temporary buffer to set the working directory context
+                        (with-temp-buffer
+                          (cd selected-dir)
+                          (let ((filepath (read-file-name "Enter filename: " selected-dir nil nil)))
+                            (unless (file-exists-p filepath)
+                              (with-temp-buffer (write-file filepath)))
+                            (find-file filepath)
+                            (message "File opened: %s" filepath))))
+    :caller 'my-counsel-fzf-touch-and-open-file))
+  (global-set-key (kbd "C-c n") #'my-counsel-fzf-touch-and-open-file)
 
   ;; Use C-j for immediate termination with the current value, and RET for continuing
   ;; completion for that directory. This is the ido behaviour.
