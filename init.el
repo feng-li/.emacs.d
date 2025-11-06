@@ -231,6 +231,8 @@
   (visual-fill-column-width (+ fill-column +6)) ;; fill-column+6
 
   :config
+  (add-hook 'visual-line-mode-hook #'visual-fill-column-for-vline)
+
   (dolist (hook '(message-mode-hook
                   ;; prog-mode-hook
                   org-mode-hook
@@ -239,16 +241,29 @@
                   reftex-toc-mode-hook))
     (add-hook hook #'(lambda ()
                      (visual-line-mode t)
-                     (visual-fill-column-mode)
-                     )))
+                     ;; (visual-fill-column-mode)
+                       )))
+
+  (defun my-latex-toggle-visual-fill-column ()
+    "Disable visual-fill-column in long table/tabular environments only."
+    (when (derived-mode-p 'latex-mode)
+      (let ((env (ignore-errors (LaTeX-current-environment))))
+        (if (member env '("table" "tabular" "tabularx" "longtable"))
+            (when visual-fill-column-mode
+              (visual-fill-column-mode -1))
+          (unless visual-fill-column-mode
+            (visual-fill-column-mode 1))))))
+  (add-hook 'post-command-hook #'my-latex-toggle-visual-fill-column)
   )
 
-(use-package adaptive-wrap
-  :ensure t
-  :config
-  (setq-default adaptive-wrap-extra-indent 0)
-  (add-hook 'visual-line-mode-hook #'adaptive-wrap-prefix-mode)
-  )
+
+
+;; (use-package adaptive-wrap
+;;   :ensure t
+;;   :config
+;;   (setq-default adaptive-wrap-extra-indent 0)
+;;   (add-hook 'visual-line-mode-hook #'adaptive-wrap-prefix-mode)
+;;   )
 
 
 ;; shift selection
@@ -1253,6 +1268,8 @@
                 ;;              '(m "\\bm{" "}"))
                 ))
 
+
+
   ;; Translate key § to ` so both can be used as a math abbreviation
   ;; Drawback, could not type § anymore. Make it locally?
   (keyboard-translate ?§ ?`)
@@ -1335,6 +1352,7 @@
 
   (with-eval-after-load 'reftex
     (define-key reftex-mode-map (kbd "C-x C-s") #'my-latex-rescan-on-save))
+
 
   )
 
