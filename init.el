@@ -65,11 +65,11 @@
  '(org-support-shift-select t)
  '(package-selected-packages
    '(adaptive-wrap auctex company-reftex counsel dracula-theme electric-operator elpy envrc flycheck-julia
-                   flycheck-languagetool format-all gnu-elpa-keyring-update gptel highlight-doxygen highlight-symbol
-                   iedit imenu-list jinx julia-mode keytar lexic lsp-latex lsp-metals magit magit-popup
-                   math-symbol-lists multiple-cursors mw-thesaurus neotree notmuch pandoc-mode pdf-tools pinyinlib
-                   poly-R popup powerthesaurus proxy-mode synosaurus treesit-auto unfill visual-fill-column wgrep
-                   writegood-mode yaml-mode yasnippet-snippets))
+                   flycheck-languagetool format-all gnu-elpa-keyring-update gptel highlight-doxygen
+                   highlight-indent-guides highlight-symbol iedit imenu-list jinx julia-mode keytar lexic lsp-latex
+                   lsp-metals magit magit-popup math-symbol-lists multiple-cursors mw-thesaurus neotree notmuch
+                   pandoc-mode pdf-tools pinyinlib poly-R popup powerthesaurus proxy-mode synosaurus treesit-auto unfill
+                   visual-fill-column wgrep writegood-mode yaml-mode yasnippet-snippets))
  '(safe-local-variable-values '((TeX-engine . pdflatex)))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
@@ -1530,6 +1530,27 @@
 
                 ))
   )
+
+
+(use-package highlight-indent-guides
+  :ensure t
+  :config
+
+  (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
+
+
+  (defun my-highlighter (level responsive display)
+  (if (> 1 level)
+      nil
+    (highlight-indent-guides--highlighter-default level responsive display)))
+  (setq highlight-indent-guides-highlighter-function 'my-highlighter)
+
+  (setq highlight-indent-guides-auto-enabled nil)
+  (set-face-background 'highlight-indent-guides-odd-face "dimgray")
+  (set-face-background 'highlight-indent-guides-even-face "dimgray")
+  (set-face-foreground 'highlight-indent-guides-character-face "dimgray")
+  (setq highlight-indent-guides-method 'character)
+ )
 
 
 (use-package elpy
