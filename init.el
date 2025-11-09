@@ -248,7 +248,7 @@
     "Disable visual-fill-column in long table/tabular environments only."
     (when (derived-mode-p 'latex-mode)
       (let ((env (ignore-errors (LaTeX-current-environment))))
-        (if (member env '("table" "tabular" "tabularx" "longtable"))
+        (if (member env '("tabular" "tabularx" "longtable"))
             (when visual-fill-column-mode
               (visual-fill-column-mode -1))
           (unless visual-fill-column-mode
@@ -258,12 +258,12 @@
 
 
 
-;; (use-package adaptive-wrap
-;;   :ensure t
-;;   :config
-;;   (setq-default adaptive-wrap-extra-indent 0)
-;;   (add-hook 'visual-line-mode-hook #'adaptive-wrap-prefix-mode)
-;;   )
+(use-package adaptive-wrap
+  :ensure t
+  :config
+  (setq-default adaptive-wrap-extra-indent 0)
+  (add-hook 'visual-line-mode-hook #'adaptive-wrap-prefix-mode)
+  )
 
 
 ;; shift selection

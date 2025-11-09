@@ -44,7 +44,7 @@
 \titlespacing{\subsection}{0pt}{0ex}{0ex}
 \titlespacing{\subsubsection}{0pt}{0ex}{0ex}
 
-\setlength{\parskip}{0cm}
+\setlength{\parskip}{0.1em}
 \setlength{\parindent}{1em}
 
 
@@ -57,16 +57,16 @@
 % \preauthor{\\}
 % \postauthor{}
 \usepackage{enumitem}
-% For enumerate:
+\usepackage{enumitem}
 \setlist[enumerate]{%
+  topsep=0pt,parsep=0.0em,partopsep=0pt,itemsep=0.2em,
   listparindent=\parindent,
   label=(\arabic*)
 }
-% For itemize:
 \setlist[itemize]{%
+  topsep=0pt,parsep=0.0em,partopsep=0pt,itemsep=0.0em,
   listparindent=\parindent
 }
-\setlength{\itemsep}{0.0pt}
 
 %% Reply Environment: \RE[]{} -> blue text, \RE{} -> Re: blue text
 \newcommand{\RE}[2][Re:~]{{\color{blue}\textbf{#1}#2}}
