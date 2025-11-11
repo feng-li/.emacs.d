@@ -14,8 +14,8 @@
 
 ;; Add path for auto saved files
 ;;; Code:
-(defvar my-base-save-list (concat (getenv "HOME") "/.config/emacs" (number-to-string emacs-major-version)))
-(defvar my-auto-save-list (concat my-base-save-list "/" (system-name))) ;; host-specified
+(defvar my-base-save-list (concat (getenv "HOME") "/.config/emacs" (number-to-string emacs-major-version) "/"))
+(defvar my-auto-save-list (concat my-base-save-list (system-name))) ;; host-specified
 (unless (file-directory-p my-auto-save-list) (make-directory my-auto-save-list t))
 
 (setq package-archives
