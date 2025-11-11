@@ -10,8 +10,17 @@
 % \PassOptionsToPackage{draft}{graphicx} % comment out this for compiling the final version
 
 %% Fonts
+\ifXeTeX
+  \usepackage{fontspec} % load system fonts, no fontenc/inputenc
+  \setmainfont{Times New Roman}
+  % \setmainfont{Garamond Premier Pro}
+  % \setmonofont[Scale=0.9]{Garamond Premier Pro}
+\else
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\fi
+
 % \usepackage[scheme=plain,fontset=adobe]{ctex} % Chinese fonts support
-\usepackage{fontspec} % Using XeLaTeX for rendering Š or ł.
 \usepackage{multicol}
 \usepackage{multirow}
 \usepackage{mathabx}

@@ -7,10 +7,18 @@
 # --
 \documentclass[a4paper,11pt]{article}
 
+%% Fonts
+\ifXeTeX
+  \setmainfont{Times New Roman}
+  \usepackage[no-math]{fontspec}% LuaLaTeX or XeLaTeX only
+  % \setmonofont{Noto Mono}
+  % \setmonofont[Scale=0.9]{Garamond Premier Pro}
+\else
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\fi
+
 %\usepackage[garamond]{mathdesign} % Garamond Math Font
-\usepackage[no-math]{fontspec}% LuaLaTeX or XeLaTeX only
-\setmainfont{Garamond Premier Pro}
-%\setmonofont{Noto Mono}
 \usepackage{fontawesome}
 
 \usepackage[twoside]{geometry}

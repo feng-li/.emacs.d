@@ -8,10 +8,19 @@
 \documentclass[11pt,a4paper]{article}
 
 %% Fonts
-\usepackage{fontspec} % LuaLaTeX or XeLaTeX only
-\setmainfont{Times New Roman}
+\ifXeTeX
+  \usepackage{fontspec} % load system fonts, no fontenc/inputenc
+  \setmainfont{Times New Roman}
+  % \setmainfont{Garamond Premier Pro}
+  % \setmonofont[Scale=0.9]{Garamond Premier Pro}
+\else
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\fi
 
 \usepackage{amssymb,amsmath}
+\usepackage{yhmath} % widehat and widetilde
+\usepackage{pdfpages}
 
 %% Page margin and linspacing
 \usepackage{geometry}
@@ -78,7 +87,7 @@
 \date{}
 \maketitle
 
-We would like to thank the Editor, Associate Editor and the two anonymous reviewers for reviewing our paper. We also thank you for the insightful comments and suggestions. In this revision, we have addressed all the comments raised by the reviewers, providing a point-to-point response to each comment made by the authors.
+We would like to thank the Editor, Associate Editor and the two anonymous reviewers for reviewing our paper. We also thank you for the insightful comments and suggestions. In this revision, we have addressed all the comments raised by the reviewers, providing a point-to-point response to each comment made by the authors. For your convenience, the revised manuscript showing all highlighted changes is provided at the end of this reply letter.
 
 \section*{\bf Responses to Associate Editor's comments}
 \label{ae-comments}
@@ -147,4 +156,8 @@ point-to-point response to your comments.
 
 \printbibliography[heading=subbibliography,title={References}]
 \end{refsection}
+
+%% Include changes in the end of document.
+% \includepdf[pages=-]{../diff_f88fa29d18f0bbc0f1.pdf}
+
 \end{document}

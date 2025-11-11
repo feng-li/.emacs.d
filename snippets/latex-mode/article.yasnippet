@@ -8,17 +8,21 @@
 \documentclass[a4paper]{article}
 
 %% Fonts
+\ifXeTeX
+  \usepackage{fontspec} % load system fonts, no fontenc/inputenc
+  \setmainfont{Times New Roman}
+  % \setmainfont{Garamond Premier Pro}
+  % \setmonofont[Scale=0.9]{Garamond Premier Pro}
+\else
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\fi
 
 % \usepackage[fontset=adobe]{ctex} % Chinese fonts
-
 % \usepackage[garamond]{mathdesign} % Garamond Math Font
-\usepackage[no-math]{fontspec}% LuaLaTeX or XeLaTeX only
-
-\setmainfont{Times New Roman}
-% \setmainfont{Garamond Premier Pro}
-% \setmonofont[Scale=0.9]{Garamond Premier Pro}
 
 \usepackage{amssymb,amsmath}
+\usepackage{yhmath} % widiehat and widetilde
 \usepackage{graphicx}
 
 %% Page margin and line spacing
