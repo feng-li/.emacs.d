@@ -66,7 +66,7 @@
  '(package-selected-packages
    '(adaptive-wrap auctex company-reftex counsel dracula-theme electric-operator elpy envrc flycheck-julia
                    flycheck-languagetool format-all gnu-elpa-keyring-update gptel highlight-doxygen
-                   highlight-indent-guides highlight-symbol iedit imenu-list jinx julia-mode keytar lexic lsp-latex
+                   highlight-symbol iedit imenu-list jinx julia-mode keytar lexic lsp-latex
                    lsp-metals magit magit-popup math-symbol-lists multiple-cursors mw-thesaurus neotree notmuch
                    pandoc-mode pdf-tools pinyinlib poly-R popup powerthesaurus proxy-mode synosaurus treesit-auto unfill
                    visual-fill-column wgrep writegood-mode yaml-mode yasnippet-snippets))
@@ -179,6 +179,8 @@
 ;; Tooltip mode
 (tooltip-mode nil)
 
+;; Which key mode
+(which-key-mode 1)
 ;; Global auto revert mode
 ;; (global-auto-revert-mode t)
 
@@ -1200,27 +1202,23 @@
   ;;                       company-backends)))
   ;; (add-hook 'TeX-mode-hook 'my-latex-mode-setup)
 
-  ;; LATEXMK integration
-  (use-package auctex-latexmk)
-  ;; (auctex-latexmk-setup) ; not needed auctex-latexmk-pvc already called.
-  (use-package auctex-latexmk-pvc
-    :ensure nil
-    :config
-    (auctex-latexmk-pvc-setup)
+  ;; LATEXMK-PVC integration
+  (setq-default TeX-output-dir (concat "auto/" (system-name)))
+  (add-hook 'LaTeX-mode-hook
+            (lambda ()
+              (add-to-list 'TeX-command-list
+                           `("LaTeXMkPvc"
+                             ;; AUCTeX latexmk placeholders must be preserved:
+                             "latexmk -pvc %(latexmk-out) %(file-line-error) %(output-dir) %`%(extraopts) %S%(mode)%' %t"
+                             TeX-run-TeX
+                             nil
+                             (LaTeX-mode docTeX-mode)
+                             :help "Run LaTeXMk continuously (-pvc)"))))
+  ;; Replace LaTeX with latexmk -pvc
+  (add-hook 'TeX-mode-hook '(lambda () (setq TeX-command-default "LaTeXMkPvc")))
 
-    (setq TeX-output-dir "auto")
-    ;; Make sure preview is always viable for PDF file in LatexMkpvc.
-    ;; (setq TeX-view-program-selection
-    ;;       '((output-pdf "Evince")))
-    ;; (add-to-list 'TeX-view-program-list '("Evince" "evince %o"))
-    ;; (setq TeX-output-extension "pdf")
-    ;; (setq TeX-PDF-mode t)
 
-    ;; Replace LaTeX with latexmk -pvc
-    (add-hook 'TeX-mode-hook '(lambda () (setq TeX-command-default "LatexMkPvc")))
-    )
-
-  ;; Other settings
+;; Other settings
   (remove-hook 'LaTeX-mode-hook #'auto-fill-mode)
 
   ;; LaTeX-mode-hook
@@ -1532,27 +1530,6 @@
   )
 
 
-(use-package highlight-indent-guides
-  :ensure t
-  :config
-
-  (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
-
-
-  (defun my-highlighter (level responsive display)
-  (if (> 1 level)
-      nil
-    (highlight-indent-guides--highlighter-default level responsive display)))
-  (setq highlight-indent-guides-highlighter-function 'my-highlighter)
-
-  (setq highlight-indent-guides-auto-enabled nil)
-  (set-face-background 'highlight-indent-guides-odd-face "dimgray")
-  (set-face-background 'highlight-indent-guides-even-face "dimgray")
-  (set-face-foreground 'highlight-indent-guides-character-face "dimgray")
-  (setq highlight-indent-guides-method 'character)
- )
-
-
 (use-package elpy
   :ensure t
   :config
@@ -1603,7 +1580,7 @@
 (use-package lsp-mode
   :after company
   :ensure t
-  :commands (lsp lsp-deferred)
+  ;; :commands (lsp lsp-deferred)
   :custom
   (lsp-diagnostics-provider :flycheck) ; could be :none
   (lsp-diagnostics-flycheck-default-level 'warning)
@@ -1624,7 +1601,7 @@
   (python-mode . lsp)
 
   :config
-  (setq lsp-keymap-prefix "C-c l")
+  (define-key lsp-mode-map (kbd "C-c l") lsp-command-map)
   (setq lsp-server-install-dir (concat (getenv "HOME") "/.config/emacs" (number-to-string emacs-major-version) "/lsp-server"))
   (setq lsp-session-file (concat my-auto-save-list "/lsp-session-v1"))
   (setq lsp-restart 'ignore)  ;; How server-exited events must be handled.
