@@ -1203,13 +1203,13 @@
   ;; (add-hook 'TeX-mode-hook 'my-latex-mode-setup)
 
   ;; LATEXMK-PVC integration
-  (setq-default TeX-output-dir (concat "auto/" (system-name)))
+  ;; (setq-default TeX-output-dir (concat "auto/" (system-name))) ;; do not set this, latexmk obeys latexmkrc config
   (add-hook 'LaTeX-mode-hook
             (lambda ()
               (add-to-list 'TeX-command-list
                            `("LaTeXMkPvc"
                              ;; AUCTeX latexmk placeholders must be preserved:
-                             "latexmk -pvc %(latexmk-out) %(file-line-error) %(output-dir) %`%(extraopts) %S%(mode)%' %t"
+                             "latexmk -pvc %(latexmk-out) %(file-line-error) %`%(extraopts) %S%(mode)%' %t"
                              TeX-run-TeX
                              nil
                              (LaTeX-mode docTeX-mode)
