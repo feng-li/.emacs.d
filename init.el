@@ -65,11 +65,11 @@
  '(org-support-shift-select t)
  '(package-selected-packages
    '(adaptive-wrap auctex company-reftex counsel dracula-theme electric-operator elpy envrc flycheck-julia
-                   flycheck-languagetool format-all gnu-elpa-keyring-update gptel highlight-doxygen
-                   highlight-symbol iedit imenu-list jinx julia-mode keytar lexic lsp-latex
-                   lsp-metals magit magit-popup math-symbol-lists multiple-cursors mw-thesaurus neotree notmuch
-                   pandoc-mode pdf-tools pinyinlib poly-R popup powerthesaurus proxy-mode synosaurus treesit-auto unfill
-                   visual-fill-column wgrep writegood-mode yaml-mode yasnippet-snippets))
+                   flycheck-languagetool format-all gnu-elpa-keyring-update gptel highlight-doxygen highlight-symbol
+                   iedit imenu-list jinx julia-mode keytar lexic lsp-latex lsp-metals magit magit-popup
+                   math-symbol-lists multiple-cursors mw-thesaurus neotree notmuch pandoc-mode pdf-tools pinyinlib
+                   poly-R popup powerthesaurus proxy-mode synosaurus treesit-auto unfill visual-fill-column wgrep
+                   writegood-mode yaml-mode yasnippet-snippets))
  '(safe-local-variable-values '((TeX-engine . pdflatex)))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
@@ -1580,7 +1580,7 @@
 (use-package lsp-mode
   :after company
   :ensure t
-  ;; :commands (lsp lsp-deferred)
+  :commands (lsp lsp-deferred)
   :custom
   (lsp-diagnostics-provider :flycheck) ; could be :none
   (lsp-diagnostics-flycheck-default-level 'warning)
@@ -1590,7 +1590,7 @@
   (lsp-pylsp-plugins-flake8-enabled t)
   (lsp-pylsp-plugins-flake8-config "~/.config/flake8/tox.ini")
   (lsp-pylsp-plugins-pydocstyle-enabled t)
-  (lsp-pylsp-plugins-pydocstyle-ignore ["D100" "D103" "D202" "D212" "D400" "D417" "D413"])
+  (lsp-pylsp-plugins-pydocstyle-ignore ["D100" "D103" "D202" "D212" "D400" "D417" "D413" "E402"])
   (lsp-pylsp-plugins-black-enabled t)
   (lsp-pylsp-plugins-isort-enabled t) ; auto sort Python imports
 
@@ -1598,10 +1598,13 @@
   ;; (lsp-pylsp-plugins-ruff-exclude "~/.virtualenvs/elpy/bin/ruff")
 
   :hook
-  (python-mode . lsp)
+  (
+   (python-mode . lsp-deferred)
+   ;; (c-mode      . lsp-deferred)
+   )
 
   :config
-  (define-key lsp-mode-map (kbd "C-c l") lsp-command-map)
+  (setq lsp-keymap-prefix "C-c l")
   (setq lsp-server-install-dir (concat (getenv "HOME") "/.config/emacs" (number-to-string emacs-major-version) "/lsp-server"))
   (setq lsp-session-file (concat my-auto-save-list "/lsp-session-v1"))
   (setq lsp-restart 'ignore)  ;; How server-exited events must be handled.
@@ -1617,7 +1620,7 @@
   ;; (setq lsp-completion-provider :none)
 
   ;; Only enable certain LSP client and do not ask for server install.
-  (setq lsp-enabled-clients '(pylsp texlab2))
+  (setq lsp-enabled-clients '(pylsp lsp-r texlab2))
   ;; (setq lsp-enabled-clients '(metals pyls pylsp ruff semgrep-ls grammarly-ls))
 
   ;;(setq lsp-clients-pylsp-library-directories "~/.virtualenvs/elpy/")
