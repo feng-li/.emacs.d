@@ -8,6 +8,7 @@
 \documentclass[a4paper]{article}
 
 %% Fonts
+\usepackage{iftex}
 \ifXeTeX
   \usepackage{fontspec} % load system fonts, no fontenc/inputenc
   \setmainfont{Times New Roman}
@@ -115,11 +116,30 @@ giveninits=true, uniquename=init, maxcitenames=2, date=year, maxbibnames=99, saf
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{document}
-\title{ }
 
-\author{ Feng Li }
+\title{ Title }
+
+\author{
+        Student Name \thanks{Guanghua School of Management, Peking University, Beijing 100871, China.}
+        \and
+        Feng Li \thanks{Guanghua School of Management, Peking University, Beijing 100871, China.
+          Email: \href{mailto:feng.li@gsm.pku.edu.cn}{feng.li@gsm.pku.edu.cn}.
+          ORCiD: \href{https://orcid.org/0000-0002-4248-9778}{0000-0002-4248-9778}}
+      }
 \date{}
 \maketitle
+
+
+\begin{abstract}
+Write your abstract here. Keep it concise and informative.
+
+\end{abstract}
+
+\textbf{Keywords:} forecasting; time series; reconciliation; Bayesian methods \\
+
+%% https://www.aeaweb.org/econlit/jelCodes.php?view=jel
+% \textbf{JEL codes:} XX; YY
+
 
 \section{Introduction}
 \label{sec:intro}
