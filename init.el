@@ -1348,6 +1348,17 @@
     (define-key reftex-mode-map (kbd "C-x C-s") #'my-latex-rescan-on-save))
 
 
+  ;; Count TeX words using texcount.pl
+  (defun texcount-word ()
+    (interactive)
+    (shell-command (concat "texcount "
+                           ;; uncomment the line below to add options, e.g., "-inc" to include subfiles
+                           ;; "-inc "
+                           ;; "-sum=1,1,1 " ; example to count only words
+                           (shell-quote-argument buffer-file-name))
+                   "*TeXcount Output*"))
+  (define-key LaTeX-mode-map (kbd "C-c w") 'texcount-word)
+
   )
 
 
