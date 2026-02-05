@@ -1357,8 +1357,7 @@
                            ;; "-sum=1,1,1 " ; example to count only words
                            (shell-quote-argument buffer-file-name))
                    "*TeXcount Output*"))
-  (define-key LaTeX-mode-map (kbd "C-c w") 'texcount-word)
-
+  (define-key TeX-mode-map (kbd "C-c w") #'texcount-word)
   )
 
 
