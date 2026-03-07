@@ -545,7 +545,7 @@
     "Fuzzy select a directory, prompt for a filename with tab completion, create it, and open it."
     (interactive
      (list (expand-file-name (read-directory-name "Search from directory: "))))
-    (ivy-read "Select leaf directory: "
+    (ivy-read "Directory patterns: "
               (split-string
                (shell-command-to-string
                 (format "find %s -type d -name .git -prune -o -type d -print 2>/dev/null"
