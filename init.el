@@ -68,8 +68,8 @@
                    flycheck-languagetool format-all gnu-elpa-keyring-update gptel highlight-doxygen highlight-symbol
                    iedit imenu-list jinx julia-mode keytar lexic lsp-latex lsp-metals magit magit-popup
                    math-symbol-lists multiple-cursors mw-thesaurus neotree notmuch pandoc-mode pdf-tools pinyinlib
-                   poly-R popup powerthesaurus proxy-mode synosaurus treesit-auto unfill visual-fill-column wgrep
-                   writegood-mode yaml-mode yasnippet-snippets))
+                   poly-R popup powerthesaurus projectile proxy-mode synosaurus treemacs-projectile treesit-auto unfill
+                   visual-fill-column wgrep writegood-mode yaml-mode yasnippet-snippets))
  '(safe-local-variable-values '((TeX-engine . pdflatex)))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
@@ -102,6 +102,7 @@
 (setenv "TERM" "xterm-256color")
 (setenv "COLORTERM" "trueclor") ;; Ensure True Color in Systemd
 (add-to-list 'term-file-aliases '("dumb" . "xterm-256color"))
+
 ;; (setenv "ENCHANT_CONFIG_DIR" (concat user-emacs-directory "dict/enchant"))
 
 ;; Stop displaying strange symbols in place of the desired colored output
@@ -1137,7 +1138,7 @@
     (add-hook hook (lambda () (pandoc-mode))))
   (add-hook 'pandoc-mode-hook
             (lambda ()
-              (local-set-key (kbd "C-c p") 'pandoc-main-hydra/body)))
+              (local-set-key (kbd "C-c m") 'pandoc-main-hydra/body)))
   )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1672,6 +1673,26 @@
   (setq lsp-metals-coursier-store-path (concat (getenv "HOME") "/.local/share/coursier/bin/coursier"))
 
   )
+
+(use-package treemacs
+  :defer t
+  :config
+  (treemacs-follow-mode 1)
+  (treemacs-filewatch-mode 1)
+  (treemacs-git-mode 'extended)
+  (define-key treemacs-mode-map [mouse-1] #'treemacs-single-click-expand-action)
+  )
+(add-hook 'emacs-startup-hook #'treemacs)
+
+(use-package projectile
+  :config
+  (projectile-mode 1)
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+  (setq projectile-known-projects-file (concat my-auto-save-list "/projectile-known-projects-file.eld"))
+  )
+
+(use-package treemacs-projectile
+  :after (treemacs projectile))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; SCALA IDE
