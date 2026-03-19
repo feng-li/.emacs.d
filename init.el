@@ -520,6 +520,12 @@
   (setq ivy-use-virtual-buffers t)
   (setq enable-recursive-minibuffers t)
 
+  (setq ivy-more-chars-alist
+        '((counsel-rg . 2)      ; or 1 for even fewer characters
+          (counsel-search . 2)
+          (t . 3)))        ; default for others
+
+  ;; enable this if you want `swiper' to use it
   ;; enable this if you want `swiper' to use it
   ;; (setq search-default-mode #'char-fold-to-regexp)
   (global-set-key "\C-s" 'swiper)
@@ -527,6 +533,7 @@
   (global-set-key (kbd "M-x") 'counsel-M-x)
   (global-set-key (kbd "M-,") 'counsel-M-x) ; mirror of M-x
   (global-set-key (kbd "C-x C-f") 'counsel-find-file)
+  (global-set-key (kbd "M-y") ' counsel-yank-pop) ; Replace default yank-pop
   (global-set-key (kbd "C-c G") 'counsel-git-grep)
   (global-set-key (kbd "C-c g") 'counsel-rg) ;; find a content pattern default within git repository, using prefix C-u for any git directory. rg is faster than ag
   (global-set-key (kbd "C-t") 'counsel-fzf)  ;; find a pattern default within git repository, using prefix C-u for any directory.
@@ -797,7 +804,7 @@
   (add-hook 'after-init-hook #'global-company-mode)
   (setq company-minimum-prefix-length 2)
   (setq company-idle-delay
-        (lambda () (if (company-in-string-or-comment) nil 0.5)))
+        (lambda () (if (company-in-string-or-comment) nil 0.1)))
 
   (setq company-files-exclusions '(".git/" ".DS_Store" "auto/"))
 
@@ -1210,14 +1217,13 @@
               (add-to-list 'TeX-command-list
                            `("LaTeXMkPvc"
                              ;; AUCTeX latexmk placeholders must be preserved:
-                             "latexmk -pvc %(latexmk-out) %(file-line-error) %`%(extraopts) %S%(mode)%' %t"
+                             "latexmk -gg -pvc %(latexmk-out) %(file-line-error) %`%(extraopts) %S%(mode)%' %t"
                              TeX-run-TeX
                              nil
                              (LaTeX-mode docTeX-mode)
-                             :help "Run LaTeXMk continuously (-pvc)"))))
+                             :help "Clean run LaTeXMk continuously (-gg -pvc)"))))
   ;; Replace LaTeX with latexmk -pvc
   (add-hook 'TeX-mode-hook '(lambda () (setq TeX-command-default "LaTeXMkPvc")))
-
 
 ;; Other settings
   (remove-hook 'LaTeX-mode-hook #'auto-fill-mode)
@@ -1228,9 +1234,15 @@
 
                 (TeX-fold-mode 1)
 
-                ;; Clean all intermediate files, like 'latexmk -c'
+                ;; Clean all intermediate files, like 'latexmk -c' and kill current job
                 (local-unset-key (kbd "C-c C-k"))
-                (local-set-key (kbd "C-c C-k") (lambda () (interactive) (TeX-clean t)))
+                (setq TeX-clean-confirm nil)
+                (defun my-tex-clean-and-kill ()
+                  (interactive)
+                  (ignore-errors (TeX-kill-job))
+                  (TeX-clean t))
+                (local-set-key (kbd "C-c C-k") #'my-tex-clean-and-kill)
+
                 (local-set-key (kbd "<f5>") 'TeX-command-run-all)
 
                 (local-set-key (kbd "<f9> (") (lambda () (interactive) (insert "\\left( \\right)")))
@@ -1489,8 +1501,7 @@
   :ensure t
   :config
   (setq python-shell-interpreter "python3")
-  ;; (setq python-shell-interpreter-args "-i -c 'import sys; print(\"Using \"+sys.executable); print(\"sys.path: \"); [print(p) for p in sys.path]' ")
-  (setq python-shell-interpreter-args "-i -c \"import os; print('os.getcwd:', os.getcwd()); import sys; print('sys.executable:' ,sys.executable)\" ")
+  (setq python-shell-interpreter-args "-i -c \"import os,sys; print('os.getcwd:', os.getcwd()); print('sys.executable:', sys.executable)\" ")
   (setq python-shell-completion-native-enable nil)
 
   ;; All symlinked files will resolve to their true location → one single pylsp server per project.
