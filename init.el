@@ -1502,6 +1502,7 @@
   :config
   (setq python-shell-interpreter "python3")
   (setq python-shell-interpreter-args "-i -c \"import os,sys; print('os.getcwd:', os.getcwd()); print('sys.executable:', sys.executable)\" ")
+
   (setq python-shell-completion-native-enable nil)
 
   ;; All symlinked files will resolve to their true location → one single pylsp server per project.
@@ -1565,10 +1566,10 @@
   (define-key elpy-mode-map (kbd "C-c C-p") nil)
 
   ;; elpy rpc
-  (setq elpy-rpc-virtualenv-path (concat (getenv "HOME") "/.virtualenvs/elpy/"))
+  (setq elpy-rpc-virtualenv-path (concat (getenv "HOME") "/.virtualenvs/lsp/"))
   (setq elpy-rpc-python-command "python3")
   (setq elpy-rpc-backend "jedi")
-  (setq elpy-syntax-check-command (concat (getenv "HOME") "/.virtualenvs/elpy/bin/flake8"))
+  (setq elpy-syntax-check-command (concat (getenv "HOME") "/.virtualenvs/lsp/bin/flake8"))
 
   ;; (remove-hook 'elpy-modules 'elpy-module-pyvenv)
   (remove-hook 'elpy-modules #'elpy-module-highlight-indentation)
@@ -1607,8 +1608,8 @@
   (lsp-diagnostics-provider :flycheck) ; could be :none
   (lsp-diagnostics-flycheck-default-level 'warning)
 
-  ;;(lsp-clients-pylsp-library-directories "~/.virtualenvs/elpy/")
-  (lsp-pylsp-server-command "~/.virtualenvs/elpy/bin/pylsp")
+  ;;(lsp-clients-pylsp-library-directories "~/.virtualenvs/lsp/")
+  (lsp-pylsp-server-command "~/.virtualenvs/lsp/bin/pylsp")
   (lsp-pylsp-plugins-flake8-enabled t)
   (lsp-pylsp-plugins-flake8-config "~/.config/flake8/tox.ini")
   (lsp-pylsp-plugins-pydocstyle-enabled t)
@@ -1617,7 +1618,7 @@
   (lsp-pylsp-plugins-isort-enabled t) ; auto sort Python imports
 
   ;; (lsp-pylsp-plugins-ruff-enabled t)
-  ;; (lsp-pylsp-plugins-ruff-exclude "~/.virtualenvs/elpy/bin/ruff")
+  ;; (lsp-pylsp-plugins-ruff-exclude "~/.virtualenvs/lsp/bin/ruff")
 
   :hook
   (
@@ -1645,8 +1646,8 @@
   (setq lsp-enabled-clients '(pylsp lsp-r texlab2))
   ;; (setq lsp-enabled-clients '(metals pyls pylsp ruff semgrep-ls grammarly-ls))
 
-  ;;(setq lsp-clients-pylsp-library-directories "~/.virtualenvs/elpy/")
-  (setq lsp-pylsp-server-command "~/.virtualenvs/elpy/bin/pylsp")
+  ;;(setq lsp-clients-pylsp-library-directories "~/.virtualenvs/lsp/")
+  (setq lsp-pylsp-server-command "~/.virtualenvs/lsp/bin/pylsp")
 
 
   (setq lsp-auto-guess-root nil)
