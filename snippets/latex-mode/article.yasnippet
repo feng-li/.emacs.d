@@ -90,8 +90,8 @@ giveninits=true, uniquename=init, maxcitenames=2, date=year, maxbibnames=99, saf
 \titlespacing{\subsubsection}{0pt}{0ex}{0ex}
 \usepackage{titling}
 \setlength{\droptitle}{-2cm}
-\predate{}
-\postdate{}
+% \predate{}  % This makes data left aligned
+% \postdate{}
 % \pretitile{}
 % \posttitle{}
 % \preauthor{}
@@ -110,8 +110,8 @@ giveninits=true, uniquename=init, maxcitenames=2, date=year, maxbibnames=99, saf
 \setlength{\marginparwidth}{2.2cm}  % set the margin note width globally
 %\usepackage{xcolor}
 \usepackage{setspace}
-\newcommand\FLI[2][]{\todo[#1]{\sf{\tiny\sffamily\begin{spacing}{0.85}#2\end{spacing}}}} % Margin
-\newcommand{\fli}[1]{\todo[inline]{\tiny\sffamily#1}} % Inline
+\newcommand\FLI[2][]{\todo[#1]{\tiny\begin{spacing}{0.9}\textbf{FLI:}~#1\end{spacing}}} % Margin
+\newcommand{\fli}[1]{\todo[color=orange!70,inline]{\tiny\begin{spacing}{0.9}\textbf{FLI:}~#1\end{spacing}}} % Inline
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

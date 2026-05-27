@@ -18,13 +18,6 @@
 (defvar my-auto-save-list (concat my-base-save-list (system-name))) ;; host-specified
 (unless (file-directory-p my-auto-save-list) (make-directory my-auto-save-list t))
 
-(defvar my-tree-sitter-dir (concat my-base-save-list "/tree-sitter"))
-(unless (file-directory-p  my-tree-sitter-dir) (make-directory my-tree-sitter-dir t))
-
-(defvar my-eln-cache-dir (concat my-base-save-list "/eln-cache"))
-(unless (file-directory-p  my-eln-cache-dir) (make-directory my-eln-cache-dir t))
-
-
 (setq package-archives
       '(
         ;; ("melpa" . "https://melpa.org/packages/")
