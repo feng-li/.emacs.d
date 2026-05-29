@@ -5,13 +5,13 @@
 # name: \documentclass{article} ...
 # expand-env: ((yas-indent-line nil))
 # --
-\documentclass[a4paper]{article}
+\documentclass[a4paper,12pt]{article}
 
 %% Fonts
 \usepackage{iftex}
 \ifXeTeX
-  \usepackage{fontspec} % load system fonts, no fontenc/inputenc
-  \setmainfont{Times New Roman}
+  % \usepackage{fontspec} % load system fonts, no fontenc/inputenc
+  % \setmainfont{Times New Roman}
   % \setmainfont{Garamond Premier Pro}
   % \setmonofont[Scale=0.9]{Garamond Premier Pro}
 \else
@@ -135,7 +135,7 @@ Write your abstract here. Keep it concise and informative.
 
 \end{abstract}
 
-\textbf{Keywords:} forecasting; time series; reconciliation; Bayesian methods \\
+\noindent\textbf{Keywords:} forecasting; time series; reconciliation; Bayesian methods.
 
 %% https://www.aeaweb.org/econlit/jelCodes.php?view=jel
 % \textbf{JEL codes:} XX; YY
