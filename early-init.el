@@ -1,3 +1,5 @@
+;;; early-init.el --- Early Emacs initialization -*- lexical-binding: t; -*-
+
 (setq package-enable-at-startup t)
 (setq package-user-dir (concat (getenv "HOME") "/.config/emacs" (number-to-string emacs-major-version)  "/elpa")) ;; Global
 

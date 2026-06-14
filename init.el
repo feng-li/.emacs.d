@@ -100,7 +100,7 @@
 
 ;; Term
 (setenv "TERM" "xterm-256color")
-(setenv "COLORTERM" "trueclor") ;; Ensure True Color in Systemd
+(setenv "COLORTERM" "truecolor") ;; Ensure True Color in Systemd
 (add-to-list 'term-file-aliases '("dumb" . "xterm-256color"))
 
 ;; (setenv "ENCHANT_CONFIG_DIR" (concat user-emacs-directory "dict/enchant"))
@@ -323,7 +323,7 @@
 (setq enable-dir-local-variables t) ;; Trust .dir-locals.el
 (add-hook 'text-mode-hook
           ;; allow file-local variables in Emacs
-          (lambda () (setq-local enable-local-variables :all)))
+          (lambda () (setq-local enable-local-variables t)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Global key bindings
@@ -379,7 +379,7 @@
 ;; (global-set-key (kbd "M-SPC") 'set-mark-command) ;It was C-SPC
 
 ;; Insert current time, Linux only?
-(global-set-key (kbd "C-c t") 'my-insert-time)
+(global-set-key (kbd "C-c T") 'my-insert-time)
 (defun my-insert-time ()
   (interactive)
   (insert (format-time-string "%a %b %d %H:%M:%S %Z %Y")))
@@ -424,7 +424,8 @@
         regexp-search-ring
         register-alist
         file-name-history)))
-(add-to-list 'desktop-modes-not-to-save '(dired-mode Info-mode fundamental-mode))
+(dolist (mode '(dired-mode Info-mode fundamental-mode))
+  (add-to-list 'desktop-modes-not-to-save mode))
 
 ;; save-place-mode
 (setq save-place-file (concat my-auto-save-list "/save-place-file.el"))
@@ -461,7 +462,7 @@
 
   (dolist (hook
            '(python-mode-hook
-             python-ts-mode
+             python-ts-mode-hook
              c-mode-hook
              c++-mode-hook
              LaTeX-mode-hook
@@ -556,7 +557,7 @@
               (split-string
                (shell-command-to-string
                 (format "find %s -type d -name .git -prune -o -type d -print 2>/dev/null"
-                        (expand-file-name initial-dir)))
+                        (shell-quote-argument (expand-file-name initial-dir))))
                "\n" t)
               :action (lambda (selected-dir)
                         (setq selected-dir (expand-file-name selected-dir))
@@ -594,7 +595,7 @@
   (defun re-builder-pinyin (str)
     (or (pinyin-to-utf8 str)
         (ivy--regex-plus str)
-        (ivy--regex-ignore-order)
+        (ivy--regex-ignore-order str)
         ))
   (setq ivy-re-builders-alist
         '(
@@ -622,7 +623,7 @@
                       (remove nil (mapcar 'my-pinyin-regexp-helper
                                           (split-string (replace-regexp-in-string my-pinyin-search-prefix "" str) "")))
                       ""))
-          nil))
+          (t nil)))
 )
 
 ;; iedit mode
@@ -1044,7 +1045,6 @@
 ;; (add-hook 'LaTeX-mode-hook (function (lambda () (setq ispell-parser 'tex))))
 
 ;; Disable flyspell globally
-(fmakunbound 'flyspell-mode) ;; Disable automatic loading
 (setq-default flyspell-mode nil)
 (dolist (hook '(change-log-mode-hook log-edit-mode-hook))
   (add-hook hook (lambda () (flyspell-mode -1))))
@@ -1509,7 +1509,8 @@
   (setq find-file-visit-truename t)     ;; always resolve symlinks
   (add-hook 'python-mode-hook
             (lambda ()
-              (setq-local buffer-file-name (file-truename buffer-file-name))))
+              (when buffer-file-name
+                (setq-local buffer-file-name (file-truename buffer-file-name)))))
 
   ;; Enter to indent in python.el
   (define-key python-mode-map (kbd "C-m") 'newline-and-indent)
@@ -1533,21 +1534,18 @@
                   (if (eq beg end)
                       (python-shell-send-region (line-beginning-position) (line-end-position))
                     (python-shell-send-region beg end))
-                  (next-line))
+                  (forward-line 1))
                 (local-set-key (kbd "C-c C-n") 'my-python-send-line-and-step)
 
 
                 ;; ElDoc for Python in the minor buffer
-                (add-hook 'python-mode-hook #'turn-on-eldoc-mode)
+                (turn-on-eldoc-mode)
 
                 (defun python-add-breakpoint ()
                   (interactive)
                   (newline-and-indent)
                   (insert "import pdb; pdb.set_trace()"))
-                (add-hook 'python-mode-hook
-                          #'(lambda ()
-                              (define-key python-mode-map
-                                          (kbd "C-c C-t") 'python-add-breakpoint)))
+                (local-set-key (kbd "C-c C-t") #'python-add-breakpoint)
 
                 ))
   )
@@ -1694,7 +1692,10 @@
   (treemacs-git-mode 'extended)
   (define-key treemacs-mode-map [mouse-1] #'treemacs-single-click-expand-action)
   )
-(add-hook 'emacs-startup-hook #'treemacs)
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (unless noninteractive
+              (treemacs))))
 
 (use-package projectile
   :config
@@ -1803,7 +1804,8 @@
   ;; Checks if the opened file has a `GPT.md` extension and enables `my-minor-mode` when it does.
   (defun my-enable-minor-mode ()
   "Enable my-minor-mode for specific files."
-  (when (string-equal buffer-file-name "GPT.md")
+  (when (and buffer-file-name
+             (string-equal (file-name-nondirectory buffer-file-name) "GPT.md"))
     (proxy-mode 1)
     (gptel-mode 1)))  ; Enable minor mode for particular file
   (add-hook 'find-file-hook 'my-enable-minor-mode)
