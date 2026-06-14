@@ -963,7 +963,7 @@
 
 ;; jinx directly calling the widely-used API of the Enchant library.
 (use-package jinx
-  :hook (emacs-startup . global-jinx-mode)
+  :hook ((text-mode prog-mode conf-mode) . jinx-mode)
   :bind (("M-4" . jinx-correct)
 	 ("C-M-$" . jinx-languages))
 
