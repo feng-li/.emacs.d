@@ -989,7 +989,7 @@
 (use-package flycheck
   :ensure t
   :custom
-  (flycheck-checker-error-threshold 2000)
+  (flycheck-checker-error-threshold 10000)
   (flycheck-check-syntax-automatically (quote (idle-change mode-enabled))) ; save
   (flycheck-idle-change-delay 3) ;; Set delay based on what suits you the best
   (global-flycheck-mode t)
