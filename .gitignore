@@ -12,6 +12,7 @@ session.*
 !session.el
 ac-comphist*
 ede-projects.el
+projectile-frecency.eld
 *conflicted\ copy*
 server/
 elpa/
