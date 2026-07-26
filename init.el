@@ -320,17 +320,6 @@
                 (window-height . 0.4)))
 
 
-;; TeX output log window size
-(add-to-list
- 'display-buffer-alist
- '((lambda (buffer _)
-     (with-current-buffer buffer
-       (derived-mode-p 'TeX-output-mode)))
-   (display-buffer-reuse-window display-buffer-below-selected)
-   (window-height . 0.25)
-   (preserve-size . (nil . t))))
-
-
 ;; Security
 (setq enable-dir-local-variables t) ;; Trust .dir-locals.el
 (add-hook 'text-mode-hook
@@ -1222,147 +1211,6 @@
   ;;                       company-backends)))
   ;; (add-hook 'TeX-mode-hook 'my-latex-mode-setup)
 
-  ;; LATEXMK-PVC integration
-  ;; (setq-default TeX-output-dir (concat "auto/" (system-name))) ;; do not set this, latexmk obeys latexmkrc config
-  (defun my-tex-clear-latexmk-output-on-rerun (original process output)
-    (let ((start
-           (string-match
-            (regexp-opt '("Latexmk: Need to remake files."
-                          "Latexmk: New file(s) found."))
-            output)))
-      (when start
-        ;; Discard anything from the preceding cycle in this output chunk.
-        (setq output (substring output start))
-
-        (with-current-buffer (process-buffer process)
-          ;; Preserve AUCTeX's command header.
-          (let ((header
-                 (save-excursion
-                   (goto-char (point-min))
-                   (when (looking-at "Running `")
-                     (buffer-substring
-                      (line-beginning-position)
-                      (line-beginning-position 2))))))
-            (erase-buffer)
-            (when header
-              (insert header))
-            (set-marker (process-mark process) (point-max))
-            (TeX-parse-reset)
-            ;; Also reset compilation-minor-mode navigation.
-            (when (bound-and-true-p compilation-minor-mode)
-              (compilation-forget-errors)))))
-      (funcall original process output)))
-  (advice-add 'TeX-format-filter :around
-              #'my-tex-clear-latexmk-output-on-rerun)
-
-  ;; Detect latexmk’s definitive failure message and display the log once per failed -pvc cycle
-  (setq TeX-show-compilation nil)
-  (defconst my-tex-latexmk-cycle-regexp
-    (regexp-opt
-     '("Latexmk: Need to remake files."
-       "Latexmk: New file(s) found.")))
-
-  (defconst my-tex-latexmk-error-regexp
-    (regexp-opt
-     '("Latexmk: Errors, so I did not complete making targets"
-       "Latexmk: Failure in processing file"
-       "==> You will need to change a source file before I do another run <==")))
-
-  (defun my-tex-popup-on-latexmk-error (process output)
-    ;; Retain a short tail in case latexmk's message spans process chunks.
-    (let* ((text (concat
-                  (or (process-get process 'my-latexmk-popup-tail) "")
-                  output))
-           (scan text)
-           (search-start 0)
-           cycle-end)
-
-      ;; A new -pvc rebuild permits another error popup.
-      (while (string-match my-tex-latexmk-cycle-regexp text search-start)
-        (setq cycle-end (match-end 0)
-              search-start (match-end 0)))
-
-      (when cycle-end
-        (process-put process 'my-latexmk-error-shown nil)
-        (setq scan (substring text cycle-end)))
-
-      (when (and (not (process-get process 'my-latexmk-error-shown))
-                 (string-match-p my-tex-latexmk-error-regexp scan))
-        (process-put process 'my-latexmk-error-shown t)
-
-        (let ((buffer (process-buffer process)))
-          (when (buffer-live-p buffer)
-            (let ((window (display-buffer buffer)))
-              (when (window-live-p window)
-                (set-window-point
-                 window
-                 (with-current-buffer buffer (point-max)))))
-
-            (run-at-time 0 nil
-                         #'my-tex-jump-to-first-latexmk-error
-                         buffer)))
-        )
-
-      (process-put
-       process 'my-latexmk-popup-tail
-       (substring scan (max 0 (- (length scan) 512))))))
-
-  (unless (advice-member-p
-           #'my-tex-popup-on-latexmk-error
-           'TeX-format-filter)
-    (advice-add 'TeX-format-filter :after
-                #'my-tex-popup-on-latexmk-error))
-
-
-  (defun my-tex-jump-to-first-latexmk-error (buffer)
-    (when (buffer-live-p buffer)
-      (with-current-buffer buffer
-        (require 'compile)
-        (unless (bound-and-true-p compilation-minor-mode)
-          (compilation-minor-mode 1))
-
-        (save-restriction
-          (widen)
-          (goto-char (point-max))
-
-          ;; Start after the latest latexmk rebuild marker.
-          (let ((start
-                 (if (re-search-backward
-                      my-tex-latexmk-cycle-regexp nil t)
-                     (match-end 0)
-                   (point-min)))
-                ;; Ignore warnings and informational diagnostics.
-                (compilation-skip-threshold 2))
-            (setq compilation-current-error (copy-marker start))
-            (condition-case error-data
-                (compilation-next-error-function 1)
-              (user-error
-               (message "No parseable file:line LaTeX error found"))
-              (error
-               (message "Could not jump to LaTeX error: %s"
-                        (error-message-string error-data)))))))))
-
-
-  (add-hook 'LaTeX-mode-hook
-            (lambda ()
-              (add-to-list 'TeX-command-list
-                           `("LaTeXMkPvc"
-                             ;; AUCTeX latexmk placeholders must be preserved:
-                             "latexmk -gg -pvc %(latexmk-out) %(file-line-error) %`%(extraopts) %S%(mode)%' %t"
-                             TeX-run-TeX
-                             nil
-                             (LaTeX-mode docTeX-mode)
-                             :help "Clean run LaTeXMk continuously (-gg -pvc)"))))
-  ;; Replace LaTeX with latexmk -pvc
-  (add-hook 'TeX-mode-hook '(lambda () (setq TeX-command-default "LaTeXMkPvc")))
-
-  ;; Make the live latexmk buffer use Emacs’s incremental compilation parser instead of waiting for latexmk -pvc to terminate
-  (defun my-tex-output-enable-compilation-navigation ()
-    (require 'compile)
-    (compilation-minor-mode 1))
-  (add-hook 'TeX-output-mode-hook
-            #'my-tex-output-enable-compilation-navigation)
-
 ;; Other settings
   (remove-hook 'LaTeX-mode-hook #'auto-fill-mode)
 
@@ -1511,6 +1359,11 @@
   (define-key TeX-mode-map (kbd "C-c w") #'texcount-word)
   )
 
+(use-package latexmkpvc
+  :ensure nil
+  :after tex
+  :config
+  (latexmkpvc-setup))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ESS (Emacs speaks statistics)
