@@ -14,8 +14,10 @@
 ;; adapts AUCTeX to that long-running process by:
 ;;
 ;; - keeping only the latest rebuild cycle in the TeX output buffer;
-;; - parsing errors as output arrives instead of waiting for process exit; and
-;; - displaying the output and visiting the first error after a failed cycle.
+;; - parsing errors as output arrives instead of waiting for process exit;
+;; - displaying the output and visiting the first error after a failed
+;;   cycle; and
+;; - hiding automatically opened error output after a later successful cycle.
 ;;
 ;; Enable the integration in one AUCTeX LaTeX buffer with:
 ;;
@@ -73,6 +75,15 @@ error, unless the user displays it explicitly."
   :type 'boolean
   :group 'latexmkpvc)
 
+(defcustom latexmkpvc-hide-output-after-success t
+  "Whether to hide error output after a later successful latexmk cycle.
+
+Only a window opened automatically by this package after an error is hidden.
+An output window that was already visible when the error occurred is left
+alone."
+  :type 'boolean
+  :group 'latexmkpvc)
+
 (defcustom latexmkpvc-jump-to-error t
   "Whether to visit the first parseable error after a failed latexmk cycle."
   :type 'boolean
@@ -102,6 +113,10 @@ to use `display-buffer-alist' and the standard display behavior."
      "Latexmk: Failure in processing file"
      "==> You will need to change a source file before I do another run <=="))
   "Regexp matching latexmk's definitive failure messages.")
+
+(defconst latexmkpvc--success-regexp
+  "Latexmk: All targets .* are up-to-date"
+  "Regexp matching latexmk's successful-cycle summary.")
 
 (defconst latexmkpvc--output-tail-length 512
   "Number of process-output characters retained across filter calls.")
@@ -173,13 +188,41 @@ REGEXP does not match."
   (let ((buffer (process-buffer process)))
     (when (buffer-live-p buffer)
       (when latexmkpvc-show-output-on-error
-        (let ((window (display-buffer buffer latexmkpvc-error-display-action)))
-          (when (window-live-p window)
-            (set-window-point
-             window
-             (with-current-buffer buffer (point-max))))))
+        (let ((tracked-window
+               (process-get process 'latexmkpvc--error-window)))
+          (unless (and (window-live-p tracked-window)
+                       (eq (window-buffer tracked-window) buffer))
+            (process-put process 'latexmkpvc--error-window nil))
+          (let* ((already-visible (get-buffer-window buffer t))
+                 (window
+                  (display-buffer buffer latexmkpvc-error-display-action)))
+            (when (and (window-live-p window)
+                       (not already-visible))
+              (process-put process 'latexmkpvc--error-window window))
+            (when (window-live-p window)
+              (set-window-point
+               window
+               (with-current-buffer buffer (point-max)))))))
       (when latexmkpvc-jump-to-error
         (run-at-time 0 nil #'latexmkpvc--jump-to-first-error buffer)))))
+
+(defun latexmkpvc--hide-error-output (process)
+  "Hide the output window opened automatically for an error from PROCESS."
+  (let ((buffer (process-buffer process))
+        (window (process-get process 'latexmkpvc--error-window)))
+    (cond
+     ((not (window-live-p window))
+      (process-put process 'latexmkpvc--error-window nil))
+     ((not (eq (window-buffer window) buffer))
+      (process-put process 'latexmkpvc--error-window nil))
+     (t
+      (condition-case error-data
+          (progn
+            (quit-window nil window)
+            (process-put process 'latexmkpvc--error-window nil))
+        (error
+         (message "Could not hide latexmk output: %s"
+                  (error-message-string error-data))))))))
 
 (defun latexmkpvc--process-filter (process output)
   "Handle continuous latexmk OUTPUT from PROCESS.
@@ -191,6 +234,8 @@ has been removed."
            (text (concat tail output))
            (cycle (latexmkpvc--last-match latexmkpvc--cycle-regexp text))
            (scan text)
+           failure
+           success
            (original-filter
             (or (process-get process 'latexmkpvc--original-filter)
                 #'TeX-format-filter)))
@@ -202,10 +247,17 @@ has been removed."
           ;; Reinsert a complete marker when it was split across chunks.
           (setq output (substring text (car cycle)))))
       (funcall original-filter process output)
-      (when (and (not (process-get process 'latexmkpvc--error-shown))
-                 (string-match-p latexmkpvc--error-regexp scan))
-        (process-put process 'latexmkpvc--error-shown t)
-        (latexmkpvc--report-error process))
+      (setq failure (latexmkpvc--last-match latexmkpvc--error-regexp scan)
+            success (latexmkpvc--last-match latexmkpvc--success-regexp scan))
+      (when failure
+        (unless (process-get process 'latexmkpvc--error-shown)
+          (process-put process 'latexmkpvc--error-shown t)
+          (latexmkpvc--report-error process)))
+      (when (and latexmkpvc-hide-output-after-success
+                 success
+                 (or (not failure)
+                     (> (car success) (car failure))))
+        (latexmkpvc--hide-error-output process))
       (process-put
        process 'latexmkpvc--output-tail
        (substring scan
@@ -226,6 +278,7 @@ This function has the command-runner signature required by
                    (process-filter process))
       (process-put process 'latexmkpvc--output-tail "")
       (process-put process 'latexmkpvc--error-shown nil)
+      (process-put process 'latexmkpvc--error-window nil)
       (set-process-filter process #'latexmkpvc--process-filter)
       (with-current-buffer (process-buffer process)
         (unless (bound-and-true-p compilation-minor-mode)
