@@ -782,9 +782,78 @@
 ;; Auto completion settings (company mode, yasnippet)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defconst my-yas-user-snippet-directory
+  (expand-file-name "snippets" user-emacs-directory)
+  "Directory containing personal Yasnippet snippets.")
+
+(defun my-yas--user-template-p (template)
+  "Return non-nil when TEMPLATE comes from the personal snippet directory."
+  (let ((file (yas--template-get-file template)))
+    (and file
+         (file-in-directory-p file my-yas-user-snippet-directory))))
+
+(defun my-yas--filter-shadowed-items (items template-function)
+  "Remove bundled ITEMS shadowed by personal snippets.
+
+TEMPLATE-FUNCTION extracts a Yasnippet template from each item.  A personal
+snippet shadows bundled snippets with the same trigger key, while snippets
+with other keys and additional personal snippets are retained."
+  (let (user-keys)
+    (dolist (item items)
+      (let* ((template (funcall template-function item))
+             (key (and template (yas--template-key template))))
+        (when (and key (my-yas--user-template-p template)
+                   (not (member key user-keys)))
+          (push key user-keys))))
+    (if (null user-keys)
+        items
+      (let (filtered)
+        (dolist (item items (nreverse filtered))
+          (let* ((template (funcall template-function item))
+                 (key (and template (yas--template-key template))))
+            (unless (and key
+                         (member key user-keys)
+                         (not (my-yas--user-template-p template)))
+              (push item filtered))))))))
+
+(defun my-yas--filter-expansion-arguments (arguments)
+  "Prefer personal snippets in Yasnippet expansion ARGUMENTS."
+  (cons (my-yas--filter-shadowed-items (car arguments) #'cdr)
+        (cdr arguments)))
+
+(defun my-yas--filter-all-templates (templates)
+  "Prefer personal snippets in Yasnippet template menus."
+  (my-yas--filter-shadowed-items templates #'identity))
+
+(defun my-yas--company-candidate-template (candidate)
+  "Return the Yasnippet template attached to Company CANDIDATE."
+  (get-text-property 0 'yas-template candidate))
+
+(defun my-yas--filter-company-candidates (candidates)
+  "Prefer personal snippets among Company CANDIDATES."
+  (my-yas--filter-shadowed-items
+   candidates #'my-yas--company-candidate-template))
+
 (use-package yasnippet
   :ensure t
   :config
+
+  ;; Yasnippet's directory precedence uses snippet identity, not trigger key.
+  ;; Filter candidates so a personal key replaces bundled definitions.
+  (unless (advice-member-p #'my-yas--filter-expansion-arguments
+                           'yas--expand-or-prompt-for-template)
+    (advice-add 'yas--expand-or-prompt-for-template
+                :filter-args #'my-yas--filter-expansion-arguments))
+  (unless (advice-member-p #'my-yas--filter-all-templates
+                           'yas--all-templates)
+    (advice-add 'yas--all-templates
+                :filter-return #'my-yas--filter-all-templates))
+
+  (with-eval-after-load 'company-yasnippet
+    (unless (advice-member-p #'my-yas--filter-company-candidates
+                             'company-yasnippet--completions-for-prefix)
+      (advice-add 'company-yasnippet--completions-for-prefix
+                  :filter-return #'my-yas--filter-company-candidates)))
 
   ;; Make yasnippet treat LaTeX-mode as latex-mode
   (add-hook 'LaTeX-mode-hook
