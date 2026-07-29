@@ -14,9 +14,10 @@
 ;; adapts AUCTeX to that long-running process by:
 ;;
 ;; - keeping only the latest rebuild cycle in the TeX output buffer;
-;; - parsing errors as output arrives instead of waiting for process exit;
-;; - displaying the output and visiting the first error after a failed
-;;   cycle; and
+;; - parsing AUCTeX diagnostics from the latest TeX-engine run whenever
+;;   latexmk finishes a rebuild and resumes watching;
+;; - displaying the output and visiting the first source error after a failed
+;;   cycle, or positioning the output at a failed auxiliary rule; and
 ;; - hiding automatically opened error output after a later successful cycle.
 ;;
 ;; Enable the integration in one AUCTeX LaTeX buffer with:
@@ -26,6 +27,16 @@
 ;; Or enable it for all AUCTeX LaTeX buffers with:
 ;;
 ;;   (latexmkpvc-setup)
+;;
+;; Environment variables in `process-environment' are inherited when the
+;; latexmk process starts.  This package does not derive variables such as
+;; LATEXENC from `buffer-file-coding-system'.  Set such variables explicitly
+;; before starting the command when they are used by latexmkrc, for example:
+;;
+;;   (setenv "LATEXENC" "utf8")
+;;
+;; Since the latexmk process is persistent, stop and restart it after changing
+;; its environment.
 
 ;;; Code:
 
@@ -118,6 +129,14 @@ to use `display-buffer-alist' and the standard display behavior."
   "Latexmk: All targets .* are up-to-date"
   "Regexp matching latexmk's successful-cycle summary.")
 
+(defconst latexmkpvc--cycle-end-regexp
+  "^=== Watching for updated files\\. Use ctrl/C to stop \\.\\.\\."
+  "Regexp matching the point where latexmk resumes watching files.")
+
+(defconst latexmkpvc--engine-run-regexp
+  "^Run number [0-9]+ of rule '[^'\n]*latex'"
+  "Regexp matching a latexmk primary TeX-engine run.")
+
 (defconst latexmkpvc--output-tail-length 512
   "Number of process-output characters retained across filter calls.")
 
@@ -158,6 +177,103 @@ REGEXP does not match."
           (TeX-parse-reset)
           (when (bound-and-true-p compilation-minor-mode)
             (compilation-forget-errors)))))))
+
+(defun latexmkpvc--latest-cycle-region ()
+  "Return the bounds of the latest latexmk cycle in the current buffer."
+  (save-restriction
+    (widen)
+    (save-excursion
+      (goto-char (point-max))
+      (let ((end
+             (if (re-search-backward latexmkpvc--cycle-end-regexp nil t)
+                 (match-beginning 0)
+               (point-max))))
+        (goto-char end)
+        (cons
+         (if (re-search-backward latexmkpvc--cycle-regexp nil t)
+             (match-end 0)
+           (point-min))
+         end)))))
+
+(defun latexmkpvc--latest-engine-region ()
+  "Return the latest TeX-engine run bounds in the current latexmk cycle."
+  (pcase-let ((`(,cycle-start . ,cycle-end)
+               (latexmkpvc--latest-cycle-region)))
+    (save-excursion
+      (goto-char cycle-end)
+      (cons
+       (if (re-search-backward
+            latexmkpvc--engine-run-regexp cycle-start t)
+           (match-beginning 0)
+         cycle-start)
+       cycle-end))))
+
+(defun latexmkpvc--parse-latest-cycle ()
+  "Populate AUCTeX diagnostics from the latest TeX-engine run."
+  (pcase-let ((`(,start . ,end) (latexmkpvc--latest-engine-region)))
+    (save-restriction
+      (narrow-to-region start end)
+      (TeX-parse-reset t))))
+
+(defun latexmkpvc--native-error-p ()
+  "Return non-nil when AUCTeX parsed an error in the current output buffer."
+  (cl-some (lambda (diagnostic)
+             (eq (car-safe diagnostic) 'error))
+           TeX-error-list))
+
+(defun latexmkpvc--failed-rule-info ()
+  "Return the failed latexmk rule and its output position, or nil.
+
+The return value is a list whose first element is the rule name and whose
+second element is the start of that rule's latest run."
+  (pcase-let ((`(,start . ,end) (latexmkpvc--latest-cycle-region)))
+    (save-excursion
+      (goto-char end)
+      (when (re-search-backward
+             "^Collected error summary (may duplicate other messages):"
+             start t)
+        (let ((summary-start (match-beginning 0)))
+          (goto-char (match-end 0))
+          (when (re-search-forward "^  \\([^:\n]+\\):" end t)
+            (let ((rule (match-string-no-properties 1)))
+              (goto-char summary-start)
+              (list
+               rule
+               (if (re-search-backward
+                    (format "^Run number [0-9]+ of rule '%s'"
+                            (regexp-quote rule))
+                    start t)
+                   (line-beginning-position)
+                 summary-start)))))))))
+
+(defun latexmkpvc--position-at-failed-rule (process)
+  "Position PROCESS output at the failed rule reported by latexmk."
+  (let ((buffer (process-buffer process)))
+    (when (buffer-live-p buffer)
+      (with-current-buffer buffer
+        (pcase (latexmkpvc--failed-rule-info)
+          (`(,rule ,position)
+           (goto-char position)
+           (let ((window (get-buffer-window buffer t)))
+             (when (window-live-p window)
+               (set-window-point window position)
+               (set-window-start window position)))
+           (message "Latexmk rule `%s' failed" rule)
+           t))))))
+
+(defun latexmkpvc--finalize-cycle (process)
+  "Finalize the latexmk rebuild cycle handled by PROCESS."
+  (let ((buffer (process-buffer process)))
+    (when (buffer-live-p buffer)
+      (with-current-buffer buffer
+        (condition-case error-data
+            (latexmkpvc--parse-latest-cycle)
+          (error
+           (message "Could not parse LaTeX diagnostics: %s"
+                    (error-message-string error-data))))
+        (when (and (process-get process 'latexmkpvc--cycle-failed)
+                   (not (latexmkpvc--native-error-p)))
+          (latexmkpvc--position-at-failed-rule process))))))
 
 (defun latexmkpvc--jump-to-first-error (buffer)
   "Visit the first parseable error in the latest cycle of BUFFER."
@@ -224,6 +340,20 @@ REGEXP does not match."
          (message "Could not hide latexmk output: %s"
                   (error-message-string error-data))))))))
 
+(defun latexmkpvc--final-sentinel (process name)
+  "Handle termination of continuous PROCESS named NAME."
+  (let ((status (process-status process))
+        (exit-status (process-exit-status process)))
+    (when (and (eq status 'exit)
+               (not (zerop exit-status))
+               (not (process-get process 'latexmkpvc--error-shown)))
+      (process-put process 'latexmkpvc--error-shown t)
+      (latexmkpvc--report-error process))
+    (if (or (eq status 'signal) (zerop exit-status))
+        (message "%s: continuous build stopped" name)
+      (message "%s: continuous build exited with status %d"
+               name exit-status))))
+
 (defun latexmkpvc--process-filter (process output)
   "Handle continuous latexmk OUTPUT from PROCESS.
 
@@ -236,11 +366,14 @@ has been removed."
            (scan text)
            failure
            success
+           cycle-end
            (original-filter
             (or (process-get process 'latexmkpvc--original-filter)
                 #'TeX-format-filter)))
       (when cycle
         (process-put process 'latexmkpvc--error-shown nil)
+        (process-put process 'latexmkpvc--cycle-finalized nil)
+        (process-put process 'latexmkpvc--cycle-failed nil)
         (setq scan (substring text (cdr cycle)))
         (when latexmkpvc-clear-output-on-rerun
           (latexmkpvc--clear-output-buffer process)
@@ -248,16 +381,24 @@ has been removed."
           (setq output (substring text (car cycle)))))
       (funcall original-filter process output)
       (setq failure (latexmkpvc--last-match latexmkpvc--error-regexp scan)
-            success (latexmkpvc--last-match latexmkpvc--success-regexp scan))
+            success (latexmkpvc--last-match latexmkpvc--success-regexp scan)
+            cycle-end
+            (latexmkpvc--last-match latexmkpvc--cycle-end-regexp scan))
       (when failure
+        (process-put process 'latexmkpvc--cycle-failed t)
         (unless (process-get process 'latexmkpvc--error-shown)
           (process-put process 'latexmkpvc--error-shown t)
           (latexmkpvc--report-error process)))
-      (when (and latexmkpvc-hide-output-after-success
-                 success
+      (when (and success
                  (or (not failure)
                      (> (car success) (car failure))))
-        (latexmkpvc--hide-error-output process))
+        (process-put process 'latexmkpvc--cycle-failed nil)
+        (when latexmkpvc-hide-output-after-success
+          (latexmkpvc--hide-error-output process)))
+      (when (and cycle-end
+                 (not (process-get process 'latexmkpvc--cycle-finalized)))
+        (process-put process 'latexmkpvc--cycle-finalized t)
+        (latexmkpvc--finalize-cycle process))
       (process-put
        process 'latexmkpvc--output-tail
        (substring scan
@@ -268,10 +409,12 @@ has been removed."
   "Run continuous latexmk command NAME using COMMAND on FILE.
 
 This function has the command-runner signature required by
-`TeX-command-list'."
+`TeX-command-list'.  The process inherits `process-environment' at startup;
+no environment variables are synthesized from the buffer's coding system."
   (unless TeX-process-asynchronous
     (user-error "Continuous latexmk builds require `TeX-process-asynchronous'"))
   (let* ((TeX-show-compilation latexmkpvc-show-compilation)
+         (TeX-sentinel-default-function #'latexmkpvc--final-sentinel)
          (process (TeX-run-TeX name command file)))
     (when (processp process)
       (process-put process 'latexmkpvc--original-filter
@@ -279,6 +422,8 @@ This function has the command-runner signature required by
       (process-put process 'latexmkpvc--output-tail "")
       (process-put process 'latexmkpvc--error-shown nil)
       (process-put process 'latexmkpvc--error-window nil)
+      (process-put process 'latexmkpvc--cycle-finalized nil)
+      (process-put process 'latexmkpvc--cycle-failed nil)
       (set-process-filter process #'latexmkpvc--process-filter)
       (with-current-buffer (process-buffer process)
         (unless (bound-and-true-p compilation-minor-mode)
