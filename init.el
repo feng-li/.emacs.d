@@ -517,6 +517,8 @@
   (counsel-rg-base-command
    '("rg" "--max-columns" "1600" "--with-filename" "--no-heading" "--line-number" "--color" "never" "%s"))
 
+  (ivy-truncate-lines nil)
+
   :config
   (ivy-mode)
   (setq ivy-use-virtual-buffers t)
@@ -548,7 +550,6 @@
     (let ((dir (read-directory-name "Find a pattern (rg) in directory: ")))
       (counsel-rg nil dir)))
   (global-set-key (kbd "C-c r") #'my-counsel-rg-in-dir)
-
 
   (defun my-counsel-fzf-touch-and-open-file (initial-dir)
     "Fuzzy select a directory, prompt for a filename with tab completion, create it, and open it."
@@ -1324,6 +1325,30 @@ with other keys and additional personal snippets are retained."
                         (?u "\\textup{"     "}")
                         (?w "\\textsw{"     "}")
                         (?d "" "" t)))
+
+
+                (defun my-latex-toggle-draft ()
+                  "Toggle graphicx draft mode in the current document."
+                  (interactive)
+                  (save-excursion
+                    (goto-char (point-min))
+                    (let ((regexp
+                           "^[ \t]*\\(%[ \t]*\\)?\\\\PassOptionsToPackage{draft}{graphicx}"))
+                      (if (re-search-forward regexp nil t)
+                          (let ((disabled (match-beginning 1))
+                                (beg (line-beginning-position))
+                                (end (line-end-position)))
+                            (if disabled
+                                (uncomment-region beg end)
+                              (comment-region beg end))
+                            (message "Graphicx draft mode %s"
+                                     (if disabled "enabled" "disabled")))
+                        (goto-char (point-min))
+                        (when (re-search-forward "^\\\\documentclass" nil t)
+                          (beginning-of-line))
+                        (insert "\\PassOptionsToPackage{draft}{graphicx}\n")
+                        (message "Graphicx draft mode enabled")))))
+                (local-set-key (kbd "C-c d") #'my-latex-toggle-draft)
 
                 ;; Use \bm{} to repace \mathbf{}
                 ;; (add-to-list 'LaTeX-font-list
