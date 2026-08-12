@@ -517,7 +517,7 @@
   (counsel-rg-base-command
    '("rg" "--max-columns" "1600" "--with-filename" "--no-heading" "--line-number" "--color" "never" "%s"))
 
-  (ivy-truncate-lines nil)
+  ;; (ivy-truncate-lines nil)
 
   :config
   (ivy-mode)
@@ -1294,9 +1294,14 @@ with other keys and additional personal snippets are retained."
                 (local-unset-key (kbd "C-c C-k"))
                 (setq TeX-clean-confirm nil)
                 (defun my-tex-clean-and-kill ()
+                  "Stop the current AUCTeX job and remove generated TeX files.
+The job may be TeX, LaTeX, BibTeX, or a previewer.  Clean both
+intermediate and output files, as requested by the non-nil argument to
+`TeX-clean'."
                   (interactive)
                   (ignore-errors (TeX-kill-job))
-                  (TeX-clean t))
+                  (TeX-clean t)
+                  (message "Stopped any running AUCTeX job; cleaned intermediate and output files"))
                 (local-set-key (kbd "C-c C-k") #'my-tex-clean-and-kill)
 
                 (local-set-key (kbd "<f5>") 'TeX-command-run-all)
