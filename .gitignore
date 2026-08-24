@@ -16,6 +16,7 @@ projectile-frecency.eld
 *conflicted\ copy*
 server/
 elpa/
+test/
 elpy/
 tutorial/
 eshell/

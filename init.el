@@ -1288,7 +1288,10 @@ with other keys and additional personal snippets are retained."
   (add-hook 'LaTeX-mode-hook
             #'(lambda ()
 
+                ;; Emacs folding
                 (TeX-fold-mode 1)
+                (outline-minor-mode 1)
+                (local-set-key (kbd "C-c TAB") #'outline-cycle)
 
                 ;; Clean all intermediate files, like 'latexmk -c' and kill current job
                 (local-unset-key (kbd "C-c C-k"))
