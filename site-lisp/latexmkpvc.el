@@ -17,7 +17,8 @@
 ;; - parsing AUCTeX diagnostics from the latest TeX-engine run whenever
 ;;   latexmk finishes a rebuild and resumes watching;
 ;; - displaying the output and visiting the first source error after a failed
-;;   cycle, or positioning the output at a failed auxiliary rule; and
+;;   cycle when its source buffer is still selected, or positioning the output
+;;   at a failed auxiliary rule; and
 ;; - hiding automatically opened error output after a later successful cycle.
 ;;
 ;; Enable the integration in one AUCTeX LaTeX buffer with:
@@ -275,34 +276,44 @@ second element is the start of that rule's latest run."
                    (not (latexmkpvc--native-error-p)))
           (latexmkpvc--position-at-failed-rule process))))))
 
-(defun latexmkpvc--jump-to-first-error (buffer)
-  "Visit the first parseable error in the latest cycle of BUFFER."
-  (when (buffer-live-p buffer)
-    (with-current-buffer buffer
-      (unless (bound-and-true-p compilation-minor-mode)
-        (compilation-minor-mode 1))
-      (save-restriction
-        (widen)
-        (goto-char (point-max))
-        (let ((start
-               (if (re-search-backward latexmkpvc--cycle-regexp nil t)
-                   (match-end 0)
-                 (point-min)))
-              ;; Ignore warnings and informational diagnostics.
-              (compilation-skip-threshold 2))
-          (setq compilation-current-error (copy-marker start))
-          (condition-case error-data
-              (compilation-next-error-function 1)
-            (user-error
-             (message "No parseable file:line LaTeX error found"))
-            (error
-             (message "Could not jump to LaTeX error: %s"
-                      (error-message-string error-data)))))))))
+(defun latexmkpvc--source-buffer-active-p (process)
+  "Return non-nil when PROCESS's source buffer is currently selected."
+  (let ((source-buffer
+         (process-get process 'latexmkpvc--source-buffer)))
+    (and (buffer-live-p source-buffer)
+         (eq source-buffer (window-buffer (selected-window))))))
+
+(defun latexmkpvc--jump-to-first-error (process)
+  "Visit the first parseable error for PROCESS if its source is still active."
+  (let ((buffer (process-buffer process)))
+    (when (and (buffer-live-p buffer)
+               (latexmkpvc--source-buffer-active-p process))
+      (with-current-buffer buffer
+        (unless (bound-and-true-p compilation-minor-mode)
+          (compilation-minor-mode 1))
+        (save-restriction
+          (widen)
+          (goto-char (point-max))
+          (let ((start
+                 (if (re-search-backward latexmkpvc--cycle-regexp nil t)
+                     (match-end 0)
+                   (point-min)))
+                ;; Ignore warnings and informational diagnostics.
+                (compilation-skip-threshold 2))
+            (setq compilation-current-error (copy-marker start))
+            (condition-case error-data
+                (compilation-next-error-function 1)
+              (user-error
+               (message "No parseable file:line LaTeX error found"))
+              (error
+               (message "Could not jump to LaTeX error: %s"
+                        (error-message-string error-data))))))))))
 
 (defun latexmkpvc--report-error (process)
-  "Report a failed latexmk rebuild handled by PROCESS."
+  "Report a failed rebuild when PROCESS's source buffer is still active."
   (let ((buffer (process-buffer process)))
-    (when (buffer-live-p buffer)
+    (when (and (buffer-live-p buffer)
+               (latexmkpvc--source-buffer-active-p process))
       (when latexmkpvc-show-output-on-error
         (let ((tracked-window
                (process-get process 'latexmkpvc--error-window)))
@@ -320,7 +331,7 @@ second element is the start of that rule's latest run."
                window
                (with-current-buffer buffer (point-max)))))))
       (when latexmkpvc-jump-to-error
-        (run-at-time 0 nil #'latexmkpvc--jump-to-first-error buffer)))))
+        (run-at-time 0 nil #'latexmkpvc--jump-to-first-error process)))))
 
 (defun latexmkpvc--hide-error-output (process)
   "Hide the output window opened automatically for an error from PROCESS."
@@ -413,10 +424,12 @@ This function has the command-runner signature required by
 no environment variables are synthesized from the buffer's coding system."
   (unless TeX-process-asynchronous
     (user-error "Continuous latexmk builds require `TeX-process-asynchronous'"))
-  (let* ((TeX-show-compilation latexmkpvc-show-compilation)
+  (let* ((source-buffer (current-buffer))
+         (TeX-show-compilation latexmkpvc-show-compilation)
          (TeX-sentinel-default-function #'latexmkpvc--final-sentinel)
          (process (TeX-run-TeX name command file)))
     (when (processp process)
+      (process-put process 'latexmkpvc--source-buffer source-buffer)
       (process-put process 'latexmkpvc--original-filter
                    (process-filter process))
       (process-put process 'latexmkpvc--output-tail "")
