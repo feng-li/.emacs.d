@@ -64,12 +64,12 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(adaptive-wrap auctex company-reftex counsel dracula-theme electric-operator elpy envrc flycheck-julia
-                   flycheck-languagetool format-all gnu-elpa-keyring-update gptel highlight-doxygen highlight-symbol
-                   iedit imenu-list jinx julia-mode keytar lexic lsp-latex lsp-metals magit magit-popup
-                   math-symbol-lists multiple-cursors mw-thesaurus neotree notmuch pandoc-mode pdf-tools pinyinlib
-                   poly-R popup powerthesaurus projectile proxy-mode synosaurus treemacs-projectile treesit-auto unfill
-                   visual-fill-column wgrep writegood-mode yaml-mode yasnippet-snippets))
+   '(adaptive-wrap auctex counsel dracula-theme electric-operator elpy envrc flycheck-julia flycheck-languagetool
+                   format-all gnu-elpa-keyring-update gptel highlight-doxygen highlight-symbol iedit imenu-list jinx
+                   julia-mode keytar lexic lsp-latex lsp-metals magit magit-popup math-symbol-lists multiple-cursors
+                   mw-thesaurus neotree notmuch pandoc-mode pdf-tools pinyinlib poly-R popup powerthesaurus projectile
+                   proxy-mode synosaurus treemacs-projectile treesit-auto unfill visual-fill-column wgrep writegood-mode
+                   yaml-mode yasnippet-snippets))
  '(safe-local-variable-values '((TeX-engine . pdflatex)))
  '(save-place-mode t)
  '(scroll-bar-mode nil)
