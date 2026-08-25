@@ -126,7 +126,9 @@ open-buffer and history data accidentally.
 | --- | --- |
 | `early-init.el` | package, native-comp, environment, and early startup settings |
 | `init.el` | the main configuration and package declarations |
-| `site-lisp/` | local Lisp, including `latexmkpvc` and Company RefTeX support |
+| `site-lisp/latexmkpvc.el` | continuous `latexmk` integration for AUCTeX |
+| `site-lisp/company-reftex.el` | cached Company completion for RefTeX citations and labels |
+| `site-lisp/` | other local and bundled Lisp |
 | `snippets/` | personal Yasnippet templates for LaTeX, Python, and text modes |
 | `dict/hunspell/` | bundled US and UK English Hunspell dictionaries |
 | `dict/sdcv/` | bundled StarDict dictionaries used by Lexic |
@@ -136,6 +138,17 @@ open-buffer and history data accidentally.
 
 Runtime files under paths such as `eln-cache/`, `auto-save-list/`, `request/`,
 and `transient/` are ignored by Git.
+
+## Local LaTeX extensions
+
+Two custom packages power the LaTeX workflow:
+
+- [`latexmkpvc.el`](site-lisp/latexmkpvc.el) integrates AUCTeX with continuous
+  `latexmk -pvc` builds and handles their diagnostics without stealing focus.
+- [`company-reftex.el`](site-lisp/company-reftex.el) provides fast Company
+  completion for RefTeX citations and labels using a bibliography cache.
+
+See [`site-lisp/README.md`](site-lisp/README.md) for usage and customization.
 
 ## Selected key bindings
 
@@ -182,12 +195,10 @@ configuration; `which-key-mode` is enabled for discovering the rest.
 | `C-c d` | toggle `graphicx` draft mode |
 | `C-c w` | count words with `texcount` |
 | `C-c c` / `C-c r` / `C-c l` | RefTeX citation / reference / label |
-| `C-M-\\` | reformat a BibTeX entry |
+| `C-M-\` | reformat a BibTeX entry |
 
-The local `latexmkpvc` integration keeps a continuous build alive, retains only
-the latest build cycle in the output buffer, reveals failures, jumps to a
-parseable source error, and hides automatically opened error output after a
-later successful build.
+See [Local LaTeX extensions](#local-latex-extensions) for details about the
+continuous build and Company/RefTeX completion integrations.
 
 ### Language workflows
 
