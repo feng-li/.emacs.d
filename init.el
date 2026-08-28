@@ -472,6 +472,7 @@
 
   ;; Customize rules
   (electric-operator-add-rules-for-mode 'python-mode (cons "*" nil))
+  (electric-operator-add-rules-for-mode 'latex-mode (cons "*" nil))
   (electric-operator-add-rules-for-mode 'python-mode (cons "/" nil))
   (electric-operator-add-rules-for-mode 'python-mode (cons "?" nil))
 
@@ -1097,10 +1098,22 @@ with other keys and additional personal snippets are retained."
 
 (use-package synosaurus
   :config
+
+  (require 'my-synosaurus-mdx)
+  (setq my-synosaurus-mdict-program
+        "/home/fli/.virtualenvs/lsp/bin/mdict")
+  (setq my-synosaurus-mdx-file
+        (expand-file-name
+         "dict/sdcv/Merriam-Webster's Collegiate Dictionary and Thesaurus, 2015.mdx"
+         user-emacs-directory))
+  (setq my-synosaurus-soule-dictionary
+        "Soule's Dictionary of English Synonyms (En-En)")
+
   (dolist (hook '(text-mode-hook latex-mode-hook LaTeX-mode-hook prog-mode-hook org-mode-hook markdown-mode-hook))
     (add-hook hook (lambda () (synosaurus-mode))))
   (setq synosaurus-choose-method 'popup) ; popup, ido
-  ;; (setq synosaurus-backend  'Wordnet) ; apt install wordnet
+  (setq-default synosaurus-backend
+                #'my-synosaurus-backend-local-thesauri)
   (define-key synosaurus-mode-map (kbd "<f9> s") 'synosaurus-choose-and-replace)
   )
 
@@ -1364,6 +1377,18 @@ intermediate and output files, as requested by the non-nil argument to
                 ))
 
 
+  (defun my-latex-clean-delimiters ()
+    "Replace \\( and \\) with $, and remove ** before saving."
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward "\\\\(\\|\\\\)\\|\\*\\*" nil t)
+        (if (string= (match-string 0) "**")
+            (replace-match "")
+          (replace-match "$")))))
+  (add-hook 'LaTeX-mode-hook
+            (lambda ()
+              (add-hook 'before-save-hook
+                        #'my-latex-clean-delimiters nil t)))
 
   ;; Translate key § to ` so both can be used as a math abbreviation
   ;; Drawback, could not type § anymore. Make it locally?
