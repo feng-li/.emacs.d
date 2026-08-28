@@ -2,7 +2,7 @@
 
 ;; Package-Version: 0.1.0
 ;; Package-Requires: ((emacs "29.1"))
-;; Author: Hans-Peter Deifel <hpd@hpdeifel.de>
+;; Author: Feng Li <m@feng.li>
 ;; Keywords: convenience, dictionary, thesaurus, text
 ;; Copyright (C) 2026 Feng Li <m@feng.li>
 ;; Copyright (C) 2019 Hans-Peter Deifel
