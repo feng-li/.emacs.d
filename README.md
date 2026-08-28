@@ -23,8 +23,8 @@ sections before adopting it wholesale.
   `latexmk -pvc` workflow for LaTeX and BibTeX authoring.
 - Elpy, LSP mode, pylsp, Flycheck, and common formatters/checkers for Python.
 - ESS and poly-R for R and R Markdown, plus modes for Julia and Scala/Metals.
-- Jinx, Hunspell, LanguageTool, Pandoc, and bundled StarDict dictionaries for
-  prose editing.
+- Jinx, Hunspell, LanguageTool, Pandoc, and local MDX/StarDict dictionaries
+  with integrated Synosaurus support for prose editing.
 - Dracula theme, adaptive visual wrapping, line numbers, tree-sitter mode
   remapping, desktop restoration, and host-specific state directories.
 - gptel through a configured OpenAI-compatible backend, with credentials read
@@ -48,7 +48,7 @@ External programs are feature-dependent:
 | --- | --- |
 | Search and projects | `git`, `rg`, `fzf`, and standard Unix `find` |
 | Environment loading | `direnv` |
-| Spelling and dictionaries | the Enchant library for Jinx, `hunspell`, and `sdcv` |
+| Spelling and dictionaries | the Enchant library for Jinx, `hunspell`, `sdcv`, and the `mdict` command from `mdict-utils` |
 | Prose conversion | `pandoc`; optionally a LanguageTool server at `localhost:8081` |
 | LaTeX | a TeX distribution with `xelatex`, `latexmk`, `kpsewhich`, and `texcount`; Evince for PDF viewing |
 | Python | `python3`, pylsp, Flake8, Pylint, Ruff, Black, and isort as needed |
@@ -56,8 +56,8 @@ External programs are feature-dependent:
 | Appearance | the `M PLUS Code Latin 50` font, or a replacement configured in `init.el` |
 | Remote synchronization | `rsync` and SSH |
 
-The Hunspell and StarDict data files are included in `dict/`; their corresponding
-executables or libraries still need to be installed on the host.
+The Hunspell, StarDict, and local MDX data files are kept in `dict/`; their
+corresponding executables or libraries still need to be installed on the host.
 
 ## Installation
 
@@ -99,8 +99,9 @@ bash setup_env.sh
 The script is deliberately machine-specific. It expects Mamba at
 `~/.local/miniforge3/bin/mamba`, creates Python 3.12 under
 `~/.local/python3.12`, creates `~/.virtualenvs/lsp`, and installs packages from
-the Tsinghua PyPI mirror. Review and edit those paths, the Python version, and
-the index URL before running it on another machine.
+the Tsinghua PyPI mirror, including `mdict-utils` for the `mdict` command.
+Review and edit those paths, the Python version, and the index URL before
+running it on another machine.
 
 ## State and cache layout
 
@@ -131,7 +132,7 @@ open-buffer and history data accidentally.
 | `site-lisp/` | other local and bundled Lisp |
 | `snippets/` | personal Yasnippet templates for LaTeX, Python, and text modes |
 | `dict/hunspell/` | bundled US and UK English Hunspell dictionaries |
-| `dict/sdcv/` | bundled StarDict dictionaries used by Lexic |
+| `dict/sdcv/` | local MDX and StarDict data used by `mdx-dict-and-synosaurus.el` |
 | `dict/mobythesaurus/` | local thesaurus data |
 | `setup_env.sh` | optional Python/pylsp environment bootstrap |
 | `make_sync.sh` | optional rsync helper for copying the config and versioned state to another host |
@@ -149,6 +150,21 @@ Two custom packages power the LaTeX workflow:
   completion for RefTeX citations and labels using a bibliography cache.
 
 See [`site-lisp/README.md`](site-lisp/README.md) for usage and customization.
+
+## Local dictionary and thesaurus
+
+[`mdx-dict-and-synosaurus.el`](site-lisp/mdx-dict-and-synosaurus.el) is a
+standalone local package that combines dictionary browsing with the Synosaurus
+frontend. It reads MDX files through `mdict`, reads selected StarDict sources
+through `sdcv`, and provides the feature `mdx-dict-and-synosaurus`.
+
+`mdx-dict-search` uses the active region or word at point without opening a
+minibuffer prompt. It selects an exact, normalized, prefix, or nearby spelling
+from the configured MDX headwords and displays that result directly. The
+Synosaurus backend uses the Merriam-Webster Collegiate MDX thesaurus first and
+falls back to Soule's Dictionary of English Synonyms. See
+[`site-lisp/README.md`](site-lisp/README.md#mdx-dict-and-synosaurus) for the
+commands, result-buffer controls, caching, and configuration variables.
 
 ## Selected key bindings
 
@@ -183,8 +199,9 @@ configuration; `which-key-mode` is enabled for discovering the rest.
 | `M-4` | correct with Jinx |
 | `C-M-$` | select Jinx languages |
 | `<f9> 4` | check a word with Ispell/Hunspell |
-| `<f9> d` | search the bundled StarDict dictionaries with Lexic |
-| `<f9> t` | look up a word with Merriam-Webster Thesaurus |
+| `<f9> d` | display the best local dictionary match for the region or word at point, without prompting |
+| `<f9> s` | choose a local thesaurus result and replace the region or word at point |
+| `<f9> t` | query the separate online Merriam-Webster Thesaurus command |
 
 ### LaTeX and BibTeX
 
@@ -228,8 +245,8 @@ At minimum, review these parts of `init.el` after cloning:
 - the gptel backend, proxy host, model names, and API-key source. Do not commit
   personal credentials; keep them in `~/.authinfo`, `~/.authinfo.gpg`, or
   another Emacs auth-source backend.
-- the Merriam-Webster integration if you do not want to use the configured API
-  access.
+- the local MDX dictionary paths and the separate online Merriam-Webster API
+  integration if those sources are not available or should not be used.
 
 `early-init.el` prepends `~/.local/bin`, `~/.cargo/bin`, and
 `~/.local/share/coursier/bin` to `PATH`. Adjust this list if GUI Emacs cannot

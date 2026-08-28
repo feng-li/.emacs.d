@@ -66,9 +66,9 @@
  '(package-selected-packages
    '(adaptive-wrap auctex counsel dracula-theme electric-operator elpy envrc flycheck-julia flycheck-languagetool
                    format-all gnu-elpa-keyring-update gptel highlight-doxygen highlight-symbol iedit imenu-list jinx
-                   julia-mode keytar lexic lsp-latex lsp-metals magit magit-popup math-symbol-lists multiple-cursors
+                   julia-mode keytar lsp-latex lsp-metals magit magit-popup math-symbol-lists multiple-cursors
                    mw-thesaurus neotree notmuch pandoc-mode pdf-tools pinyinlib poly-R popup powerthesaurus projectile
-                   proxy-mode synosaurus treemacs-projectile treesit-auto unfill visual-fill-column wgrep writegood-mode
+                   proxy-mode treemacs-projectile treesit-auto unfill visual-fill-column wgrep writegood-mode
                    yaml-mode yasnippet-snippets))
  '(safe-local-variable-values '((TeX-engine . pdflatex)))
  '(save-place-mode t)
@@ -703,7 +703,7 @@
                     (mode . inferior-ess-mode)))
            ("Help" (or
                     (mode . help-mode)
-                    (mode . lexic-mode)
+                    (mode . mdx-dict-mode)
                     (mode . ess-help-mode)
                     (mode . Info-mode)))
            ("Messages" (or
@@ -1096,26 +1096,38 @@ with other keys and additional personal snippets are retained."
   )
 
 
-(use-package synosaurus
+(use-package mdx-dict-and-synosaurus
+  :ensure nil
+  :demand t
   :config
-
-  (require 'my-synosaurus-mdx)
-  (setq my-synosaurus-mdict-program
+  (setq mdx-dict-program
         "/home/fli/.virtualenvs/lsp/bin/mdict")
-  (setq my-synosaurus-mdx-file
-        (expand-file-name
-         "dict/sdcv/Merriam-Webster's Collegiate Dictionary and Thesaurus, 2015.mdx"
-         user-emacs-directory))
-  (setq my-synosaurus-soule-dictionary
+  (setq mdx-dict-dictionaries
+        `(("Merriam-Webster Collegiate Dictionary and Thesaurus (2015)"
+           . ,(expand-file-name
+               "dict/sdcv/Merriam-Webster's Collegiate Dictionary and Thesaurus, 2015.mdx"
+               user-emacs-directory))
+          ("Collins English Dictionary and Thesaurus (2015)"
+           . ,(expand-file-name
+               "dict/sdcv/Collins English Dictionary and Thesaurus, 2015.mdx"
+               user-emacs-directory))))
+  (setq mdx-dict-sdcv-directory
+        (expand-file-name "dict/sdcv" user-emacs-directory))
+  (setq mdx-dict-sdcv-dictionaries
+        '("Merriam-Webster's Advanced Learner's Dictionary (En-En)"
+          "Longman Dictionary of Common Errors (En-En)"))
+  (setq mdx-dict-synosaurus-mdx-file
+        (cdar mdx-dict-dictionaries))
+  (setq mdx-dict-synosaurus-soule-dictionary
         "Soule's Dictionary of English Synonyms (En-En)")
-
+  (global-set-key (kbd "<f9> d") #'mdx-dict-search)
   (dolist (hook '(text-mode-hook latex-mode-hook LaTeX-mode-hook prog-mode-hook org-mode-hook markdown-mode-hook))
-    (add-hook hook (lambda () (synosaurus-mode))))
+    (add-hook hook (lambda () (synosaurus-mode 1))))
   (setq synosaurus-choose-method 'popup) ; popup, ido
   (setq-default synosaurus-backend
-                #'my-synosaurus-backend-local-thesauri)
-  (define-key synosaurus-mode-map (kbd "<f9> s") 'synosaurus-choose-and-replace)
-  )
+                #'mdx-dict-synosaurus-backend)
+  (define-key synosaurus-mode-map (kbd "<f9> s")
+              #'synosaurus-choose-and-replace))
 
 
 ;; Fly spell performance
@@ -1139,21 +1151,6 @@ with other keys and additional personal snippets are retained."
 
 ;; Auto correct spelling mistakes
 ;; (global-set-key (kbd "<f9> c") 'flyspell-auto-correct-word)
-
-;; StarDict
-;; apt install sdcv
-;; https://github.com/Dushistov/sdcv
-(use-package lexic
-  :defer nil
-  :config
-  (setq lexic-dictionary-path (concat user-emacs-directory "dict/sdcv/"))
-  (setq lexic-dictionary-list
-        '(;; "Soule's Dictionary of English Synonyms (En-En)"
-          "Merriam-Webster's Collegiate Thesaurus (En-En)"
-          "Merriam-Webster's Advanced Learner's Dictionary (En-En)"
-          "Longman Dictionary of Common Errors (En-En)"))
-  (global-set-key (kbd "<f9> d") 'lexic-search)
-  )
 
 (use-package mw-thesaurus
   :defer nil
@@ -1858,23 +1855,6 @@ intermediate and output files, as requested by the non-nil argument to
 ;;;                        (require 'lsp-latex)
 ;;;                        (lsp-deferred)))  ; or lsp
 ;;;   )
-
-;; grammerly for lsp
-;; (use-package lsp-grammarly
-;;   :ensure t
-;;   :defer t
-;;   ;; Comment out to start manually
-;;   :hook ((latex-mode org-mode)
-;;          . (lambda ()
-;;              (require 'lsp-grammarly)
-;;              (lsp-deferred)))  ;; or lsp
-
-;;   :config
-;;   (setq lsp-grammarly-active-modes '(latex-mode org-mode))
-;;   (setq lsp-grammarly-auto-activate nil)
-;;   (setq lsp-grammarly-domain "academic")
-;;   (setq lsp-grammarly-user-words (concat (getenv "HOME") "/.hunspell_en_US"))
-;;   )
 
 ;; Proxy https://repo.or.cz/proxy-mode.git
 (use-package proxy-mode

@@ -1,8 +1,44 @@
-# Local LaTeX extensions
+# Local Emacs Lisp packages
 
-This directory contains two custom Emacs Lisp packages that provide the core
-of this configuration's LaTeX workflow. `site-lisp/` is added to `load-path`
-recursively during startup, so neither package needs to be installed from ELPA.
+This directory contains custom Emacs Lisp packages used directly by the main
+configuration. `site-lisp/` is added to `load-path` recursively during startup,
+so these packages do not need to be installed from ELPA.
+
+## mdx-dict-and-synosaurus
+
+[`mdx-dict-and-synosaurus.el`](mdx-dict-and-synosaurus.el) is a standalone
+local dictionary and thesaurus package. It combines an MDX/StarDict browser
+with the Synosaurus lookup, insertion, and replacement interface. The package
+provides only the feature `mdx-dict-and-synosaurus`; the public Synosaurus
+commands remain named `synosaurus-*`.
+
+`mdx-dict-search` reads the active region or word at point and displays the
+result immediately in `*MDict*`. It does not prompt for a word or dictionary.
+The lookup prefers an exact or punctuation-insensitive MDX headword, then a
+prefix match, and finally a nearby spelling. In the result buffer:
+
+- `s` looks up the word at point;
+- `b` and `f` move backward and forward through lookup history;
+- `g` refreshes the current entry; and
+- `RET` or mouse-1 follows an MDX cross-reference.
+
+The main configuration binds `<f9> d` to `mdx-dict-search`. MDX files are read
+through `/home/fli/.virtualenvs/lsp/bin/mdict`, supplied by the Python
+`mdict-utils` package. Configured StarDict sources are read through `sdcv`.
+Only readable MDX files are included, so an optional dictionary can be added or
+removed without changing the package.
+
+The Synosaurus backend first extracts thesaurus senses from the configured
+Merriam-Webster Collegiate MDX file. If that entry contains no synonyms, it
+falls back to Soule's Dictionary of English Synonyms through `sdcv`. The
+minibuffer reports which source supplied each lookup. `<f9> s` runs
+`synosaurus-choose-and-replace`; the other public commands are
+`synosaurus-lookup` and `synosaurus-choose-and-insert`.
+
+MDX headword indexes and queried entries are cached for the Emacs session. Run
+`M-x mdx-dict-clear-cache` after replacing or modifying an MDX file. Use
+`M-x customize-group RET mdx-dict` for dictionary paths and programs, and
+`M-x customize-group RET synosaurus` for the chooser, backend, and prefix key.
 
 ## latexmkpvc
 
