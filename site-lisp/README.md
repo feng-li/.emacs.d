@@ -23,8 +23,8 @@ prefix match, and finally a nearby spelling. In the result buffer:
 - `RET` or mouse-1 follows an MDX cross-reference.
 
 The main configuration binds `<f9> d` to `mdx-dict-search`. MDX files are read
-through `/home/fli/.virtualenvs/lsp/bin/mdict`, supplied by the Python
-`mdict-utils` package. Configured StarDict sources are read through `sdcv`.
+through `~/.virtualenvs/lsp/bin/mdict`, supplied by the Python `mdict-utils`
+package. Configured StarDict sources are read through `sdcv`.
 Only readable MDX files are included, so an optional dictionary can be added or
 removed without changing the package.
 
@@ -113,3 +113,22 @@ backends to the buffer-local Company backend list. Useful controls are:
 
 Run `M-x customize-group RET company-reftex` to edit these options through the
 Customize interface.
+
+## company-numbered-selection
+
+[`company-numbered-selection.el`](company-numbered-selection.el) turns the
+unmodified keys `1` through `9` and `0` into direct selectors for Company's
+first ten visible rows. If adding the pressed digit still matches a completion
+candidate, the digit is inserted instead; this keeps identifiers such as
+`sha256` typeable. In Company search mode the same decision uses the current
+search expression and continues the search correctly.
+
+The global `company-numbered-selection-mode` installs the bindings in both
+`company-active-map` and `company-search-map`, displays matching quick-access
+hints, and restores the previous bindings and hint settings when disabled. The
+mode is enabled from `init.el` after Company loads.
+
+Customize `company-numbered-selection-keys` to change the ordered selection
+keys, or set `company-numbered-selection-show-hints` to nil before enabling the
+mode to leave Company's hint display unchanged. Run
+`M-x customize-group RET company-numbered-selection` for both options.

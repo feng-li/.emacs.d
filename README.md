@@ -15,8 +15,9 @@ sections before adopting it wholesale.
 
 - Ivy, Counsel, and Swiper for minibuffer completion and search, including
   ripgrep, fzf, and optional Chinese-pinyin matching.
-- Company and Yasnippet completion, with bundled snippets taking precedence
-  over snippets with the same trigger from `yasnippet-snippets`.
+- Company and Yasnippet completion, with direct number-key candidate selection
+  and bundled snippets taking precedence over snippets with the same trigger
+  from `yasnippet-snippets`.
 - Projectile, Treemacs, Ibuffer, Magit, multiple cursors, and iedit for project
   and code navigation.
 - AUCTeX, RefTeX, Company RefTeX completion, and a custom continuous
@@ -129,6 +130,7 @@ open-buffer and history data accidentally.
 | `init.el` | the main configuration and package declarations |
 | `site-lisp/latexmkpvc.el` | continuous `latexmk` integration for AUCTeX |
 | `site-lisp/company-reftex.el` | cached Company completion for RefTeX citations and labels |
+| `site-lisp/company-numbered-selection.el` | context-aware number-key selection for Company candidates |
 | `site-lisp/` | other local and bundled Lisp |
 | `snippets/` | personal Yasnippet templates for LaTeX, Python, and text modes |
 | `dict/hunspell/` | bundled US and UK English Hunspell dictionaries |
