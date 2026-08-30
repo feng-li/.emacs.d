@@ -14,10 +14,11 @@ sections before adopting it wholesale.
 ## Highlights
 
 - Ivy, Counsel, and Swiper for minibuffer completion and search, including
-  ripgrep, fzf, and optional Chinese-pinyin matching.
+  ripgrep, fzf, and automatically detected initial or full Chinese-pinyin
+  matching.
 - Company and Yasnippet completion, with direct number-key candidate selection
-  and bundled snippets taking precedence over snippets with the same trigger
-  from `yasnippet-snippets`.
+  and personal snippets taking precedence over bundled definitions with the
+  same trigger from `yasnippet-snippets`.
 - Projectile, Treemacs, Ibuffer, Magit, multiple cursors, and iedit for project
   and code navigation.
 - AUCTeX, RefTeX, Company RefTeX completion, and a custom continuous
@@ -131,6 +132,8 @@ open-buffer and history data accidentally.
 | `site-lisp/latexmkpvc.el` | continuous `latexmk` integration for AUCTeX |
 | `site-lisp/company-reftex.el` | cached Company completion for RefTeX citations and labels |
 | `site-lisp/company-numbered-selection.el` | context-aware number-key selection for Company candidates |
+| `site-lisp/ivy-pinyin-search.el` | initial and full-pinyin matching for Ivy |
+| `site-lisp/yasnippet-personal-priority.el` | personal-over-bundled Yasnippet precedence by trigger key |
 | `site-lisp/` | other local and bundled Lisp |
 | `snippets/` | personal Yasnippet templates for LaTeX, Python, and text modes |
 | `dict/hunspell/` | bundled US and UK English Hunspell dictionaries |

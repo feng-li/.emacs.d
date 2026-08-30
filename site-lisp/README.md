@@ -4,6 +4,19 @@ This directory contains custom Emacs Lisp packages used directly by the main
 configuration. `site-lisp/` is added to `load-path` recursively during startup,
 so these packages do not need to be installed from ELPA.
 
+## ivy-pinyin-search
+
+[`ivy-pinyin-search.el`](ivy-pinyin-search.el) adds automatic Chinese-pinyin
+matching to Ivy. In Swiper buffers and static Ivy collections containing
+Chinese text, both initials such as `bj` and full pinyin such as `beijing` or
+`bei jing` automatically match `北京`. Matching is case-insensitive, so `BJ`
+works as well. Latin-only sources retain the ordinary Ivy matcher. A leading
+backtick is unnecessary. Appending one, as in `` beijing` ``, forces pinyin
+matching for Chinese candidates only, even in dynamic or otherwise undetectable
+sources. Thus `` beijing` `` matches `北京` but not the Latin word `beijing`.
+The package uses Emacs's built-in `chinese-py` input-method table and leaves any
+command-specific Ivy regexp builders intact.
+
 ## mdx-dict-and-synosaurus
 
 [`mdx-dict-and-synosaurus.el`](mdx-dict-and-synosaurus.el) is a standalone
@@ -132,3 +145,27 @@ Customize `company-numbered-selection-keys` to change the ordered selection
 keys, or set `company-numbered-selection-show-hints` to nil before enabling the
 mode to leave Company's hint display unchanged. Run
 `M-x customize-group RET company-numbered-selection` for both options.
+
+## yasnippet-personal-priority
+
+[`yasnippet-personal-priority.el`](yasnippet-personal-priority.el) makes
+personal snippets override non-personal snippets that use the same trigger
+key. Yasnippet's normal directory order only replaces snippets with the same
+identity, so differently named snippets from `yasnippet-snippets` can otherwise
+remain alongside a personal definition.
+
+The global `yasnippet-personal-priority-mode` applies the rule to direct
+expansion, Yasnippet selection menus, and Company candidates supplied by
+`company-yasnippet`. Multiple personal snippets sharing a trigger are retained,
+as are bundled snippets whose triggers do not conflict. Optional Company
+integration is attached when `company-yasnippet` loads and is removed cleanly
+when the mode is disabled.
+
+By default, files below `~/.emacs.d/snippets/` are considered personal.
+Customize `yasnippet-personal-priority-directories` to recognize other snippet
+trees. Template origins are held in a weak cache that is invalidated
+automatically when this directory list changes; it can also be reset with
+`M-x yasnippet-personal-priority-clear-cache`. The implementation advises
+private Yasnippet and company-yasnippet candidate functions because no public
+API exposes these lists at the required stage; keeping that dependency in this
+package isolates the maintenance risk from `init.el`.

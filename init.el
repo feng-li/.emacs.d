@@ -67,7 +67,7 @@
    '(adaptive-wrap auctex counsel dracula-theme electric-operator elpy envrc flycheck-julia flycheck-languagetool
                    format-all gnu-elpa-keyring-update gptel highlight-doxygen highlight-symbol iedit imenu-list jinx
                    julia-mode keytar lsp-latex lsp-metals magit magit-popup math-symbol-lists multiple-cursors
-                   mw-thesaurus neotree notmuch pandoc-mode pdf-tools pinyinlib poly-R popup powerthesaurus projectile
+                   mw-thesaurus neotree notmuch pandoc-mode pdf-tools poly-R popup powerthesaurus projectile
                    proxy-mode treemacs-projectile treesit-auto unfill visual-fill-column wgrep writegood-mode
                    yaml-mode yasnippet-snippets))
  '(safe-local-variable-values '((TeX-engine . pdflatex)))
@@ -590,44 +590,13 @@
 
   )
 
-;; let `ivy-read' support Chinese pinyin, toggle with `
-(use-package pinyinlib
-  :ensure t
+;; Detect Chinese Ivy sources automatically; a trailing ` searches Chinese only.
+(use-package ivy-pinyin-search
+  :ensure nil
+  :after ivy
+  :demand t
   :config
-  (defvar-local my-pinyin-search-prefix "`")
-  (defun re-builder-pinyin (str)
-    (or (pinyin-to-utf8 str)
-        (ivy--regex-plus str)
-        (ivy--regex-ignore-order str)
-        ))
-  (setq ivy-re-builders-alist
-        '(
-          (t . re-builder-pinyin)
-          ))
-  (defun my-pinyinlib-build-regexp-string (str)
-    (progn
-      (cond ((equal str ".*")
-             ".*")
-            (t
-             (pinyinlib-build-regexp-string str t))))
-    )
-  (defun my-pinyin-regexp-helper (str)
-    (cond ((equal str " ")
-           ".*")
-          ((equal str "")
-           nil)
-          (t
-           str)))
-  (defun pinyin-to-utf8 (str)
-    (cond ((equal 0 (length str))
-           nil)
-          ((equal (substring str 0 1) my-pinyin-search-prefix)
-           (mapconcat 'my-pinyinlib-build-regexp-string
-                      (remove nil (mapcar 'my-pinyin-regexp-helper
-                                          (split-string (replace-regexp-in-string my-pinyin-search-prefix "" str) "")))
-                      ""))
-          (t nil)))
-)
+  (ivy-pinyin-search-mode 1))
 
 ;; iedit mode
 (use-package iedit
@@ -784,79 +753,9 @@
 ;; Auto completion settings (company mode, yasnippet)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defconst my-yas-user-snippet-directory
-  (expand-file-name "snippets" user-emacs-directory)
-  "Directory containing personal Yasnippet snippets.")
-
-(defun my-yas--user-template-p (template)
-  "Return non-nil when TEMPLATE comes from the personal snippet directory."
-  (let ((file (yas--template-get-file template)))
-    (and file
-         (file-in-directory-p file my-yas-user-snippet-directory))))
-
-(defun my-yas--filter-shadowed-items (items template-function)
-  "Remove bundled ITEMS shadowed by personal snippets.
-
-TEMPLATE-FUNCTION extracts a Yasnippet template from each item.  A personal
-snippet shadows bundled snippets with the same trigger key, while snippets
-with other keys and additional personal snippets are retained."
-  (let (user-keys)
-    (dolist (item items)
-      (let* ((template (funcall template-function item))
-             (key (and template (yas--template-key template))))
-        (when (and key (my-yas--user-template-p template)
-                   (not (member key user-keys)))
-          (push key user-keys))))
-    (if (null user-keys)
-        items
-      (let (filtered)
-        (dolist (item items (nreverse filtered))
-          (let* ((template (funcall template-function item))
-                 (key (and template (yas--template-key template))))
-            (unless (and key
-                         (member key user-keys)
-                         (not (my-yas--user-template-p template)))
-              (push item filtered))))))))
-
-(defun my-yas--filter-expansion-arguments (arguments)
-  "Prefer personal snippets in Yasnippet expansion ARGUMENTS."
-  (cons (my-yas--filter-shadowed-items (car arguments) #'cdr)
-        (cdr arguments)))
-
-(defun my-yas--filter-all-templates (templates)
-  "Prefer personal snippets in Yasnippet template menus."
-  (my-yas--filter-shadowed-items templates #'identity))
-
-(defun my-yas--company-candidate-template (candidate)
-  "Return the Yasnippet template attached to Company CANDIDATE."
-  (get-text-property 0 'yas-template candidate))
-
-(defun my-yas--filter-company-candidates (candidates)
-  "Prefer personal snippets among Company CANDIDATES."
-  (my-yas--filter-shadowed-items
-   candidates #'my-yas--company-candidate-template))
-
 (use-package yasnippet
   :ensure t
   :config
-
-  ;; Yasnippet's directory precedence uses snippet identity, not trigger key.
-  ;; Filter candidates so a personal key replaces bundled definitions.
-  (unless (advice-member-p #'my-yas--filter-expansion-arguments
-                           'yas--expand-or-prompt-for-template)
-    (advice-add 'yas--expand-or-prompt-for-template
-                :filter-args #'my-yas--filter-expansion-arguments))
-  (unless (advice-member-p #'my-yas--filter-all-templates
-                           'yas--all-templates)
-    (advice-add 'yas--all-templates
-                :filter-return #'my-yas--filter-all-templates))
-
-  (with-eval-after-load 'company-yasnippet
-    (unless (advice-member-p #'my-yas--filter-company-candidates
-                             'company-yasnippet--completions-for-prefix)
-      (advice-add 'company-yasnippet--completions-for-prefix
-                  :filter-return #'my-yas--filter-company-candidates)))
-
   ;; Make yasnippet treat LaTeX-mode as latex-mode
   (add-hook 'LaTeX-mode-hook
             (lambda ()
@@ -870,6 +769,13 @@ with other keys and additional personal snippets are retained."
   ;;         ;; "~/.emacs.d/site-lisp/yasnippet-snippets/snippets"
   ;;         ))
   )
+
+(use-package yasnippet-personal-priority
+  :ensure nil
+  :after yasnippet
+  :demand t
+  :config
+  (yasnippet-personal-priority-mode 1))
 
 (use-package company
   :ensure t
