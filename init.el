@@ -1468,15 +1468,6 @@ intermediate and output files, as requested by the non-nil argument to
 ;;; Python IDE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defun my-python-send-line-and-step (beg end)
-  "Send the active region or current line to Python, then move forward."
-  (interactive "r")
-  (if (use-region-p)
-      (python-shell-send-region beg end)
-    (python-shell-send-region
-     (line-beginning-position) (line-end-position)))
-  (forward-line 1))
-
 (defun my-python-add-breakpoint ()
   "Insert a pdb breakpoint on a new indented line."
   (interactive)
@@ -1491,7 +1482,6 @@ intermediate and output files, as requested by the non-nil argument to
   (local-set-key (kbd "C-c >") #'python-indent-shift-right)
   (local-set-key (kbd "C-c <") #'python-indent-shift-left)
   (local-set-key (kbd "C-c M-r") #'python-shell-send-region)
-  (local-set-key (kbd "C-c C-n") #'my-python-send-line-and-step)
   (local-set-key (kbd "C-c C-t") #'my-python-add-breakpoint))
 
 (use-package python

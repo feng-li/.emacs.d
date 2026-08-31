@@ -10,10 +10,12 @@ so these packages do not need to be installed from ELPA.
 Elpy-independent Python evaluation commands. Its buffer-local minor mode binds
 `C-c C-c` to send the current blank-line-separated group of top-level
 statements and advance to the next group. Compound statements, decorators, and
-blank lines inside a definition remain together. `C-c C-r` sends the active
-region, or the whole buffer when no region is active, and moves point to the
-end. A prefix argument permits execution of an
-`if __name__ == "__main__"` block.
+blank lines inside a definition remain together. `C-c C-f` preserves the old
+Elpy binding: it sends the containing definition, advances past it, and opens
+the Python shell. `C-c C-n` sends the active region or current line and moves
+down one line. `C-c C-r` sends the active region, or the whole buffer when no
+region is active, and moves point to the end. A prefix argument permits
+execution of an `if __name__ == "__main__"` block.
 
 The main configuration enables `python-send-and-step-mode` in both
 `python-mode` and `python-ts-mode` buffers.
