@@ -4,6 +4,20 @@ This directory contains custom Emacs Lisp packages used directly by the main
 configuration. `site-lisp/` is added to `load-path` recursively during startup,
 so these packages do not need to be installed from ELPA.
 
+## python-send-and-step
+
+[`python-send-and-step.el`](python-send-and-step.el) provides standalone,
+Elpy-independent Python evaluation commands. Its buffer-local minor mode binds
+`C-c C-c` to send the current blank-line-separated group of top-level
+statements and advance to the next group. Compound statements, decorators, and
+blank lines inside a definition remain together. `C-c C-r` sends the active
+region, or the whole buffer when no region is active, and moves point to the
+end. A prefix argument permits execution of an
+`if __name__ == "__main__"` block.
+
+The main configuration enables `python-send-and-step-mode` in both
+`python-mode` and `python-ts-mode` buffers.
+
 ## ivy-pinyin-search
 
 [`ivy-pinyin-search.el`](ivy-pinyin-search.el) adds automatic Chinese-pinyin

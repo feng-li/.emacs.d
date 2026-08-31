@@ -3,6 +3,12 @@
 (setq package-enable-at-startup t)
 (setq package-user-dir (concat (getenv "HOME") "/.config/emacs" (number-to-string emacs-major-version)  "/elpa")) ;; Global
 
+;; Reduce garbage collection during startup, then restore a moderate threshold.
+(setq gc-cons-threshold (* 1024 1024 1024))
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (setq gc-cons-threshold (* 64 1024 1024))))
+
 ;; Set eln-cache dir
 (when (boundp 'native-comp-eln-load-path)
   (startup-redirect-eln-cache (expand-file-name

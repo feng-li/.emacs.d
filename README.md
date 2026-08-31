@@ -23,8 +23,8 @@ sections before adopting it wholesale.
   and code navigation.
 - AUCTeX, RefTeX, Company RefTeX completion, and a custom continuous
   `latexmk -pvc` workflow for LaTeX and BibTeX authoring.
-- Elpy, LSP mode, pylsp, Flycheck, and common formatters/checkers for Python.
-- ESS and poly-R for R and R Markdown, plus modes for Julia and Scala/Metals.
+- LSP mode, pylsp, Flycheck, and common formatters/checkers for Python.
+- ESS and poly-R for R and R Markdown, plus modes for Julia and Scala.
 - Jinx, Hunspell, LanguageTool, Pandoc, and local MDX/StarDict dictionaries
   with integrated Synosaurus support for prose editing.
 - Dracula theme, adaptive visual wrapping, line numbers, tree-sitter mode
@@ -54,7 +54,7 @@ External programs are feature-dependent:
 | Prose conversion | `pandoc`; optionally a LanguageTool server at `localhost:8081` |
 | LaTeX | a TeX distribution with `xelatex`, `latexmk`, `kpsewhich`, and `texcount`; Evince for PDF viewing |
 | Python | `python3`, pylsp, Flake8, Pylint, Ruff, Black, and isort as needed |
-| Other languages | R for ESS; Julia; or Scala, Coursier, and Metals as needed |
+| Other languages | R for ESS; Julia; or Scala as needed |
 | Appearance | the `M PLUS Code Latin 50` font, or a replacement configured in `init.el` |
 | Remote synchronization | `rsync` and SSH |
 
@@ -91,8 +91,7 @@ by the configuration is tracked directly in this repository.
 
 ### Optional Python environment
 
-`setup_env.sh` builds the Python environment expected by the Elpy and pylsp
-settings:
+`setup_env.sh` builds the Python environment expected by the pylsp settings:
 
 ```sh
 bash setup_env.sh
@@ -133,6 +132,7 @@ open-buffer and history data accidentally.
 | `site-lisp/company-reftex.el` | cached Company completion for RefTeX citations and labels |
 | `site-lisp/company-numbered-selection.el` | context-aware number-key selection for Company candidates |
 | `site-lisp/ivy-pinyin-search.el` | initial and full-pinyin matching for Ivy |
+| `site-lisp/python-send-and-step.el` | Elpy-independent Python evaluation and stepping commands |
 | `site-lisp/yasnippet-personal-priority.el` | personal-over-bundled Yasnippet precedence by trigger key |
 | `site-lisp/` | other local and bundled Lisp |
 | `snippets/` | personal Yasnippet templates for LaTeX, Python, and text modes |
@@ -226,8 +226,8 @@ continuous build and Company/RefTeX completion integrations.
 
 | Key | Context | Action |
 | --- | --- | --- |
-| `C-c C-c` | Python/Elpy | send a group and step |
-| `C-c C-r` | Python/Elpy | send a region or buffer and step |
+| `C-c C-c` | Python | send the current top-level group and step |
+| `C-c C-r` | Python | send the active region or whole buffer and step |
 | `C-c C-n` | Python | send a line or region and step |
 | `C-c C-t` | Python | insert a `pdb` breakpoint |
 | `<f9> <f6>` | R/ESS | start R |
@@ -246,12 +246,11 @@ At minimum, review these parts of `init.el` after cloning:
   8081.
 - Python executable, virtual-environment, Flake8, and pylsp paths.
 - TeX engine and PDF viewer (`xetex` and Evince by default).
-- the Coursier and Metals paths used by the Scala LSP setup.
 - the gptel backend, proxy host, model names, and API-key source. Do not commit
   personal credentials; keep them in `~/.authinfo`, `~/.authinfo.gpg`, or
   another Emacs auth-source backend.
-- the local MDX dictionary paths and the separate online Merriam-Webster API
-  integration if those sources are not available or should not be used.
+- the local MDX and StarDict dictionary paths if those sources are not
+  available or should not be used.
 
 `early-init.el` prepends `~/.local/bin`, `~/.cargo/bin`, and
 `~/.local/share/coursier/bin` to `PATH`. Adjust this list if GUI Emacs cannot

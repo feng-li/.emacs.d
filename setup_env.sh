@@ -6,7 +6,7 @@ echo -e "
 ... Installing Python and Language Server for Emacs
 "
 
-# Python 3.12 dropped distutils which failed elpy
+# Keep the pylsp environment on a known Python version.
 python3_ver=3.12
 python_dist_path=$HOME/.local/python${python3_ver}
 lsp=${HOME}/.virtualenvs/lsp

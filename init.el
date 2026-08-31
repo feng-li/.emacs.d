@@ -64,14 +64,13 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(adaptive-wrap auctex counsel dracula-theme electric-operator elpy envrc flycheck-julia flycheck-languagetool
+   '(adaptive-wrap auctex counsel dracula-theme electric-operator envrc flycheck-julia flycheck-languagetool
                    format-all gnu-elpa-keyring-update gptel highlight-doxygen highlight-symbol iedit imenu-list jinx
-                   julia-mode keytar lsp-latex lsp-metals magit magit-popup math-symbol-lists multiple-cursors
-                   mw-thesaurus neotree notmuch pandoc-mode pdf-tools poly-R popup powerthesaurus projectile
+                   julia-mode keytar lsp-latex magit magit-popup math-symbol-lists multiple-cursors
+                   neotree notmuch pandoc-mode pdf-tools poly-R popup powerthesaurus projectile
                    proxy-mode treemacs-projectile treesit-auto unfill visual-fill-column wgrep writegood-mode
                    yaml-mode yasnippet-snippets))
  '(safe-local-variable-values '((TeX-engine . pdflatex)))
- '(save-place-mode t)
  '(scroll-bar-mode nil)
  '(scroll-conservatively 1)
  '(send-mail-function 'mailclient-send-it)
@@ -93,7 +92,9 @@
 (setq frame-title-format "%b")
 (setq user-full-name "Feng Li")
 (setq user-mail-address "m@feng.li")
-(setq gc-cons-threshold (* 1000 1024 1024)) ; 1000 MB
+
+;; Resolve symlinks before visiting files so each project has one file identity.
+(setq find-file-visit-truename t)
 
 ;; Auto-save list file prefix
 (setq auto-save-list-file-prefix (concat my-auto-save-list "/.saves-"))
@@ -199,7 +200,10 @@
 ;;   (global-set-key [?\e ?\e escape] 'keyboard-escape-quit)
 ;;   )
 
-(add-hook 'before-save-hook #'delete-trailing-whitespace)
+(defun my-delete-trailing-whitespace-on-save-setup ()
+  "Delete trailing whitespace when saving the current programming buffer."
+  (add-hook 'before-save-hook #'delete-trailing-whitespace nil t))
+(add-hook 'prog-mode-hook #'my-delete-trailing-whitespace-on-save-setup)
 
 ;; Let Alt key be the meta key
 (setq x-alt-keysym 'meta)
@@ -256,7 +260,12 @@
               (visual-fill-column-mode -1))
           (unless visual-fill-column-mode
             (visual-fill-column-mode 1))))))
-  (add-hook 'post-command-hook #'my-latex-toggle-visual-fill-column)
+
+  (defun my-latex-visual-fill-column-setup ()
+    "Update visual filling after commands in the current LaTeX buffer."
+    (add-hook 'post-command-hook
+              #'my-latex-toggle-visual-fill-column nil t))
+  (add-hook 'LaTeX-mode-hook #'my-latex-visual-fill-column-setup)
   )
 
 
@@ -402,9 +411,9 @@
 (setq desktop-restore-frames nil)
 
 ;; save mini buffer history
-(savehist-mode 1)
 (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring))
 (setq savehist-file (concat my-desktop-path "/savehist-file.el"))
+(savehist-mode 1)
 
 ;; Add a hook when emacs is closed to we reset the desktop modification time (in this way
 ;; the user does not get a warning message about desktop modifications)
@@ -430,6 +439,7 @@
 
 ;; save-place-mode
 (setq save-place-file (concat my-auto-save-list "/save-place-file.el"))
+(save-place-mode 1)
 
 ;; bookmarks
 ;; every time bookmark is changed, automatically save it
@@ -449,8 +459,11 @@
 ;; Hide and Show code blocks
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(dolist (hook '(after-text-mode-hook c-mode-hook org-mode-hook python-mode-hook mail-mode-hook ess-mode-hook))
-  (add-hook hook #'(lambda () (hs-minor-mode))))
+(defun my-enable-hs-minor-mode ()
+  "Enable `hs-minor-mode' in the current buffer."
+  (hs-minor-mode 1))
+(dolist (hook '(c-mode-hook org-mode-hook python-mode-hook mail-mode-hook ess-mode-hook))
+  (add-hook hook #'my-enable-hs-minor-mode))
 (global-set-key (kbd "M-+") 'hs-toggle-hiding)
 (global-set-key (kbd "M-*") 'hs-show-all)
 
@@ -521,7 +534,7 @@
   ;; (ivy-truncate-lines nil)
 
   :config
-  (ivy-mode)
+  (ivy-mode 1)
   (setq ivy-use-virtual-buffers t)
   (setq enable-recursive-minibuffers t)
 
@@ -686,39 +699,7 @@
             (lambda ()
               (ibuffer-switch-to-saved-filter-groups "default"))))
 
-;; Ido mode
-(use-package ido
-  :ensure t
-  :config
-  (ido-mode t)
-  (setq ido-use-virtual-buffers nil)
-  (setq ido-enable-flex-matching nil)
-  (setq ido-ignore-extensions t)
-  (setq ido-save-directory-list-file (concat my-auto-save-list "/ido-save-directory-list-file.el"))
-  (setq ido-ignore-files ; this also works with directories with c-x c-f
-        '("\\.Rc$" "\\.dvi$" "\\.pdf$" "\\.ps$" "\\.out$" "\\.fls$" "\\.spl$"
-          "\\.fff$" "\\.ttt$" "\\.log$" "\\.ods$" "\\.eps$" "\\#$" "\\.png$" "\\~$"
-          "\\.RData$" "\\.nav$" "\\.snm$" "\\`\\.\\./" "\\`\\./" "\\.synctex.gz$"
-          "\\.fdb_latexmk$" "\\.tar.gz$" "\\.zip$" "\\.o$" "\\.tar$" "\\.Rproj$"
-          "\\.Rcheck$" "\\.doc$" "\\.docx$" "\\.Rhistory$" "auto/" "__pycache__/"
-          "\\.bcf$" "\\.run.xml$" "_region_.tex$" "\\.xdv$" "\\.DS_Store$"
-          "\\.cfg$" "\\.bak$" "\\.gitignore" "\\.tmp$"))
-
-  (setq  ido-ignore-directories ; only works with ido-dired
-         '("\\`auto/" "\\.prv/" "\\`CVS/" "\\`.git/" "\\`.ropeproject/" "\\`\\.\\./"
-           "\\`\\./" "\\`_bookdown_files/" "__pycache__/"))
-
-  (setq ido-ignore-buffers
-        '("\\` " "^\\*ESS\\*" "^\\*Messages\\*" "^\\*Help\\*" "^\\*Buffer"
-          "*scratch*" "^\\*Ibuffer*" "^\\*ESS-errors*" "^\\*Warnings*" "*TeX Help*"
-          "*Pymacs*" "*Flymake log*" "\\.log$" "^\\*.*Completions\\*$" "^\\*Ediff"
-          "^\\*tramp" "^\\*cvs-" "_region_" "^TAGS$" "^\\*Ido"
-          "^\\*.*dictem buffer\\*$" "^\\*inferior-lisp*" "^\\*Compile-Log\\*"
-          "*output*" "\.\*output*" "^\\*EGLOT*" "^\\*Async-native-compile-log*"
-          "^\\*lsp-log*" "^\\*grammarly-ls::stderr*" "^\\*grammarly-ls*"))
-
-  (defun ido-kill-emacs-hook () (ignore-errors (ido-save-history)))
-  )
+;; Ivy is the sole minibuffer completion framework.
 
 ;; ElDoc mode
 (add-hook 'emacs-lisp-mode-hook #'turn-on-eldoc-mode)
@@ -735,7 +716,6 @@
 
   ;; Comint history length
   (setq comint-input-ring-size 5000)
-  (setq comint-read-input-ring t)
 
   ;; Comint scroll output
   (setq comint-scroll-to-bottom-on-output 'others)
@@ -940,12 +920,14 @@
   (flycheck-check-syntax-automatically (quote (idle-change mode-enabled))) ; save
   (flycheck-idle-change-delay 3) ;; Set delay based on what suits you the best
   (global-flycheck-mode t)
-  (flycheck-add-next-checker 'python-flake8 'python-pylint)
   (flycheck-flake8rc '(".flake8" "setup.cfg" "tox.ini"
                        "~/.config/flake8/setup.cfg"
                        "~/.config/flake8/tox.ini"))
 
   :config
+  ;; Run Pylint after Flake8.
+  (flycheck-add-next-checker 'python-flake8 'python-pylint)
+
   ;; Checkers for Python
   (setq flycheck-python-flake8-executable "flake8")
   (setq flycheck-python-ruff-executable   "ruff")
@@ -1027,13 +1009,6 @@
 ;; Auto correct spelling mistakes
 ;; (global-set-key (kbd "<f9> c") 'flyspell-auto-correct-word)
 
-(use-package mw-thesaurus
-  :defer nil
-  :config
-  (setq mw-thesaurus--api-key "23ed2cad-ce64-4ab1-abd9-774760e6842d")
-  (global-set-key (kbd "<f9> t") 'mw-thesaurus-lookup-dwim)
-  )
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; General settings for program mode
@@ -1046,13 +1021,14 @@
 ;;         "~/code/TAGS/C/"
 ;;         "~/code/TAGS/FORTRAN/"))
 
-(dolist (hook '(after-text-mode-hook ess-mode-hook python-mode-hook c-mode-hook c++-mode-hook inferior-ess-mode-hook))
-  (add-hook hook #'(lambda () (xref-etags-mode))))
+(defun my-enable-xref-etags-mode ()
+  "Enable `xref-etags-mode' in the current buffer."
+  (xref-etags-mode 1))
+(dolist (hook '(ess-mode-hook python-mode-hook c-mode-hook c++-mode-hook inferior-ess-mode-hook))
+  (add-hook hook #'my-enable-xref-etags-mode))
 
 ;; Highlight doxygen mode
 (highlight-doxygen-global-mode 1)
-(dolist (hook '(c-mode-hook c++-mode-hook python-mode-hook ess-r-mode-hook))
-  (add-hook hook #'(lambda () (highlight-doxygen-mode))))
 
 ;; Add font lock keywords
 (mapc (lambda (mode)
@@ -1076,7 +1052,7 @@
 (use-package markdown-mode
   :ensure t
   :config
-  (setq auto-mode-alist (cons '("\\.md" . markdown-mode) auto-mode-alist))
+  (setq auto-mode-alist (cons '("\\.md\\'" . markdown-mode) auto-mode-alist))
   (add-hook 'markdown-mode-hook 'imenu-add-menubar-index)
   (setq imenu-auto-rescan t)
 
@@ -1097,8 +1073,11 @@
 (use-package pandoc-mode
   :ensure t
   :config
+  (defun my-enable-pandoc-mode ()
+    "Enable `pandoc-mode' in the current buffer."
+    (pandoc-mode 1))
   (dolist (hook '(text-mode-hook LaTeX-mode-hook org-mode-hook markdown-mode-hook))
-    (add-hook hook (lambda () (pandoc-mode))))
+    (add-hook hook #'my-enable-pandoc-mode))
   (add-hook 'pandoc-mode-hook
             (lambda ()
               (local-set-key (kbd "C-c m") 'pandoc-main-hydra/body)))
@@ -1134,6 +1113,51 @@
   (let ((fill-prefix (make-string (1+ bibtex-text-indentation) ? )))
     (apply orig-func args)))
 (advice-add 'bibtex-clean-entry :around #'bibtex-reset-fill-prefix)
+
+(defun my-tex-clean-and-kill ()
+  "Stop the current AUCTeX job and remove generated TeX files.
+The job may be TeX, LaTeX, BibTeX, or a previewer.  Clean both
+intermediate and output files, as requested by the non-nil argument to
+`TeX-clean'."
+  (interactive)
+  (ignore-errors (TeX-kill-job))
+  (TeX-clean t)
+  (message "Stopped any running AUCTeX job; cleaned intermediate and output files"))
+
+(defun my-latex-toggle-draft ()
+  "Toggle graphicx draft mode in the current document."
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (let ((regexp
+           "^[ \t]*\\(%[ \t]*\\)?\\\\PassOptionsToPackage{draft}{graphicx}"))
+      (if (re-search-forward regexp nil t)
+          (let ((disabled (match-beginning 1))
+                (beg (line-beginning-position))
+                (end (line-end-position)))
+            (if disabled
+                (uncomment-region beg end)
+              (comment-region beg end))
+            (message "Graphicx draft mode %s"
+                     (if disabled "enabled" "disabled")))
+        (goto-char (point-min))
+        (when (re-search-forward "^\\\\documentclass" nil t)
+          (beginning-of-line))
+        (insert "\\PassOptionsToPackage{draft}{graphicx}\n")
+        (message "Graphicx draft mode enabled")))))
+
+(defun my-latex-clean-delimiters ()
+  "Replace \\( and \\) with $, and remove ** before saving."
+  (let ((replacements 0))
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward "\\\\(\\|\\\\)\\|\\*\\*" nil t)
+        (if (string= (match-string 0) "**")
+            (replace-match "")
+          (replace-match "$"))
+        (setq replacements (1+ replacements))))
+    (message "LaTeX pre-save cleanup: %d replacement%s"
+             replacements (if (= replacements 1) "" "s"))))
 
 ;; AUCTEX
 (use-package tex
@@ -1181,15 +1205,6 @@
                 ;; Clean all intermediate files, like 'latexmk -c' and kill current job
                 (local-unset-key (kbd "C-c C-k"))
                 (setq TeX-clean-confirm nil)
-                (defun my-tex-clean-and-kill ()
-                  "Stop the current AUCTeX job and remove generated TeX files.
-The job may be TeX, LaTeX, BibTeX, or a previewer.  Clean both
-intermediate and output files, as requested by the non-nil argument to
-`TeX-clean'."
-                  (interactive)
-                  (ignore-errors (TeX-kill-job))
-                  (TeX-clean t)
-                  (message "Stopped any running AUCTeX job; cleaned intermediate and output files"))
                 (local-set-key (kbd "C-c C-k") #'my-tex-clean-and-kill)
 
                 (local-set-key (kbd "<f5>") 'TeX-command-run-all)
@@ -1219,28 +1234,6 @@ intermediate and output files, as requested by the non-nil argument to
                         (?w "\\textsw{"     "}")
                         (?d "" "" t)))
 
-
-                (defun my-latex-toggle-draft ()
-                  "Toggle graphicx draft mode in the current document."
-                  (interactive)
-                  (save-excursion
-                    (goto-char (point-min))
-                    (let ((regexp
-                           "^[ \t]*\\(%[ \t]*\\)?\\\\PassOptionsToPackage{draft}{graphicx}"))
-                      (if (re-search-forward regexp nil t)
-                          (let ((disabled (match-beginning 1))
-                                (beg (line-beginning-position))
-                                (end (line-end-position)))
-                            (if disabled
-                                (uncomment-region beg end)
-                              (comment-region beg end))
-                            (message "Graphicx draft mode %s"
-                                     (if disabled "enabled" "disabled")))
-                        (goto-char (point-min))
-                        (when (re-search-forward "^\\\\documentclass" nil t)
-                          (beginning-of-line))
-                        (insert "\\PassOptionsToPackage{draft}{graphicx}\n")
-                        (message "Graphicx draft mode enabled")))))
                 (local-set-key (kbd "C-c d") #'my-latex-toggle-draft)
 
                 ;; Use \bm{} to repace \mathbf{}
@@ -1248,15 +1241,6 @@ intermediate and output files, as requested by the non-nil argument to
                 ;;              '(m "\\bm{" "}"))
                 ))
 
-
-  (defun my-latex-clean-delimiters ()
-    "Replace \\( and \\) with $, and remove ** before saving."
-    (save-excursion
-      (goto-char (point-min))
-      (while (re-search-forward "\\\\(\\|\\\\)\\|\\*\\*" nil t)
-        (if (string= (match-string 0) "**")
-            (replace-match "")
-          (replace-match "$")))))
   (add-hook 'LaTeX-mode-hook
             (lambda ()
               (add-hook 'before-save-hook
@@ -1297,15 +1281,12 @@ intermediate and output files, as requested by the non-nil argument to
 
 ;; Extra keybinds for RefTeX
   ;; (setq reftex-extra-bindings t) ;; equavalent as below
-  (add-hook 'reftex-load-hook
-            #'(lambda ()
-                (define-key reftex-mode-map (kbd "C-c l") 'reftex-label)
-                (define-key reftex-mode-map (kbd "C-c r") 'reftex-reference)
-                (define-key reftex-mode-map (kbd "C-c c") 'reftex-citation)
-                (define-key reftex-mode-map (kbd "C-c v") 'reftex-view-crossref)
-                (define-key reftex-mode-map (kbd "C-c s") 'reftex-search-document)
-                )
-            )
+  (with-eval-after-load 'reftex
+    (define-key reftex-mode-map (kbd "C-c l") 'reftex-label)
+    (define-key reftex-mode-map (kbd "C-c r") 'reftex-reference)
+    (define-key reftex-mode-map (kbd "C-c c") 'reftex-citation)
+    (define-key reftex-mode-map (kbd "C-c v") 'reftex-view-crossref)
+    (define-key reftex-mode-map (kbd "C-c s") 'reftex-search-document))
 
   ;; Add company-reftex backends
   (use-package company-reftex)
@@ -1421,12 +1402,12 @@ intermediate and output files, as requested by the non-nil argument to
 
   ;; Let help on new frame
   ;; (setq ess-help-own-frame t)
+  ;; Insert three level-2 comment lines.
+  (fset 'my-R-comment-level-2
+        [?\C-a ?\C-u ?3 ?# ?\C-u ?7 ?6 ?- return
+               ?\C-u ?3 ?# return ?\C-a ?\C-u ?3 ?# ?\C-u ?7 ?6 ?- up ? ])
   (add-hook 'ess-mode-hook
             #'(lambda ()
-                ;; Insert three line comments level-2
-                (fset 'my-R-comment-level-2
-                      [?\C-a ?\C-u ?3 ?# ?\C-u ?7 ?6 ?- return
-                             ?\C-u ?3 ?# return ?\C-a ?\C-u ?3 ?# ?\C-u ?7 ?6 ?- up ? ])
                 (local-set-key (kbd "<f9> 2") 'my-R-comment-level-2)
 
                 ))
@@ -1487,6 +1468,32 @@ intermediate and output files, as requested by the non-nil argument to
 ;;; Python IDE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defun my-python-send-line-and-step (beg end)
+  "Send the active region or current line to Python, then move forward."
+  (interactive "r")
+  (if (use-region-p)
+      (python-shell-send-region beg end)
+    (python-shell-send-region
+     (line-beginning-position) (line-end-position)))
+  (forward-line 1))
+
+(defun my-python-add-breakpoint ()
+  "Insert a pdb breakpoint on a new indented line."
+  (interactive)
+  (newline-and-indent)
+  (insert "import pdb; pdb.set_trace()"))
+
+(defun my-python-mode-setup ()
+  "Configure shared Python editing commands for the current buffer."
+  (flycheck-mode 1)
+  (turn-on-eldoc-mode)
+  (local-set-key (kbd "C-m") #'newline-and-indent)
+  (local-set-key (kbd "C-c >") #'python-indent-shift-right)
+  (local-set-key (kbd "C-c <") #'python-indent-shift-left)
+  (local-set-key (kbd "C-c M-r") #'python-shell-send-region)
+  (local-set-key (kbd "C-c C-n") #'my-python-send-line-and-step)
+  (local-set-key (kbd "C-c C-t") #'my-python-add-breakpoint))
+
 (use-package python
   :ensure t
   :config
@@ -1495,96 +1502,16 @@ intermediate and output files, as requested by the non-nil argument to
 
   (setq python-shell-completion-native-enable nil)
 
-  ;; All symlinked files will resolve to their true location → one single pylsp server per project.
-  (setq find-file-visit-truename t)     ;; always resolve symlinks
-  (add-hook 'python-mode-hook
-            (lambda ()
-              (when buffer-file-name
-                (setq-local buffer-file-name (file-truename buffer-file-name)))))
-
-  ;; Enter to indent in python.el
-  (define-key python-mode-map (kbd "C-m") 'newline-and-indent)
-
-  ;; Indent/unindent
-  (define-key python-mode-map (kbd "C-c >") 'python-indent-shift-right)
-  (define-key python-mode-map (kbd "C-c <") 'python-indent-shift-left)
-
-  ;; Disable "python-shell-send-buffer" default binding.
-  (define-key python-mode-map (kbd "C-c C-c") nil)
-  (define-key python-ts-mode-map (kbd "C-c C-c") nil)
-
-  (define-key python-mode-map (kbd "C-c M-r") 'python-shell-send-region)
-
-  (add-hook 'python-mode-hook
-            #'(lambda ()
-                ;; Enable flycheck mode
-                (flycheck-mode t)
-                (defun my-python-send-line-and-step (beg end)
-                  (interactive "r")
-                  (if (eq beg end)
-                      (python-shell-send-region (line-beginning-position) (line-end-position))
-                    (python-shell-send-region beg end))
-                  (forward-line 1))
-                (local-set-key (kbd "C-c C-n") 'my-python-send-line-and-step)
-
-
-                ;; ElDoc for Python in the minor buffer
-                (turn-on-eldoc-mode)
-
-                (defun python-add-breakpoint ()
-                  (interactive)
-                  (newline-and-indent)
-                  (insert "import pdb; pdb.set_trace()"))
-                (local-set-key (kbd "C-c C-t") #'python-add-breakpoint)
-
-                ))
+  (add-hook 'python-mode-hook #'my-python-mode-setup)
+  (add-hook 'python-ts-mode-hook #'my-python-mode-setup)
   )
 
+(use-package python-send-and-step
+  :ensure nil
+  :after python
+  :demand t
+  :hook ((python-mode python-ts-mode) . turn-on-python-send-and-step-mode))
 
-(use-package elpy
-  :ensure t
-  :config
-  (elpy-enable)
-
-  ;; Enable elpy for python ts mode.
-  (add-hook 'python-ts-mode-hook 'elpy-enable)
-
-  ;; Disable elpy's flymake, use flycheck
-  (remove-hook 'elpy-modules #'elpy-module-flymake)
-  (define-key elpy-mode-map (kbd "C-c C-p") nil)
-
-  ;; elpy rpc
-  (setq elpy-rpc-virtualenv-path (concat (getenv "HOME") "/.virtualenvs/lsp/"))
-  (setq elpy-rpc-python-command "python3")
-  (setq elpy-rpc-backend "jedi")
-  (setq elpy-syntax-check-command (concat (getenv "HOME") "/.virtualenvs/lsp/bin/flake8"))
-
-  ;; (remove-hook 'elpy-modules 'elpy-module-pyvenv)
-  (remove-hook 'elpy-modules #'elpy-module-highlight-indentation)
-  (define-key elpy-mode-map (kbd "C-c C-n") nil)
-
-  (define-key elpy-mode-map (kbd "C-c C-c") 'elpy-shell-send-group-and-step)
-  (define-key elpy-mode-map (kbd "C-c C-r") 'elpy-shell-send-region-or-buffer-and-step)
-
-  ;; Alternatives to elpy-goto-definition and fallback to rgrep
-  (defun elpy-goto-definition-or-rgrep ()
-    "Go to the definition of the symbol at point, if found. Otherwise, run `elpy-rgrep-symbol'."
-    (interactive)
-    (if (version< emacs-version "25.1")
-        (ring-insert find-tag-marker-ring (point-marker))
-      (xref-push-marker-stack))
-    (condition-case nil (elpy-goto-definition)
-      (error (elpy-rgrep-symbol
-              (concat "\\(def\\|class\\)\s" (thing-at-point 'symbol) "(")))))
-  (define-key elpy-mode-map (kbd "M-.") 'elpy-goto-definition-or-rgrep)
-
-
-  ;; auto-format your code with "C-c C-r f" on save
-  ;; (add-hook 'elpy-mode-hook (lambda ()
-  ;;                             (add-hook 'before-save-hook
-  ;;                                       'elpy-format-code nil t)))
-
-  )
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Language server mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1611,6 +1538,7 @@ intermediate and output files, as requested by the non-nil argument to
   :hook
   (
    (python-mode . lsp-deferred)
+   (python-ts-mode . lsp-deferred)
    ;; (c-mode      . lsp-deferred)
    )
 
@@ -1619,7 +1547,6 @@ intermediate and output files, as requested by the non-nil argument to
   (setq lsp-server-install-dir (concat (getenv "HOME") "/.config/emacs" (number-to-string emacs-major-version) "/lsp-server"))
   (setq lsp-session-file (concat my-auto-save-list "/lsp-session-v1"))
   (setq lsp-restart 'ignore)  ;; How server-exited events must be handled.
-  (setq lsp-verify-signature nil) ;; Disable to get metals server (key expired) working
   (setq lsp-headerline-breadcrumb-enable nil)
   (setq lsp-ui-doc-show-with-cursor nil) ;; disable cursor hover (keep mouse hover)
 
@@ -1632,7 +1559,6 @@ intermediate and output files, as requested by the non-nil argument to
 
   ;; Only enable certain LSP client and do not ask for server install.
   (setq lsp-enabled-clients '(pylsp lsp-r texlab2))
-  ;; (setq lsp-enabled-clients '(metals pyls pylsp ruff semgrep-ls grammarly-ls))
 
   ;;(setq lsp-clients-pylsp-library-directories "~/.virtualenvs/lsp/")
   (setq lsp-pylsp-server-command "~/.virtualenvs/lsp/bin/pylsp")
@@ -1655,24 +1581,6 @@ intermediate and output files, as requested by the non-nil argument to
 ;;   (defvar treemacs-no-load-time-warnings t)
 ;;   (define-key lsp-mode-map (kbd "<f4> e") 'lsp-treemacs-errors-list)
 ;;   )
-
-;; Add metals backend for lsp-mode
-(use-package lsp-metals
-  :ensure t
-  :defer t
-  :custom
-  ;; Metals claims to support range formatting by default but it supports range
-  ;; formatting of multiline strings only. You might want to disable it so that
-  ;; emacs can use indentation provided by scala-mode.
-  (lsp-metals-server-args '("-J-Dmetals.allow-multiline-string-formatting=off"))
-
-  :hook (scala-mode . lsp-deferred)
-
-  :config
-  (setq lsp-metals-metals-store-path   (concat (getenv "HOME") "/.local/share/coursier/bin/metals"))
-  (setq lsp-metals-coursier-store-path (concat (getenv "HOME") "/.local/share/coursier/bin/coursier"))
-
-  )
 
 (use-package treemacs
   :defer t
@@ -1798,7 +1706,7 @@ intermediate and output files, as requested by the non-nil argument to
   :config
   (treesit-auto-add-to-auto-mode-alist 'all)
 
-  (global-treesit-auto-mode)
+  (global-treesit-auto-mode 1)
   )
 
 (use-package envrc
