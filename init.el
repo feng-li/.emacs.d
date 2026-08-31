@@ -760,6 +760,7 @@
 (use-package company
   :ensure t
   :config
+
   (add-hook 'after-init-hook #'global-company-mode)
   (setq company-minimum-prefix-length 2)
   (setq company-idle-delay
@@ -790,7 +791,9 @@
   :after company
   :demand t
   :config
-  (company-numbered-selection-mode 1))
+  (company-numbered-selection-mode 1)
+  (setq company-show-quick-access 'left) ;; BUGFIX: Emacs 31’s terminal child frame failed to paint the rightmost number column
+  )
 
 
 ;; Font lock
