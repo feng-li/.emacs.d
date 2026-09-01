@@ -100,6 +100,14 @@ for prose checking.  Source positions and newlines are preserved."
   :type 'boolean
   :group 'flycheck-vale)
 
+(defcustom flycheck-vale-ignore-tex-whitespace t
+  "Whether to ignore Vale whitespace and spacing checks in TeX buffers.
+
+When non-nil, alerts whose check name contains `Whitespace' or `Spacing' are
+discarded in TeX modes.  Other checks and non-TeX buffers are unaffected."
+  :type 'boolean
+  :group 'flycheck-vale)
+
 (defcustom flycheck-vale-mode-extensions
   '((markdown-mode . "md")
     (gfm-mode . "md")
@@ -290,8 +298,17 @@ modes derived from it."
                      (> (match-end 0) beg))))
         found))))
 
+(defun flycheck-vale--tex-whitespace-alert-p (alert)
+  "Return non-nil when ALERT is a whitespace check ignored in TeX."
+  (let ((check (alist-get 'Check alert)))
+    (and flycheck-vale-ignore-tex-whitespace
+         (flycheck-vale--tex-mode-p)
+         (stringp check)
+         (string-match-p "\\(?:white[-_.]?space\\|spacing\\)"
+                         (downcase check)))))
+
 (defun flycheck-vale--ignored-alert-p (alert buffer)
-  "Return non-nil when ALERT points to masked content in BUFFER."
+  "Return non-nil when ALERT should be ignored in BUFFER."
   (with-current-buffer buffer
     (save-restriction
       (widen)
@@ -302,7 +319,8 @@ modes derived from it."
              (beg (flycheck-line-column-to-position line column))
              (end (flycheck-line-column-to-position line (1+ last-column)))
              (preamble-end (flycheck-vale--tex-preamble-end)))
-        (or (and preamble-end (< beg preamble-end))
+        (or (flycheck-vale--tex-whitespace-alert-p alert)
+            (and preamble-end (< beg preamble-end))
             (flycheck-vale--tex-math-range-p beg end)
             (flycheck-vale--tex-command-range-p beg end))))))
 
