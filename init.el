@@ -796,7 +796,7 @@
     (setq-local company-backends
                 '((company-yasnippet
                    company-dabbrev
-                   company-ispell :separate)
+                   company-ispell :separate) ;; use company to auto complete words from ispell dictionary.
                   company-files)))
   (add-hook 'text-mode-hook #'my-text-mode-hook)
 
@@ -910,14 +910,18 @@
 ;; jinx directly calling the widely-used API of the Enchant library.
 (use-package jinx
   :hook ((text-mode prog-mode conf-mode) . jinx-mode)
-  :bind (("M-4" . jinx-correct)
-	 ("C-M-$" . jinx-languages))
+  :bind (("C-M-$" . jinx-languages))
 
   :config
 
   (add-to-list 'jinx-exclude-regexps '(t "\\cc")) ;; Disable Chinese check
 
   )
+
+(use-package company-jinx
+  :ensure nil
+  :hook (jinx-mode . company-jinx-auto-popup-setup)
+  :bind (("M-4" . company-jinx-correct)))
 
 (with-eval-after-load 'comint
   (define-key comint-mode-map (kbd "C-d") nil)

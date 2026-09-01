@@ -162,6 +162,16 @@ keys, or set `company-numbered-selection-show-hints` to nil before enabling the
 mode to leave Company's hint display unchanged. Run
 `M-x customize-group RET company-numbered-selection` for both options.
 
+## company-jinx
+
+[`company-jinx.el`](company-jinx.el) displays Jinx spelling corrections in a
+Company popup at the misspelled word under point. Invoke
+`company-jinx-correct` manually; the backend is not added to normal Company
+completion. `company-jinx-auto-popup-mode' can also open the popup after point
+rests on an existing Jinx underline. Jinx accept-and-save actions are retained
+as annotated Company candidates. An open popup closes as soon as point leaves
+the word being corrected, and opening it does not move point.
+
 ## yasnippet-personal-priority
 
 [`yasnippet-personal-priority.el`](yasnippet-personal-priority.el) makes
