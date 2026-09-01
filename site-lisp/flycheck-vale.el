@@ -42,7 +42,7 @@
 ;;
 ;; Vale does not parse LaTeX markup natively.  In `latex-mode' and
 ;; `LaTeX-mode', this package therefore passes `--ignore-syntax'; phrase rules
-;; work, but TeX commands can produce false positives.
+;; work, while preambles, math, and TeX command tokens are masked by default.
 
 ;;; Code:
 
@@ -89,6 +89,14 @@ When an uncommented `\\begin{document}' is present, the text through that
 command is replaced with whitespace before it is sent to Vale.  Source
 positions and newlines are preserved.  Buffers without that command, such as
 included chapter files, are left unchanged."
+  :type 'boolean
+  :group 'flycheck-vale)
+
+(defcustom flycheck-vale-ignore-tex-commands t
+  "Whether to ignore TeX command tokens such as `\\section' and `\\%'.
+
+Only the command token is replaced with whitespace; arguments remain available
+for prose checking.  Source positions and newlines are preserved."
   :type 'boolean
   :group 'flycheck-vale)
 
@@ -156,6 +164,10 @@ modes derived from it."
       (and (listp face)
            (memq 'font-latex-math-face face))))
 
+(defconst flycheck-vale--tex-command-regexp
+  "\\\\\\(?:[[:alpha:]@]+\\*?\\|[^[:alpha:]@\n]\\)"
+  "Regular expression matching a TeX control word or control symbol.")
+
 (defun flycheck-vale--tex-preamble-end ()
   "Return the end of the current buffer's TeX preamble, or nil."
   (when (and flycheck-vale-ignore-tex-preamble
@@ -179,6 +191,15 @@ modes derived from it."
                  for string-pos from 0
                  unless (eq (char-after buffer-pos) ?\n)
                  do (aset text string-pos ?\s))))
+    (when (and flycheck-vale-ignore-tex-commands
+               (flycheck-vale--tex-mode-p))
+      (save-excursion
+        (goto-char (point-min))
+        (while (re-search-forward flycheck-vale--tex-command-regexp nil t)
+          (cl-loop for buffer-pos from (match-beginning 0) below (match-end 0)
+                   for string-pos from (- (match-beginning 0) (point-min))
+                   unless (eq (char-after buffer-pos) ?\n)
+                   do (aset text string-pos ?\s)))))
     (when (and flycheck-vale-ignore-tex-math
                (flycheck-vale--tex-mode-p))
       (font-lock-ensure (point-min) (point-max))
@@ -250,6 +271,25 @@ modes derived from it."
                 pos (next-single-property-change pos 'face nil limit))))
       found)))
 
+(defun flycheck-vale--tex-command-range-p (beg end)
+  "Return non-nil when the range from BEG to END overlaps a TeX command."
+  (when (and flycheck-vale-ignore-tex-commands
+             (flycheck-vale--tex-mode-p))
+    (save-excursion
+      (goto-char (max beg (point-min)))
+      (goto-char (line-beginning-position))
+      (let ((limit (save-excursion
+                     (goto-char (min end (point-max)))
+                     (line-end-position)))
+            found)
+        (while (and (not found)
+                    (re-search-forward flycheck-vale--tex-command-regexp
+                                       limit t))
+          (setq found
+                (and (< (match-beginning 0) end)
+                     (> (match-end 0) beg))))
+        found))))
+
 (defun flycheck-vale--ignored-alert-p (alert buffer)
   "Return non-nil when ALERT points to masked content in BUFFER."
   (with-current-buffer buffer
@@ -263,7 +303,8 @@ modes derived from it."
              (end (flycheck-line-column-to-position line (1+ last-column)))
              (preamble-end (flycheck-vale--tex-preamble-end)))
         (or (and preamble-end (< beg preamble-end))
-            (flycheck-vale--tex-math-range-p beg end))))))
+            (flycheck-vale--tex-math-range-p beg end)
+            (flycheck-vale--tex-command-range-p beg end))))))
 
 (defun flycheck-vale--deduplicate-alerts (alerts)
   "Deduplicate Vale ALERTS according to their exact source ranges.
