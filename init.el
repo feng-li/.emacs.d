@@ -940,6 +940,16 @@
   )
 
 
+(use-package flycheck-vale
+  :ensure nil
+  :after (flycheck flycheck-languagetool)
+  :custom
+  (flycheck-vale-executable
+   (expand-file-name "~/.virtualenvs/lsp/bin/vale"))
+  :config
+  (flycheck-vale-setup)
+  (flycheck-add-next-checker 'languagetool 'vale))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Language and writing https://languagetool.org/
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

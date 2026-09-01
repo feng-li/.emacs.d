@@ -100,7 +100,8 @@ bash setup_env.sh
 The script is deliberately machine-specific. It expects Mamba at
 `~/.local/miniforge3/bin/mamba`, creates Python 3.12 under
 `~/.local/python3.12`, creates `~/.virtualenvs/lsp`, and installs packages from
-the Tsinghua PyPI mirror, including `mdict-utils` for the `mdict` command.
+the Tsinghua PyPI mirror, including `mdict-utils` for the `mdict` command and
+the Python Vale wrapper for `~/.virtualenvs/lsp/bin/vale`.
 Review and edit those paths, the Python version, and the index URL before
 running it on another machine.
 

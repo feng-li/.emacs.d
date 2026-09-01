@@ -28,7 +28,7 @@ ${python} -m venv ${lsp}
 source ${lsp}/bin/activate
 python3 -m pip install pip -U -i ${pip_index_url}
 python3 -m pip install 'python-lsp-server[all]' -U -i ${pip_index_url}
-python3 -m pip install flake8 jedi autopep8 black mdict-utils -U -i ${pip_index_url}
+python3 -m pip install flake8 jedi autopep8 black mdict-utils vale -U -i ${pip_index_url}
 
 # echo -e "
 # ... Installing Rust and Cargo
