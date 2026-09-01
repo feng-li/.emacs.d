@@ -3,7 +3,7 @@
 ;; Copyright (C) 2026 Feng Li
 
 ;; Author: Feng Li <m@feng.li>
-;; Version: 0.1.0
+;; Version: 0.2.0
 ;; Package-Requires: ((emacs "27.1") (flycheck "32"))
 ;; Keywords: convenience, text, tools
 ;; URL: https://github.com/feng-li/.emacs.d
@@ -27,6 +27,9 @@
 ;; Checks use the current buffer contents through standard input, so unsaved
 ;; edits are included.  Vale's JSON output is converted to Flycheck errors
 ;; while preserving error, warning, and suggestion severity.
+;; By default, when multiple Vale rules report the same exact source range,
+;; only the most severe message is shown.
+;; Set `flycheck-vale-deduplicate-errors' to nil to show every alert.
 ;;
 ;; Enable the checker with:
 ;;
@@ -60,6 +63,15 @@
 Each element must be one complete argument.  These arguments precede the
 automatically selected `--ext' and `--ignore-syntax' arguments."
   :type '(repeat string)
+  :group 'flycheck-vale)
+
+(defcustom flycheck-vale-deduplicate-errors t
+  "Whether to show only one Vale message for each source range.
+
+When non-nil, alerts with the same line, start column, and end column are
+collapsed into one Flycheck error.  The alert with the highest severity is
+kept; alerts of equal severity retain Vale's original order."
+  :type 'boolean
   :group 'flycheck-vale)
 
 (defcustom flycheck-vale-mode-extensions
@@ -129,6 +141,44 @@ modes derived from it."
     ("warning" 'warning)
     (_ 'info)))
 
+(defun flycheck-vale--severity-rank (alert)
+  "Return a numeric severity rank for Vale ALERT."
+  (pcase (flycheck-vale--level (alist-get 'Severity alert))
+    ('error 2)
+    ('warning 1)
+    (_ 0)))
+
+(defun flycheck-vale--alert-range (alert)
+  "Return the normalized source range of Vale ALERT."
+  (let* ((line (or (alist-get 'Line alert) 1))
+         (span (alist-get 'Span alert))
+         (column (or (car-safe span) 1))
+         (last-column (or (cadr span) column)))
+    (list line column last-column)))
+
+(defun flycheck-vale--deduplicate-alerts (alerts)
+  "Deduplicate Vale ALERTS according to their exact source ranges.
+
+Keep the most severe alert for a duplicated range and the first alert when
+severities are equal.  Preserve the order in which ranges first occur."
+  (if (not flycheck-vale-deduplicate-errors)
+      alerts
+    (let ((alerts-by-range (make-hash-table :test #'equal))
+          (missing (make-symbol "missing"))
+          ranges)
+      (dolist (alert alerts)
+        (let* ((range (flycheck-vale--alert-range alert))
+               (existing (gethash range alerts-by-range missing)))
+          (when (eq existing missing)
+            (push range ranges))
+          (when (or (eq existing missing)
+                    (> (flycheck-vale--severity-rank alert)
+                       (flycheck-vale--severity-rank existing)))
+            (puthash range alert alerts-by-range))))
+      (mapcar (lambda (range)
+                (gethash range alerts-by-range))
+              (nreverse ranges)))))
+
 (defun flycheck-vale--runtime-error (data checker buffer)
   "Convert runtime error DATA into an error for CHECKER and BUFFER."
   (when-let* ((message (alist-get 'Text data)))
@@ -178,11 +228,11 @@ Return a list of `flycheck-error' objects."
         (list error)))
      (t
       (cl-loop for (_file . alerts) in data
-               append (mapcar
-                       (lambda (alert)
-                         (flycheck-vale--alert-error
-                          alert checker buffer))
-                       alerts))))))
+               append
+               (mapcar
+                (lambda (alert)
+                  (flycheck-vale--alert-error alert checker buffer))
+                (flycheck-vale--deduplicate-alerts alerts)))))))
 
 (flycheck-define-command-checker 'vale
   "Check prose with Vale.

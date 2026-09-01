@@ -64,11 +64,11 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(adaptive-wrap auctex counsel dracula-theme electric-operator envrc flycheck-julia flycheck-languagetool
-                   format-all gnu-elpa-keyring-update gptel highlight-doxygen highlight-symbol iedit imenu-list jinx
+   '(adaptive-wrap auctex counsel dracula-theme electric-operator envrc flycheck-julia format-all
+                   gnu-elpa-keyring-update gptel highlight-doxygen highlight-symbol iedit imenu-list jinx
                    julia-mode keytar lsp-latex magit magit-popup math-symbol-lists multiple-cursors
                    neotree notmuch pandoc-mode pdf-tools poly-R popup powerthesaurus projectile
-                   proxy-mode treemacs-projectile treesit-auto unfill visual-fill-column wgrep writegood-mode
+                   proxy-mode treemacs-projectile treesit-auto unfill visual-fill-column wgrep
                    yaml-mode yasnippet-snippets))
  '(safe-local-variable-values '((TeX-engine . pdflatex)))
  '(scroll-bar-mode nil)
@@ -699,7 +699,23 @@
             (lambda ()
               (ibuffer-switch-to-saved-filter-groups "default"))))
 
-;; Ivy is the sole minibuffer completion framework.
+;; Keep Ivy/Counsel for general completion, but use the former Ido
+;; interface for buffer switching.
+(use-package ido
+  :ensure nil
+  :after ivy
+  :config
+  (setq ido-use-virtual-buffers nil
+        ido-enable-flex-matching nil
+        ido-ignore-buffers
+        '("\\` " "^\\*ESS\\*" "^\\*Messages\\*" "^\\*Help\\*" "^\\*Buffer"
+          "*scratch*" "^\\*Ibuffer*" "^\\*ESS-errors*" "^\\*Warnings*" "*TeX Help*"
+          "*Pymacs*" "*Flymake log*" "\\.log$" "^\\*.*Completions\\*$" "^\\*Ediff"
+          "^\\*tramp" "^\\*cvs-" "_region_" "^TAGS$" "^\\*Ido"
+          "^\\*.*dictem buffer\\*$" "^\\*inferior-lisp*" "^\\*Compile-Log\\*"
+          "*output*" "\\.\\*output*" "^\\*EGLOT*" "^\\*Async-native-compile-log*"
+          "^\\*lsp-log*" "^\\*grammarly-ls::stderr*" "^\\*grammarly-ls*"))
+  (ido-mode 'buffers))
 
 ;; ElDoc mode
 (add-hook 'emacs-lisp-mode-hook #'turn-on-eldoc-mode)
@@ -948,7 +964,8 @@
    (expand-file-name "~/.virtualenvs/lsp/bin/vale"))
   :config
   (flycheck-vale-setup)
-  (flycheck-add-next-checker 'languagetool 'vale))
+  (flycheck-add-next-checker 'languagetool '(info . vale))
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Language and writing https://languagetool.org/
@@ -959,9 +976,10 @@
   :custom
   (flycheck-languagetool-active-modes
    '(latex-mode LaTeX-mode org-mode markdown-mode gfm-mode))
+  (flycheck-languagetool-check-on-save-only t)
+
   :config
-  ;; (setq flycheck-languagetool-active-modes '(LaTeX-mode org-mode markdown-mode))
-  (setq flycheck-languagetool-url  "http://localhost:8081")
+  (setq flycheck-languagetool-url  "http://127.0.0.1:8081")
   (flycheck-languagetool-setup)
   )
 
