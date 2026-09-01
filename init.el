@@ -964,7 +964,8 @@
    (expand-file-name "~/.virtualenvs/lsp/bin/vale"))
   :config
   (flycheck-vale-setup)
-  (flycheck-add-next-checker 'languagetool '(info . vale))
+  ;; (flycheck-add-next-checker 'languagetool '(info . vale))
+  (flycheck-add-next-checker 'languagetool 'vale)
   )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
