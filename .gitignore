@@ -25,6 +25,7 @@ eln-cache/
 url/
 snippet/
 site-lisp/yasnippet/
+site-lisp/flycheck-languagetool/
 auto-save-list/
 site-lisp/local/
 transient/
