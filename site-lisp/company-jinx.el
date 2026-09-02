@@ -167,6 +167,7 @@ COMMAND, ARG, and remaining arguments follow the Company backend protocol."
     ('meta (get-text-property 0 'company-jinx--group arg))
     ('kind 'text)
     ('sorted t)
+    ('duplicates t)
     ('no-cache t)
     ('require-match t)
     ('post-completion (company-jinx--post-completion arg))))
