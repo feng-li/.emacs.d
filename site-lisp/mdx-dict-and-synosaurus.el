@@ -174,6 +174,7 @@ COMMAND and REST follow the Company backend protocol."
                t))))
     ('candidates synosaurus--company-candidates)
     ('adjust-boundaries (cons (car rest) (cadr rest)))
+    ('match '((0 . 0)))
     ('kind 'text)
     ('sorted t)
     ('duplicates t)
