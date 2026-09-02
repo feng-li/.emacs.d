@@ -14,9 +14,13 @@
 
 ;; Add path for auto saved files
 ;;; Code:
-(defvar my-base-save-list (concat (getenv "HOME") "/.config/emacs" (number-to-string emacs-major-version) "/"))
+;; (defvar my-base-save-list (concat (getenv "HOME") "/.config/emacs" (number-to-string emacs-major-version)
+;;                                   "." (car (split-string system-configuration "-")) "/"))
 (defvar my-auto-save-list (concat my-base-save-list (system-name))) ;; host-specified
+(defvar my-tree-sitter-directory (concat my-base-save-list "/tree-sitter/"))
 (unless (file-directory-p my-auto-save-list) (make-directory my-auto-save-list t))
+(unless (file-directory-p my-tree-sitter-directory)
+  (make-directory my-tree-sitter-directory t))
 
 (setq package-archives
       '(
@@ -64,12 +68,11 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(adaptive-wrap auctex counsel dracula-theme electric-operator envrc flycheck-julia format-all
-                   gnu-elpa-keyring-update gptel highlight-doxygen highlight-symbol iedit imenu-list jinx
-                   julia-mode keytar lsp-latex magit magit-popup math-symbol-lists multiple-cursors
-                   neotree notmuch pandoc-mode pdf-tools poly-R popup powerthesaurus projectile
-                   proxy-mode treemacs-projectile treesit-auto unfill visual-fill-column wgrep
-                   yaml-mode yasnippet-snippets))
+   '(adaptive-wrap auctex company counsel dracula-theme electric-operator envrc flycheck-julia format-all
+                   gnu-elpa-keyring-update gptel highlight-doxygen highlight-symbol iedit imenu-list jinx julia-mode
+                   keytar lsp-latex magit magit-popup math-symbol-lists multiple-cursors neotree notmuch pandoc-mode
+                   pdf-tools poly-R popup powerthesaurus projectile proxy-mode scala-mode treemacs-projectile unfill
+                   visual-fill-column wgrep yaml-mode yasnippet-snippets))
  '(safe-local-variable-values '((TeX-engine . pdflatex)))
  '(scroll-bar-mode nil)
  '(scroll-conservatively 1)
@@ -220,6 +223,9 @@
 ;; Global visual line mode with better indentation
 ;; (global-visual-line-mode t)
 (setq-default fill-column 120)
+(add-hook 'LaTeX-mode-hook
+          (lambda ()
+            (setq-local fill-column 80)))
 (global-set-key (kbd "M-p") 'fill-paragraph) ;; mirror key for M-q
 (dolist (hook '(message-mode-hook
                 prog-mode-hook
@@ -1724,16 +1730,12 @@ intermediate and output files, as requested by the non-nil argument to
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Tree-sitter mode
-(use-package treesit-auto
+(use-package treesit
+  :ensure nil
   :custom
-  (treesit-auto-install 'prompt)
-  (treesit-extra-load-path (list (concat my-base-save-list "tree-sitter/")))
-
-  :config
-  (treesit-auto-add-to-auto-mode-alist 'all)
-
-  (global-treesit-auto-mode 1)
-  )
+  (treesit-enabled-modes t)
+  (treesit-auto-install-grammar 'ask)
+  (treesit-extra-load-path (list my-tree-sitter-directory)))
 
 (use-package envrc
   :hook (after-init . envrc-global-mode)

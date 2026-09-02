@@ -109,13 +109,14 @@ running it on another machine.
 
 The repository contains source configuration and reusable assets. Generated
 state is kept outside it and separated by Emacs major version so that upgrades
-do not reuse incompatible packages or native-compiled files.
+do not reuse incompatible packages or native-compiled files. Tree-sitter
+grammars are additionally separated by system architecture.
 
 | Path | Contents |
 | --- | --- |
 | `~/.config/emacs<major>/elpa/` | installed Emacs packages |
 | `~/.config/emacs<major>/eln-cache/` | native-compiled Lisp |
-| `~/.config/emacs<major>/tree-sitter/` | tree-sitter grammars |
+| `~/.config/emacs<major>_<arch>/tree-sitter/` | tree-sitter grammars |
 | `~/.config/emacs<major>/lsp-server/` | language servers managed by LSP mode |
 | `~/.config/emacs<major>/<hostname>/` | desktop, history, bookmarks, auto-save metadata, Projectile state, and LSP sessions |
 

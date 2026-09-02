@@ -1,7 +1,9 @@
 ;;; early-init.el --- Early Emacs initialization -*- lexical-binding: t; -*-
 
 (setq package-enable-at-startup t)
-(setq package-user-dir (concat (getenv "HOME") "/.config/emacs" (number-to-string emacs-major-version)  "/elpa")) ;; Global
+(defvar my-base-save-list (concat (getenv "HOME") "/.config/emacs" (number-to-string emacs-major-version)
+                                  "." (car (split-string system-configuration "-")) "/"))
+(setq package-user-dir (concat my-base-save-list "/elpa")) ;; Global
 
 ;; Reduce garbage collection during startup, then restore a moderate threshold.
 (setq gc-cons-threshold (* 1024 1024 1024))
@@ -12,7 +14,7 @@
 ;; Set eln-cache dir
 (when (boundp 'native-comp-eln-load-path)
   (startup-redirect-eln-cache (expand-file-name
-                               (concat (getenv "HOME") "/.config/emacs" (number-to-string emacs-major-version) "/eln-cache")
+                               (concat my-base-save-list "/eln-cache")
                                user-emacs-directory)))
 
 ;; Environment variables
