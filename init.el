@@ -1016,7 +1016,7 @@
   (global-set-key (kbd "<f9> d") #'mdx-dict-search)
   (dolist (hook '(text-mode-hook latex-mode-hook LaTeX-mode-hook prog-mode-hook org-mode-hook markdown-mode-hook))
     (add-hook hook (lambda () (synosaurus-mode 1))))
-  (setq synosaurus-choose-method 'popup) ; popup, ido
+  (setq synosaurus-choose-method 'company) ; company, popup, ido, default
   (setq-default synosaurus-backend
                 #'mdx-dict-synosaurus-backend)
   (define-key synosaurus-mode-map (kbd "<f9> s")

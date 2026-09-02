@@ -1,7 +1,7 @@
 ;;; mdx-dict-and-synosaurus.el --- Local dictionaries and thesaurus -*- lexical-binding: t; -*-
 
 ;; Package-Version: 0.1.0
-;; Package-Requires: ((emacs "29.1"))
+;; Package-Requires: ((emacs "29.1") (company "0.10.0"))
 ;; Author: Feng Li <m@feng.li>
 ;; Keywords: convenience, dictionary, thesaurus, text
 ;; Copyright (C) 2026 Feng Li <m@feng.li>
@@ -42,6 +42,7 @@
 
 (require 'button)
 (require 'cl-lib)
+(require 'company)
 (require 'dom)
 (require 'ido)
 (require 'json)
@@ -99,12 +100,13 @@
   :group 'mdx-dict
   :group 'convenience)
 
-(defcustom synosaurus-choose-method 'ido
+(defcustom synosaurus-choose-method 'company
   "Completion interface used to choose a replacement.
 
-The value `popup' uses popup.el, `ido' uses IDO, and `default' uses
-`completing-read'."
-  :type '(choice (const :tag "popup.el" popup)
+The value `company' uses a Company popup in the current buffer, `popup' uses
+popup.el, `ido' uses IDO, and `default' uses `completing-read'."
+  :type '(choice (const :tag "Company" company)
+                 (const :tag "popup.el" popup)
                  (const :tag "IDO" ido)
                  (const :tag "Standard completion" default))
   :group 'synosaurus)
@@ -132,6 +134,71 @@ The value `popup' uses popup.el, `ido' uses IDO, and `default' uses
 
 (defvar synosaurus--history nil
   "Minibuffer history for Synosaurus lookups.")
+
+(defvar-local synosaurus--company-start-marker nil)
+(defvar-local synosaurus--company-end-marker nil)
+(defvar-local synosaurus--company-candidates nil)
+
+(defun synosaurus--company-cleanup (&rest _)
+  "Clear state left by a Synosaurus Company selection."
+  (when (markerp synosaurus--company-start-marker)
+    (set-marker synosaurus--company-start-marker nil))
+  (when (markerp synosaurus--company-end-marker)
+    (set-marker synosaurus--company-end-marker nil))
+  (setq synosaurus--company-start-marker nil
+        synosaurus--company-end-marker nil
+        synosaurus--company-candidates nil)
+  (remove-hook 'company-after-completion-hook
+               #'synosaurus--company-cleanup t)
+  (remove-hook 'company-completion-cancelled-hook
+               #'synosaurus--company-cleanup t))
+
+(defun synosaurus--company (command &optional _arg &rest rest)
+  "Company backend for choosing Synosaurus replacements.
+
+COMMAND and REST follow the Company backend protocol."
+  (pcase command
+    ('prefix
+     (when (and (markerp synosaurus--company-start-marker)
+                (markerp synosaurus--company-end-marker)
+                (eq (marker-buffer synosaurus--company-start-marker)
+                    (current-buffer))
+                (eq (marker-buffer synosaurus--company-end-marker)
+                    (current-buffer))
+                (<= (marker-position synosaurus--company-start-marker) (point))
+                (<= (point) (marker-position synosaurus--company-end-marker)))
+       (let ((start (marker-position synosaurus--company-start-marker))
+             (end (marker-position synosaurus--company-end-marker)))
+         (list (buffer-substring-no-properties start (point))
+               (buffer-substring-no-properties (point) end)
+               t))))
+    ('candidates synosaurus--company-candidates)
+    ('adjust-boundaries (cons (car rest) (cadr rest)))
+    ('kind 'text)
+    ('sorted t)
+    ('duplicates t)
+    ('no-cache t)
+    ('require-match t)))
+
+(defun synosaurus--company-start (candidates start end)
+  "Choose from CANDIDATES with Company, replacing START through END."
+  (when company-candidates
+    (company-abort))
+  (synosaurus--company-cleanup)
+  (setq synosaurus--company-start-marker (copy-marker start)
+        synosaurus--company-end-marker (copy-marker end t)
+        synosaurus--company-candidates candidates)
+  (unless company-mode
+    (company-mode 1))
+  (add-hook 'company-after-completion-hook
+            #'synosaurus--company-cleanup nil t)
+  (add-hook 'company-completion-cancelled-hook
+            #'synosaurus--company-cleanup nil t)
+  (condition-case err
+      (company-begin-backend #'synosaurus--company)
+    (error
+     (synosaurus--company-cleanup)
+     (signal (car err) (cdr err)))))
 
 (defun synosaurus--internal-lookup (word)
   "Call `synosaurus-backend' with WORD."
@@ -243,10 +310,12 @@ Display the result as clickable words in `*Synonyms List*'."
            (synosaurus--internal-lookup word) word)))
     (if (null candidates)
         (message "No synonyms found for %s" word)
-      (when-let* ((replacement (synosaurus--choose candidates)))
-        (delete-region (car bounds) (cdr bounds))
-        (goto-char (car bounds))
-        (insert replacement)))))
+      (if (eq synosaurus-choose-method 'company)
+          (synosaurus--company-start candidates (car bounds) (cdr bounds))
+        (when-let* ((replacement (synosaurus--choose candidates)))
+          (delete-region (car bounds) (cdr bounds))
+          (goto-char (car bounds))
+          (insert replacement))))))
 
 ;;;###autoload
 (defun synosaurus-choose-and-insert (word)
@@ -257,8 +326,10 @@ Display the result as clickable words in `*Synonyms List*'."
           (synosaurus--internal-lookup word) word)))
     (if (null candidates)
         (message "No synonyms found for %s" word)
-      (when-let* ((replacement (synosaurus--choose candidates)))
-        (insert replacement)))))
+      (if (eq synosaurus-choose-method 'company)
+          (synosaurus--company-start candidates (point) (point))
+        (when-let* ((replacement (synosaurus--choose candidates)))
+          (insert replacement))))))
 
 (defvar synosaurus-command-map
   (let ((map (make-sparse-keymap)))

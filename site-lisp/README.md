@@ -60,8 +60,10 @@ removed without changing the package.
 The Synosaurus backend first extracts thesaurus senses from the configured
 Merriam-Webster Collegiate MDX file. If that entry contains no synonyms, it
 falls back to Soule's Dictionary of English Synonyms through `sdcv`. The
-minibuffer reports which source supplied each lookup. `<f9> s` runs
-`synosaurus-choose-and-replace`; the other public commands are
+minibuffer reports which source supplied each lookup. Synonym replacement and
+insertion use a Company popup in the current buffer by default; popup.el, Ido,
+and standard completion remain available through `synosaurus-choose-method`.
+`<f9> s` runs `synosaurus-choose-and-replace`; the other public commands are
 `synosaurus-lookup` and `synosaurus-choose-and-insert`.
 
 MDX headword indexes and queried entries are cached for the Emacs session. Run
