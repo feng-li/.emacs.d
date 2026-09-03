@@ -68,11 +68,11 @@
  '(neo-window-width 40)
  '(org-support-shift-select t)
  '(package-selected-packages
-   '(adaptive-wrap auctex company counsel dracula-theme electric-operator envrc flycheck-julia format-all
-                   gnu-elpa-keyring-update gptel highlight-doxygen highlight-symbol iedit imenu-list jinx julia-mode
-                   keytar lsp-latex magit magit-popup math-symbol-lists multiple-cursors neotree notmuch pandoc-mode
-                   pdf-tools poly-R popup powerthesaurus projectile proxy-mode scala-mode treemacs-projectile unfill
-                   visual-fill-column wgrep yaml-mode yasnippet-snippets))
+   '(adaptive-wrap auctex auth-source-xoauth2-plugin company counsel dracula-theme electric-operator envrc flycheck-julia
+                   format-all gnu-elpa-keyring-update gptel highlight-doxygen highlight-symbol iedit imenu-list jinx
+                   julia-mode keytar lsp-latex magit magit-popup math-symbol-lists multiple-cursors neotree notmuch
+                   pandoc-mode pdf-tools poly-R popup powerthesaurus projectile proxy-mode scala-mode
+                   treemacs-projectile unfill visual-fill-column wgrep yaml-mode yasnippet-snippets))
  '(safe-local-variable-values '((TeX-engine . pdflatex)))
  '(scroll-bar-mode nil)
  '(scroll-conservatively 1)
@@ -94,7 +94,7 @@
 ;; Personal information
 (setq frame-title-format "%b")
 (setq user-full-name "Feng Li")
-(setq user-mail-address "m@feng.li")
+(setq user-mail-address "feng.li@gsm.pku.edu.cn")
 
 ;; Resolve symlinks before visiting files so each project has one file identity.
 (setq find-file-visit-truename t)
@@ -230,7 +230,6 @@
 (dolist (hook '(message-mode-hook
                 prog-mode-hook
                 org-mode-hook
-                mail-mode-hook
                 text-mode-hook))
   (add-hook hook #'(lambda ()
                      (display-line-numbers-mode t)
@@ -249,7 +248,6 @@
   (dolist (hook '(message-mode-hook
                   ;; prog-mode-hook
                   org-mode-hook
-                  mail-mode-hook
                   text-mode-hook
                   reftex-toc-mode-hook))
     (add-hook hook #'(lambda ()
@@ -310,7 +308,6 @@
                 ;; markdown-mode-hook
                 message-mode-hook
                 org-mode-hook
-	        mail-mode-hook
                 ;; ess-mode-hook
                 ))
   (add-hook hook #'(lambda () (auto-fill-mode 1))))
@@ -342,7 +339,69 @@
           (lambda () (setq-local enable-local-variables t)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Global key bindings
+;; Notmuch
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Office 365 SMTP with OAuth2
+(use-package auth-source-xoauth2-plugin
+  :ensure t
+  :demand t
+  :init
+  (add-to-list 'auth-sources "~/.authinfo.json.gpg")
+  :config
+  (auth-source-xoauth2-plugin-mode 1))
+
+(use-package smtpmail
+  :ensure nil
+  :init
+  (setq send-mail-function #'smtpmail-send-it
+        message-send-mail-function #'smtpmail-send-it
+        smtpmail-smtp-server "smtp.office365.com"
+        smtpmail-smtp-service 587
+        smtpmail-stream-type 'starttls
+        smtpmail-smtp-user "feng.li@gsm.pku.edu.cn"
+        smtpmail-servers-requiring-authorization
+        "smtp\\.office365\\.com"))
+
+(setq mail-user-agent 'message-user-agent)
+
+(defun my-notmuch-query-display-name (query-name)
+  "Turn an ordered Notmuch QUERY-NAME into a display label.
+The numeric prefix controls order, a hyphen becomes a space, and a
+double hyphen becomes a folder separator."
+  (let ((name (replace-regexp-in-string "\\`[0-9]+-" "" query-name)))
+    (setq name (replace-regexp-in-string "--" " / " name))
+    (replace-regexp-in-string "-" " " name)))
+
+(defun my-notmuch-saved-searches-from-profile ()
+  "Build Emacs saved searches from the active profile's query.* entries."
+  (let (query-names)
+    (dolist (line (notmuch--process-lines notmuch-command "config" "list"))
+      (when (string-match "\\`query\\.\\([^=]+\\)=" line)
+        (push (match-string 1 line) query-names)))
+    (mapcar (lambda (query-name)
+              (list :name (my-notmuch-query-display-name query-name)
+                    :query (concat "query:" query-name)
+                    :search-type 'unthreaded))
+            (sort query-names #'string-lessp))))
+
+(use-package notmuch
+  :config
+
+  ;; Display folders vertically, including empty ones.
+  (setq notmuch-column-control 1.0
+        notmuch-show-empty-saved-searches t
+        notmuch-saved-searches-sort-function nil
+        notmuch-saved-searches (my-notmuch-saved-searches-from-profile))
+
+  ;; Show the newest messages first in every search/folder buffer.
+  (setq-default notmuch-search-oldest-first nil)
+
+  )
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Key bindings
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; copy with other applications
@@ -468,7 +527,7 @@
 (defun my-enable-hs-minor-mode ()
   "Enable `hs-minor-mode' in the current buffer."
   (hs-minor-mode 1))
-(dolist (hook '(c-mode-hook org-mode-hook python-mode-hook mail-mode-hook ess-mode-hook))
+(dolist (hook '(c-mode-hook org-mode-hook python-mode-hook ess-mode-hook))
   (add-hook hook #'my-enable-hs-minor-mode))
 (global-set-key (kbd "M-+") 'hs-toggle-hiding)
 (global-set-key (kbd "M-*") 'hs-show-all)
@@ -849,7 +908,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Mail
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(add-to-list 'auto-mode-alist '("neomutt" . message-mode))
+;; (add-to-list 'auto-mode-alist '("neomutt" . message-mode))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1622,10 +1681,6 @@ intermediate and output files, as requested by the non-nil argument to
   (treemacs-git-mode 'extended)
   (define-key treemacs-mode-map [mouse-1] #'treemacs-single-click-expand-action)
   )
-(add-hook 'emacs-startup-hook
-          (lambda ()
-            (unless noninteractive
-              (treemacs))))
 
 (use-package projectile
   :config
