@@ -363,39 +363,36 @@
         smtpmail-servers-requiring-authorization
         "smtp\\.office365\\.com"))
 
-(setq mail-user-agent 'message-user-agent)
+;; Make standard Emacs mail entry points, including `C-x m', compose through
+;; Notmuch so address completion, drafts, and Notmuch send actions are active.
+(setq mail-user-agent 'notmuch-user-agent)
 
-(defun my-notmuch-query-display-name (query-name)
-  "Turn an ordered Notmuch QUERY-NAME into a display label.
-The numeric prefix controls order, a hyphen becomes a space, and a
-double hyphen becomes a folder separator."
-  (let ((name (replace-regexp-in-string "\\`[0-9]+-" "" query-name)))
-    (setq name (replace-regexp-in-string "--" " / " name))
-    (replace-regexp-in-string "-" " " name)))
+;; Append the shared signature to newly composed Notmuch messages.
+(setq message-signature t
+      message-signature-file
+      (expand-file-name "~/carbon/workspace/Notes/Templates/signature.txt"))
 
-(defun my-notmuch-saved-searches-from-profile ()
-  "Build Emacs saved searches from the active profile's query.* entries."
-  (let (query-names)
-    (dolist (line (notmuch--process-lines notmuch-command "config" "list"))
-      (when (string-match "\\`query\\.\\([^=]+\\)=" line)
-        (push (match-string 1 line) query-names)))
-    (mapcar (lambda (query-name)
-              (list :name (my-notmuch-query-display-name query-name)
-                    :query (concat "query:" query-name)
-                    :search-type 'unthreaded))
-            (sort query-names #'string-lessp))))
+;; Place new reply text and the signature above the quoted original message.
+(setq message-cite-reply-position 'above)
 
 (use-package notmuch
   :config
+
+  (require 'notmuch-custom)
+  (notmuch-custom-setup)
 
   ;; Display folders vertically, including empty ones.
   (setq notmuch-column-control 1.0
         notmuch-show-empty-saved-searches t
         notmuch-saved-searches-sort-function nil
-        notmuch-saved-searches (my-notmuch-saved-searches-from-profile))
+        notmuch-saved-searches
+        (notmuch-custom-saved-searches-from-profile))
 
   ;; Show the newest messages first in every search/folder buffer.
   (setq-default notmuch-search-oldest-first nil)
+
+  ;; Do not save an additional local copy of sent messages.
+  (setq notmuch-fcc-dirs nil)
 
   )
 

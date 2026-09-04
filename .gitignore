@@ -2,6 +2,8 @@ abbrev_defs
 *.~
 *~
 *.elc
+*.eld
+oauth2.plstore
 *.desktop
 *.lock
 places
