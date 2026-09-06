@@ -94,7 +94,7 @@
 ;; Personal information
 (setq frame-title-format "%b")
 (setq user-full-name "Feng Li")
-(setq user-mail-address "feng.li@gsm.pku.edu.cn")
+(setq user-mail-address "m@feng.li")
 
 ;; Resolve symlinks before visiting files so each project has one file identity.
 (setq find-file-visit-truename t)
@@ -342,15 +342,25 @@
 ;; Notmuch
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; Ask for GPG passphrases in the Emacs minibuffer.  This works in terminal
+;; Emacs on a headless host, where an external Pinentry window is unavailable.
+;; GPG Agent still caches the passphrase after it has been entered.
+(setq epg-pinentry-mode 'loopback
+      ;; Encrypt OAuth2 tokens to this GPG key instead of using a symmetric
+      ;; plstore passphrase.
+      plstore-encrypt-to "m@feng.li")
+
 ;; Office 365 SMTP with OAuth2
 (use-package auth-source-xoauth2-plugin
   :ensure t
   :demand t
   :init
-  (add-to-list 'auth-sources "~/.authinfo.json.gpg")
+  (add-to-list 'auth-sources "~/.config/notmuch/authinfo.json")
+  ;; (add-to-list 'auth-sources "~/.authinfo.json.gpg")
   :config
   (auth-source-xoauth2-plugin-mode 1))
 
+;; describes where and how to connect; it does not contain proof that Microsoft should authenticate yo
 (use-package smtpmail
   :ensure nil
   :init
@@ -367,13 +377,20 @@
 ;; Notmuch so address completion, drafts, and Notmuch send actions are active.
 (setq mail-user-agent 'notmuch-user-agent)
 
+;; Keep outgoing prose readable after it is quoted by later replies.  Message
+;; mode enables Auto Fill automatically when this value is non-nil.
+(setq message-fill-column 72)
+
 ;; Append the shared signature to newly composed Notmuch messages.
 (setq message-signature t
       message-signature-file
       (expand-file-name "~/carbon/workspace/Notes/Templates/signature.txt"))
 
-;; Place new reply text and the signature above the quoted original message.
-(setq message-cite-reply-position 'above)
+;; Place new text and the signature above the decoded original message in both
+;; replies and inline forwards.
+(setq message-cite-reply-position 'above
+      message-forward-as-mime nil
+      message-forward-before-signature nil)
 
 (use-package notmuch
   :config
@@ -390,6 +407,10 @@
 
   ;; Show the newest messages first in every search/folder buffer.
   (setq-default notmuch-search-oldest-first nil)
+
+  ;; Wrap displayed plain-text message bodies at 72 columns (or at the window
+  ;; edge when the window is narrower).
+  (setq notmuch-wash-wrap-lines-length 72)
 
   ;; Do not save an additional local copy of sent messages.
   (setq notmuch-fcc-dirs nil)
@@ -1028,6 +1049,17 @@
   :custom
   (flycheck-vale-executable
    (expand-file-name "~/.virtualenvs/lsp/bin/vale"))
+  (flycheck-vale-mode-extensions
+   '((notmuch-message-mode . "txt")
+     (markdown-mode . "md")
+     (gfm-mode . "md")
+     (org-mode . "org")
+     (LaTeX-mode . "tex")
+     (latex-mode . "tex")
+     (text-mode . "txt")))
+  (flycheck-vale-modes
+   '(notmuch-message-mode text-mode markdown-mode gfm-mode org-mode
+     latex-mode LaTeX-mode))
   :config
   (flycheck-vale-setup)
   ;; (flycheck-add-next-checker 'languagetool '(info . vale))
@@ -1042,7 +1074,8 @@
 (use-package flycheck-languagetool
   :custom
   (flycheck-languagetool-active-modes
-   '(latex-mode LaTeX-mode org-mode markdown-mode gfm-mode))
+   '(notmuch-message-mode latex-mode LaTeX-mode org-mode markdown-mode
+     gfm-mode))
   (flycheck-languagetool-check-on-save-only t)
 
   :config
