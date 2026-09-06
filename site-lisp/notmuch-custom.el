@@ -552,7 +552,7 @@ Refresh the buffer with `notmuch-show-refresh-view' to restore its rendering."
     (user-error "This command is only available while reading Notmuch mail"))
   (let* ((width (if (numberp notmuch-wash-wrap-lines-length)
                     notmuch-wash-wrap-lines-length
-                  72))
+                  80))
          (depth (or (notmuch-show-get-depth) 0))
          (indent (if notmuch-show-indent-content
                      (* depth notmuch-show-indent-messages-width)

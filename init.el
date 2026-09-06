@@ -408,9 +408,9 @@
   ;; Show the newest messages first in every search/folder buffer.
   (setq-default notmuch-search-oldest-first nil)
 
-  ;; Wrap displayed plain-text message bodies at 72 columns (or at the window
+  ;; Wrap displayed plain-text message bodies at columns (or at the window
   ;; edge when the window is narrower).
-  (setq notmuch-wash-wrap-lines-length 72)
+  (setq notmuch-wash-wrap-lines-length 80)
 
   ;; Do not save an additional local copy of sent messages.
   (setq notmuch-fcc-dirs nil)
