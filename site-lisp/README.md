@@ -151,8 +151,10 @@ Customize interface.
 unmodified keys `1` through `9` and `0` into direct selectors for Company's
 first ten visible rows. If adding the pressed digit still matches a completion
 candidate, the digit is inserted instead; this keeps identifiers such as
-`sha256` typeable. In Company search mode the same decision uses the current
-search expression and continues the search correctly.
+`sha256` typeable. A digit following an all-numeric prefix is always inserted,
+so arbitrary numbers remain typeable even when the popup only contains
+different numeric candidates. In Company search mode the same decision uses
+the current search expression and continues the search correctly.
 
 The global `company-numbered-selection-mode` installs the bindings in both
 `company-active-map` and `company-search-map`, displays matching quick-access

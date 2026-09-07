@@ -26,7 +26,9 @@
 ;; This package makes unmodified number keys select the corresponding visible
 ;; Company candidate.  A number is inserted normally when it can extend the
 ;; current completion prefix, so candidates such as "sha256" remain typeable.
-;; The same distinction is applied to incremental Company searches.
+;; Digits are also always inserted after an all-numeric prefix, allowing an
+;; arbitrary number to be typed even when it is not among the candidates.  The
+;; same distinction is applied to incremental Company searches.
 ;;
 ;; Enable the behavior globally with:
 ;;
@@ -117,17 +119,28 @@ character event."
        (and (stringp candidate) (string-match-p regexp candidate)))
      company-candidates)))
 
+(defun company-numbered-selection--numeric-input-p (key)
+  "Return non-nil when KEY continues an all-numeric input prefix."
+  (let ((prefix (if (bound-and-true-p company-search-mode)
+                    company-search-string
+                  company-prefix)))
+    (and (stringp prefix)
+         (string-match-p "\\`[0-9]+\\'" prefix)
+         (string-match-p "\\`[0-9]\\'" key))))
+
 (defun company-numbered-selection--can-insert-p (key)
   "Return non-nil when KEY should refine completion instead of select."
-  (if (bound-and-true-p company-search-mode)
-      (company-numbered-selection--search-extends-p key)
-    (company-numbered-selection--prefix-extends-p key)))
+  (or (company-numbered-selection--numeric-input-p key)
+      (if (bound-and-true-p company-search-mode)
+          (company-numbered-selection--search-extends-p key)
+        (company-numbered-selection--prefix-extends-p key))))
 
 ;;;###autoload
 (defun company-numbered-selection-select-or-insert ()
   "Select the row denoted by the pressed key, or insert that key.
-Insert the key when doing so can still match a Company candidate.  Otherwise,
-complete the corresponding visible tooltip row."
+Insert the key when doing so can still match a Company candidate, or when it
+continues an all-numeric prefix.  Otherwise, complete the corresponding visible
+tooltip row."
   (interactive)
   (let* ((key (company-numbered-selection--event-key))
          (row (seq-position company-numbered-selection-keys key #'equal)))

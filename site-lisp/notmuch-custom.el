@@ -17,6 +17,8 @@
 ;; - prose checking limited to the subject and newly written message text;
 ;; - attachment opening through the desktop default application;
 ;; - display-only reflow of hard-wrapped plain-text messages;
+;; - recipients instead of senders in saved Sent-folder views;
+;; - omission of a signature already present in quoted reply text;
 ;; - canonical reply and forward subject markers;
 ;; - CRLF normalization in inline forwarded messages; and
 ;; - coexistence of address completion in headers and word completion in bodies.
@@ -27,6 +29,7 @@
 (require 'company)
 (require 'ivy-pinyin-search)
 (require 'mail-extr)
+(require 'nnheader)
 (require 'notmuch)
 (require 'notmuch-address)
 (require 'notmuch-company)
@@ -56,8 +59,63 @@ double hyphen becomes a folder separator."
     (mapcar (lambda (query-name)
               (list :name (notmuch-custom-query-display-name query-name)
                     :query (concat "query:" query-name)
-                    :search-type 'unthreaded))
+                    :search-type 'unthreaded
+                    :show-recipients
+                    (let ((case-fold-search t))
+                      (string-match-p "--sent\\'" query-name))))
             (sort query-names #'string-lessp))))
+
+;;; Sent-folder correspondents
+
+(defun notmuch-custom--sent-folder-view-p ()
+  "Return non-nil when the current tree buffer is a saved Sent view."
+  (and (boundp 'notmuch-tree-basic-query)
+       (stringp notmuch-tree-basic-query)
+       (cl-some
+        (lambda (search)
+          (and (notmuch-saved-search-get search :show-recipients)
+               (equal notmuch-tree-basic-query
+                      (notmuch-saved-search-get search :query))))
+        notmuch-saved-searches)))
+
+(defun notmuch-custom--message-recipient-names (message)
+  "Return the display names of all recipients in MESSAGE.
+MESSAGE is a Notmuch message plist as used by `notmuch-tree-mode'."
+  (let* ((headers (plist-get message :headers))
+         (addresses
+          (string-join
+           (delq nil (mapcar (lambda (field)
+                               (let ((value (plist-get headers field)))
+                                 (and (stringp value)
+                                      (not (string-empty-p value))
+                                      value)))
+                             '(:To :Cc :Bcc)))
+           ", "))
+         (recipients
+          (and (not (string-empty-p addresses))
+               (mail-extract-address-components addresses t))))
+    (if recipients
+        (mapconcat (lambda (recipient)
+                     (or (car recipient) (cadr recipient)))
+                   recipients ", ")
+      "(no recipient)")))
+
+(defun notmuch-custom--format-sent-folder-recipients
+    (original-function field format-string message)
+  "Use recipients for the author FIELD in a saved Sent-folder view.
+Otherwise call ORIGINAL-FUNCTION with FORMAT-STRING and MESSAGE unchanged."
+  (if (and (equal field "authors")
+           (notmuch-custom--sent-folder-view-p))
+      (let* ((recipients (notmuch-custom--message-recipient-names message))
+             (width (length (format format-string "")))
+             (face (if (plist-get message :match)
+                       'notmuch-tree-match-author-face
+                     'notmuch-tree-no-match-author-face)))
+        (propertize
+         (format format-string
+                 (truncate-string-to-width recipients width nil nil "..."))
+         'face face))
+    (funcall original-function field format-string message)))
 
 ;;; Pinyin address completion
 
@@ -629,6 +687,78 @@ KIND is either `reply' or `forward'."
       (message-replace-header
        "Subject" (notmuch-custom--canonical-subject subject 'reply)))))
 
+(defun notmuch-custom--configured-signature-text ()
+  "Return the text of the configured Message-mode signature, or nil."
+  (cond
+   ((stringp message-signature) message-signature)
+   ((and message-signature-file
+         (file-readable-p message-signature-file))
+    (with-temp-buffer
+      (insert-file-contents message-signature-file)
+      (buffer-string)))))
+
+(defun notmuch-custom--normalized-signature-text (text)
+  "Normalize line endings and trailing whitespace in signature TEXT."
+  (string-trim
+   (mapconcat #'string-trim-right
+              (split-string
+               (replace-regexp-in-string "\r\n?" "\n" text)
+               "\n")
+              "\n")))
+
+(defun notmuch-custom--quoted-reply-text ()
+  "Return the quoted lines in the current reply without quote prefixes."
+  (save-excursion
+    (message-goto-body)
+    (let (lines)
+      (while (not (eobp))
+        (let ((line (buffer-substring-no-properties
+                     (line-beginning-position) (line-end-position))))
+          (when (string-match-p "\\`[ \t]*>" line)
+            (while (string-match "\\`[ \t]*>[ \t]?" line)
+              (setq line (substring line (match-end 0))))
+            (push (string-trim-right line) lines)))
+        (forward-line 1))
+      (mapconcat #'identity (nreverse lines) "\n"))))
+
+(defun notmuch-custom--remove-current-signature (signature)
+  "Remove the unquoted current-message SIGNATURE and its separator.
+Remove every bare separator even when the signature body has already
+disappeared or Message mode inserted more than one separator."
+  (save-excursion
+    (message-goto-body)
+    (let ((body-start (point))
+          (signature (string-trim-right signature)))
+      ;; Remove the unquoted signature body first.  A quoted copy cannot match
+      ;; this multi-line string because every quoted line has its own `>'
+      ;; prefix.
+      (unless (string-empty-p signature)
+        (while (search-forward signature nil t)
+          (let ((start (match-beginning 0))
+                (end (match-end 0)))
+            (unless (save-excursion
+                      (goto-char start)
+                      (beginning-of-line)
+                      (looking-at-p "[ \t]*>"))
+              (delete-region start end)))))
+      ;; Remove all unquoted separator-only lines.  Doing this independently
+      ;; of the signature body also handles duplicate or orphan separators.
+      (goto-char body-start)
+      (while (re-search-forward "^--[ \t]*\\(?:\n\\|\\'\\)" nil t)
+        (replace-match "" t t)))))
+
+(defun notmuch-custom--omit-signature-already-quoted (&rest _ignored)
+  "Omit the new signature when the quoted reply already contains its text."
+  (when (derived-mode-p 'notmuch-message-mode)
+    (when-let* ((signature (notmuch-custom--configured-signature-text))
+                (needle (notmuch-custom--normalized-signature-text signature)))
+      (unless (string-empty-p needle)
+        (let ((quoted
+               (notmuch-custom--normalized-signature-text
+                (notmuch-custom--quoted-reply-text))))
+          (when (string-match-p (regexp-quote needle) quoted)
+            (notmuch-custom--remove-current-signature signature)))))))
+
 (defun notmuch-custom-message-forward-subject (subject)
   "Return SUBJECT with all old markers replaced by one `Fwd:'."
   (notmuch-custom--canonical-subject subject 'forward))
@@ -644,10 +774,28 @@ ARGUMENTS are passed unchanged to ORIGINAL-FUNCTION."
 (defun notmuch-custom--fill-message-region (start end &optional prefix)
   "Fill text between START and END to `message-fill-column'.
 PREFIX is the citation prefix already present on every line, or nil for
-ordinary forwarded text."
-  (let ((fill-column (or message-fill-column fill-column))
-        (fill-prefix prefix))
-    (fill-individual-paragraphs start end)))
+ordinary forwarded text.  Do not alter a signature or an embedded forwarded
+message, at any quote depth."
+  (let* ((fill-column (or message-fill-column fill-column))
+         (fill-prefix prefix)
+         (case-fold-search t)
+         (protected-start
+          (save-excursion
+            (goto-char start)
+            (when (re-search-forward
+                   (concat
+                    "^[ \t]*\\(?:>[ \t]*\\)*"
+                    "\\(?:"
+                    "\\(?:--[ \t]*\\|_+\\)[ \t]*"
+                    ;; Protect malformed legacy blocks too, where an earlier
+                    ;; formatter joined `From:' onto the marker line.
+                    "\\|" notmuch-custom--forward-start-regexp ".*"
+                    "\\)$")
+                   end t)
+              (match-beginning 0))))
+         (fill-end (or protected-start end)))
+    (when (< start fill-end)
+      (fill-individual-paragraphs start fill-end))))
 
 (defun notmuch-custom-fill-cited-text ()
   "Fill the reply citation between point and mark to the message width.
@@ -664,6 +812,67 @@ This function follows `message-indent-citation' in
             (set-mark (marker-position end-marker)))
         (set-marker start-marker nil)
         (set-marker end-marker nil)))))
+
+(defun notmuch-custom--citation-zone-name (offset)
+  "Return a readable UTC zone name for OFFSET seconds."
+  (if (zerop offset)
+      "UTC"
+    (let* ((absolute (abs offset))
+           (hours (/ absolute 3600))
+           (minutes (/ (% absolute 3600) 60)))
+      (format "UTC%c%d%s"
+              (if (< offset 0) ?- ?+)
+              hours
+              (if (zerop minutes) "" (format ":%02d" minutes))))))
+
+(defun notmuch-custom--citation-sender-name ()
+  "Return the original sender's display name or email address."
+  (let* ((from (mail-header-from message-reply-headers))
+         (address-parts
+          (and from (mail-extract-address-components from))))
+    (or (car address-parts) (cadr address-parts) from "Unknown sender")))
+
+(defun notmuch-custom-insert-citation-line ()
+  "Insert a citation line with local time and optional sender-zone time."
+  (let* ((date (mail-header-date message-reply-headers))
+         (time (and date (ignore-errors (date-to-time date))))
+         (sender-zone (and date (nth 8 (parse-time-string date))))
+         (sender (notmuch-custom--citation-sender-name)))
+    (if (not time)
+        (insert (format "%s wrote:\n\n" sender))
+      (let* ((local-date (decode-time time nil))
+             (local-offset (car (current-time-zone time)))
+             (different-zone
+              (and (integerp sender-zone)
+                   (/= sender-zone local-offset)))
+             (sender-date
+              (and different-zone (decode-time time sender-zone))))
+        (insert
+         (format "On %d/%d/%02d %02d:%02d %s%s, %s wrote:\n\n"
+                 (nth 4 local-date)
+                 (nth 3 local-date)
+                 (% (nth 5 local-date) 100)
+                 (nth 2 local-date)
+                 (nth 1 local-date)
+                 (notmuch-custom--citation-zone-name local-offset)
+                 (if sender-date
+                     (let ((same-day
+                            (and (= (nth 3 local-date) (nth 3 sender-date))
+                                 (= (nth 4 local-date) (nth 4 sender-date))
+                                 (= (nth 5 local-date) (nth 5 sender-date)))))
+                       (format " (%s%02d:%02d %s)"
+                               (if same-day
+                                   ""
+                                 (format "%d/%d/%02d "
+                                         (nth 4 sender-date)
+                                         (nth 3 sender-date)
+                                         (% (nth 5 sender-date) 100)))
+                               (nth 2 sender-date)
+                               (nth 1 sender-date)
+                               (notmuch-custom--citation-zone-name
+                                sender-zone)))
+                   "")
+                 sender))))))
 
 (defun notmuch-custom-message-fill-setup ()
   "Fill newly inserted Notmuch reply citations to the message width."
@@ -847,6 +1056,11 @@ recipient has been configured."
 ;;;###autoload
 (defun notmuch-custom-setup ()
   "Enable the local Notmuch enhancements defined in this library."
+  (unless (advice-member-p
+           #'notmuch-custom--format-sent-folder-recipients
+           'notmuch-tree-format-field)
+    (advice-add 'notmuch-tree-format-field :around
+                #'notmuch-custom--format-sent-folder-recipients))
   (unless (advice-member-p #'notmuch-custom--insert-truncated-address-header
                            'notmuch-show-insert-header)
     (advice-add 'notmuch-show-insert-header :around
@@ -863,6 +1077,10 @@ recipient has been configured."
                            'notmuch-mua-reply)
     (advice-add 'notmuch-mua-reply :after
                 #'notmuch-custom--normalize-current-reply-subject))
+  (unless (advice-member-p #'notmuch-custom--omit-signature-already-quoted
+                           'notmuch-mua-reply)
+    (advice-add 'notmuch-mua-reply :after
+                #'notmuch-custom--omit-signature-already-quoted))
   (unless (advice-member-p
            #'notmuch-custom--message-forward-make-body-decoded
            'message-forward-make-body)

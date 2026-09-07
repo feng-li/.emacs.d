@@ -379,9 +379,12 @@
 
 ;; Keep outgoing prose readable after it is quoted by later replies.  Message
 ;; mode enables Auto Fill automatically when this value is non-nil.
-(setq message-fill-column 72)
+(setq message-fill-column 72
+      message-citation-line-function
+      #'notmuch-custom-insert-citation-line)
 
-;; Append the shared signature to newly composed Notmuch messages.
+;; Append the shared signature to new mail and forwards.  In replies,
+;; `notmuch-custom' omits it when the quoted text already contains it.
 (setq message-signature t
       message-signature-file
       (expand-file-name "~/carbon/workspace/Notes/Templates/signature.txt"))
@@ -413,7 +416,10 @@
   (setq notmuch-wash-wrap-lines-length 80)
 
   ;; Do not save an additional local copy of sent messages.
-  (setq notmuch-fcc-dirs nil)
+  (setq notmuch-fcc-dirs nil
+        ;; Store postponed messages where Thunderbird's Local Folders can
+        ;; display them.  This path is relative to database.mail_root.
+        notmuch-draft-folder "Mail/Local Folders-maildir/Drafts")
 
   )
 
@@ -1786,17 +1792,17 @@ intermediate and output files, as requested by the non-nil argument to
   (global-set-key (kbd "<f9> w") 'gptel-rewrite)
 
   ;; Specify an alternative model
-  (gptel-make-openai "GPT-PROXY"
-    :host "s.lconai.com"
-    :endpoint "/v1/chat/completions"
+  (gptel-make-openai "DeepSeek"
+    :host "api.deepseek.com"
+    :endpoint "/chat/completions"
     :key gptel-api-key ;; ~/.authinfo
     :stream t
-    :models '(chatgpt-4o-latest deepseek-reasoner))
+    :models '(deepseek-v4-flash deepseek-v4-pro))
 
   ;; Set default options
   (setq gptel-default-mode 'markdown-mode
-	gptel-backend (gptel-get-backend "GPT-PROXY")
-	gptel-model 'chatgpt-4o-latest)
+	gptel-backend (gptel-get-backend "DeepSeek")
+	gptel-model 'deekseek-v4-flash)
 
 
   ;; Checks if the opened file has a `GPT.md` extension and enables `my-minor-mode` when it does.
