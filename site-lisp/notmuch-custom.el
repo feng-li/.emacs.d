@@ -639,7 +639,7 @@ Refresh the buffer with `notmuch-show-refresh-view' to restore its rendering."
 ;;; Forwarded message cleanup
 
 (defconst notmuch-custom--reply-subject-word-regexp
-  "\\(?:re\\|reply\\|回复\\|回覆\\|答复\\|答覆\\|回信\\)"
+  "\\(?:re\\|reply\\|sv\\|回复\\|回覆\\|答复\\|答覆\\|回信\\)"
   "Regexp matching a reply word at the start of a subject marker.")
 
 (defconst notmuch-custom--forward-subject-word-regexp
