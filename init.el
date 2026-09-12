@@ -399,6 +399,21 @@
   :config
 
   (require 'notmuch-custom)
+  ;; After SMTP succeeds, mirror Notmuch's replied/forwarded action to the
+  ;; original Office 365 message.  The OAuth token is the same scoped token
+  ;; already stored for SMTP; it also includes IMAP.AccessAsUser.All.
+  (setq notmuch-custom-imap-post-send-accounts
+        (list
+         (list
+          :local-root
+          (expand-file-name
+           "~/.thunderbird/4rx39fjz.default-esr/ImapMail/outlook.office365.com-maildir")
+          :host "outlook.office365.com"
+          :port 993
+          ;; Reuse the SMTP identity and its OAuth auth-source entry.
+          :user smtpmail-smtp-user
+          :auth-source-host smtpmail-smtp-server
+          :auth-source-port smtpmail-smtp-service)))
   (notmuch-custom-setup)
 
   ;; Display folders vertically, including empty ones.

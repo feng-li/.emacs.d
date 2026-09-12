@@ -20,21 +20,26 @@
 ;; - recipients instead of senders in saved Sent-folder views;
 ;; - omission of a signature already present in quoted reply text;
 ;; - canonical reply and forward subject markers;
-;; - CRLF normalization in inline forwarded messages; and
+;; - CRLF normalization in inline forwarded messages;
+;; - post-send IMAP reply/forward flags that Thunderbird understands; and
 ;; - coexistence of address completion in headers and word completion in bodies.
 
 ;;; Code:
 
 (require 'cl-lib)
+(require 'auth-source)
 (require 'company)
 (require 'ivy-pinyin-search)
 (require 'mail-extr)
+(require 'network-stream)
 (require 'nnheader)
 (require 'notmuch)
 (require 'notmuch-address)
 (require 'notmuch-company)
+(require 'notmuch-message)
 (require 'notmuch-show)
 (require 'subr-x)
+(require 'utf7)
 
 (defgroup notmuch-custom nil
   "Local enhancements for Notmuch."
@@ -988,6 +993,348 @@ byte intact because their embedded message may contain signed or binary data."
             (replace-match "" t t))))
       (set-buffer-modified-p modified))))
 
+;;; Thunderbird-compatible IMAP reply and forward flags
+
+(defcustom notmuch-custom-imap-post-send-accounts nil
+  "IMAP accounts whose source-message flags should be updated after sending.
+Each entry is a plist with these keys:
+
+  :local-root       Thunderbird's local Maildir root for the account
+  :host             IMAP server name
+  :port             IMAP TLS port, normally 993
+  :user             IMAP login name
+  :auth-method      optional override: either `xoauth2' or `login'
+  :auth-source-host optional host used to find the credential
+  :auth-source-port optional port used to find the credential
+
+When :auth-method is absent, use the auth-source entry's :auth value, falling
+back to `login'.  The auth-source host and port overrides are useful when one
+OAuth credential grants both SMTP and IMAP access but is stored under the SMTP
+endpoint.  Message contents and credentials are never copied into this
+variable."
+  :type '(repeat sexp)
+  :group 'notmuch-custom)
+
+(defcustom notmuch-custom-imap-post-send-timeout 20
+  "Maximum seconds to wait for each post-send IMAP operation."
+  :type 'integer
+  :group 'notmuch-custom)
+
+(defcustom notmuch-custom-imap-post-send-enabled t
+  "When non-nil, update the original message's IMAP flag after sending.
+Replies receive `\\Answered'.  Forwards receive Thunderbird's `$Forwarded'
+keyword when the server advertises support for it."
+  :type 'boolean
+  :group 'notmuch-custom)
+
+(defun notmuch-custom--imap-account-for-file (file)
+  "Return the configured IMAP account containing FILE."
+  (let ((file (expand-file-name file)))
+    (cl-find-if
+     (lambda (account)
+       (when-let* ((root (plist-get account :local-root)))
+         (string-prefix-p (file-name-as-directory (expand-file-name root))
+                          file)))
+     notmuch-custom-imap-post-send-accounts)))
+
+(defun notmuch-custom--imap-folder-for-file (file account)
+  "Return FILE's IMAP mailbox name within ACCOUNT.
+Thunderbird represents a nested local Maildir folder as `parent.sbd/child';
+convert that representation back to the IMAP name `parent/child'."
+  (let* ((root (file-name-as-directory
+                (expand-file-name (plist-get account :local-root))))
+         (relative (string-remove-prefix root (expand-file-name file))))
+    (when (string-match
+           "\\`\\(.+\\)/\\(?:cur\\|new\\)/[^/]+\\'" relative)
+      (replace-regexp-in-string "\\.sbd/" "/" (match-string 1 relative)
+                                t t))))
+
+(defun notmuch-custom--imap-flag-for-tags (tags)
+  "Return the Thunderbird-compatible IMAP flag implied by Notmuch TAGS."
+  (cond
+   ((or (equal tags notmuch-message-replied-tags)
+        (member "+replied" tags))
+    "\\Answered")
+   ((or (equal tags notmuch-message-forwarded-tags)
+        (member "+forwarded" tags))
+    "$Forwarded")))
+
+(defun notmuch-custom--imap-message-ids (query)
+  "Return bare Notmuch message IDs matching QUERY."
+  (mapcar (lambda (id) (string-remove-prefix "id:" id))
+          (notmuch--process-lines notmuch-command
+                                  "search" "--output=messages" query)))
+
+(defun notmuch-custom--imap-jobs-for-change (query tags)
+  "Return IMAP update jobs for Notmuch QUERY and queued TAGS."
+  (when-let* ((flag (notmuch-custom--imap-flag-for-tags tags)))
+    (cl-loop
+     for message-id in (notmuch-custom--imap-message-ids query)
+     append
+     (cl-loop
+      for file in (notmuch--process-lines
+                   notmuch-command "search" "--output=files"
+                   (notmuch-id-to-query message-id))
+      for account = (notmuch-custom--imap-account-for-file file)
+      for folder = (and account
+                        (notmuch-custom--imap-folder-for-file file account))
+      when folder
+      collect (list :account account
+                    :folder folder
+                    :message-id message-id
+                    :flag flag)))))
+
+(defun notmuch-custom--imap-post-send-jobs ()
+  "Build distinct IMAP jobs from this Notmuch composition buffer."
+  (delete-dups
+   (cl-loop for (query . tags) in notmuch-message-queued-tag-changes
+            append (notmuch-custom--imap-jobs-for-change query tags))))
+
+(defun notmuch-custom--imap-quote (string)
+  "Return STRING as an IMAP quoted string."
+  (concat "\""
+          (string-replace "\"" "\\\""
+                          (string-replace "\\" "\\\\" string))
+          "\""))
+
+(defun notmuch-custom--imap-wait-for (process regexp start description)
+  "Wait for REGEXP after START in PROCESS's buffer.
+Signal an error naming DESCRIPTION on failure or timeout."
+  (let ((deadline (+ (float-time) notmuch-custom-imap-post-send-timeout))
+        found)
+    (while (and (process-live-p process)
+                (< (float-time) deadline)
+                (not found))
+      (with-current-buffer (process-buffer process)
+        (save-excursion
+          (goto-char start)
+          (setq found (re-search-forward regexp nil t))))
+      (unless found
+        (accept-process-output process 0.1)))
+    (unless found
+      (error "%s%s"
+             description
+             (if (process-live-p process) " timed out" " disconnected")))
+    found))
+
+(defun notmuch-custom--imap-command (process command description)
+  "Send COMMAND through PROCESS and return its response.
+DESCRIPTION identifies the operation in errors without exposing credentials."
+  (let* ((number (1+ (or (process-get process 'notmuch-custom-imap-tag) 0)))
+         (tag (format "NM%04d" number))
+         (buffer (process-buffer process))
+         start end status response)
+    (process-put process 'notmuch-custom-imap-tag number)
+    (with-current-buffer buffer
+      (setq start (point-max)))
+    (process-send-string process (format "%s %s\r\n" tag command))
+    (let ((case-fold-search t))
+      (notmuch-custom--imap-wait-for
+       process
+       (concat "^" (regexp-quote tag)
+               "[ \t]+\\(OK\\|NO\\|BAD\\)\\(?:[ \t\r\n]\\|\\'\\)")
+       start description)
+      (with-current-buffer buffer
+        (setq end (point-max)
+              response (buffer-substring-no-properties start end))
+        (when (string-match
+               (concat "^" (regexp-quote tag)
+                       "[ \t]+\\(OK\\|NO\\|BAD\\)")
+               response)
+          (setq status (upcase (match-string 1 response))))))
+    (unless (equal status "OK")
+      (error "%s failed (%s)" description (or status "invalid response")))
+    response))
+
+(defun notmuch-custom--imap-auth-entry (account)
+  "Return ACCOUNT's matching entry from `auth-source'."
+  (let* ((host (or (plist-get account :auth-source-host)
+                   (plist-get account :host)))
+         (port (or (plist-get account :auth-source-port)
+                   (plist-get account :port)))
+         (user (plist-get account :user))
+         ;; JSON auth-source files preserve the JSON value's type, so accept
+         ;; both a numeric port and its string representation.
+         (entry
+          (cl-loop for candidate-port in (delete-dups
+                                          (list port (format "%s" port)))
+                   thereis
+                   (car (auth-source-search :max 1
+                                            :host host
+                                            :port candidate-port
+                                            :user user
+                                            :require '(:secret)
+                                            :create nil)))))
+    (unless entry
+      (error "No auth-source credential for %s@%s:%s" user host port))
+    entry))
+
+(defun notmuch-custom--imap-authenticate (process account)
+  "Authenticate PROCESS using ACCOUNT's auth-source credential."
+  (let* ((user (plist-get account :user))
+         (entry (notmuch-custom--imap-auth-entry account))
+         (secret (or (auth-info-password entry)
+                     (error "The auth-source entry for %s has no secret"
+                            user)))
+         (method
+          (or (plist-get account :auth-method)
+              (pcase (plist-get entry :auth)
+                ((or 'xoauth2 "xoauth2") 'xoauth2)
+                (_ 'login)))))
+    (pcase method
+      ('xoauth2
+       (notmuch-custom--imap-command
+        process
+        (concat
+         "AUTHENTICATE XOAUTH2 "
+         (base64-encode-string
+          (format "user=%s\1auth=Bearer %s\1\1" user secret) t))
+        "IMAP OAuth authentication"))
+      ('login
+       (notmuch-custom--imap-command
+        process
+        (format "LOGIN %s %s"
+                (notmuch-custom--imap-quote user)
+                (notmuch-custom--imap-quote secret))
+        "IMAP login"))
+      (_
+       (error "Unsupported IMAP authentication method: %S" method)))))
+
+(defun notmuch-custom--imap-connect (account)
+  "Open and authenticate a TLS IMAP connection for ACCOUNT."
+  (let* ((host (plist-get account :host))
+         (port (or (plist-get account :port) 993))
+         (buffer (generate-new-buffer
+                  (format " *notmuch-imap %s*" host)))
+         process)
+    (with-current-buffer buffer
+      (set-buffer-multibyte nil)
+      (buffer-disable-undo))
+    (condition-case error-data
+        (progn
+          (setq process
+                (with-timeout
+                    (notmuch-custom-imap-post-send-timeout
+                     (error "Connecting to IMAP %s:%s timed out" host port))
+                  (open-network-stream
+                   "notmuch-imap" buffer host port
+                   :type 'tls :warn-unless-encrypted t)))
+          (set-process-query-on-exit-flag process nil)
+          (set-process-coding-system process 'binary 'binary)
+          (let ((case-fold-search t))
+            (notmuch-custom--imap-wait-for
+             process "^\\* [ \t]*\\(?:OK\\|PREAUTH\\)\\(?:[ \t\r\n]\\|\\'\\)"
+             (with-current-buffer buffer (point-min))
+             "IMAP greeting"))
+          (notmuch-custom--imap-authenticate process account)
+          process)
+      (error
+       (when (processp process)
+         (delete-process process))
+       (when (buffer-live-p buffer)
+         (kill-buffer buffer))
+       (signal (car error-data) (cdr error-data))))))
+
+(defun notmuch-custom--imap-flag-settable-p (select-response flag)
+  "Return non-nil when SELECT-RESPONSE permits setting FLAG.
+When the server omits PERMANENTFLAGS, let STORE provide the authoritative
+answer instead."
+  (let ((case-fold-search t))
+    (if (string-match
+         "\\[PERMANENTFLAGS[ \t]+(\\([^)]*\\))\\]" select-response)
+        (let ((permanent-flags
+               (split-string (match-string 1 select-response) nil t)))
+          (or (member-ignore-case flag permanent-flags)
+              (member "\\*" permanent-flags)))
+      t)))
+
+(defun notmuch-custom--imap-search-uids (process message-id)
+  "Return UIDs for MESSAGE-ID in PROCESS's selected mailbox."
+  (let* ((response
+          (notmuch-custom--imap-command
+           process
+           (format "UID SEARCH HEADER Message-ID %s"
+                   (notmuch-custom--imap-quote
+                    (format "<%s>" message-id)))
+           "IMAP Message-ID search"))
+         uids)
+    (dolist (line (split-string response "\r?\n" t))
+      (when (string-match "\\`\\* SEARCH\\(?:[ \t]+\\(.*\\)\\)?\\'" line)
+        (setq uids (split-string (or (match-string 1 line) "") nil t))))
+    (cl-remove-if-not (lambda (uid) (string-match-p "\\`[0-9]+\\'" uid))
+                      uids)))
+
+(defun notmuch-custom--imap-sync-account (account jobs)
+  "Apply JOBS through one authenticated connection for ACCOUNT.
+Return the number of remote messages changed."
+  (let ((process (notmuch-custom--imap-connect account))
+        selected-folder select-response
+        (changed 0))
+    (unwind-protect
+        (dolist (job jobs)
+          (let ((folder (plist-get job :folder))
+                (flag (plist-get job :flag)))
+            (unless (equal folder selected-folder)
+              (setq select-response
+                    (notmuch-custom--imap-command
+                     process
+                     (format "SELECT %s"
+                             (notmuch-custom--imap-quote
+                              (utf7-encode folder t)))
+                     (format "Selecting IMAP folder %s" folder))
+                    selected-folder folder))
+            (when (notmuch-custom--imap-flag-settable-p select-response flag)
+              (when-let* ((uids
+                           (notmuch-custom--imap-search-uids
+                            process (plist-get job :message-id))))
+                (notmuch-custom--imap-command
+                 process
+                 (format "UID STORE %s +FLAGS.SILENT (%s)"
+                         (string-join uids ",") flag)
+                 (format "Setting IMAP flag %s" flag))
+                (cl-incf changed)))))
+      (when (process-live-p process)
+        (ignore-errors
+          (notmuch-custom--imap-command process "LOGOUT" "IMAP logout"))
+        (delete-process process))
+      (when-let* ((buffer (and (processp process) (process-buffer process))))
+        (when (buffer-live-p buffer)
+          (kill-buffer buffer))))
+    changed))
+
+(defun notmuch-custom-imap-update-original-after-send ()
+  "Update replied or forwarded status on the original IMAP message.
+This function belongs on `message-sent-hook', which Emacs runs only after the
+transport reports a successful send.  IMAP failures never turn a successful
+mail submission into a send failure."
+  (when (and notmuch-custom-imap-post-send-enabled
+             (boundp 'notmuch-message-queued-tag-changes)
+             notmuch-message-queued-tag-changes)
+    (condition-case error-data
+        (let ((jobs (notmuch-custom--imap-post-send-jobs))
+              (changed 0))
+          (dolist (account (delete-dups
+                            (mapcar (lambda (job) (plist-get job :account))
+                                    jobs)))
+            (condition-case account-error
+                (cl-incf changed
+                         (notmuch-custom--imap-sync-account
+                          account
+                          (cl-remove-if-not
+                           (lambda (job)
+                             (equal account (plist-get job :account)))
+                           jobs)))
+              (error
+               (message "Message sent, but IMAP status sync failed for %s: %s"
+                        (plist-get account :host)
+                        (error-message-string account-error)))))
+          (when (> changed 0)
+            (message "Message sent; updated Thunderbird IMAP status for %d source message%s"
+                     changed (if (= changed 1) "" "s"))))
+      (error
+       (message "Message sent, but IMAP status sync could not be prepared: %s"
+                (error-message-string error-data))))))
+
 ;;; OAuth2 token-store migration
 
 (defun notmuch-custom-reencrypt-oauth2-token-store ()
@@ -1088,6 +1435,8 @@ recipient has been configured."
                 #'notmuch-custom--message-forward-make-body-decoded))
   (add-hook 'notmuch-message-mode-hook #'notmuch-custom-company-setup)
   (add-hook 'notmuch-message-mode-hook #'notmuch-custom-message-fill-setup)
+  (add-hook 'message-sent-hook
+            #'notmuch-custom-imap-update-original-after-send)
   (with-eval-after-load 'flycheck-languagetool
     (notmuch-custom--install-languagetool-filter))
   (with-eval-after-load 'flycheck-vale
