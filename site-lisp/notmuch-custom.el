@@ -1374,6 +1374,50 @@ recipient has been configured."
 (defvar notmuch-custom--refresh-timer nil
   "Timer used for automatic Notmuch indexing and refreshes.")
 
+(defun notmuch-custom--inbox-message-ids ()
+  "Return the message IDs currently in the inbox."
+  (notmuch-call-notmuch-sexp
+   "search" "--format=sexp" "--output=messages" "tag:inbox"))
+
+(defun notmuch-custom--poll-with-senders (poll &rest args)
+  "Call POLL with ARGS and announce senders of newly arrived inbox mail."
+  (let ((before (condition-case nil
+                    (let ((ids (make-hash-table :test #'equal)))
+                      (dolist (id (notmuch-custom--inbox-message-ids))
+                        (puthash id t ids))
+                      ids)
+                  (error nil))))
+    (prog1 (apply poll args)
+      (when before
+        (condition-case error-data
+            (let ((new-ids
+                   (cl-remove-if
+                    (lambda (id) (gethash id before))
+                    (notmuch-custom--inbox-message-ids))))
+              (when new-ids
+                (let* ((addresses
+                        (notmuch-call-notmuch-sexp
+                         "address" "--format=sexp" "--output=sender"
+                         "--deduplicate=address"
+                         (mapconcat #'notmuch-id-to-query new-ids " or ")))
+                       (senders
+                        (mapcar
+                         (lambda (address)
+                           (let ((name (plist-get address :name)))
+                             (replace-regexp-in-string
+                              "[\n\r\t]+" " "
+                              (if (and name (not (string-empty-p name)))
+                                  name
+                                (or (plist-get address :address)
+                                    "Unknown sender")))))
+                         addresses)))
+                  (message "New mail from %s"
+                           (if senders (string-join senders ", ")
+                             "Unknown sender")))))
+          (error
+           (message "Mail fetched; could not read new senders: %s"
+                    (error-message-string error-data))))))))
+
 (defun notmuch-custom-poll-and-refresh ()
   "Index new mail and refresh all open Notmuch buffers."
   (interactive)
@@ -1403,6 +1447,8 @@ recipient has been configured."
 ;;;###autoload
 (defun notmuch-custom-setup ()
   "Enable the local Notmuch enhancements defined in this library."
+  (unless (advice-member-p #'notmuch-custom--poll-with-senders 'notmuch-poll)
+    (advice-add 'notmuch-poll :around #'notmuch-custom--poll-with-senders))
   (unless (advice-member-p
            #'notmuch-custom--format-sent-folder-recipients
            'notmuch-tree-format-field)

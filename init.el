@@ -861,20 +861,18 @@
             (lambda ()
               (yas-activate-extra-mode 'latex-mode)))
 
-  (yas-global-mode 1)
-  ;; (setq yas-snippet-dirs
-  ;;       '(;; personal snippets
-  ;;         "~/.emacs.d/snippets"
-  ;;         ;; snippet collection
-  ;;         ;; "~/.emacs.d/site-lisp/yasnippet-snippets/snippets"
-  ;;         ))
-  )
+  ;; Private mail templates live outside the dotfiles repository.
+  (add-to-list 'yas-snippet-dirs
+               (expand-file-name "~/workspace/Notes/Templates"))
+  (yas-global-mode 1))
 
 (use-package yasnippet-personal-priority
   :ensure nil
   :after yasnippet
   :demand t
   :config
+  (add-to-list 'yasnippet-personal-priority-directories
+               (expand-file-name "~/workspace/Notes/Templates"))
   (yasnippet-personal-priority-mode 1))
 
 (use-package company
