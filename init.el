@@ -417,7 +417,8 @@
   (notmuch-custom-setup)
 
   ;; Display folders vertically, including empty ones.
-  (setq notmuch-column-control 1.0
+  (setq notmuch-custom-unified-folders '("Papers")
+        notmuch-column-control 1.0
         notmuch-show-empty-saved-searches t
         notmuch-saved-searches-sort-function nil
         notmuch-saved-searches
@@ -425,6 +426,11 @@
 
   ;; Show the newest messages first in every search/folder buffer.
   (setq-default notmuch-search-oldest-first nil)
+
+  ;; Prefer plain text; notmuch-custom cleans up stray HTML entities.
+  (setq notmuch-multipart/alternative-discouraged
+        '("text/html" "multipart/related")
+        mm-text-html-renderer 'shr)
 
   ;; Wrap displayed plain-text message bodies at columns (or at the window
   ;; edge when the window is narrower).

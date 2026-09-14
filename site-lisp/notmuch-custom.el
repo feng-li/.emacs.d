@@ -47,6 +47,54 @@
 
 ;;; Saved searches
 
+(defcustom notmuch-custom-unified-folders nil
+  "Folder names for which to add unified saved searches across accounts.
+Nil disables generation; t includes every shared folder name; a list of
+strings selects names such as \"Papers\".  Names match case-sensitively.
+Profile query names must follow NUMBER-ACCOUNT--FOLDER, optionally with
+more -- separated subfolders.  The full folder path must match across
+at least two accounts.  Account-specific searches remain available.
+Rebuild `notmuch-saved-searches' after changing this option."
+  :type '(choice (const :tag "Disabled" nil)
+                 (const :tag "All shared folders" t)
+                 (repeat :tag "Selected folders" string))
+  :group 'notmuch-custom)
+
+(defun notmuch-custom--unified-searches (query-names)
+  "Build unified saved searches from ordered profile QUERY-NAMES."
+  (let ((groups (make-hash-table :test #'equal))
+        order searches)
+    (dolist (query-name query-names)
+      (let* ((name (replace-regexp-in-string "\\`[0-9]+-" "" query-name))
+             (components (split-string name "--"))
+             (account (car components))
+             (folder (mapconcat #'identity (cdr components) "--"))
+             (label (notmuch-custom-query-display-name folder)))
+        (when (and (cdr components)
+                   (or (eq notmuch-custom-unified-folders t)
+                       (member label notmuch-custom-unified-folders)))
+          (unless (gethash folder groups)
+            (push folder order))
+          (puthash folder (cons (cons account query-name)
+                                (gethash folder groups)) groups))))
+    (dolist (folder (nreverse order))
+      (let ((members (nreverse (gethash folder groups))))
+        (when (> (length (delete-dups (mapcar #'car members))) 1)
+          (push (list :name (concat "All "
+                                    (notmuch-custom-query-display-name folder))
+                      :query (concat "("
+                                     (mapconcat
+                                      (lambda (member)
+                                        (concat "query:" (cdr member)))
+                                      members " or ")
+                                     ")")
+                      :search-type 'unthreaded
+                      :show-recipients
+                      (let ((case-fold-search t))
+                        (string-match-p "\\(?:\\`\\|--\\)sent\\'" folder)))
+                searches))))
+    (nreverse searches)))
+
 (defun notmuch-custom-query-display-name (query-name)
   "Turn an ordered Notmuch QUERY-NAME into a display label.
 The numeric prefix controls order, a hyphen becomes a space, and a
@@ -61,14 +109,17 @@ double hyphen becomes a folder separator."
     (dolist (line (notmuch--process-lines notmuch-command "config" "list"))
       (when (string-match "\\`query\\.\\([^=]+\\)=" line)
         (push (match-string 1 line) query-names)))
-    (mapcar (lambda (query-name)
+    (setq query-names (sort query-names #'string-lessp))
+    (append
+     (notmuch-custom--unified-searches query-names)
+     (mapcar (lambda (query-name)
               (list :name (notmuch-custom-query-display-name query-name)
                     :query (concat "query:" query-name)
                     :search-type 'unthreaded
                     :show-recipients
                     (let ((case-fold-search t))
                       (string-match-p "--sent\\'" query-name))))
-            (sort query-names #'string-lessp))))
+             query-names))))
 
 ;;; Sent-folder correspondents
 
@@ -482,6 +533,46 @@ ORIGINAL-FUNCTION applies Vale's other exclusion rules in BUFFER."
         (notmuch-custom--insert-collapsed-address-button
          (notmuch-sanitize omitted-text) (length omitted))
         (insert "\n")))))
+
+;;; Simplified HTML display
+
+(defun notmuch-custom--render-simple-html (render &rest arguments)
+  "Call RENDER with ARGUMENTS using theme colors and the default font.
+Scope these settings to Notmuch's HTML rendering.  Links, emphasis, and
+tables are still rendered by SHR."
+  (require 'shr)
+  (let ((shr-use-colors nil)
+        (shr-use-fonts nil))
+    (apply render arguments)))
+
+;;; Plain-text display
+
+(defun notmuch-custom-decode-plain-text-entities (_msg _depth)
+  "Decode stray HTML entities in the narrowed plain-text display.
+Decode once, preserving line breaks, literal tags, and unknown entities.
+Only entity tokens are parsed as HTML, never the message itself.  The
+stored message is unchanged.  Run before wrapping and blank-line cleanup."
+  (when (libxml-available-p)
+    (require 'dom)
+    (save-excursion
+      (goto-char (point-min))
+      (let ((case-fold-search nil))
+        (while (re-search-forward
+                "&\\(?:#[0-9]+\\|#[xX][0-9a-fA-F]+\\|[A-Za-z][A-Za-z0-9]*\\);"
+                nil t)
+          (let* ((entity (match-string-no-properties 0))
+                 (decoded
+                  (save-match-data
+                    (with-temp-buffer
+                      (insert "<html><body><p>" entity "</p></body></html>")
+                      (dom-texts
+                       (dom-by-tag
+                        (libxml-parse-html-region (point-min) (point-max))
+                        'p))))))
+            (unless (or (string-empty-p decoded) (equal entity decoded))
+              (replace-match
+               (replace-regexp-in-string "\u00a0" " " decoded t t)
+               t t))))))))
 
 ;;; External attachment opening
 
@@ -902,6 +993,71 @@ This function follows `message-indent-citation' in
     (or (plist-get reply :original)
         (error "Notmuch did not return the original message"))))
 
+(defun notmuch-custom--clean-forward-url (url)
+  "Unwrap known Scholar and Elsevier redirects in URL.
+Only accept an explicit HTTP or HTTPS destination.  Do not fetch the URL
+or remove parameters from the destination itself."
+  (if (not (stringp url))
+      url
+    (require 'url-util)
+    (save-match-data
+      (let ((case-fold-search nil)
+            destination)
+        (cond
+         ((string-match
+               "\\`https?://scholar\\.google\\.com/scholar_\\(?:url\\|share\\)\\?\\(.*\\)\\'"
+               url)
+          (let ((query (match-string 1 url)))
+            (when (string-match "\\(?:\\`\\|&\\)url=\\([^&]*\\)" query)
+              (setq destination (url-unhex-string (match-string 1 query))))))
+         ((string-match
+           (concat "\\`https?://click\\.notification\\.elsevier\\.com/CL0/"
+                   "\\(.+?\\)/[0-9]+/[^/]+/[^/]+\\'")
+           url)
+          (setq destination (url-unhex-string (match-string 1 url)))))
+        (if (and destination
+                 (string-match-p "\\`https?://[^[:space:]<>]+\\'" destination))
+            destination
+          url)))))
+
+(defun notmuch-custom--clean-forward-text-urls ()
+  "Unwrap known tracking URLs in rendered forwarding text."
+  (save-excursion
+    (goto-char (point-min))
+    (while (re-search-forward
+            (concat "https?://\\(?:scholar\\.google\\.com/scholar_\\(?:url\\|share\\)\\?"
+                    "\\|click\\.notification\\.elsevier\\.com/CL0/\\)"
+                    "[^[:space:]<>]+")
+            nil t)
+      (let* ((url (match-string-no-properties 0))
+             (clean (save-match-data (notmuch-custom--clean-forward-url url))))
+        (unless (equal url clean)
+          (replace-match clean t t))))))
+
+(defun notmuch-custom--insert-rendered-link-destinations ()
+  "Make SHR link destinations explicit before copying rendered plain text.
+Keep a bare URL only once when it is already the visible link label."
+  (save-excursion
+    (goto-char (point-min))
+    (while (< (point) (point-max))
+      (let* ((start (point))
+             (url (notmuch-custom--clean-forward-url
+                   (get-text-property start 'shr-url)))
+             (end (next-single-property-change
+                   start 'shr-url nil (point-max))))
+        (goto-char end)
+        (when (and (stringp url)
+                   (not (string-empty-p url))
+                   (not (equal url
+                               (notmuch-custom--clean-forward-url
+                                (replace-regexp-in-string
+                                 "[[:space:]]+" ""
+                                 (buffer-substring-no-properties start end))))))
+          (let ((begin (point)))
+            (insert (concat " <" url ">"))
+            ;; Do not inherit the link's properties onto the appended URL.
+            (set-text-properties begin (point) nil)))))))
+
 (defun notmuch-custom--render-forward-original (original)
   "Render decoded ORIGINAL using the same MIME selection as a reply."
   (with-temp-buffer
@@ -917,6 +1073,8 @@ This function follows `message-indent-citation' in
                 ((symbol-function 'notmuch-crypto-insert-encstatus-button)
                  #'ignore))
         (notmuch-show-insert-body original (plist-get original :body) 0)))
+    (notmuch-custom--insert-rendered-link-destinations)
+    (notmuch-custom--clean-forward-text-urls)
     (buffer-substring-no-properties (point-min) (point-max))))
 
 (defun notmuch-custom--insert-forward-headers (headers)
@@ -955,9 +1113,24 @@ through `mime-to-mml' a second time."
     (message-remove-ignored-headers forward-start forward-end))
   (message-position-point))
 
+(defun notmuch-custom--forward-has-attachments-p (parts)
+  "Return non-nil if PARTS contain attachments or non-text MIME content.
+Such messages need native MIME forwarding, not reply-style rendering."
+  (cl-some
+   (lambda (part)
+     (let ((type (or (plist-get part :content-type) "")))
+       (or (plist-get part :filename)
+           (equal (plist-get part :content-disposition) "attachment")
+           (if (string-prefix-p "multipart/" type)
+               (notmuch-custom--forward-has-attachments-p
+                (plist-get part :content))
+             (not (member type '("text/plain" "text/html")))))))
+   parts))
+
 (defun notmuch-custom--message-forward-make-body-decoded
     (original-function forward-buffer &optional digest)
-  "Use reply-style MIME decoding for an inline Notmuch forward.
+  "Use reply-style decoding only for text-only inline Notmuch forwards.
+Preserve attachments through native MIME forwarding.
 ORIGINAL-FUNCTION, FORWARD-BUFFER, and DIGEST are the arguments used by
 `message-forward-make-body'."
   (if (or message-forward-as-mime
@@ -965,8 +1138,22 @@ ORIGINAL-FUNCTION, FORWARD-BUFFER, and DIGEST are the arguments used by
           (not (derived-mode-p 'notmuch-message-mode)))
       (funcall original-function forward-buffer digest)
     (condition-case error-data
-        (notmuch-custom--insert-decoded-forward
-         (notmuch-custom--forward-original forward-buffer))
+        (let ((original (notmuch-custom--forward-original forward-buffer)))
+          (if (notmuch-custom--forward-has-attachments-p
+               (plist-get original :body))
+              ;; Notmuch returns raw CRLF, sometimes with additional LF
+              ;; headers.  Emacs's MIME parser expects LF separators.
+              ;; Normalize a copy before parsing, not just the final draft.
+              (let ((destination (current-buffer)))
+                (with-temp-buffer
+                  (insert-buffer-substring forward-buffer)
+                  (goto-char (point-min))
+                  (while (search-forward "\r\n" nil t)
+                    (replace-match "\n" t t))
+                  (let ((normalized (current-buffer)))
+                    (with-current-buffer destination
+                      (funcall original-function normalized digest)))))
+            (notmuch-custom--insert-decoded-forward original)))
       (error
        (message "Decoded Notmuch forward failed; using raw message: %s"
                 (error-message-string error-data))
@@ -1447,6 +1634,12 @@ recipient has been configured."
 ;;;###autoload
 (defun notmuch-custom-setup ()
   "Enable the local Notmuch enhancements defined in this library."
+  (unless (advice-member-p #'notmuch-custom--render-simple-html
+                           'notmuch-show-insert-part-text/html)
+    (advice-add 'notmuch-show-insert-part-text/html :around
+                #'notmuch-custom--render-simple-html))
+  (add-hook 'notmuch-show-insert-text/plain-hook
+            #'notmuch-custom-decode-plain-text-entities)
   (unless (advice-member-p #'notmuch-custom--poll-with-senders 'notmuch-poll)
     (advice-add 'notmuch-poll :around #'notmuch-custom--poll-with-senders))
   (unless (advice-member-p
