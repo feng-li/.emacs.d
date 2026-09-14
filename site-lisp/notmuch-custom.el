@@ -269,7 +269,9 @@ COMMAND, ARG, and IGNORED follow the Company backend protocol."
    "\\(?:"
    "[ \t]*-+[ \t]*"
    "\\(?:start of forwarded message\\|begin forwarded message"
-   "\\|forwarded message\\|original message\\)"
+   "\\|forwarded message\\|original message"
+   "\\|回复的原邮件\\|回覆的原郵件\\|回復的原郵件"
+   "\\|原始邮件\\|原始郵件\\|转发邮件\\|轉寄郵件\\)"
    "[ \t]*-+[ \t]*"
    "\\|[ \t]*begin forwarded message:[ \t]*"
    "\\)")
@@ -278,6 +280,10 @@ COMMAND, ARG, and IGNORED follow the Company backend protocol."
 (defconst notmuch-custom--forward-end-regexp
   "[ \t]*-+[ \t]*end of forwarded message[ \t]*-+[ \t]*"
   "Regexp matching a line that ends an inline forwarded message.")
+
+(defconst notmuch-custom--embedded-mail-header-regexp
+  "[ \t]*\\(?:发件人\\|發件人\\|寄件人\\|寄件者\\)[ \t]*[:：]"
+  "Regexp introducing an embedded Chinese mail header without a separator.")
 
 (defconst notmuch-custom--reply-attribution-regexp
   (concat
@@ -669,7 +675,8 @@ lists, indented text, signatures, and forwarded-message blocks are omitted."
                  indent))
                (forward-start
                 (string-match-p
-                 (concat "\\`" notmuch-custom--forward-start-regexp "\\'")
+                 (concat "\\`\\(?:" notmuch-custom--forward-start-regexp
+                         "\\|" notmuch-custom--embedded-mail-header-regexp "\\)")
                  line))
                (forward-end
                 (string-match-p
@@ -886,6 +893,7 @@ message, at any quote depth."
                     ;; Protect malformed legacy blocks too, where an earlier
                     ;; formatter joined `From:' onto the marker line.
                     "\\|" notmuch-custom--forward-start-regexp ".*"
+                    "\\|" notmuch-custom--embedded-mail-header-regexp ".*"
                     "\\)$")
                    end t)
               (match-beginning 0))))
