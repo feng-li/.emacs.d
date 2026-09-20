@@ -22,13 +22,11 @@
 (unless (file-directory-p my-tree-sitter-directory)
   (make-directory my-tree-sitter-directory t))
 
-(setq package-archives
-      '(
-        ;; ("melpa" . "https://melpa.org/packages/")
-        ;; ("elpa" . "https://elpa.gnu.org/packages/")
-        ("elpa-cn"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
-        ("melpa-cn"      . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
-        ))
+
+(setq package-archives '(("gnu"    . "https://mirrors.cernet.edu.cn/elpa/gnu/")
+                         ("nongnu" . "https://mirrors.cernet.edu.cn/elpa/nongnu/")
+                         ("melpa"  . "https://mirrors.cernet.edu.cn/elpa/melpa/")))
+;; (package-initialize) ;; You might already have this line
 
 ;; Local server socket dir. Some server does not allow to use the default
 ;; (setq server-use-tcp t)
@@ -1816,12 +1814,12 @@ intermediate and output files, as requested by the non-nil argument to
     :endpoint "/chat/completions"
     :key gptel-api-key ;; ~/.authinfo
     :stream t
-    :models '(deepseek-v4-flash deepseek-v4-pro))
+    :models '(deepseek-flash))
 
   ;; Set default options
   (setq gptel-default-mode 'markdown-mode
 	gptel-backend (gptel-get-backend "DeepSeek")
-	gptel-model 'deekseek-v4-flash)
+	gptel-model 'deepseek-flash)
 
 
   ;; Checks if the opened file has a `GPT.md` extension and enables `my-minor-mode` when it does.
