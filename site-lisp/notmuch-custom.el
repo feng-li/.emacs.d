@@ -11,17 +11,19 @@
 
 ;; Local Notmuch enhancements:
 ;;
-;; - saved searches generated from the active Notmuch profile;
+;; - saved searches generated from the active Notmuch profile, plus a
+;;   global starred view;
 ;; - address completion using literal text, full Pinyin, or Pinyin initials;
 ;; - compact, expandable To and Cc headers;
 ;; - prose checking limited to the subject and newly written message text;
 ;; - attachment opening through the desktop default application;
-;; - display-only reflow of hard-wrapped plain-text messages;
+;; - automatic, display-only reflow of hard-wrapped plain-text messages;
 ;; - recipients instead of senders in saved Sent-folder views;
 ;; - omission of a signature already present in quoted reply text;
 ;; - canonical reply and forward subject markers;
 ;; - CRLF normalization in inline forwarded messages;
-;; - post-send IMAP reply/forward flags that Thunderbird understands; and
+;; - post-send IMAP reply/forward flags that Thunderbird understands;
+;; - mirroring of IMAP stars onto Notmuch's `imap-starred' tag; and
 ;; - coexistence of address completion in headers and word completion in bodies.
 
 ;;; Code:
@@ -39,6 +41,7 @@
 (require 'notmuch-message)
 (require 'notmuch-show)
 (require 'subr-x)
+(require 'seq)
 (require 'utf7)
 
 (defgroup notmuch-custom nil
@@ -58,6 +61,14 @@ Rebuild `notmuch-saved-searches' after changing this option."
   :type '(choice (const :tag "Disabled" nil)
                  (const :tag "All shared folders" t)
                  (repeat :tag "Selected folders" string))
+  :group 'notmuch-custom)
+
+(defcustom notmuch-custom-global-starred-search t
+  "When non-nil, add an \"All Starred\" saved search across accounts.
+Server stars carry the `imap-starred' tag, populated directly from
+IMAP by `notmuch-custom-sync-imap-starred'.  Rebuild
+`notmuch-saved-searches' after changing this option."
+  :type 'boolean
   :group 'notmuch-custom)
 
 (defun notmuch-custom--unified-searches (query-names)
@@ -103,6 +114,14 @@ double hyphen becomes a folder separator."
     (setq name (replace-regexp-in-string "--" " / " name))
     (replace-regexp-in-string "-" " " name)))
 
+(defun notmuch-custom--starred-search ()
+  "Build the global saved search for starred messages.
+Configured accounts share the `imap-starred' tag, so unlike the
+per-folder unified searches this needs no `query:' disjunction."
+  (list :name "All Starred"
+        :query "tag:imap-starred"
+        :search-type 'unthreaded))
+
 (defun notmuch-custom-saved-searches-from-profile ()
   "Build Emacs saved searches from the active profile's query.* entries."
   (let (query-names)
@@ -112,6 +131,8 @@ double hyphen becomes a folder separator."
     (setq query-names (sort query-names #'string-lessp))
     (append
      (notmuch-custom--unified-searches query-names)
+     (and notmuch-custom-global-starred-search
+          (list (notmuch-custom--starred-search)))
      (mapcar (lambda (query-name)
               (list :name (notmuch-custom-query-display-name query-name)
                     :query (concat "query:" query-name)
@@ -603,6 +624,27 @@ stored message is unchanged.  Run before wrapping and blank-line cleanup."
 
 ;;; Reading hard-wrapped messages
 
+(defcustom notmuch-custom-reflow-on-display t
+  "When non-nil, reflow every message automatically as it is displayed.
+This performs the reflowing of `notmuch-custom-reflow-current-message',
+bound to W in Notmuch show buffers: ordinary prose is filled to
+`notmuch-custom-reflow-width' columns, and quoted, structured,
+signature, and forwarded text is left alone.  Only the Notmuch display
+buffer is changed.  Set this to nil and refresh with g to see the
+original wrapping again."
+  :type 'boolean
+  :group 'notmuch-custom)
+
+(defcustom notmuch-custom-reflow-width 100
+  "Column that reflowing fills ordinary prose to.
+Notmuch's own washing already wraps text/plain parts to
+`notmuch-wash-wrap-lines-length' columns as they are inserted, so keep
+this wider than that for reflowing to have a visible effect; nil
+follows the wash width instead."
+  :type '(choice (const :tag "Follow wash width" nil)
+                 (integer :tag "Columns"))
+  :group 'notmuch-custom)
+
 (defun notmuch-custom--plain-text-part-regions ()
   "Return visible inline text/plain regions in the current message."
   (let* ((extent (notmuch-show-message-extent))
@@ -646,6 +688,9 @@ stored message is unchanged.  Run before wrapping and blank-line cleanup."
   (or (string-empty-p line)
       (string-match-p "\\`[ \t]" line)
       (string-match-p "\\`>" line)
+      ;; Notmuch's citation, original-message, and part buttons all
+      ;; begin with a bracket.
+      (string-match-p "\\`\\[" line)
       (string-match-p
        "\\`\\(?:[-+*]\\|[[:digit:]]+[.)]\\)[ \t]+" line)
       (string-match-p "\\`\\(?:|\\|```\\|~~~\\)" line)
@@ -703,17 +748,15 @@ lists, indented text, signatures, and forwarded-message blocks are omitted."
         (push (cons block-start end) blocks)))
     (nreverse blocks)))
 
-(defun notmuch-custom-reflow-current-message ()
-  "Reflow ordinary prose in the displayed message to the configured width.
+(defun notmuch-custom--reflow-message-at-point ()
+  "Reflow ordinary prose in the message at point to the configured width.
 Only inline text/plain parts are changed, and only in the Notmuch display
 buffer.  Quoted, structured, signature, and forwarded text is left alone.
-Refresh the buffer with `notmuch-show-refresh-view' to restore its rendering."
-  (interactive)
-  (unless (derived-mode-p 'notmuch-show-mode)
-    (user-error "This command is only available while reading Notmuch mail"))
-  (let* ((width (if (numberp notmuch-wash-wrap-lines-length)
-                    notmuch-wash-wrap-lines-length
-                  80))
+Return the width reflowed to, or nil when nothing was reflowable."
+  (let* ((width (or notmuch-custom-reflow-width
+                    (if (numberp notmuch-wash-wrap-lines-length)
+                        notmuch-wash-wrap-lines-length
+                      80)))
          (depth (or (notmuch-show-get-depth) 0))
          (indent (if notmuch-show-indent-content
                      (* depth notmuch-show-indent-messages-width)
@@ -724,20 +767,51 @@ Refresh the buffer with `notmuch-show-refresh-view' to restore its rendering."
             (nconc blocks
                    (notmuch-custom--reflowable-blocks
                     (car region) (cdr region) indent))))
-    (unless blocks
-      (user-error "The current message has no reflowable plain-text prose"))
-    ;; Work from the bottom upward so earlier buffer positions remain stable.
-    (let ((inhibit-read-only t)
-          (buffer-undo-list t)
-          (fill-column (+ width indent))
-          (fill-prefix (make-string indent ?\s))
-          (adaptive-fill-mode nil)
-          (sentence-end-double-space nil))
-      (with-silent-modifications
-        (dolist (block (reverse blocks))
-          (fill-region-as-paragraph (car block) (cdr block)))))
-    (message "Reflowed current message to %d columns; press g to restore"
-             width)))
+    (when blocks
+      ;; Work from the bottom upward so earlier buffer positions remain stable.
+      (let ((inhibit-read-only t)
+            (buffer-undo-list t)
+            (fill-column (+ width indent))
+            (fill-prefix (make-string indent ?\s))
+            (adaptive-fill-mode nil)
+            (sentence-end-double-space nil))
+        (with-silent-modifications
+          (dolist (block (reverse blocks))
+            (fill-region-as-paragraph (car block) (cdr block)))))
+      width)))
+
+(defun notmuch-custom-reflow-current-message ()
+  "Reflow ordinary prose in the displayed message to `notmuch-custom-reflow-width'.
+Only inline text/plain parts are changed, and only in the Notmuch display
+buffer.  Quoted, structured, signature, and forwarded text is left alone.
+Refresh the buffer with `notmuch-show-refresh-view' to restore its
+rendering, or to see the original wrapping after disabling
+`notmuch-custom-reflow-on-display'."
+  (interactive)
+  (unless (derived-mode-p 'notmuch-show-mode)
+    (user-error "This command is only available while reading Notmuch mail"))
+  (let ((width (notmuch-custom--reflow-message-at-point)))
+    (if width
+        (message "Reflowed current message to %d columns; press g to restore"
+                 width)
+      (user-error "The current message has no reflowable plain-text prose"))))
+
+(defun notmuch-custom--reflow-displayed-messages ()
+  "Reflow every message in the current Notmuch show buffer.
+A message that cannot be reflowed is left untouched."
+  (notmuch-show-mapc
+   (lambda ()
+     (ignore-errors (notmuch-custom--reflow-message-at-point)))))
+
+(defun notmuch-custom--reflow-after-build (&rest _)
+  "Reflow displayed messages after a Notmuch show buffer is built.
+A buffer that was built without any message, or cannot be walked for
+some other reason, is left alone rather than disturbing the display
+that caused it."
+  (when (and notmuch-custom-reflow-on-display
+             (derived-mode-p 'notmuch-show-mode))
+    (ignore-errors
+      (notmuch-custom--reflow-displayed-messages))))
 
 ;;; Forwarded message cleanup
 
@@ -1105,7 +1179,7 @@ through `mime-to-mml' a second time."
       (message-goto-body)
     (goto-char (point-max)))
   (insert
-   "\n-------------------- Start of forwarded message --------------------\n")
+   "\n-------- Forwarded Message --------\n")
   (let ((forward-start (point))
         forward-end)
     (notmuch-custom--insert-forward-headers (plist-get original :headers))
@@ -1116,10 +1190,30 @@ through `mime-to-mml' a second time."
     (unless (bolp)
       (insert "\n"))
     (setq forward-end (point))
-    (insert
-     "-------------------- End of forwarded message --------------------\n")
     (message-remove-ignored-headers forward-start forward-end))
   (message-position-point))
+
+(defun notmuch-custom--format-native-forward-markers (original-function &rest args)
+  "Format the outer markers inserted by ORIGINAL-FUNCTION with ARGS.
+Apply only to inline Notmuch forwards, including attachment fallbacks."
+  (if (not (derived-mode-p 'notmuch-message-mode))
+      (apply original-function args)
+    (let ((start (point))
+          (size (buffer-size)))
+      (prog1 (apply original-function args)
+        (save-excursion
+          (goto-char (+ start (- (buffer-size) size)))
+          ;; Change only the newly inserted outer markers, preserving any
+          ;; forwarded messages already quoted inside the original body.
+          (when (and (bolp)
+                     (looking-back
+                      "-------------------- End of forwarded message --------------------\n"
+                      start))
+            (delete-region (match-beginning 0) (point)))
+          (goto-char start)
+          (when (looking-at
+                 "\n-------------------- Start of forwarded message --------------------\n")
+            (replace-match "\n-------- Forwarded Message --------\n" t t)))))))
 
 (defun notmuch-custom--forward-has-attachments-p (parts)
   "Return non-nil if PARTS contain attachments or non-text MIME content.
@@ -1191,7 +1285,10 @@ byte intact because their embedded message may contain signed or binary data."
 ;;; Thunderbird-compatible IMAP reply and forward flags
 
 (defcustom notmuch-custom-imap-post-send-accounts nil
-  "IMAP accounts whose source-message flags should be updated after sending.
+  "IMAP accounts used for server-side flag maintenance.
+Flags are updated after sending; see
+`notmuch-custom-imap-update-original-after-send'.  These accounts also
+supply server stars through `notmuch-custom-sync-imap-starred'.
 Each entry is a plist with these keys:
 
   :local-root       Thunderbird's local Maildir root for the account
@@ -1530,6 +1627,88 @@ mail submission into a send failure."
        (message "Message sent, but IMAP status sync could not be prepared: %s"
                 (error-message-string error-data))))))
 
+;;; IMAP starred synchronization
+
+(defcustom notmuch-custom-imap-starred-sync t
+  "When non-nil, mirror server stars during each refresh.
+Use `notmuch-custom-imap-post-send-accounts' and scan the mailboxes
+represented in the local Notmuch index.  Server stars use the separate
+`imap-starred' tag; local `flagged' tags are never changed."
+  :type 'boolean
+  :group 'notmuch-custom)
+
+(defun notmuch-custom--imap-starred-account-ids (account folders)
+  "Read starred Message-IDs from ACCOUNT's FOLDERS without changing mail.
+Signal an error on an incomplete scan so existing tags are preserved."
+  (let ((process (notmuch-custom--imap-connect account))
+        (case-fold-search t)
+        ids)
+    (unwind-protect
+        (dolist (folder folders)
+          (notmuch-custom--imap-command
+           process
+           (concat "EXAMINE " (notmuch-custom--imap-quote (utf7-encode folder t)))
+           "Opening IMAP mailbox read-only")
+          (let ((response (notmuch-custom--imap-command
+                           process "UID SEARCH FLAGGED" "Searching IMAP stars")))
+            (unless (string-match "^\\* SEARCH\\(?: +\\([0-9 ]*\\)\\)?\r?$" response)
+              (error "Invalid IMAP starred search response"))
+            (dolist (uid (split-string (or (match-string 1 response) "") " " t))
+              (let* ((reply (notmuch-custom--imap-command
+                             process
+                             (format "UID FETCH %s (BODY.PEEK[HEADER.FIELDS (MESSAGE-ID)])"
+                                     uid)
+                             "Reading starred Message-ID"))
+                     ;; Unfold header continuation lines before matching.
+                     (header (replace-regexp-in-string "\r?\n[ \t]+" " " reply)))
+                (unless (string-match "^Message-ID:[ \t]*<\\([^<>\r\n]+\\)>" header)
+                  (error "Missing Message-ID for starred IMAP UID %s" uid))
+                (push (match-string 1 header) ids)))))
+      (when (process-live-p process)
+        (ignore-errors
+          (notmuch-custom--imap-command process "LOGOUT" "IMAP logout"))
+        (delete-process process))
+      (when-let* ((buffer (process-buffer process)))
+        (when (buffer-live-p buffer)
+          (kill-buffer buffer))))
+    ids))
+
+(defun notmuch-custom-sync-imap-starred ()
+  "Mirror server stars into Notmuch's `imap-starred' tag.
+Scan indexed folders of `notmuch-custom-imap-post-send-accounts'.
+Only update tags after every mailbox scan succeeds.  With no configured
+accounts or indexed folders, leave existing tags alone.  The tag is
+owned by this sync; ordinary `flagged' tags are left untouched."
+  (interactive)
+  (when notmuch-custom-imap-post-send-accounts
+    (let ((folders (make-hash-table :test #'equal))
+          remote-ids)
+      (dolist (file (notmuch--process-lines
+                     notmuch-command "search" "--output=files" "*"))
+        (when-let* ((account (notmuch-custom--imap-account-for-file file))
+                    (folder (notmuch-custom--imap-folder-for-file file account)))
+          (cl-pushnew folder (gethash account folders) :test #'equal)))
+      (when (> (hash-table-count folders) 0)
+        ;; Finish all network reads before making any local tag changes.
+        (maphash
+         (lambda (account mailboxes)
+           (setq remote-ids
+                 (nconc (notmuch-custom--imap-starred-account-ids account mailboxes)
+                        remote-ids)))
+         folders)
+        (let* ((local-ids (notmuch-custom--imap-message-ids "tag:imap-starred"))
+               (remote-ids (delete-dups remote-ids))
+               (add-ids (cl-set-difference remote-ids local-ids :test #'equal))
+               (remove-ids (cl-set-difference local-ids remote-ids :test #'equal)))
+          ;; Bound command sizes even for accounts with many stars.
+          (dolist (change (list (cons "+imap-starred" add-ids)
+                                (cons "-imap-starred" remove-ids)))
+            (dolist (batch (seq-partition (cdr change) 100))
+              (notmuch-tag (mapconcat #'notmuch-id-to-query batch " or ")
+                           (list (car change)) 'omit)))
+          (when (called-interactively-p 'any)
+            (message "IMAP starred sync complete")))))))
+
 ;;; OAuth2 token-store migration
 
 (defun notmuch-custom-reencrypt-oauth2-token-store ()
@@ -1614,11 +1793,18 @@ recipient has been configured."
                     (error-message-string error-data))))))))
 
 (defun notmuch-custom-poll-and-refresh ()
-  "Index new mail and refresh all open Notmuch buffers."
+  "Index new mail and refresh all open Notmuch buffers.
+Mirror IMAP stars first so the refreshed buffers display them."
   (interactive)
   (condition-case error-data
       (progn
         (notmuch-poll)
+        (when notmuch-custom-imap-starred-sync
+          (condition-case sync-error
+              (notmuch-custom-sync-imap-starred)
+            (error
+             (message "IMAP starred sync failed: %s"
+                      (error-message-string sync-error)))))
         (notmuch-refresh-all-buffers))
     (error
      (message "Automatic Notmuch refresh failed: %s"
@@ -1655,10 +1841,18 @@ recipient has been configured."
            'notmuch-tree-format-field)
     (advice-add 'notmuch-tree-format-field :around
                 #'notmuch-custom--format-sent-folder-recipients))
+  (unless (advice-member-p #'notmuch-custom--reflow-after-build
+                           'notmuch-show--build-buffer)
+    (advice-add 'notmuch-show--build-buffer :after
+                #'notmuch-custom--reflow-after-build))
   (unless (advice-member-p #'notmuch-custom--insert-truncated-address-header
                            'notmuch-show-insert-header)
     (advice-add 'notmuch-show-insert-header :around
                 #'notmuch-custom--insert-truncated-address-header))
+  (dolist (function '(message-forward-make-body-plain
+                      message-forward-make-body-digest-plain))
+    (unless (advice-member-p #'notmuch-custom--format-native-forward-markers function)
+      (advice-add function :around #'notmuch-custom--format-native-forward-markers)))
   (unless (advice-member-p #'notmuch-custom--normalize-inline-forward-crlf
                            'notmuch-mua-new-forward-messages)
     (advice-add 'notmuch-mua-new-forward-messages :after
