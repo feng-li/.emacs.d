@@ -574,6 +574,50 @@ tables are still rendered by SHR."
 
 ;;; Plain-text display
 
+(defun notmuch-custom--decode-unlabeled-chinese-text
+    (original msg part process-crypto &optional cache)
+  "Recover unlabeled GB18030 plain text, regardless of sender.
+Only retry when ORIGINAL returns replacement characters or raw bytes.
+Preserve valid UTF-8.  Otherwise accept GB18030 only when it decodes
+losslessly and contains Chinese characters.  Charset detection is
+heuristic; explicitly labeled parts are always left alone."
+  (let ((text (funcall original msg part process-crypto cache)))
+    (if (and (equal (plist-get part :content-type) "text/plain")
+             (not (plist-get part :content-charset))
+             (string-match-p "[\ufffd\x3fff80-\x3fffff]" text))
+        (let* ((raw (notmuch-get-bodypart-binary msg part process-crypto cache))
+               (utf8 (decode-coding-string raw 'utf-8-unix))
+               (decoded (decode-coding-string raw 'gb18030-unix)))
+          (cond
+           ((and (not (string-match-p "[\x3fff80-\x3fffff]" utf8))
+                 (equal raw (encode-coding-string utf8 'utf-8-unix)))
+            utf8)
+           ((and (not (string-match-p "[\ufffd\x3fff80-\x3fffff]" decoded))
+                 (string-match-p
+                  "[\u3400-\u4dbf\u4e00-\u9fff\U00020000-\U000323af]" decoded)
+                 (equal raw (encode-coding-string decoded 'gb18030-unix)))
+            decoded)
+           (t text)))
+      text)))
+
+(defun notmuch-custom--normalize-crlf (start end &optional bare-cr)
+  "Normalize CRLF to LF between START and END.
+BARE-CR controls lone carriage returns: `keep' preserves them, `remove'
+deletes them, and nil converts them to LF.  Respect the current narrowing."
+  (save-excursion
+    (save-restriction
+      (narrow-to-region start end)
+      (goto-char (point-min))
+      (while (re-search-forward "\r\n?" nil t)
+        (cond
+         ((or (= (length (match-string 0)) 2) (null bare-cr))
+          (replace-match "\n" t t))
+         ((eq bare-cr 'remove) (replace-match "" t t)))))))
+
+(defun notmuch-custom-normalize-plain-text-newlines (_msg _depth)
+  "Normalize line endings in the narrowed display, leaving stored mail intact."
+  (notmuch-custom--normalize-crlf (point-min) (point-max)))
+
 (defun notmuch-custom-decode-plain-text-entities (_msg _depth)
   "Decode stray HTML entities in the narrowed plain-text display.
 Decode once, preserving line breaks, literal tags, and unknown entities.
@@ -1249,9 +1293,8 @@ ORIGINAL-FUNCTION, FORWARD-BUFFER, and DIGEST are the arguments used by
               (let ((destination (current-buffer)))
                 (with-temp-buffer
                   (insert-buffer-substring forward-buffer)
-                  (goto-char (point-min))
-                  (while (search-forward "\r\n" nil t)
-                    (replace-match "\n" t t))
+                  (notmuch-custom--normalize-crlf
+                   (point-min) (point-max) 'keep)
                   (let ((normalized (current-buffer)))
                     (with-current-buffer destination
                       (funcall original-function normalized digest)))))
@@ -1271,15 +1314,11 @@ byte intact because their embedded message may contain signed or binary data."
       (save-excursion
         (save-restriction
           (widen)
-          (goto-char (point-min))
-          (while (search-forward "\r\n" nil t)
-            (replace-match "\n" t t))
           ;; Header unfolding can leave a bare carriage return after the
           ;; newline has already been removed.  It is displayed as `^M', most
           ;; noticeably in the generated Subject header.
-          (goto-char (point-min))
-          (while (search-forward "\r" nil t)
-            (replace-match "" t t))))
+          (notmuch-custom--normalize-crlf
+           (point-min) (point-max) 'remove)))
       (set-buffer-modified-p modified))))
 
 ;;; Thunderbird-compatible IMAP reply and forward flags
@@ -1828,12 +1867,21 @@ Mirror IMAP stars first so the refreshed buffers display them."
 ;;;###autoload
 (defun notmuch-custom-setup ()
   "Enable the local Notmuch enhancements defined in this library."
+  ;; Replace the former sender-specific advice if it is still loaded.
+  (advice-remove 'notmuch-get-bodypart-text
+                 'notmuch-custom--decode-pku-plain-text)
+  (unless (advice-member-p #'notmuch-custom--decode-unlabeled-chinese-text
+                           'notmuch-get-bodypart-text)
+    (advice-add 'notmuch-get-bodypart-text :around
+                #'notmuch-custom--decode-unlabeled-chinese-text))
   (unless (advice-member-p #'notmuch-custom--render-simple-html
                            'notmuch-show-insert-part-text/html)
     (advice-add 'notmuch-show-insert-part-text/html :around
                 #'notmuch-custom--render-simple-html))
   (add-hook 'notmuch-show-insert-text/plain-hook
             #'notmuch-custom-decode-plain-text-entities)
+  (add-hook 'notmuch-show-insert-text/plain-hook
+            #'notmuch-custom-normalize-plain-text-newlines)
   (unless (advice-member-p #'notmuch-custom--poll-with-senders 'notmuch-poll)
     (advice-add 'notmuch-poll :around #'notmuch-custom--poll-with-senders))
   (unless (advice-member-p
