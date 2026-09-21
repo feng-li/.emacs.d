@@ -28,7 +28,8 @@
 ;; current completion prefix, so candidates such as "sha256" remain typeable.
 ;; Digits are also always inserted after an all-numeric prefix, allowing an
 ;; arbitrary number to be typed even when it is not among the candidates.  The
-;; same distinction is applied to incremental Company searches.
+;; same distinction is applied to incremental Company searches.  Keys without
+;; a corresponding candidate row are inserted normally as well.
 ;;
 ;; Enable the behavior globally with:
 ;;
@@ -139,14 +140,15 @@ character event."
 (defun company-numbered-selection-select-or-insert ()
   "Select the row denoted by the pressed key, or insert that key.
 Insert the key when doing so can still match a Company candidate, or when it
-continues an all-numeric prefix.  Otherwise, complete the corresponding visible
-tooltip row."
+continues an all-numeric prefix, or when the corresponding tooltip row has no
+candidate.  Otherwise, complete the corresponding visible tooltip row."
   (interactive)
   (let* ((key (company-numbered-selection--event-key))
          (row (seq-position company-numbered-selection-keys key #'equal)))
     (unless row
       (user-error "Key %s is not configured for numbered selection" key))
-    (if (company-numbered-selection--can-insert-p key)
+    (if (or (company-numbered-selection--can-insert-p key)
+            (null (nth (+ row company-tooltip-offset) company-candidates)))
         (if (bound-and-true-p company-search-mode)
             (company-search-printing-char)
           (self-insert-command 1))
