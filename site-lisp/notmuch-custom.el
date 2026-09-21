@@ -1792,6 +1792,14 @@ recipient has been configured."
   (notmuch-call-notmuch-sexp
    "search" "--format=sexp" "--output=messages" "tag:inbox"))
 
+(defvar notmuch-custom--sync-notification nil
+  "New-mail notification collected by the background worker.")
+
+(defconst notmuch-custom--source-file
+  (expand-file-name "notmuch-custom.el"
+                    (file-name-directory (or load-file-name buffer-file-name)))
+  "Source loaded by the background worker, even if bytecode is outdated.")
+
 (defun notmuch-custom--poll-with-senders (poll &rest args)
   "Call POLL with ARGS and announce senders of newly arrived inbox mail."
   (let ((before (condition-case nil
@@ -1824,30 +1832,135 @@ recipient has been configured."
                                 (or (plist-get address :address)
                                     "Unknown sender")))))
                          addresses)))
-                  (message "New mail from %s"
-                           (if senders (string-join senders ", ")
-                             "Unknown sender")))))
+                  (setq notmuch-custom--sync-notification
+                        (format "New mail from %s"
+                                (if senders (string-join senders ", ")
+                                  "Unknown sender")))
+                  (message "%s" notmuch-custom--sync-notification))))
           (error
            (message "Mail fetched; could not read new senders: %s"
                     (error-message-string error-data))))))))
 
+(defvar notmuch-custom--sync-process nil
+  "Current background sync process, or nil.")
+
+(defun notmuch-custom--sync-worker ()
+  "Index mail and mirror stars in a separate batch Emacs.
+Return a status plist; star-sync failure does not discard successful indexing."
+  (let (notmuch-custom--sync-notification star-error)
+    (condition-case error-data
+        (progn
+          (notmuch-custom--poll-with-senders #'notmuch-poll)
+          (when notmuch-custom-imap-starred-sync
+            (condition-case sync-error
+                (notmuch-custom-sync-imap-starred)
+              (error (setq star-error (error-message-string sync-error)))))
+          (list :ok t :notification notmuch-custom--sync-notification
+                :star-error star-error))
+      (error (list :error (error-message-string error-data))))))
+
+(defun notmuch-custom--sync-worker-form ()
+  "Build the worker's initialization form using current mail settings.
+Send this form through a pipe, never through command-line arguments or files.
+The worker loads only mail dependencies, not the interactive Emacs init file."
+  (let ((variables
+         '(notmuch-command notmuch-poll-script
+           notmuch-custom-imap-starred-sync
+           notmuch-custom-imap-post-send-accounts
+           notmuch-custom-imap-post-send-timeout
+           auth-sources epg-pinentry-mode plstore-encrypt-to oauth2-token-file
+           smtpmail-smtp-user
+           gnutls-verify-error gnutls-trustfiles network-security-level))
+        settings)
+    (dolist (variable variables)
+      (when (boundp variable)
+        (setq settings
+              (append settings (list variable (list 'quote (symbol-value variable)))))))
+    `(condition-case error-data
+         (progn
+           (setq load-path ',load-path
+                 exec-path ',exec-path
+                 user-emacs-directory ,user-emacs-directory
+                 load-prefer-newer t)
+           (load ,notmuch-custom--source-file nil t t)
+           ,(when (bound-and-true-p auth-source-xoauth2-plugin-mode)
+              '(progn (require 'auth-source-xoauth2-plugin)
+                      (auth-source-xoauth2-plugin-mode 1)
+                      ;; A timer must not launch a browser for a new login.
+                      (advice-add 'oauth2-auth :override
+                                  (lambda (&rest _)
+                                    (error "OAuth login required; authenticate interactively first")))))
+           (setq ,@settings)
+           (let ((result (notmuch-custom--sync-worker)))
+             (princ "\nNOTMUCH-SYNC-RESULT ")
+             (prin1 result)))
+       (error
+        (princ "\nNOTMUCH-SYNC-RESULT ")
+        (prin1 (list :error (error-message-string error-data)))))))
+
+(defun notmuch-custom--sync-finished (process _event)
+  "Refresh mail buffers when background PROCESS finishes."
+  (when (and (memq (process-status process) '(exit signal))
+             (eq process notmuch-custom--sync-process))
+    (setq notmuch-custom--sync-process nil)
+    (condition-case error-data
+        (let ((result
+               (with-current-buffer (process-buffer process)
+                 (save-excursion
+                   (goto-char (point-max))
+                   (unless (and (= (process-exit-status process) 0)
+                                (re-search-backward "^NOTMUCH-SYNC-RESULT " nil t))
+                     (error "Worker exited unsuccessfully; see *notmuch-sync*"))
+                   (goto-char (match-end 0))
+                   (read (current-buffer))))))
+          (unless (plist-get result :ok)
+            (error "%s" (or (plist-get result :error) "Invalid sync result")))
+          (notmuch-refresh-all-buffers)
+          (message "%s%s"
+                   (or (plist-get result :notification) "Notmuch sync complete")
+                   (if-let* ((failure (plist-get result :star-error)))
+                       (format "; IMAP stars failed: %s" failure)
+                     "")))
+      (error (message "Notmuch sync failed: %s" (error-message-string error-data))))))
+
 (defun notmuch-custom-poll-and-refresh ()
-  "Index new mail and refresh all open Notmuch buffers.
-Mirror IMAP stars first so the refreshed buffers display them."
+  "Sync mail in the background, then refresh all open Notmuch buffers.
+Indexing, new-sender lookup, and IMAP star synchronization run in a separate
+Emacs process.  Repeated requests share the running job.  Diagnostics remain
+in the `*notmuch-sync*' buffer."
   (interactive)
-  (condition-case error-data
+  (if (and notmuch-custom--sync-process
+           (process-live-p notmuch-custom--sync-process))
       (progn
-        (notmuch-poll)
-        (when notmuch-custom-imap-starred-sync
-          (condition-case sync-error
-              (notmuch-custom-sync-imap-starred)
-            (error
-             (message "IMAP starred sync failed: %s"
-                      (error-message-string sync-error)))))
-        (notmuch-refresh-all-buffers))
-    (error
-     (message "Automatic Notmuch refresh failed: %s"
-              (error-message-string error-data)))))
+        (when (called-interactively-p 'interactive)
+          (message "Notmuch sync is already running"))
+        notmuch-custom--sync-process)
+    (let ((buffer (get-buffer-create "*notmuch-sync*"))
+          (form (notmuch-custom--sync-worker-form)))
+      (with-current-buffer buffer
+        (let ((inhibit-read-only t)) (erase-buffer)))
+      (condition-case error-data
+          (progn
+            (setq notmuch-custom--sync-process
+                  (make-process
+                   :name "notmuch-sync" :buffer buffer
+                   :command (list (expand-file-name invocation-name invocation-directory)
+                                  "-Q" "--batch" "--eval" "(eval (read t) t)")
+                   :connection-type 'pipe :coding 'utf-8-unix :noquery t
+                   :sentinel #'notmuch-custom--sync-finished))
+            (let ((print-length nil) (print-level nil)
+                  (print-escape-newlines t))
+              (process-send-string notmuch-custom--sync-process
+                                   (concat (prin1-to-string form) "\n")))
+            (process-send-eof notmuch-custom--sync-process)
+            (message "Notmuch sync started in background")
+            notmuch-custom--sync-process)
+        (error
+         (when (and notmuch-custom--sync-process
+                    (process-live-p notmuch-custom--sync-process))
+           (delete-process notmuch-custom--sync-process))
+         (setq notmuch-custom--sync-process nil)
+         (signal (car error-data) (cdr error-data)))))))
 
 (defun notmuch-custom-start-auto-refresh ()
   "Start automatic Notmuch indexing and refreshing."
@@ -1882,8 +1995,12 @@ Mirror IMAP stars first so the refreshed buffers display them."
             #'notmuch-custom-decode-plain-text-entities)
   (add-hook 'notmuch-show-insert-text/plain-hook
             #'notmuch-custom-normalize-plain-text-newlines)
-  (unless (advice-member-p #'notmuch-custom--poll-with-senders 'notmuch-poll)
-    (advice-add 'notmuch-poll :around #'notmuch-custom--poll-with-senders))
+  (advice-remove 'notmuch-poll #'notmuch-custom--poll-with-senders)
+  ;; Override the combined command too: its normal implementation refreshes
+  ;; immediately after polling, before an asynchronous job could finish.
+  (dolist (command '(notmuch-poll notmuch-poll-and-refresh-this-buffer))
+    (unless (advice-member-p #'notmuch-custom-poll-and-refresh command)
+      (advice-add command :override #'notmuch-custom-poll-and-refresh)))
   (unless (advice-member-p
            #'notmuch-custom--format-sent-folder-recipients
            'notmuch-tree-format-field)
