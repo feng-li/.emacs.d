@@ -42,6 +42,8 @@
 (require 'notmuch-show)
 (require 'subr-x)
 (require 'seq)
+;; Declare SHR's options before compiling the dynamic HTML-rendering bindings.
+(require 'shr)
 (require 'utf7)
 
 (defgroup notmuch-custom nil
@@ -567,7 +569,6 @@ ORIGINAL-FUNCTION applies Vale's other exclusion rules in BUFFER."
   "Call RENDER with ARGUMENTS using theme colors and the default font.
 Scope these settings to Notmuch's HTML rendering.  Links, emphasis, and
 tables are still rendered by SHR."
-  (require 'shr)
   (let ((shr-use-colors nil)
         (shr-use-fonts nil))
     (apply render arguments)))
