@@ -5,6 +5,10 @@ abbrev_defs
 *.eld
 oauth2.plstore*
 *-test.el
+!site-lisp/tests/
+site-lisp/tests/*
+!site-lisp/tests/test_notmuch_msf.py
+!site-lisp/tests/notmuch-msf-tests.el
 *.desktop
 *.lock
 places

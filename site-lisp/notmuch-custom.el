@@ -42,9 +42,15 @@
 (require 'notmuch-show)
 (require 'subr-x)
 (require 'seq)
+(require 'json)
 ;; Declare SHR's options before compiling the dynamic HTML-rendering bindings.
 (require 'shr)
 (require 'utf7)
+
+(defconst notmuch-custom--source-file
+  (expand-file-name "notmuch-custom.el"
+                    (file-name-directory (or load-file-name buffer-file-name)))
+  "Source loaded by the background worker, even if bytecode is outdated.")
 
 (defgroup notmuch-custom nil
   "Local enhancements for Notmuch."
@@ -67,8 +73,9 @@ Rebuild `notmuch-saved-searches' after changing this option."
 
 (defcustom notmuch-custom-global-starred-search t
   "When non-nil, add an \"All Starred\" saved search across accounts.
-Server stars carry the `imap-starred' tag, populated directly from
-IMAP by `notmuch-custom-sync-imap-starred'.  Rebuild
+Stars carry the `imap-starred' tag, populated manually from IMAP by
+`notmuch-custom-sync-imap-starred', or from Thunderbird's cached summaries
+by `notmuch-custom-sync-thunderbird-starred'.  Rebuild
 `notmuch-saved-searches' after changing this option."
   :type 'boolean
   :group 'notmuch-custom)
@@ -1669,13 +1676,11 @@ mail submission into a send failure."
 
 ;;; IMAP starred synchronization
 
-(defcustom notmuch-custom-imap-starred-sync t
-  "When non-nil, mirror server stars during each refresh.
-Use `notmuch-custom-imap-post-send-accounts' and scan the mailboxes
-represented in the local Notmuch index.  Server stars use the separate
-`imap-starred' tag; local `flagged' tags are never changed."
-  :type 'boolean
-  :group 'notmuch-custom)
+(defvar notmuch-custom-imap-starred-sync nil
+  "Obsolete option; IMAP stars are now synchronized only on manual request.
+Use `notmuch-custom-sync-imap-starred' to start a background star sync.")
+(make-obsolete-variable 'notmuch-custom-imap-starred-sync
+                        "Use M-x notmuch-custom-sync-imap-starred instead." "2026-09-26")
 
 (defun notmuch-custom--imap-starred-account-ids (account folders)
   "Read starred Message-IDs from ACCOUNT's FOLDERS without changing mail.
@@ -1713,41 +1718,126 @@ Signal an error on an incomplete scan so existing tags are preserved."
           (kill-buffer buffer))))
     ids))
 
-(defun notmuch-custom-sync-imap-starred ()
+(defun notmuch-custom-sync-imap-starred (&optional background)
   "Mirror server stars into Notmuch's `imap-starred' tag.
 Scan indexed folders of `notmuch-custom-imap-post-send-accounts'.
 Only update tags after every mailbox scan succeeds.  With no configured
 accounts or indexed folders, leave existing tags alone.  The tag is
-owned by this sync; ordinary `flagged' tags are left untouched."
-  (interactive)
-  (when notmuch-custom-imap-post-send-accounts
-    (let ((folders (make-hash-table :test #'equal))
-          remote-ids)
-      (dolist (file (notmuch--process-lines
-                     notmuch-command "search" "--output=files" "*"))
-        (when-let* ((account (notmuch-custom--imap-account-for-file file))
-                    (folder (notmuch-custom--imap-folder-for-file file account)))
-          (cl-pushnew folder (gethash account folders) :test #'equal)))
-      (when (> (hash-table-count folders) 0)
-        ;; Finish all network reads before making any local tag changes.
-        (maphash
-         (lambda (account mailboxes)
-           (setq remote-ids
-                 (nconc (notmuch-custom--imap-starred-account-ids account mailboxes)
-                        remote-ids)))
-         folders)
-        (let* ((local-ids (notmuch-custom--imap-message-ids "tag:imap-starred"))
-               (remote-ids (delete-dups remote-ids))
-               (add-ids (cl-set-difference remote-ids local-ids :test #'equal))
-               (remove-ids (cl-set-difference local-ids remote-ids :test #'equal)))
-          ;; Bound command sizes even for accounts with many stars.
-          (dolist (change (list (cons "+imap-starred" add-ids)
-                                (cons "-imap-starred" remove-ids)))
-            (dolist (batch (seq-partition (cdr change) 100))
-              (notmuch-tag (mapconcat #'notmuch-id-to-query batch " or ")
-                           (list (car change)) 'omit)))
-          (when (called-interactively-p 'any)
-            (message "IMAP starred sync complete")))))))
+owned by this sync; ordinary `flagged' tags are left untouched.
+Interactively, or with BACKGROUND non-nil, run asynchronously and refresh
+mail buffers when done.  Lisp callers without BACKGROUND run synchronously."
+  (interactive (list t))
+  (if background
+      (notmuch-custom--start-sync t)
+    (when notmuch-custom-imap-post-send-accounts
+      (let ((folders (make-hash-table :test #'equal))
+            remote-ids)
+        (dolist (file (notmuch--process-lines
+                       notmuch-command "search" "--output=files" "*"))
+          (when-let* ((account (notmuch-custom--imap-account-for-file file))
+                      (folder (notmuch-custom--imap-folder-for-file file account)))
+            (cl-pushnew folder (gethash account folders) :test #'equal)))
+        (when (> (hash-table-count folders) 0)
+          ;; Finish all network reads before making any local tag changes.
+          (maphash
+           (lambda (account mailboxes)
+             (setq remote-ids
+                   (nconc (notmuch-custom--imap-starred-account-ids account mailboxes)
+                          remote-ids)))
+           folders)
+          (let* ((local-ids (notmuch-custom--imap-message-ids "tag:imap-starred"))
+                 (remote-ids (delete-dups remote-ids))
+                 (add-ids (cl-set-difference remote-ids local-ids :test #'equal))
+                 (remove-ids (cl-set-difference local-ids remote-ids :test #'equal)))
+            ;; Bound command sizes even for accounts with many stars.
+            (dolist (change (list (cons "+imap-starred" add-ids)
+                                  (cons "-imap-starred" remove-ids)))
+              (dolist (batch (seq-partition (cdr change) 100))
+                (notmuch-tag (mapconcat #'notmuch-id-to-query batch " or ")
+                             (list (car change)) 'omit)))
+            (when (called-interactively-p 'any)
+              (message "IMAP starred sync complete"))))))))
+
+;;; Thunderbird summary synchronization
+
+(defcustom notmuch-custom-msf-python-command "python3"
+  "Python interpreter for the read-only Thunderbird summary reader.
+The interpreter must provide the `tqdm' module for scan progress."
+  :type 'string
+  :group 'notmuch-custom)
+
+(defun notmuch-custom--msf-files ()
+  "Return summaries for indexed Maildir folders in configured accounts.
+Keep Thunderbird's physical .sbd paths: do not convert them to IMAP names.
+Missing summaries are included so the reader fails instead of silently
+interpreting an incomplete scan as an empty set of stars."
+  (let (summaries)
+    (dolist (file (notmuch-call-notmuch-sexp
+                  "search" "--format=sexp" "--output=files" "*"))
+      (when (notmuch-custom--imap-account-for-file file)
+        (let* ((directory (directory-file-name (file-name-directory file)))
+               (folder (directory-file-name (file-name-directory directory))))
+          (when (member (file-name-nondirectory directory) '("cur" "new"))
+            (cl-pushnew (concat folder ".msf") summaries :test #'equal)))))
+    (sort summaries #'string-lessp)))
+
+(defun notmuch-custom--read-msf-files (files)
+  "Read FILES as one validated snapshot using the Python Mork reader.
+Return a plist of known starred and unstarred Message-IDs.  No tags change."
+  (let ((output (generate-new-buffer " *notmuch-msf-result*"))
+        (script (expand-file-name "notmuch-msf.py"
+                                  (file-name-directory notmuch-custom--source-file))))
+    (unwind-protect
+        (with-temp-buffer
+          (insert (json-encode files))
+          (let ((coding-system-for-write 'utf-8-unix)
+                (coding-system-for-read 'utf-8-unix))
+            ;; This runs inside the background Emacs.  Forward progress and
+            ;; parser errors to its stderr, visible in *notmuch-sync*.
+            (unless (eq 0 (call-process-region
+                           (point-min) (point-max) notmuch-custom-msf-python-command
+                           nil (list output "/dev/stderr") nil script))
+              (error "Thunderbird summary scan failed; see *notmuch-sync*")))
+          (with-current-buffer output
+            (goto-char (point-min))
+            (let ((json-object-type 'plist)
+                  (json-array-type 'list))
+              (json-read))))
+      (kill-buffer output))))
+
+(defun notmuch-custom-sync-thunderbird-starred (&optional background)
+  "Mirror Thunderbird's cached stars into `imap-starred'.
+Use .msf files beside indexed Maildir folders of configured accounts.
+Interactively, or with BACKGROUND non-nil, run in the background.
+No IMAP connection or OAuth login is needed.  Thunderbird's cached state
+may lag the server; use `notmuch-custom-sync-imap-starred' for server state.
+
+Only clear stars for Message-IDs explicitly present and unstarred in the
+validated summaries.  Missing/deleted rows do not prove a message is
+unstarred.  Any starred copy wins across folders.  Local `flagged' tags
+and tags for messages outside the snapshot are left alone."
+  (interactive (list t))
+  (if background
+      (notmuch-custom--start-sync 'msf)
+    (let ((files (notmuch-custom--msf-files)))
+      (unless files
+        (user-error "No indexed Maildir folders found for the configured accounts"))
+      ;; Validate every summary before making any tag changes.
+      (let* ((snapshot (notmuch-custom--read-msf-files files))
+             (starred (plist-get snapshot :starred))
+             (unstarred (plist-get snapshot :unstarred))
+             (local (notmuch-custom--imap-message-ids "tag:imap-starred"))
+             (add (cl-set-difference starred local :test #'equal))
+             (remove (cl-set-difference
+                      (cl-intersection unstarred local :test #'equal)
+                      starred :test #'equal)))
+        (dolist (change (list (cons "+imap-starred" add)
+                             (cons "-imap-starred" remove)))
+          (dolist (batch (seq-partition (cdr change) 100))
+            (notmuch-tag (mapconcat #'notmuch-id-to-query batch " or ")
+                         (list (car change)) 'omit)))
+        (format "Thunderbird star sync complete: %d folders, %d added, %d removed"
+                (length files) (length add) (length remove))))))
 
 ;;; OAuth2 token-store migration
 
@@ -1796,11 +1886,6 @@ recipient has been configured."
 (defvar notmuch-custom--sync-notification nil
   "New-mail notification collected by the background worker.")
 
-(defconst notmuch-custom--source-file
-  (expand-file-name "notmuch-custom.el"
-                    (file-name-directory (or load-file-name buffer-file-name)))
-  "Source loaded by the background worker, even if bytecode is outdated.")
-
 (defun notmuch-custom--poll-with-senders (poll &rest args)
   "Call POLL with ARGS and announce senders of newly arrived inbox mail."
   (let ((before (condition-case nil
@@ -1845,30 +1930,48 @@ recipient has been configured."
 (defvar notmuch-custom--sync-process nil
   "Current background sync process, or nil.")
 
-(defun notmuch-custom--sync-worker ()
-  "Index mail and mirror stars in a separate batch Emacs.
-Return a status plist; star-sync failure does not discard successful indexing."
+(defvar notmuch-custom--sync-queue nil
+  "Manual sync modes queued behind the current job, without duplicates.")
+
+(defun notmuch-custom--sync-worker (&optional stars-only)
+  "Index mail, or synchronize stars when STARS-ONLY is non-nil.
+STARS-ONLY is t for IMAP or `msf' for Thunderbird summaries.
+Automatic indexing also reads local summaries, without contacting IMAP.
+Return a status plist; local star failures do not discard successful indexing."
   (let (notmuch-custom--sync-notification star-error)
     (condition-case error-data
         (progn
-          (notmuch-custom--poll-with-senders #'notmuch-poll)
-          (when notmuch-custom-imap-starred-sync
-            (condition-case sync-error
-                (notmuch-custom-sync-imap-starred)
-              (error (setq star-error (error-message-string sync-error)))))
+          (pcase stars-only
+            ('msf
+             (setq notmuch-custom--sync-notification
+                   (notmuch-custom-sync-thunderbird-starred)))
+            ('t
+             (notmuch-custom-sync-imap-starred)
+             (setq notmuch-custom--sync-notification "IMAP starred sync complete"))
+            ('nil
+             (notmuch-custom--poll-with-senders #'notmuch-poll)
+             (when notmuch-custom-imap-post-send-accounts
+               (condition-case sync-error
+                   (let ((summary (notmuch-custom-sync-thunderbird-starred)))
+                     (setq notmuch-custom--sync-notification
+                           (if notmuch-custom--sync-notification
+                               (concat notmuch-custom--sync-notification "; " summary)
+                             summary)))
+                 (error (setq star-error (error-message-string sync-error))))))
+            (_ (error "Unknown Notmuch sync mode")))
           (list :ok t :notification notmuch-custom--sync-notification
                 :star-error star-error))
       (error (list :error (error-message-string error-data))))))
 
-(defun notmuch-custom--sync-worker-form ()
-  "Build the worker's initialization form using current mail settings.
+(defun notmuch-custom--sync-worker-form (&optional stars-only)
+  "Build the worker's initialization form for indexing or STARS-ONLY.
 Send this form through a pipe, never through command-line arguments or files.
 The worker loads only mail dependencies, not the interactive Emacs init file."
   (let ((variables
          '(notmuch-command notmuch-poll-script
-           notmuch-custom-imap-starred-sync
            notmuch-custom-imap-post-send-accounts
            notmuch-custom-imap-post-send-timeout
+           notmuch-custom-msf-python-command
            auth-sources epg-pinentry-mode plstore-encrypt-to oauth2-token-file
            smtpmail-smtp-user
            gnutls-verify-error gnutls-trustfiles network-security-level))
@@ -1884,7 +1987,7 @@ The worker loads only mail dependencies, not the interactive Emacs init file."
                  user-emacs-directory ,user-emacs-directory
                  load-prefer-newer t)
            (load ,notmuch-custom--source-file nil t t)
-           ,(when (bound-and-true-p auth-source-xoauth2-plugin-mode)
+           ,(when (and (eq stars-only t) (bound-and-true-p auth-source-xoauth2-plugin-mode))
               '(progn (require 'auth-source-xoauth2-plugin)
                       (auth-source-xoauth2-plugin-mode 1)
                       ;; A timer must not launch a browser for a new login.
@@ -1892,7 +1995,7 @@ The worker loads only mail dependencies, not the interactive Emacs init file."
                                   (lambda (&rest _)
                                     (error "OAuth login required; authenticate interactively first")))))
            (setq ,@settings)
-           (let ((result (notmuch-custom--sync-worker)))
+           (let ((result (notmuch-custom--sync-worker ',stars-only)))
              (princ "\nNOTMUCH-SYNC-RESULT ")
              (prin1 result)))
        (error
@@ -1920,24 +2023,38 @@ The worker loads only mail dependencies, not the interactive Emacs init file."
           (message "%s%s"
                    (or (plist-get result :notification) "Notmuch sync complete")
                    (if-let* ((failure (plist-get result :star-error)))
-                       (format "; IMAP stars failed: %s" failure)
+                       (format "; star sync failed: %s" failure)
                      "")))
-      (error (message "Notmuch sync failed: %s" (error-message-string error-data))))))
+      (error (message "Notmuch sync failed: %s" (error-message-string error-data))))
+    (when notmuch-custom--sync-queue
+      (notmuch-custom--start-sync (pop notmuch-custom--sync-queue)))))
 
 (defun notmuch-custom-poll-and-refresh ()
-  "Sync mail in the background, then refresh all open Notmuch buffers.
-Indexing, new-sender lookup, and IMAP star synchronization run in a separate
-Emacs process.  Repeated requests share the running job.  Diagnostics remain
-in the `*notmuch-sync*' buffer."
+  "Index new mail and sync Thunderbird stars in the background, then refresh.
+Preserve new-sender notifications.  A local-summary failure leaves existing
+stars intact and still refreshes indexed mail.  IMAP sync remains manual via
+`notmuch-custom-sync-imap-starred'."
   (interactive)
+  (notmuch-custom--start-sync))
+
+(defun notmuch-custom--start-sync (&optional stars-only)
+  "Start indexing, IMAP stars (STARS-ONLY t), or local stars (STARS-ONLY `msf').
+Queue a different manual star request if a job is running; never overlap jobs."
   (if (and notmuch-custom--sync-process
            (process-live-p notmuch-custom--sync-process))
       (progn
-        (when (called-interactively-p 'interactive)
+        (if (and stars-only
+                 (not (eq stars-only
+                          (process-get notmuch-custom--sync-process 'stars-only))))
+            (progn
+              (unless (memq stars-only notmuch-custom--sync-queue)
+                (setq notmuch-custom--sync-queue
+                      (append notmuch-custom--sync-queue (list stars-only))))
+              (message "Star sync queued after the current job"))
           (message "Notmuch sync is already running"))
         notmuch-custom--sync-process)
     (let ((buffer (get-buffer-create "*notmuch-sync*"))
-          (form (notmuch-custom--sync-worker-form)))
+          (form (notmuch-custom--sync-worker-form stars-only)))
       (with-current-buffer buffer
         (let ((inhibit-read-only t)) (erase-buffer)))
       (condition-case error-data
@@ -1949,12 +2066,17 @@ in the `*notmuch-sync*' buffer."
                                   "-Q" "--batch" "--eval" "(eval (read t) t)")
                    :connection-type 'pipe :coding 'utf-8-unix :noquery t
                    :sentinel #'notmuch-custom--sync-finished))
+            (process-put notmuch-custom--sync-process 'stars-only stars-only)
             (let ((print-length nil) (print-level nil)
                   (print-escape-newlines t))
               (process-send-string notmuch-custom--sync-process
                                    (concat (prin1-to-string form) "\n")))
             (process-send-eof notmuch-custom--sync-process)
-            (message "Notmuch sync started in background")
+            (message "%s started in background"
+                     (pcase stars-only
+                       ('msf "Thunderbird star sync")
+                       ('t "IMAP star sync")
+                       (_ "Notmuch indexing")))
             notmuch-custom--sync-process)
         (error
          (when (and notmuch-custom--sync-process
