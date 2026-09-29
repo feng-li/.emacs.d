@@ -580,30 +580,38 @@ tables are still rendered by SHR."
         (shr-use-fonts nil))
     (apply render arguments)))
 
-;;; Plain-text display
+;;; Text decoding
 
 (defun notmuch-custom--decode-unlabeled-chinese-text
     (original msg part process-crypto &optional cache)
-  "Recover unlabeled GB18030 plain text, regardless of sender.
+  "Recover unlabeled Chinese text and GBK mislabeled as GB2312.
 Only retry when ORIGINAL returns replacement characters or raw bytes.
-Preserve valid UTF-8.  Otherwise accept GB18030 only when it decodes
-losslessly and contains Chinese characters.  Charset detection is
-heuristic; explicitly labeled parts are always left alone."
-  (let ((text (funcall original msg part process-crypto cache)))
-    (if (and (equal (plist-get part :content-type) "text/plain")
-             (not (plist-get part :content-charset))
+Preserve valid UTF-8 in unlabeled plain text.  Accept the Chinese
+fallback only when it decodes losslessly and contains Chinese characters.
+For GB2312-labeled plain text or HTML, use its GBK superset; leave
+all other explicit charsets alone."
+  (let* ((text (funcall original msg part process-crypto cache))
+         (charset (plist-get part :content-charset))
+         (gb2312 (and charset (equal (downcase charset) "gb2312")))
+         (coding (if gb2312 'gbk-unix 'gb18030-unix)))
+    (if (and (or (and (equal (plist-get part :content-type) "text/plain")
+                       (not charset))
+                  (and gb2312
+                       (member (plist-get part :content-type)
+                               '("text/plain" "text/html"))))
              (string-match-p "[\ufffd\x3fff80-\x3fffff]" text))
         (let* ((raw (notmuch-get-bodypart-binary msg part process-crypto cache))
                (utf8 (decode-coding-string raw 'utf-8-unix))
-               (decoded (decode-coding-string raw 'gb18030-unix)))
+               (decoded (decode-coding-string raw coding)))
           (cond
-           ((and (not (string-match-p "[\x3fff80-\x3fffff]" utf8))
+           ((and (not charset)
+                 (not (string-match-p "[\x3fff80-\x3fffff]" utf8))
                  (equal raw (encode-coding-string utf8 'utf-8-unix)))
             utf8)
            ((and (not (string-match-p "[\ufffd\x3fff80-\x3fffff]" decoded))
                  (string-match-p
                   "[\u3400-\u4dbf\u4e00-\u9fff\U00020000-\U000323af]" decoded)
-                 (equal raw (encode-coding-string decoded 'gb18030-unix)))
+                 (equal raw (encode-coding-string decoded coding)))
             decoded)
            (t text)))
       text)))
@@ -1113,8 +1121,47 @@ Set to nil to retain all quoted text.  Stored messages are not changed."
                  (integer :tag "Maximum depth"))
   :group 'notmuch-custom)
 
+(defun notmuch-custom--clean-omitted-attributions (start end)
+  "Clean quotation prefixes and empty attribution blocks between START and END.
+END must be a marker so deletions keep the region boundary accurate."
+  (goto-char start)
+  ;; Message mode can produce mixed prefixes such as `>> >'.
+  (while (re-search-forward "^[ \t]*\\(?:>[ \t]*\\)+" end t)
+    (let ((depth (cl-count ?> (match-string 0))))
+      (replace-match (concat (make-string depth ?>) " ") t t)))
+  (let* ((marker "[Older quoted text omitted]")
+         (marker-line (concat "^>+ " (regexp-quote marker) "[ \t]*$"))
+         ;; Only match a bounded, contiguous attribution with the same
+         ;; quote depth on each line, directly followed by an omission.
+         (attribution
+          (concat "^\\(>+\\) On [^\n]*"
+                  "\\(?:\n\\1 [^\n]*\\)\\{0,5\\}"
+                  "\\(?:wrote\\|writes\\):[ \t]*\n"
+                  "\\(?:>+[ \t]*\n\\)*"
+                  "\\(" marker-line "\\)"))
+         (case-fold-search nil))
+    (goto-char start)
+    (while (re-search-forward attribution end t)
+      (delete-region (match-beginning 0) (match-beginning 2))
+      ;; An outer attribution may now also introduce only omitted text.
+      (goto-char start))
+    (goto-char start)
+    (while (re-search-forward marker-line end t)
+      (forward-line 1)
+      (let ((after-marker (point)))
+        (while (and (< (point) end) (looking-at ">+[ \t]*$"))
+          (forward-line 1))
+        ;; A detached closing line can survive older, wrapped citations.
+        (when (and (< (point) end)
+                   (looking-at ">+ \\(?:wrote\\|writes\\):[ \t]*$"))
+          (forward-line 1)
+          (while (and (< (point) end) (looking-at ">+[ \t]*$"))
+            (forward-line 1))
+          (delete-region after-marker (min (point) end)))))))
+
 (defun notmuch-custom-truncate-cited-text ()
-  "Limit the freshly cited region between point and mark to the quote depth."
+  "Limit the freshly cited region to the quote depth, with one omission marker.
+Keep only the first marker, including markers inherited from older replies."
   (when (and (integerp notmuch-custom-reply-quote-depth)
              (> notmuch-custom-reply-quote-depth 0)
              (mark t))
@@ -1133,7 +1180,18 @@ Set to nil to retain all quoted text.  Stored messages are not changed."
                   (delete-region block-start (min (point) end))
                   (goto-char block-start)
                   (insert (make-string notmuch-custom-reply-quote-depth ?>)
-                          " [Older quoted text omitted]\n")))))
+                          " [Older quoted text omitted]\n"))))
+            (notmuch-custom--clean-omitted-attributions start end)
+            (goto-char start)
+            (let (seen)
+              (while (re-search-forward
+                      "^[ \t]*\\(?:>[ \t]*\\)+\\[Older quoted text omitted\\][ \t]*$"
+                      end t)
+                (if (not seen)
+                    (setq seen t)
+                  (beginning-of-line)
+                  (delete-region (point)
+                                 (min end (line-beginning-position 2)))))))
         (set-marker start nil)
         (set-marker end nil)))))
 

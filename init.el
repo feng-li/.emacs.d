@@ -397,6 +397,10 @@
   :config
 
   (require 'notmuch-custom)
+  ;; Omit the sender's standard -- signature block from reply quotations.
+  (setq notmuch-mua-cite-function
+        #'message-cite-original-without-signature)
+
   ;; After SMTP succeeds, mirror Notmuch's replied/forwarded action to the
   ;; original Office 365 message.  The OAuth token is the same scoped token
   ;; already stored for SMTP; it also includes IMAP.AccessAsUser.All.
