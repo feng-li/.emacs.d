@@ -1104,10 +1104,44 @@ This function follows `message-indent-citation' in
                    "")
                  sender))))))
 
+(defcustom notmuch-custom-reply-quote-depth 3
+  "Maximum quote depth retained in a newly composed reply.
+Depth is counted after adding the reply's own citation prefix.  Deeper
+blocks are replaced with an omission marker; later inline replies remain.
+Set to nil to retain all quoted text.  Stored messages are not changed."
+  :type '(choice (const :tag "Unlimited" nil)
+                 (integer :tag "Maximum depth"))
+  :group 'notmuch-custom)
+
+(defun notmuch-custom-truncate-cited-text ()
+  "Limit the freshly cited region between point and mark to the quote depth."
+  (when (and (integerp notmuch-custom-reply-quote-depth)
+             (> notmuch-custom-reply-quote-depth 0)
+             (mark t))
+    (let ((start (copy-marker (min (point) (mark t))))
+          (end (copy-marker (max (point) (mark t)) t)))
+      (unwind-protect
+          (save-excursion
+            (goto-char start)
+            (let ((regexp (format "^[ \t]*\\(?:>[ \t]*\\)\\{%d,\\}"
+                                  (1+ notmuch-custom-reply-quote-depth))))
+              (while (re-search-forward regexp end t)
+                (beginning-of-line)
+                (let ((block-start (point)))
+                  (while (and (< (point) end) (looking-at regexp))
+                    (forward-line 1))
+                  (delete-region block-start (min (point) end))
+                  (goto-char block-start)
+                  (insert (make-string notmuch-custom-reply-quote-depth ?>)
+                          " [Older quoted text omitted]\n")))))
+        (set-marker start nil)
+        (set-marker end nil)))))
+
 (defun notmuch-custom-message-fill-setup ()
   "Fill newly inserted Notmuch reply citations to the message width."
   (setq-local message-indent-citation-function
-              '(message-indent-citation notmuch-custom-fill-cited-text)))
+              '(message-indent-citation notmuch-custom-fill-cited-text
+                notmuch-custom-truncate-cited-text)))
 
 (defun notmuch-custom--forward-message-id (forward-buffer)
   "Return the bare Message-ID from raw FORWARD-BUFFER."
