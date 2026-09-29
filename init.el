@@ -478,7 +478,7 @@
 (global-set-key (kbd "<home>") 'beginning-of-buffer)
 (global-set-key (kbd "<end>") 'end-of-buffer)
 (global-set-key (kbd "<select>") 'end-of-buffer)
-(global-set-key (kbd "<f9> n") 'new-frame)
+(global-set-key (kbd "<f9> n") #'notmuch)
 (global-set-key (kbd "<f9> g") 'rgrep)
 (global-set-key (kbd "<f9> f") 'find-name-dired)
 (global-set-key (kbd "<f9> q") 'fill-region-as-paragraph)
@@ -1601,7 +1601,7 @@ intermediate and output files, as requested by the non-nil argument to
   (defun ess-code-style ()
     (local-set-key (kbd "<f9> *") (lambda () (interactive) (insert " %*% ")))
     (local-set-key (kbd "<f9> x") (lambda () (interactive) (insert " %x% ")))
-    (local-set-key (kbd "<f9> n") (lambda () (interactive) (insert " %in% "))))
+    (local-set-key (kbd "<f9> N") (lambda () (interactive) (insert " %in% "))))
   (add-hook 'ess-mode-hook #'ess-code-style)
   (add-hook 'inferior-ess-mode-hook #'ess-code-style))
 
