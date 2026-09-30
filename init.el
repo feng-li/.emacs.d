@@ -397,11 +397,6 @@
   :config
 
   (require 'notmuch-custom)
-  ;; Resolve this computer's Thunderbird profile before configuring accounts.
-  (condition-case error-data
-      (notmuch-custom-update-thunderbird-mail-root)
-    (error
-     (display-warning 'notmuch-custom (error-message-string error-data))))
   ;; Omit the sender's standard -- signature block from reply quotations.
   (setq notmuch-mua-cite-function
         #'message-cite-original-without-signature)
@@ -442,9 +437,9 @@
 
   ;; Do not save an additional local copy of sent messages.
   (setq notmuch-fcc-dirs nil
-        ;; Store postponed messages where Thunderbird's Local Folders can
-        ;; display them.  This path is relative to database.mail_root.
-        notmuch-draft-folder "Mail/Local Folders-maildir/Drafts")
+        ;; Resolve Thunderbird's local Drafts folder when saving; use Notmuch's
+        ;; drafts folder if this computer has no local Maildir Drafts yet.
+        notmuch-draft-folder "drafts")
 
   )
 

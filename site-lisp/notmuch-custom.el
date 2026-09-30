@@ -38,6 +38,7 @@
 (require 'notmuch)
 (require 'notmuch-address)
 (require 'notmuch-company)
+(require 'notmuch-draft)
 (require 'notmuch-message)
 (require 'notmuch-show)
 (require 'subr-x)
@@ -56,82 +57,59 @@
   "Local enhancements for Notmuch."
   :group 'notmuch)
 
-;;; Thunderbird profile discovery
+;;; Mail directories
 
 (defvar notmuch-custom--imap-mail-root nil
   "Cached Notmuch mail root for resolving account paths during file scans.
-Reset by profile updates and `notmuch-custom-setup'.")
+Reset by `notmuch-custom-setup'.")
 
-(defcustom notmuch-custom-thunderbird-profiles-file
-  "~/.thunderbird/profiles.ini"
-  "Thunderbird profile registry used to locate Notmuch's mail root."
-  :type 'file
-  :group 'notmuch-custom)
+(defvar notmuch-custom--imap-account-roots nil
+  "Cached automatic account directories, keyed by mail root and host.")
 
-(defun notmuch-custom-thunderbird-default-directory (&optional profiles-file)
-  "Return the default Thunderbird profile directory in PROFILES-FILE.
-Prefer installation-specific defaults over a Profile section's Default=1.
-Honor IsRelative for Profile paths.  Refuse missing or ambiguous defaults."
-  (let* ((file (expand-file-name
-                (or profiles-file notmuch-custom-thunderbird-profiles-file)))
-         (base (file-name-directory file))
-         (sections (make-hash-table :test #'equal))
-         section install-defaults profile-defaults)
-    (with-temp-buffer
-      (insert-file-contents file)
-      (dolist (line (split-string (buffer-string) "\n"))
-        (setq line (string-trim line))
-        (cond
-         ((string-match "\\`\\[\\([^]]+\\)\\]\\'" line)
-          (setq section (match-string 1 line)))
-         ((and section
-               (string-match "\\`\\([^=;#]+\\)=\\(.*\\)\\'" line))
-          (let ((key (string-trim (match-string 1 line)))
-                (value (string-trim (match-string 2 line))))
-            (puthash section
-                     (cons (cons key value) (gethash section sections))
-                     sections))))))
-    (maphash
-     (lambda (name values)
-       (cond
-        ((string-prefix-p "Install" name)
-         (when-let* ((path (cdr (assoc "Default" values)))
-                     ((not (string-empty-p path))))
-           (push (expand-file-name path base) install-defaults)))
-        ((and (string-match-p "\\`Profile[0-9]+\\'" name)
-              (equal (cdr (assoc "Default" values)) "1"))
-         (let ((path (cdr (assoc "Path" values)))
-               (relative (cdr (assoc "IsRelative" values))))
-           (unless (and path (not (string-empty-p path))
-                        (or (equal relative "1")
-                            (and (equal relative "0")
-                                 (file-name-absolute-p path))))
-             (user-error "Invalid Thunderbird profile path in %s" name))
-           (push (expand-file-name path base) profile-defaults)))))
-     sections)
-    (let ((defaults (delete-dups (or install-defaults profile-defaults))))
-      (unless (= (length defaults) 1)
-        (user-error "Expected one Thunderbird default in %s; found %d"
-                    file (length defaults)))
-      (let ((directory (car defaults)))
-        (unless (and (file-directory-p directory)
-                     (or (file-directory-p (expand-file-name "ImapMail" directory))
-                         (file-directory-p (expand-file-name "Mail" directory))))
-          (user-error "Thunderbird default has no mail directory: %s" directory))
-        directory))))
+(defun notmuch-custom--mail-profile-directories (mail-root)
+  "Return directories containing Imap, ImapMail or Mail beneath MAIL-ROOT.
+Support a profile itself as MAIL-ROOT, or profiles one directory below it."
+  (let ((has-mail
+         (lambda (directory)
+           (and (file-directory-p directory)
+                (cl-some (lambda (name)
+                           (file-directory-p (expand-file-name name directory)))
+                         '("Imap" "ImapMail" "Mail"))))))
+    (append
+     (when (funcall has-mail mail-root) (list mail-root))
+      (cl-remove-if-not
+       has-mail
+       (directory-files mail-root t directory-files-no-dot-files-regexp)))))
 
-(defun notmuch-custom-update-thunderbird-mail-root ()
-  "Set database.mail_root in Notmuch's active config to Thunderbird's default.
-Only write when the configured path differs.  Profile discovery must succeed
-before any configuration is changed.  Return the selected directory."
-  (interactive)
-  (let ((directory (notmuch-custom-thunderbird-default-directory)))
-    (unless (equal directory (notmuch-config-get "database.mail_root"))
-      (notmuch-call-notmuch-process "config" "set" "database.mail_root" directory))
-    (setq notmuch-custom--imap-mail-root nil)
-    (when (called-interactively-p 'interactive)
-      (message "Notmuch mail root: %s" directory))
-    directory))
+(defun notmuch-custom-thunderbird-draft-folder ()
+  "Return the local Maildir Drafts path, or the fallback folder drafts.
+Discover it from existing directories without consulting profiles.ini.
+If no local Maildir Drafts exists, Notmuch creates drafts when saving.
+Ambiguous local draft folders require an explicit `notmuch-draft-folder'."
+  (let* ((mail-root (expand-file-name
+                     (notmuch-config-get "database.mail_root") "~/"))
+         (folders
+          (cl-loop for profile in (notmuch-custom--mail-profile-directories mail-root)
+                   append
+                   (cl-loop for account in '("Local Folders" "Local Folders-maildir")
+                            for folder = (expand-file-name
+                                          (concat "Mail/" account "/Drafts") profile)
+                            when (or (file-directory-p (expand-file-name "cur" folder))
+                                     (file-directory-p (expand-file-name "new" folder)))
+                            collect folder))))
+    (cond
+     ((null folders) "drafts")
+     ((null (cdr folders)) (file-relative-name (car folders) mail-root))
+     (t (user-error "Multiple local Maildir Drafts folders; set notmuch-draft-folder")))))
+
+(defun notmuch-custom--save-draft (save &rest arguments)
+  "Resolve the default draft destination only when calling SAVE.
+An explicitly configured `notmuch-draft-folder' takes precedence."
+  (let ((notmuch-draft-folder
+         (if (equal notmuch-draft-folder "drafts")
+             (notmuch-custom-thunderbird-draft-folder)
+           notmuch-draft-folder)))
+    (apply save arguments)))
 
 ;;; Saved searches
 
@@ -1519,9 +1497,11 @@ When :auth-method is absent, use the auth-source entry's :auth value, falling
 back to `login'.  The auth-source host and port overrides are useful when one
 OAuth credential grants both SMTP and IMAP access but is stored under the SMTP
 endpoint.  Message contents and credentials are never copied into this
-variable.  When :local-root is absent, resolve it as
-ImapMail/HOST-maildir beneath Notmuch's database.mail_root.  That directory
-must exist; use :local-root for Thunderbird account folders with other names."
+variable.  When :local-root is absent, look for HOST or HOST-maildir under
+Imap or ImapMail, directly in database.mail_root or in its profile directories.
+A mail root pointing directly at a profile also works.
+Select the directory containing Maildir folders.  Use :local-root if both
+qualify or if the Thunderbird account folder has another name."
   :type '(repeat sexp)
   :group 'notmuch-custom)
 
@@ -1536,6 +1516,19 @@ Replies receive `\\Answered'.  Forwards receive Thunderbird's `$Forwarded'
 keyword when the server advertises support for it."
   :type 'boolean
   :group 'notmuch-custom)
+
+(defun notmuch-custom--maildir-account-p (directory)
+  "Return non-nil if DIRECTORY contains Thunderbird Maildir folders.
+Inspect mailbox directories and .sbd containers without scanning messages."
+  (and (file-directory-p directory)
+       (cl-some
+        (lambda (folder)
+          (and (file-directory-p folder)
+               (or (file-directory-p (expand-file-name "cur" folder))
+                   (file-directory-p (expand-file-name "new" folder))
+                   (and (string-suffix-p ".sbd" folder)
+                        (notmuch-custom--maildir-account-p folder)))))
+        (directory-files directory t directory-files-no-dot-files-regexp))))
 
 (defun notmuch-custom--imap-local-root (account)
   "Return ACCOUNT's explicit root or resolve it from its :host.
@@ -1552,12 +1545,24 @@ star scans from changing tags."
                   (setq notmuch-custom--imap-mail-root
                         (expand-file-name
                          (notmuch-config-get "database.mail_root") "~/"))))
-             (root (expand-file-name (concat "ImapMail/" host "-maildir")
-                                     mail-root)))
-        (unless (file-directory-p root)
-          (user-error "No Thunderbird Maildir for %s at %s; set :local-root"
-                      host root))
-        root))))
+             (key (list mail-root host)))
+        (or (cdr (assoc key notmuch-custom--imap-account-roots))
+            (let ((roots
+                   (cl-remove-if-not
+                    #'notmuch-custom--maildir-account-p
+                    (cl-loop for profile in (notmuch-custom--mail-profile-directories mail-root)
+                             append
+                             (cl-loop for container in '("Imap" "ImapMail")
+                                      append
+                                      (mapcar (lambda (suffix)
+                                                (expand-file-name
+                                                 (concat container "/" host suffix) profile))
+                                              '("" "-maildir")))))))
+              (unless (= (length roots) 1)
+                (user-error "Expected one Thunderbird Maildir for %s; found %d; set :local-root"
+                            host (length roots)))
+              (push (cons key (car roots)) notmuch-custom--imap-account-roots)
+              (car roots)))))))
 
 (defun notmuch-custom--imap-account-for-file (file)
   "Return the configured IMAP account containing FILE."
@@ -2013,7 +2018,7 @@ and tags for messages outside the snapshot are left alone."
       (notmuch-custom--start-sync 'msf)
     (let ((files (notmuch-custom--msf-files)))
       (unless files
-        (user-error "No indexed Maildir folders found for the configured accounts"))
+        (user-error "No indexed Maildir folders for configured accounts; run notmuch new and check new.ignore and database.mail_root"))
       ;; Validate every summary before making any tag changes.
       (let* ((snapshot (notmuch-custom--read-msf-files files))
              (starred (plist-get snapshot :starred))
@@ -2295,7 +2300,10 @@ Queue a different manual star request if a job is running; never overlap jobs."
 ;;;###autoload
 (defun notmuch-custom-setup ()
   "Enable the local Notmuch enhancements defined in this library."
-  (setq notmuch-custom--imap-mail-root nil)
+  (setq notmuch-custom--imap-mail-root nil
+        notmuch-custom--imap-account-roots nil)
+  (unless (advice-member-p #'notmuch-custom--save-draft 'notmuch-draft-save)
+    (advice-add 'notmuch-draft-save :around #'notmuch-custom--save-draft))
   ;; Replace the former sender-specific advice if it is still loaded.
   (advice-remove 'notmuch-get-bodypart-text
                  'notmuch-custom--decode-pku-plain-text)
