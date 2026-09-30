@@ -397,6 +397,11 @@
   :config
 
   (require 'notmuch-custom)
+  ;; Resolve this computer's Thunderbird profile before configuring accounts.
+  (condition-case error-data
+      (notmuch-custom-update-thunderbird-mail-root)
+    (error
+     (display-warning 'notmuch-custom (error-message-string error-data))))
   ;; Omit the sender's standard -- signature block from reply quotations.
   (setq notmuch-mua-cite-function
         #'message-cite-original-without-signature)
@@ -407,9 +412,6 @@
   (setq notmuch-custom-imap-post-send-accounts
         (list
          (list
-          :local-root
-          (expand-file-name "ImapMail/outlook.office365.com-maildir"
-                            (notmuch-config-get "database.mail_root"))
           :host "outlook.office365.com"
           :port 993
           ;; Reuse the SMTP identity and its OAuth auth-source entry.

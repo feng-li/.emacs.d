@@ -56,6 +56,83 @@
   "Local enhancements for Notmuch."
   :group 'notmuch)
 
+;;; Thunderbird profile discovery
+
+(defvar notmuch-custom--imap-mail-root nil
+  "Cached Notmuch mail root for resolving account paths during file scans.
+Reset by profile updates and `notmuch-custom-setup'.")
+
+(defcustom notmuch-custom-thunderbird-profiles-file
+  "~/.thunderbird/profiles.ini"
+  "Thunderbird profile registry used to locate Notmuch's mail root."
+  :type 'file
+  :group 'notmuch-custom)
+
+(defun notmuch-custom-thunderbird-default-directory (&optional profiles-file)
+  "Return the default Thunderbird profile directory in PROFILES-FILE.
+Prefer installation-specific defaults over a Profile section's Default=1.
+Honor IsRelative for Profile paths.  Refuse missing or ambiguous defaults."
+  (let* ((file (expand-file-name
+                (or profiles-file notmuch-custom-thunderbird-profiles-file)))
+         (base (file-name-directory file))
+         (sections (make-hash-table :test #'equal))
+         section install-defaults profile-defaults)
+    (with-temp-buffer
+      (insert-file-contents file)
+      (dolist (line (split-string (buffer-string) "\n"))
+        (setq line (string-trim line))
+        (cond
+         ((string-match "\\`\\[\\([^]]+\\)\\]\\'" line)
+          (setq section (match-string 1 line)))
+         ((and section
+               (string-match "\\`\\([^=;#]+\\)=\\(.*\\)\\'" line))
+          (let ((key (string-trim (match-string 1 line)))
+                (value (string-trim (match-string 2 line))))
+            (puthash section
+                     (cons (cons key value) (gethash section sections))
+                     sections))))))
+    (maphash
+     (lambda (name values)
+       (cond
+        ((string-prefix-p "Install" name)
+         (when-let* ((path (cdr (assoc "Default" values)))
+                     ((not (string-empty-p path))))
+           (push (expand-file-name path base) install-defaults)))
+        ((and (string-match-p "\\`Profile[0-9]+\\'" name)
+              (equal (cdr (assoc "Default" values)) "1"))
+         (let ((path (cdr (assoc "Path" values)))
+               (relative (cdr (assoc "IsRelative" values))))
+           (unless (and path (not (string-empty-p path))
+                        (or (equal relative "1")
+                            (and (equal relative "0")
+                                 (file-name-absolute-p path))))
+             (user-error "Invalid Thunderbird profile path in %s" name))
+           (push (expand-file-name path base) profile-defaults)))))
+     sections)
+    (let ((defaults (delete-dups (or install-defaults profile-defaults))))
+      (unless (= (length defaults) 1)
+        (user-error "Expected one Thunderbird default in %s; found %d"
+                    file (length defaults)))
+      (let ((directory (car defaults)))
+        (unless (and (file-directory-p directory)
+                     (or (file-directory-p (expand-file-name "ImapMail" directory))
+                         (file-directory-p (expand-file-name "Mail" directory))))
+          (user-error "Thunderbird default has no mail directory: %s" directory))
+        directory))))
+
+(defun notmuch-custom-update-thunderbird-mail-root ()
+  "Set database.mail_root in Notmuch's active config to Thunderbird's default.
+Only write when the configured path differs.  Profile discovery must succeed
+before any configuration is changed.  Return the selected directory."
+  (interactive)
+  (let ((directory (notmuch-custom-thunderbird-default-directory)))
+    (unless (equal directory (notmuch-config-get "database.mail_root"))
+      (notmuch-call-notmuch-process "config" "set" "database.mail_root" directory))
+    (setq notmuch-custom--imap-mail-root nil)
+    (when (called-interactively-p 'interactive)
+      (message "Notmuch mail root: %s" directory))
+    directory))
+
 ;;; Saved searches
 
 (defcustom notmuch-custom-unified-folders nil
@@ -148,7 +225,7 @@ per-folder unified searches this needs no `query:' disjunction."
                     :search-type 'unthreaded
                     :show-recipients
                     (let ((case-fold-search t))
-                      (string-match-p "--sent\\'" query-name))))
+                      (string-match-p "\\(?:\\`\\|-\\)sent\\'" query-name))))
              query-names))))
 
 ;;; Sent-folder correspondents
@@ -1430,7 +1507,7 @@ Flags are updated after sending; see
 supply server stars through `notmuch-custom-sync-imap-starred'.
 Each entry is a plist with these keys:
 
-  :local-root       Thunderbird's local Maildir root for the account
+  :local-root       optional explicit Thunderbird Maildir root for the account
   :host             IMAP server name
   :port             IMAP TLS port, normally 993
   :user             IMAP login name
@@ -1442,7 +1519,9 @@ When :auth-method is absent, use the auth-source entry's :auth value, falling
 back to `login'.  The auth-source host and port overrides are useful when one
 OAuth credential grants both SMTP and IMAP access but is stored under the SMTP
 endpoint.  Message contents and credentials are never copied into this
-variable."
+variable.  When :local-root is absent, resolve it as
+ImapMail/HOST-maildir beneath Notmuch's database.mail_root.  That directory
+must exist; use :local-root for Thunderbird account folders with other names."
   :type '(repeat sexp)
   :group 'notmuch-custom)
 
@@ -1458,14 +1537,35 @@ keyword when the server advertises support for it."
   :type 'boolean
   :group 'notmuch-custom)
 
+(defun notmuch-custom--imap-local-root (account)
+  "Return ACCOUNT's explicit root or resolve it from its :host.
+Cache the mail root so scanning messages does not run Notmuch per file.
+A missing automatic account directory is an error, preventing incomplete
+star scans from changing tags."
+  (if-let* ((root (plist-get account :local-root)))
+      (expand-file-name root)
+    (let ((host (plist-get account :host)))
+      (unless (and (stringp host) (not (string-empty-p host)))
+        (user-error "IMAP account needs :host or :local-root"))
+      (let* ((mail-root
+              (or notmuch-custom--imap-mail-root
+                  (setq notmuch-custom--imap-mail-root
+                        (expand-file-name
+                         (notmuch-config-get "database.mail_root") "~/"))))
+             (root (expand-file-name (concat "ImapMail/" host "-maildir")
+                                     mail-root)))
+        (unless (file-directory-p root)
+          (user-error "No Thunderbird Maildir for %s at %s; set :local-root"
+                      host root))
+        root))))
+
 (defun notmuch-custom--imap-account-for-file (file)
   "Return the configured IMAP account containing FILE."
   (let ((file (expand-file-name file)))
     (cl-find-if
      (lambda (account)
-       (when-let* ((root (plist-get account :local-root)))
-         (string-prefix-p (file-name-as-directory (expand-file-name root))
-                          file)))
+       (string-prefix-p
+        (file-name-as-directory (notmuch-custom--imap-local-root account)) file))
      notmuch-custom-imap-post-send-accounts)))
 
 (defun notmuch-custom--imap-folder-for-file (file account)
@@ -1473,7 +1573,7 @@ keyword when the server advertises support for it."
 Thunderbird represents a nested local Maildir folder as `parent.sbd/child';
 convert that representation back to the IMAP name `parent/child'."
   (let* ((root (file-name-as-directory
-                (expand-file-name (plist-get account :local-root))))
+                (notmuch-custom--imap-local-root account)))
          (relative (string-remove-prefix root (expand-file-name file))))
     (when (string-match
            "\\`\\(.+\\)/\\(?:cur\\|new\\)/[^/]+\\'" relative)
@@ -2195,6 +2295,7 @@ Queue a different manual star request if a job is running; never overlap jobs."
 ;;;###autoload
 (defun notmuch-custom-setup ()
   "Enable the local Notmuch enhancements defined in this library."
+  (setq notmuch-custom--imap-mail-root nil)
   ;; Replace the former sender-specific advice if it is still loaded.
   (advice-remove 'notmuch-get-bodypart-text
                  'notmuch-custom--decode-pku-plain-text)
