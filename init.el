@@ -408,8 +408,8 @@
         (list
          (list
           :local-root
-          (expand-file-name
-           "~/.thunderbird/4rx39fjz.default-esr/ImapMail/outlook.office365.com-maildir")
+          (expand-file-name "ImapMail/outlook.office365.com-maildir"
+                            (notmuch-config-get "database.mail_root"))
           :host "outlook.office365.com"
           :port 993
           ;; Reuse the SMTP identity and its OAuth auth-source entry.
