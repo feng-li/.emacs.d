@@ -43,6 +43,10 @@
                 (normal-top-level-add-subdirs-to-load-path)))
              load-path))))
 
+;; Capture desktop credentials once, before packages initialize D-Bus.
+(require 'auctex-evince-compat)
+(my-desktop-environment-setup)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; custom-set-variables
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1417,8 +1421,7 @@ intermediate and output files, as requested by the non-nil argument to
   (setq TeX-source-correlate-method (quote synctex)) ;only for evince
   (setq TeX-view-evince-keep-focus t)
 
-  ;; Support current Evince D-Bus names and daemon display credentials.
-  (require 'auctex-evince-compat)
+  ;; Support current Evince D-Bus names without refreshing the environment.
   (add-hook 'LaTeX-mode-hook #'my-auctex-evince-setup)
 
   ;; RefTeX
@@ -1502,8 +1505,6 @@ intermediate and output files, as requested by the non-nil argument to
   :ensure nil
   :after tex
   :config
-  (advice-add 'latexmkpvc-run :before
-              #'my-auctex-evince-refresh-desktop-environment)
   (latexmkpvc-setup))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
