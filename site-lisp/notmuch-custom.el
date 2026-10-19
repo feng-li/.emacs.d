@@ -15,6 +15,7 @@
 ;;   global starred view;
 ;; - address completion using literal text, full Pinyin, or Pinyin initials;
 ;; - compact, expandable To and Cc headers;
+;; - newest-first chronological messages in opened threads;
 ;; - prose checking limited to the subject and newly written message text;
 ;; - attachment opening through the desktop default application;
 ;; - automatic, display-only reflow of hard-wrapped plain-text messages;
@@ -205,6 +206,36 @@ per-folder unified searches this needs no `query:' disjunction."
                     (let ((case-fold-search t))
                       (string-match-p "\\(?:\\`\\|-\\)sent\\'" query-name))))
              query-names))))
+
+;;; Opened thread order
+
+(defcustom notmuch-custom-show-newest-first t
+  "When non-nil, show messages newest first inside each opened thread.
+Display each thread as a flat chronological list rather than a parent-first
+reply tree.  This affects only the display, not messages, reply headers,
+tags, or the order of folder/search results.  Nil restores the reply tree."
+  :type 'boolean
+  :group 'notmuch-custom)
+
+(defun notmuch-custom--newest-first-thread (thread)
+  "Return THREAD as a flat, newest-first list without changing its nodes."
+  (let (messages)
+    (cl-labels ((collect (nodes)
+                  (dolist (node nodes)
+                    (when (car node)
+                      (push (car node) messages))
+                    (collect (cadr node)))))
+      (collect thread))
+    (mapcar (lambda (message) (list message nil))
+            (cl-stable-sort
+             (nreverse messages) #'>
+             :key (lambda (message) (or (plist-get message :timestamp) 0))))))
+
+(defun notmuch-custom--show-newest-first (insert forest)
+  "Call INSERT with messages in each thread of FOREST ordered newest first."
+  (funcall insert (if notmuch-custom-show-newest-first
+                      (mapcar #'notmuch-custom--newest-first-thread forest)
+                    forest)))
 
 ;;; Sent-folder correspondents
 
@@ -2302,6 +2333,10 @@ Queue a different manual star request if a job is running; never overlap jobs."
   "Enable the local Notmuch enhancements defined in this library."
   (setq notmuch-custom--imap-mail-root nil
         notmuch-custom--imap-account-roots nil)
+  (unless (advice-member-p #'notmuch-custom--show-newest-first
+                           'notmuch-show-insert-forest)
+    (advice-add 'notmuch-show-insert-forest :around
+                #'notmuch-custom--show-newest-first))
   (unless (advice-member-p #'notmuch-custom--save-draft 'notmuch-draft-save)
     (advice-add 'notmuch-draft-save :around #'notmuch-custom--save-draft))
   ;; Replace the former sender-specific advice if it is still loaded.
