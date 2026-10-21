@@ -272,7 +272,11 @@ Exclude literal Latin letters when CHINESE-ONLY is non-nil."
 (defun ivy-pinyin-search--regexp-builder (input)
   "Build a pinyin regexp for INPUT, otherwise use Ivy's prior builder."
   (or (ivy-pinyin-search--pinyin-regexp input)
-      (funcall (or ivy-pinyin-search--fallback-builder #'ivy--regex-plus)
+      (funcall (if (and ivy-pinyin-search--fallback-builder
+                        (not (eq ivy-pinyin-search--fallback-builder
+                                 #'ivy-pinyin-search--regexp-builder)))
+                   ivy-pinyin-search--fallback-builder
+                 #'ivy--regex-plus)
                input)))
 
 (define-minor-mode ivy-pinyin-search-mode
@@ -281,7 +285,12 @@ Exclude literal Latin letters when CHINESE-ONLY is non-nil."
   :group 'ivy-pinyin-search
   (let ((entry (assq t ivy-re-builders-alist)))
     (if ivy-pinyin-search-mode
-        (progn
+        (if (and entry (eq (cdr entry) #'ivy-pinyin-search--regexp-builder))
+            ;; Re-enabling must not capture our own installed builder.
+            ;; Also repair servers affected before this guard was loaded.
+            (when (eq ivy-pinyin-search--fallback-builder
+                      #'ivy-pinyin-search--regexp-builder)
+              (setq ivy-pinyin-search--fallback-builder #'ivy--regex-plus))
           (setq ivy-pinyin-search--had-default-builder (and entry t)
                 ivy-pinyin-search--fallback-builder
                 (if entry (cdr entry) #'ivy--regex-plus))
