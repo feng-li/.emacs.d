@@ -1200,8 +1200,11 @@ This function follows `message-indent-citation' in
 
 (defcustom notmuch-custom-reply-quote-depth 3
   "Maximum quote depth retained in a newly composed reply.
-Depth is counted after adding the reply's own citation prefix.  Deeper
-blocks are replaced with an omission marker; later inline replies remain.
+Depth is counted after adding the reply's own citation prefix.  Keep the
+first contiguous block at this depth, then omit everything after it,
+including later shallower quotes, signatures, and inline replies.  If a
+deeper line is encountered first, omit from that line onward.  Insert one
+omission marker when nonblank text is removed.
 Set to nil to retain all quoted text.  Stored messages are not changed."
   :type '(choice (const :tag "Unlimited" nil)
                  (integer :tag "Maximum depth"))
@@ -1246,7 +1249,9 @@ END must be a marker so deletions keep the region boundary accurate."
           (delete-region after-marker (min (point) end)))))))
 
 (defun notmuch-custom-truncate-cited-text ()
-  "Limit the freshly cited region to the quote depth, with one omission marker.
+  "Keep the first block at the quote-depth limit, then omit the cited tail.
+Deeper text and any later shallower text are discarded within the freshly
+cited region only; newly written reply text outside that region is untouched.
 Keep only the first marker, including markers inherited from older replies."
   (when (and (integerp notmuch-custom-reply-quote-depth)
              (> notmuch-custom-reply-quote-depth 0)
@@ -1257,16 +1262,25 @@ Keep only the first marker, including markers inherited from older replies."
           (save-excursion
             (goto-char start)
             (let ((regexp (format "^[ \t]*\\(?:>[ \t]*\\)\\{%d,\\}"
-                                  (1+ notmuch-custom-reply-quote-depth))))
-              (while (re-search-forward regexp end t)
+                                  notmuch-custom-reply-quote-depth)))
+              (when (re-search-forward regexp end t)
                 (beginning-of-line)
-                (let ((block-start (point)))
-                  (while (and (< (point) end) (looking-at regexp))
-                    (forward-line 1))
-                  (delete-region block-start (min (point) end))
-                  (goto-char block-start)
-                  (insert (make-string notmuch-custom-reply-quote-depth ?>)
-                          " [Older quoted text omitted]\n"))))
+                ;; Keep exactly the first contiguous block at the limit.
+                ;; A deeper line ends that block, as does a shallower one.
+                (while (and (< (point) end)
+                            (looking-at "^[ \t]*\\(?:>[ \t]*\\)+")
+                            (= notmuch-custom-reply-quote-depth
+                               (cl-count ?> (match-string 0))))
+                  (forward-line 1))
+                (when (< (point) end)
+                  (let ((omitted-text
+                         (string-match-p
+                          "[^ \t\r\n]"
+                          (buffer-substring-no-properties (point) end))))
+                    (delete-region (point) end)
+                    (when omitted-text
+                      (insert (make-string notmuch-custom-reply-quote-depth ?>)
+                              " [Older quoted text omitted]\n"))))))
             (notmuch-custom--clean-omitted-attributions start end)
             (goto-char start)
             (let (seen)

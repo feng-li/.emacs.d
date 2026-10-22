@@ -4,7 +4,8 @@ abbrev_defs
 *.elc
 *.eld
 oauth2.plstore*
-*-test.el
+**/*-test.el
+!site-lisp/notmuch-custom-quote-test.el
 !site-lisp/tests/
 site-lisp/tests/*
 !site-lisp/tests/test_notmuch_msf.py
