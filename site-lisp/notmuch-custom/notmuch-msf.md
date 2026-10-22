@@ -34,17 +34,18 @@ The helper itself never changes tags. For a read-only scan, send it a JSON
 array of full `.msf` paths on stdin, for example:
 
 ```sh
-printf '["/path/to/Inbox.msf"]' | python3 site-lisp/notmuch-msf.py --summary
+printf '["/path/to/Inbox.msf"]' | python3 site-lisp/notmuch-custom/notmuch-msf.py --summary
 ```
 
 Parser regression tests:
 
 ```sh
-python3 -m unittest discover -s site-lisp/tests -p 'test_notmuch_msf.py'
+python3 -m unittest discover -s site-lisp/notmuch-custom/tests -p 'test_notmuch_msf.py'
 ```
 
-Emacs integration tests are in `site-lisp/tests/notmuch-msf-tests.el`; initialize
-your package directory, add `site-lisp` to `load-path`, load that file, and run
+Emacs integration tests are in `tests/notmuch-msf-tests.el` beside this document;
+initialize your package directory, add both `site-lisp` and
+`site-lisp/notmuch-custom` to `load-path`, load that file, and run
 `ert-run-tests-batch-and-exit`. Tests include an actual background worker with
 an isolated fake notmuch executable, so they do not change the mail index.
 

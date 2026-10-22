@@ -134,6 +134,7 @@ open-buffer and history data accidentally.
 | `site-lisp/company-reftex.el` | cached Company completion for RefTeX citations and labels |
 | `site-lisp/company-numbered-selection.el` | context-aware number-key selection for Company candidates |
 | `site-lisp/ivy-pinyin-search.el` | initial and full-pinyin matching for Ivy |
+| [`site-lisp/notmuch-custom/`](site-lisp/notmuch-custom/README.md) | Notmuch mail customizations, thread attachment export, helpers, and tests |
 | `site-lisp/python-send-and-step.el` | Elpy-independent Python evaluation and stepping commands |
 | `site-lisp/yasnippet-personal-priority.el` | personal-over-bundled Yasnippet precedence by trigger key |
 | `site-lisp/` | other local and bundled Lisp |

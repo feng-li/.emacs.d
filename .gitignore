@@ -5,11 +5,12 @@ abbrev_defs
 *.eld
 oauth2.plstore*
 **/*-test.el
-!site-lisp/notmuch-custom-quote-test.el
+!site-lisp/notmuch-custom/tests/
+!site-lisp/notmuch-custom/tests/*-test.el
+site-lisp/notmuch-custom/__pycache__/
+site-lisp/notmuch-custom/tests/__pycache__/
 !site-lisp/tests/
 site-lisp/tests/*
-!site-lisp/tests/test_notmuch_msf.py
-!site-lisp/tests/notmuch-msf-tests.el
 !site-lisp/tests/ivy-pinyin-search-tests.el
 *.desktop
 *.lock

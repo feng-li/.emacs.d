@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Read Thunderbird Mork 1.4 summaries without modifying them.
+"""Read Thunderbird Mork 1.4 summaries for notmuch-custom without modifying them.
 
 Input: JSON array of .msf paths on stdin. Output: JSON starred/unstarred
 Message-IDs on stdout. Diagnostics and tqdm progress go to stderr.

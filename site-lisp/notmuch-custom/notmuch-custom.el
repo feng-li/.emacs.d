@@ -18,6 +18,7 @@
 ;; - newest-first chronological messages in opened threads;
 ;; - prose checking limited to the subject and newly written message text;
 ;; - attachment opening through the desktop default application;
+;; - background extraction of every attachment in an opened thread;
 ;; - automatic, display-only reflow of hard-wrapped plain-text messages;
 ;; - recipients instead of senders in saved Sent-folder views;
 ;; - omission of a signature already present in quoted reply text;
@@ -57,6 +58,8 @@
 (defgroup notmuch-custom nil
   "Local enhancements for Notmuch."
   :group 'notmuch)
+
+(require 'notmuch-custom-attachments)
 
 ;;; Mail directories
 
@@ -2426,6 +2429,8 @@ Queue a different manual star request if a job is running; never overlap jobs."
               #'notmuch-draft-postpone)
   (define-key notmuch-show-mode-map (kbd "W")
               #'notmuch-custom-reflow-current-message)
+  (define-key notmuch-show-mode-map (kbd "C-c C-e")
+              #'notmuch-custom-extract-thread-attachments)
   (setq notmuch-show-part-button-default-action
         'notmuch-custom-open-part-with-default-application)
   (notmuch-custom-start-auto-refresh))

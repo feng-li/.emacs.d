@@ -4,6 +4,14 @@ This directory contains custom Emacs Lisp packages used directly by the main
 configuration. `site-lisp/` is added to `load-path` recursively during startup,
 so these packages do not need to be installed from ELPA.
 
+## notmuch-custom
+
+[`notmuch-custom/`](notmuch-custom/README.md) groups the mail customizations,
+background helpers, and regression tests.  In an opened Notmuch thread,
+`C-c C-e` exports the whole thread's attachments to a chosen directory in the
+background, without changing the original messages or overwriting files.
+The existing `w` command still saves attachments from the current message.
+
 ## python-send-and-step
 
 [`python-send-and-step.el`](python-send-and-step.el) provides standalone,
