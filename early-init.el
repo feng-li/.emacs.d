@@ -21,10 +21,13 @@
 (setenv "TERM" "xterm-256color")
 (setenv "OMP_NUM_THREADS" "1")
 (setenv "LSP_USE_PLISTS"  "true")
-(setenv "PATH" (concat (concat (getenv "HOME") "/.local/bin:")
-                       (concat (getenv "HOME") "/.cargo/bin:")
-                       (concat (getenv "HOME") "/.local/share/coursier/bin:")
-                       (getenv "PATH")))
+;; PATH is inherited by child processes; Emacs searches exec-path itself.
+(let ((user-bin-directories
+       (mapcar (lambda (directory) (expand-file-name directory "~/"))
+               '(".local/bin" ".cargo/bin" ".local/share/coursier/bin"))))
+  (setenv "PATH" (concat (mapconcat #'identity user-bin-directories path-separator)
+                        path-separator (getenv "PATH")))
+  (setq exec-path (delete-dups (append user-bin-directories exec-path))))
 
 (provide 'early-init)
 ;;; early-init.el ends here

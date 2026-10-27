@@ -12,6 +12,9 @@ site-lisp/notmuch-custom/tests/__pycache__/
 !site-lisp/tests/
 site-lisp/tests/*
 !site-lisp/tests/ivy-pinyin-search-tests.el
+!site-lisp/tests/.nosearch
+!site-lisp/tests/tty-emoji-fallback-tests.el
+!site-lisp/tests/flycheck-vale-tests.el
 *.desktop
 *.lock
 places

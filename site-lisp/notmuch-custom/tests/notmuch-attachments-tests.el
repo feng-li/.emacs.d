@@ -11,6 +11,30 @@
       (should-error (call-interactively #'notmuch-custom-extract-thread-attachments)
                     :type 'user-error))))
 
+(ert-deftest notmuch-attachments-flat-folder-rejected-before-prompt ()
+  (with-temp-buffer
+    (setq major-mode 'notmuch-tree-mode)
+    (setq-local notmuch-tree-unthreaded t)
+    (cl-letf (((symbol-function 'read-directory-name)
+               (lambda (&rest _) (ert-fail "Must reject flat folders first"))))
+      (should-error (call-interactively #'notmuch-custom-extract-thread-attachments)
+                    :type 'user-error))))
+
+(ert-deftest notmuch-attachments-tree-uses-selected-id ()
+  (let ((notmuch-custom-attachments--process nil)
+        selected)
+    (with-temp-buffer
+      (setq major-mode 'notmuch-tree-mode)
+      (setq-local notmuch-tree-unthreaded nil)
+      (cl-letf (((symbol-function 'notmuch-tree-get-message-id)
+                 (lambda (&optional bare) (should bare) (setq selected t) nil))
+                ((symbol-function 'notmuch-show-get-message-id)
+                 (lambda (&rest _) (ert-fail "Must use the thread tree's ID"))))
+        ;; No row: reject cleanly after consulting the correct mode's getter.
+        (should-error (notmuch-custom-extract-thread-attachments temporary-file-directory)
+                      :type 'user-error)
+        (should selected)))))
+
 (ert-deftest notmuch-attachments-rejects-remote-destination ()
   (with-temp-buffer
     (setq major-mode 'notmuch-show-mode)
@@ -133,10 +157,13 @@
                     ";;\n'show --format=raw') printf '\\000\\377TEST\\r\\n';;\n"
                     "*) exit 19;;\nesac\n"))
           (set-file-modes notmuch-command #o700)
-          (dotimes (_ 2)
+          (dolist (mode '(notmuch-show-mode notmuch-tree-mode))
             (with-temp-buffer
-              (setq major-mode 'notmuch-show-mode)
+              (setq major-mode mode)
+              (setq-local notmuch-tree-unthreaded nil)
               (cl-letf (((symbol-function 'notmuch-show-get-message-id)
+                         (lambda (&optional _) "selected@example.test"))
+                        ((symbol-function 'notmuch-tree-get-message-id)
                          (lambda (&optional _) "selected@example.test"))
                         ((symbol-function 'display-buffer) #'ignore))
                 (let ((process (notmuch-custom-extract-thread-attachments output))

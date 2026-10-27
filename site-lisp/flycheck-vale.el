@@ -3,7 +3,7 @@
 ;; Copyright (C) 2026 Feng Li
 
 ;; Author: Feng Li <m@feng.li>
-;; Version: 0.3.0
+;; Version: 0.4.0
 ;; Package-Requires: ((emacs "27.1") (flycheck "32"))
 ;; Keywords: convenience, text, tools
 ;; URL: https://github.com/feng-li/.emacs.d
@@ -49,6 +49,7 @@
 (require 'cl-lib)
 (require 'flycheck)
 (require 'json)
+(require 'subr-x)
 
 (defgroup flycheck-vale nil
   "Flycheck support for the Vale prose linter."
@@ -64,6 +65,170 @@ Each element must be one complete argument.  These arguments precede the
 automatically selected `--ext' and `--ignore-syntax' arguments."
   :type '(repeat string)
   :group 'flycheck-vale)
+
+(defcustom flycheck-vale-auto-sync-missing-styles nil
+  "Run Vale sync once when a configured style is missing.
+This opt-in feature may download packages and write to StylesPath. It uses
+the checker's executable and configuration, runs in the background, and
+rechecks affected buffers after success. Automatic attempts are limited to
+one per executable/configuration per Emacs session, even after failure.
+Normal lint alerts and other runtime errors never trigger synchronization.
+Remote buffers are excluded. Use `flycheck-vale-sync-styles' to retry manually.
+Progress and failures appear in `*vale-sync*'."
+  :type 'boolean
+  :group 'flycheck-vale)
+
+(defvar flycheck-vale--sync-attempts (make-hash-table :test #'equal)
+  "Sync jobs keyed by executable, configuration files, and style paths.")
+(defvar flycheck-vale--sync-contexts (make-hash-table :test #'equal)
+  "Cached Vale configuration discovery, keyed by checker context.")
+(defvar flycheck-vale--sync-process nil
+  "Currently running package synchronization process, if any.")
+(defvar flycheck-vale--sync-queue nil
+  "Configuration keys awaiting synchronization; jobs run serially.")
+
+(defun flycheck-vale--sync-arguments ()
+  "Keep only configuration-selection flags from `flycheck-vale-args'."
+  (let ((args flycheck-vale-args) result)
+    (while args
+      (let ((arg (pop args)))
+        (cond
+         ((equal arg "--config")
+          (unless args (error "Missing Vale --config value"))
+          (setq result (append result (list arg (pop args)))))
+         ((or (string-prefix-p "--config=" arg) (equal arg "--no-global"))
+          (setq result (append result (list arg)))))))
+    result))
+
+(defun flycheck-vale--sync-fingerprint ()
+  "Identify the current checker context without executing Vale."
+  (list (flycheck-checker-executable 'vale) default-directory
+        (flycheck-vale--sync-arguments)
+        (mapcar #'getenv '("VALE_CONFIG_PATH" "VALE_STYLES_PATH"
+                          "XDG_CONFIG_HOME" "XDG_DATA_HOME"))))
+
+(defun flycheck-vale--sync-context (&optional refresh)
+  "Discover the current Vale configuration, bypassing the cache for REFRESH."
+  (let ((fingerprint (flycheck-vale--sync-fingerprint)))
+    (or (and (not refresh) (gethash fingerprint flycheck-vale--sync-contexts))
+        (let* ((executable (or (executable-find (car fingerprint))
+                               (error "Cannot find the configured Vale executable")))
+               (directory default-directory)
+               (args (flycheck-vale--sync-arguments))
+               (config
+                (with-temp-buffer
+                  (unless (eq 0 (apply #'call-process executable nil t nil
+                                       (append args '("ls-config"))))
+                    (error "Vale configuration discovery failed: %s"
+                           (string-trim (buffer-string))))
+                  (json-parse-string (buffer-string) :object-type 'alist
+                                     :array-type 'list :null-object nil :false-object nil)))
+               (key (list (file-truename executable)
+                          (sort (copy-sequence (or (alist-get 'ConfigFiles config)
+                                                  (list directory))) #'string<)
+                          (sort (copy-sequence (alist-get 'Paths config)) #'string<)))
+               (context (list :key key :executable executable :directory directory
+                              :args args :fingerprint fingerprint
+                              :environment (copy-sequence process-environment))))
+          (puthash fingerprint context flycheck-vale--sync-contexts)
+          context))))
+
+(defun flycheck-vale--sync-recheck (buffer fingerprint)
+  "Recheck BUFFER if it is live and still uses FINGERPRINT."
+  (when (buffer-live-p buffer)
+    (with-current-buffer buffer
+      (when (and (bound-and-true-p flycheck-mode)
+                 (not (file-remote-p default-directory))
+                 (equal fingerprint (flycheck-vale--sync-fingerprint)))
+        (flycheck-buffer)))))
+
+(defun flycheck-vale--sync-finished (process _event)
+  "Record PROCESS completion and retry affected buffers after success."
+  (when (memq (process-status process) '(exit signal))
+    (let* ((key (process-get process 'flycheck-vale-key))
+           (job (gethash key flycheck-vale--sync-attempts))
+           (success (and (eq (process-status process) 'exit)
+                         (zerop (process-exit-status process)))))
+      (when job
+        (plist-put job :status (if success 'done 'failed))
+        (if success
+            (progn
+              (dolist (request (plist-get job :buffers))
+                (run-at-time 0.1 nil #'flycheck-vale--sync-recheck
+                             (car request) (cdr request)))
+              (message "Vale styles synchronized; rechecking affected buffers"))
+          (message "Vale style sync failed; see *vale-sync*. Retry with M-x flycheck-vale-sync-styles")))
+      (when (eq process flycheck-vale--sync-process)
+        (setq flycheck-vale--sync-process nil))
+      (flycheck-vale--sync-next))))
+
+(defun flycheck-vale--sync-next ()
+  "Start the next queued job, never running two syncs concurrently."
+  (unless (process-live-p flycheck-vale--sync-process)
+    (when-let* ((key (pop flycheck-vale--sync-queue))
+                (job (gethash key flycheck-vale--sync-attempts)))
+      (let* ((context (plist-get job :context))
+             (default-directory (plist-get context :directory))
+             (process-environment (plist-get context :environment))
+             (command (append (list (plist-get context :executable))
+                              (plist-get context :args) '("sync")))
+             (log (get-buffer-create "*vale-sync*")))
+        (with-current-buffer log
+          (let ((inhibit-read-only t))
+            (goto-char (point-max))
+            (insert (format "\nVale sync: %S\nDirectory: %s\n" command default-directory))))
+        (condition-case err
+            (progn
+              (plist-put job :status 'running)
+              (setq flycheck-vale--sync-process
+                    (make-process :name "vale-sync" :buffer log :command command
+                                  :connection-type 'pipe :coding 'utf-8-unix :noquery t
+                                  :sentinel #'flycheck-vale--sync-finished))
+              (process-put flycheck-vale--sync-process 'flycheck-vale-key key)
+              (message "Syncing missing Vale styles in background; see *vale-sync*"))
+          (error
+           (plist-put job :status 'failed)
+           (setq flycheck-vale--sync-process nil)
+           (with-current-buffer log
+             (let ((inhibit-read-only t))
+               (goto-char (point-max))
+               (insert (error-message-string err) "\n")))
+           (message "Could not start Vale sync: %s" (error-message-string err))
+           (flycheck-vale--sync-next)))))))
+
+(defun flycheck-vale--request-sync (buffer &optional force)
+  "Queue synchronization for BUFFER; FORCE permits a manual retry."
+  (with-current-buffer buffer
+    (unless (file-remote-p default-directory)
+      (let* ((context (flycheck-vale--sync-context force))
+             (key (plist-get context :key))
+             (previous (gethash key flycheck-vale--sync-attempts))
+             (request (cons buffer (plist-get context :fingerprint))))
+        (cond
+         ((memq (plist-get previous :status) '(running queued))
+          (cl-pushnew request (plist-get previous :buffers) :test #'equal))
+         ((or force (not previous))
+          (puthash key (list :context context :status 'queued :buffers (list request))
+                   flycheck-vale--sync-attempts)
+          (setq flycheck-vale--sync-queue (append flycheck-vale--sync-queue (list key)))
+          (flycheck-vale--sync-next)))))))
+
+;;;###autoload
+(defun flycheck-vale-sync-styles ()
+  "Manually sync the current Vale configuration and recheck after success.
+This also retries an automatic attempt that failed earlier in this session."
+  (interactive)
+  (when (file-remote-p default-directory)
+    (user-error "Vale style synchronization is disabled for remote buffers"))
+  (flycheck-vale--request-sync (current-buffer) t))
+
+(defun flycheck-vale--missing-style-error-p (data)
+  "Whether DATA is Vale's missing-style runtime error, not a prose alert."
+  (let ((message (alist-get 'Text data)))
+    (and (equal (alist-get 'Code data) "E100")
+         (stringp message)
+         (string-match-p "\\[loadStyles\\]" message)
+         (string-match-p "style ['\"][^'\"]+['\"] does not exist on StylesPath" message))))
 
 (defcustom flycheck-vale-deduplicate-errors t
   "Whether to show only one Vale message for each source range.
@@ -392,6 +557,12 @@ Return a list of `flycheck-error' objects."
     (cond
      ((null data) nil)
      ((alist-get 'Code data)
+      (when (and (buffer-live-p buffer)
+                 (with-current-buffer buffer flycheck-vale-auto-sync-missing-styles)
+                 (flycheck-vale--missing-style-error-p data))
+        (condition-case err
+            (flycheck-vale--request-sync buffer)
+          (error (message "Could not prepare Vale style sync: %s" (error-message-string err)))))
       (when-let* ((error
                    (flycheck-vale--runtime-error data checker buffer)))
         (list error)))
@@ -426,6 +597,10 @@ See URL `https://vale.sh/'."
 (defun flycheck-vale-unload-function ()
   "Remove the Vale checker before unloading this package."
   (setq flycheck-checkers (delq 'vale flycheck-checkers))
+  (when (process-live-p flycheck-vale--sync-process)
+    ;; Let an in-progress download finish, but do not call unloaded functions.
+    (set-process-sentinel flycheck-vale--sync-process #'ignore))
+  (setq flycheck-vale--sync-process nil flycheck-vale--sync-queue nil)
   nil)
 
 (provide 'flycheck-vale)

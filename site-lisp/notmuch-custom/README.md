@@ -5,11 +5,33 @@ and regression tests. Emacs adds `site-lisp/` recursively to `load-path`, so
 `(require 'notmuch-custom)` continues to work. The `tests/.nosearch` marker
 keeps test libraries off the startup load path.
 
+## Open and navigate threads
+
+- **RET** or a click in a flat folder opens the complete thread with the
+  selected message previewed. In ordinary search results it opens only the
+  selected thread. Folder/search filters do not hide other replies.
+- The thread list uses a **reverse reply tree**: replies above their parents,
+  with branch grouping and indentation retained. Read upwards from a parent
+  to follow its replies. This is a vertical mirror of the normal tree, not a
+  strict date sort across separate branches. Repeated subjects are abbreviated
+  upwards, keeping the topic visible on the bottom message of each subject group.
+- **Up/Down** in the thread immediately previews the adjacent email, including
+  non-matching replies. Flat folder lists retain ordinary cursor navigation.
+- Inside the thread, **RET** keeps Notmuch's normal preview behavior; **q**
+  returns to the previous view. Folder lists remain flat.
+
+Set `notmuch-custom-tree-reverse-order` to `nil` and refresh with **=** to
+restore the normal parent-first tree. Outline folding groups whole threads;
+it does not fold individual reverse reply branches. The existing
+`notmuch-custom-show-newest-first` option independently controls chronology
+in full-message (`notmuch-show`) views.
+
 ## Export attachments from an opened thread
 
 Open a thread, press **`C-c C-e`**, and choose a destination directory once.
 Alternatively, run **`M-x notmuch-custom-extract-thread-attachments`**.
-This command is intentionally unavailable in search results for now.
+It works in the opened thread tree or its message preview, but not in flat
+folder lists or ordinary search results.
 The existing **`w`** command still saves the current message's attachments.
 
 The exporter resolves the thread containing the message at point, rather
@@ -46,6 +68,7 @@ exporter does not prompt for keys, log in to IMAP, or fetch missing mail.
 
 - `notmuch-custom.el`: saved searches, address completion, thread display,
   quote formatting, drafts/forwards, and background indexing/star sync.
+- `notmuch-custom-thread-view.el`: thread opening, reverse trees, and previews.
 - `notmuch-custom-attachments.el` and `notmuch-attachments.py`: thread export.
 - `notmuch-msf.py`: read-only Thunderbird summary parser; see
   [star synchronization details](notmuch-msf.md).

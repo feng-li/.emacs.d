@@ -109,6 +109,11 @@
 (setenv "COLORTERM" "truecolor") ;; Ensure True Color in Systemd
 (add-to-list 'term-file-aliases '("dumb" . "xterm-256color"))
 
+;; Use the fallback only when Emacs lacks the upstream TTY emoji fix.
+(require 'tty-emoji-fallback)
+(tty-emoji-fallback-mode
+ (if (bound-and-true-p tty-display-emoji-force-wide) -1 1))
+
 ;; (setenv "ENCHANT_CONFIG_DIR" (concat user-emacs-directory "dict/enchant"))
 
 ;; Stop displaying strange symbols in place of the desired colored output
@@ -1077,6 +1082,7 @@
   :custom
   (flycheck-vale-executable
    (expand-file-name "~/.virtualenvs/lsp/bin/vale"))
+  (flycheck-vale-auto-sync-missing-styles t)
   (flycheck-vale-mode-extensions
    '((notmuch-message-mode . "txt")
      (markdown-mode . "md")

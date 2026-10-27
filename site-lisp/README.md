@@ -4,6 +4,50 @@ This directory contains custom Emacs Lisp packages used directly by the main
 configuration. `site-lisp/` is added to `load-path` recursively during startup,
 so these packages do not need to be installed from ELPA.
 
+## flycheck-vale
+
+[`flycheck-vale.el`](flycheck-vale.el) integrates Vale prose checks with
+Flycheck. This configuration enables `flycheck-vale-auto-sync-missing-styles`:
+when Vale reports a missing configured style, the integration runs `vale sync`
+in the background using the same executable, configuration flags, and working
+directory as the checker. This may download the configured packages and write
+to StylesPath; the library option is disabled by default.
+
+There is only one automatic attempt per executable/configuration per Emacs
+session, shared across buffers. Sync jobs are serialized, normal checks do not
+sync, and failures do not retry on each edit. Successful jobs recheck affected
+buffers if they still use the same configuration. Remote buffers are excluded.
+Progress/errors are logged in `*vale-sync*`. Use
+`M-x flycheck-vale-sync-styles` for a manual retry after a network/configuration
+problem, or set the option to `nil` to disable automatic downloads.
+
+## tty-emoji-fallback
+
+[`tty-emoji-fallback.el`](tty-emoji-fallback.el) avoids terminal layout damage
+from narrow/text-style emoji (such as `Ⓜ️`) and compound emoji (joined emoji,
+flags, skin-tone variants, and keycaps). In terminal Emacs they display as
+`[emoji]`; ordinary standalone two-column emoji remain visible.
+
+Detection uses Emacs's bundled Unicode emoji data and sequence syntax, not a
+per-character blacklist. Window-specific overlays affect only displayed text:
+file contents, copying/saving, character-width tables, and graphical Emacs
+remain unchanged, even for a buffer shared between GUI and TTY frames. Only
+visible logical lines are scanned, with unchanged ranges cached.
+
+The main configuration enables the mode, including for new terminal daemon
+clients, unless Emacs has the upstream `tty-display-emoji-force-wide` fix
+enabled. Patched builds display the original emoji instead of placeholders.
+Run `M-x tty-emoji-fallback-mode` to toggle it globally. Customize
+`tty-emoji-fallback-placeholder` to change the printable-ASCII marker, then
+toggle the mode off/on. This is an Emacs workaround, not an Alacritty setting,
+and does not affect other terminal applications.
+
+Run the focused tests from the `.emacs.d` directory:
+
+```sh
+emacs -Q --batch -L site-lisp -l site-lisp/tests/tty-emoji-fallback-tests.el -f ert-run-tests-batch-and-exit
+```
+
 ## notmuch-custom
 
 [`notmuch-custom/`](notmuch-custom/README.md) groups the mail customizations,

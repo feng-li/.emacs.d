@@ -8,6 +8,7 @@
 (require 'json)
 (require 'notmuch-lib)
 (require 'notmuch-show)
+(require 'notmuch-tree)
 (require 'subr-x)
 
 (defgroup notmuch-custom-attachments nil
@@ -60,6 +61,12 @@ The exporter uses the standard library; tqdm is optional."
                                          (or (plist-get result :errors) 0)))
                      (process-status process))))))))
 
+(defun notmuch-custom-attachments--thread-view-p ()
+  "Whether point is in an opened thread tree or its message preview."
+  (or (derived-mode-p 'notmuch-show-mode)
+      (and (derived-mode-p 'notmuch-tree-mode)
+           (not notmuch-tree-unthreaded))))
+
 ;;;###autoload
 (defun notmuch-custom-extract-thread-attachments (directory)
   "Export all attachments from the opened thread containing point to DIRECTORY.
@@ -72,11 +79,11 @@ unnamed inline bodies are not.  A JSONL index records each attachment's
 message headers and saved filename.  Messages and tags are left unchanged."
   (interactive
    (progn
-     (unless (derived-mode-p 'notmuch-show-mode)
+     (unless (notmuch-custom-attachments--thread-view-p)
        (user-error "Open a Notmuch thread before extracting attachments"))
      (list (read-directory-name "Extract thread attachments to: "
                                 (expand-file-name "~/Downloads/")))))
-  (unless (derived-mode-p 'notmuch-show-mode)
+  (unless (notmuch-custom-attachments--thread-view-p)
     (user-error "Open a Notmuch thread before extracting attachments"))
   (when (and notmuch-custom-attachments--process
              (process-live-p notmuch-custom-attachments--process))
@@ -86,7 +93,9 @@ message headers and saved filename.  Messages and tags are left unchanged."
     (user-error "Choose a local destination directory"))
   (when (and (file-exists-p directory) (not (file-directory-p directory)))
     (user-error "Destination is not a directory: %s" directory))
-  (let* ((id (notmuch-show-get-message-id t))
+  (let* ((id (if (derived-mode-p 'notmuch-show-mode)
+                 (notmuch-show-get-message-id t)
+               (notmuch-tree-get-message-id t)))
          (python (executable-find notmuch-custom-attachments-python-command))
          (notmuch (executable-find notmuch-command))
          (default-directory (expand-file-name "~/"))

@@ -60,6 +60,7 @@
   :group 'notmuch)
 
 (require 'notmuch-custom-attachments)
+(require 'notmuch-custom-thread-view)
 
 ;;; Mail directories
 
@@ -2348,6 +2349,7 @@ Queue a different manual star request if a job is running; never overlap jobs."
 ;;;###autoload
 (defun notmuch-custom-setup ()
   "Enable the local Notmuch enhancements defined in this library."
+  (notmuch-custom-thread-view-setup)
   (setq notmuch-custom--imap-mail-root nil
         notmuch-custom--imap-account-roots nil)
   (unless (advice-member-p #'notmuch-custom--show-newest-first
