@@ -1312,14 +1312,38 @@ intermediate and output files, as requested by the non-nil argument to
         (message "Graphicx draft mode enabled")))))
 
 (defun my-latex-clean-delimiters ()
-  "Replace \\( and \\) with $, and remove ** before saving."
-  (let ((replacements 0))
+  "Convert paired, unescaped \\( ... \\) to $ ... $; remove ** on save.
+Leave unmatched delimiters and LaTeX line breaks such as \\\\(s) alone."
+  (let ((replacements 0)
+        opening positions)
     (save-excursion
       (goto-char (point-min))
-      (while (re-search-forward "\\\\(\\|\\\\)\\|\\*\\*" nil t)
-        (if (string= (match-string 0) "**")
-            (replace-match "")
-          (replace-match "$"))
+      (while (re-search-forward (regexp-opt '("\\(" "\\)")) nil t)
+        (let* ((begin (match-beginning 0))
+               (delimiter (match-string-no-properties 0))
+               (preceding begin))
+          ;; An odd number of preceding backslashes escapes this one.
+          ;; For example, the second slash in \\\\(s) is a line break,
+          ;; not the start of inline math.
+          (while (and (> preceding (point-min))
+                      (eq (char-before preceding) ?\\))
+            (setq preceding (1- preceding)))
+          (when (zerop (% (- begin preceding) 2))
+            (if (equal delimiter "\\(")
+                (setq opening begin)
+              (when opening
+                (push opening positions)
+                (push begin positions)
+                (setq opening nil))))))
+      ;; Replace from the end so earlier positions remain valid.
+      (dolist (position positions)
+        (goto-char position)
+        (delete-char 2)
+        (insert "$")
+        (setq replacements (1+ replacements)))
+      (goto-char (point-min))
+      (while (search-forward "**" nil t)
+        (replace-match "" t t)
         (setq replacements (1+ replacements))))
     (message "LaTeX pre-save cleanup: %d replacement%s"
              replacements (if (= replacements 1) "" "s"))))

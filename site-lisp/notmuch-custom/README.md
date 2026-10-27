@@ -11,10 +11,12 @@ keeps test libraries off the startup load path.
   selected message previewed. In ordinary search results it opens only the
   selected thread. Folder/search filters do not hide other replies.
 - The thread list uses a **reverse reply tree**: replies above their parents,
-  with branch grouping and indentation retained. Read upwards from a parent
-  to follow its replies. This is a vertical mirror of the normal tree, not a
-  strict date sort across separate branches. Repeated subjects are abbreviated
-  upwards, keeping the topic visible on the bottom message of each subject group.
+  with branch grouping retained. Compact markers keep subjects aligned:
+  `›` for replies and `•` for original messages, without nested indentation.
+  This follows the reverse traversal of the normal tree, not a
+  strict date sort across separate branches. Subjects stay visible at the top
+  and on the bottom message of each subject group, and repeat after at most
+  three abbreviated rows in long threads.
 - **Up/Down** in the thread immediately previews the adjacent email, including
   non-matching replies. Flat folder lists retain ordinary cursor navigation.
 - Inside the thread, **RET** keeps Notmuch's normal preview behavior; **q**
@@ -25,6 +27,13 @@ restore the normal parent-first tree. Outline folding groups whole threads;
 it does not fold individual reverse reply branches. The existing
 `notmuch-custom-show-newest-first` option independently controls chronology
 in full-message (`notmuch-show`) views.
+
+Set `notmuch-custom-tree-compact-markers` to `nil` and refresh with **=** to
+show the full nested branch connectors again.
+
+`notmuch-custom-tree-subject-repeat-interval` controls subject repetition:
+the default is `4`, `1` shows every subject, and `nil` keeps only the top
+row and the bottom of each subject group. Refresh with **=** after changing it.
 
 ## Export attachments from an opened thread
 

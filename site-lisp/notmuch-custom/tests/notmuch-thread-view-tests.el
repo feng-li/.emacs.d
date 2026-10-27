@@ -87,6 +87,7 @@
     (let* ((thread (notmuch-thread-view-test--thread))
            (before (copy-tree thread))
            (notmuch-custom-tree-reverse-order t)
+           (notmuch-custom-tree-compact-markers nil)
            (inhibit-read-only t))
       (setq-local notmuch-tree-unthreaded nil)
       (notmuch-custom--tree-insert-reversed #'notmuch-tree-insert-forest-thread thread)
@@ -104,12 +105,46 @@
       (should (equal thread before))
       (should (string-match-p "╭─►" (buffer-string)))
       (should (string-match-p "┴►" (buffer-string)))
-      ;; The bottom parent anchors the subject for the replies above it.
+      ;; Show the subject at both ends while the parent anchors the topic.
       (goto-char (point-min))
-      (should-not (search-forward "A shared subject" (line-end-position) t))
+      (should (search-forward "A shared subject" (line-end-position) t))
       (goto-char (point-max))
       (forward-line -1)
       (should (search-forward "A shared subject" (line-end-position) t)))))
+
+(ert-deftest notmuch-thread-view-compact-markers-align-deep-replies-and-survive-redraw ()
+  "Bound the marker width even in deep threads without changing row order."
+  (with-temp-buffer
+    (notmuch-tree-mode)
+    (let ((notmuch-tree-result-format '(("tree" . "%s") ("subject" . "%s")))
+          (notmuch-custom-tree-reverse-order t)
+          (notmuch-custom-tree-compact-markers t)
+          (inhibit-read-only t)
+          thread)
+      (dotimes (index 20)
+        (setq thread (list (list (notmuch-thread-view-test--message
+                                 (number-to-string index) t)
+                                thread))))
+      (let ((original (copy-tree thread)))
+        (notmuch-custom--tree-insert-reversed #'notmuch-tree-insert-forest-thread thread)
+        (should (equal thread original)))
+      (let* ((rows (notmuch-thread-view-test--rows))
+             (markers (mapcar (lambda (msg)
+                                (mapconcat #'identity (reverse (plist-get msg :tree-status)) ""))
+                              rows))
+             (before (buffer-string)))
+        (should (equal (mapcar (lambda (msg) (plist-get msg :id)) rows)
+                       (mapcar #'number-to-string (number-sequence 0 19))))
+        (should (equal markers (append (make-list 19 "› ") '("• "))))
+        (should (cl-every (lambda (marker) (= (string-width marker) 2)) markers))
+        (should (equal (mapcar (lambda (line) (substring line 0 2))
+                              (split-string before "\n" t))
+                       markers))
+        (goto-char (point-min))
+        (while (not (eobp))
+          (notmuch-tree-refresh-result)
+          (forward-line))
+        (should (equal (buffer-string) before))))))
 
 (ert-deftest notmuch-thread-view-subject-groups-are-anchored-at-the-bottom ()
   "Keep the original topic on the root and a changed topic on its first reply."
@@ -130,7 +165,7 @@
                                                        (list (list latest nil))))))))))
       (notmuch-custom--tree-insert-reversed #'notmuch-tree-insert-forest-thread thread)
       (should (equal (split-string (buffer-string) "\n" t)
-                     '(" ..." "Hello" " ..." "You have a new Editor Assignment")))
+                     '("Hello" "Hello" " ..." "You have a new Editor Assignment")))
       ;; Tag changes redraw individual rows using their saved comparison.
       (let ((before (buffer-string)))
         (goto-char (point-min))
@@ -147,12 +182,44 @@
            (notmuch-custom-tree-reverse-order t)
            (inhibit-read-only t)
            (root (notmuch-thread-view-test--message "root" t "A\ttopic"))
-           (reply (notmuch-thread-view-test--message "reply" t "Re: A\ttopic")))
+           (reply (notmuch-thread-view-test--message "reply" t "Re: A\ttopic"))
+           (latest (notmuch-thread-view-test--message "latest" t "Re: A\ttopic")))
       (dotimes (_ 2)
         (notmuch-custom--tree-insert-reversed
-         #'notmuch-tree-insert-forest-thread (list (list root (list (list reply nil))))))
+         #'notmuch-tree-insert-forest-thread
+         (list (list root (list (list reply (list (list latest nil))))))))
       (should (equal (split-string (buffer-string) "\n" t)
-                     '(" ..." "A topic" " ..." "A topic"))))))
+                     '("A topic" " ..." "A topic" "A topic" " ..." "A topic"))))))
+
+(ert-deftest notmuch-thread-view-repeats-subjects-in-long-threads-and-on-redraw ()
+  (dolist (interval '(4 1 nil))
+    (with-temp-buffer
+      (notmuch-tree-mode)
+      (let ((notmuch-tree-result-format '(("subject" . "%s")))
+            (notmuch-custom-tree-reverse-order t)
+            (notmuch-custom-tree-subject-repeat-interval interval)
+            (inhibit-read-only t)
+            thread)
+        (dotimes (index 10)
+          (setq thread (list (list (notmuch-thread-view-test--message
+                                   (number-to-string index) t)
+                                  thread))))
+        (notmuch-custom--tree-insert-reversed #'notmuch-tree-insert-forest-thread thread)
+        (let* ((lines (split-string (buffer-string) "\n" t))
+               (full-subject-rows
+                (cl-loop for line in lines for index from 0
+                         when (equal line "A shared subject") collect index))
+               (before (buffer-string)))
+          (should (equal full-subject-rows
+                         (pcase interval
+                           (4 '(0 4 8 9))
+                           (1 (number-sequence 0 9))
+                           (_ '(0 9)))))
+          (goto-char (point-min))
+          (while (not (eobp))
+            (notmuch-tree-refresh-result)
+            (forward-line))
+          (should (equal (buffer-string) before)))))))
 
 (ert-deftest notmuch-thread-view-preserves-target-and-auto-preview ()
   (with-temp-buffer

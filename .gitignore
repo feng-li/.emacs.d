@@ -15,6 +15,7 @@ site-lisp/tests/*
 !site-lisp/tests/.nosearch
 !site-lisp/tests/tty-emoji-fallback-tests.el
 !site-lisp/tests/flycheck-vale-tests.el
+!site-lisp/tests/latex-clean-delimiters-tests.el
 *.desktop
 *.lock
 places

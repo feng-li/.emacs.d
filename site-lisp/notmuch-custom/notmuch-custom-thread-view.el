@@ -19,11 +19,29 @@
 
 (defcustom notmuch-custom-tree-reverse-order t
   "Display replies above parents in threaded tree buffers.
-This vertically mirrors the normal reply tree, preserving branch grouping
-and indentation.  It is not a strict date sort across separate branches.
+This vertically mirrors the normal reply tree, preserving branch grouping.
+It is not a strict date sort across separate branches.
 Flat folder lists are unaffected.  Set to nil and refresh to restore the
 normal parent-first tree."
   :type 'boolean
+  :group 'notmuch-custom-thread-view)
+
+(defcustom notmuch-custom-tree-compact-markers t
+  "Use aligned reply markers instead of nested branches in reverse trees.
+Replies use \"› \" and original messages use \"• \", regardless of depth.
+Reply grouping and order are preserved, but nesting depth is not displayed.
+Set to nil and refresh to restore the full branch connectors."
+  :type 'boolean
+  :group 'notmuch-custom-thread-view)
+
+(defcustom notmuch-custom-tree-subject-repeat-interval 4
+  "Maximum spacing between full subjects in a reverse thread tree.
+The top row and the bottom row of each subject group always show their
+subjects.  With the default of 4, at most three abbreviated rows appear
+between full subjects.  Set to 1 to show every subject, or nil to disable
+periodic repetition while keeping the top row and subject-group bottoms."
+  :type '(choice (const :tag "No periodic repetition" nil)
+                 (integer :tag "Rows between full subjects"))
   :group 'notmuch-custom-thread-view)
 
 (defun notmuch-custom-open-thread-tree (&optional arg)
@@ -92,7 +110,7 @@ Other characters, including custom ASCII symbols, are left alone."
 
 (defun notmuch-custom--tree-insert-reversed (insert-thread thread)
   "Use INSERT-THREAD to render THREAD as a vertically reversed reply tree.
-Let Notmuch compute indentation and message metadata, then insert the rows
+Let Notmuch compute tree structure and message metadata, then insert the rows
 in reverse order through its normal target/preview-aware insertion path."
   (if (or notmuch-tree-unthreaded (not notmuch-custom-tree-reverse-order))
       (funcall insert-thread thread)
@@ -108,22 +126,42 @@ in reverse order through its normal target/preview-aware insertion path."
                  (lambda (message) (push message messages))))
         (funcall insert-thread (copy-tree thread)))
       (setq notmuch-tree-previous-subject nil)
-      (let ((first t))
+      (let ((first t)
+            (abbreviated-rows 0))
         (cl-loop for (message next) on messages
                  do
                  ;; Compare with the row below, so the oldest message in
                  ;; each subject group shows the topic.  Notmuch saves this
                  ;; value on the row for later redraws after tag changes.
-                 (let ((notmuch-tree-previous-subject
-                        (when next
-                          (notmuch-sanitize
-                           (notmuch-show-strip-re
-                            (plist-get (plist-get next :headers) :Subject))))))
+                 (let* ((subject (notmuch-sanitize
+                                  (notmuch-show-strip-re
+                                   (plist-get (plist-get message :headers) :Subject))))
+                        (next-subject
+                         (when next
+                           (notmuch-sanitize
+                            (notmuch-show-strip-re
+                             (plist-get (plist-get next :headers) :Subject)))))
+                        (abbreviate
+                         (and (not first) (equal subject next-subject)
+                              (or (null notmuch-custom-tree-subject-repeat-interval)
+                                  (< abbreviated-rows
+                                     (1- notmuch-custom-tree-subject-repeat-interval)))))
+                        (notmuch-tree-previous-subject (and abbreviate next-subject)))
+                   (when notmuch-custom-tree-compact-markers
+                     ;; Native tree status has two fragments at the root,
+                     ;; plus one per reply level. Save the compact marker
+                     ;; on the row so tag redraws retain the same layout.
+                     (setq message
+                           (plist-put message :tree-status
+                                      (list (if (> (length (plist-get message :tree-status)) 2)
+                                                "› "
+                                              "• ")))))
                    (setq message (plist-put message :first first))
                    ;; Outline operates downwards. Group the entire reverse
                    ;; thread instead of folding descendants as parents.
                    (setq message (plist-put message :level (if first 1 2)))
-                   (notmuch-tree-goto-and-insert-msg message))
+                   (notmuch-tree-goto-and-insert-msg message)
+                   (setq abbreviated-rows (if abbreviate (1+ abbreviated-rows) 0)))
                  (setq first nil))))))
 
 (defun notmuch-custom-thread-view-setup ()
