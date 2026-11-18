@@ -1448,8 +1448,13 @@ Leave unmatched delimiters and LaTeX line breaks such as \\\\(s) alone."
   (setq TeX-parse-self t)
   (setq TeX-auto-save t)
 
-  (setq TeX-source-correlate-method (quote synctex)) ;only for evince
+  (setq TeX-source-correlate-method (quote synctex))
   (setq TeX-view-evince-keep-focus t)
+
+  ;; Prefer Evince for SyncTeX; otherwise use the desktop's PDF association.
+  (when (eq system-type 'gnu/linux)
+    (setf (alist-get 'output-pdf TeX-view-program-selection)
+          (if (executable-find "evince") '("Evince") '("xdg-open"))))
 
   ;; Support current Evince D-Bus names without refreshing the environment.
   (add-hook 'LaTeX-mode-hook #'my-auctex-evince-setup)
