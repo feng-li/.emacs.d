@@ -1160,45 +1160,45 @@ This function follows `message-indent-citation' in
           (and from (mail-extract-address-components from))))
     (or (car address-parts) (cadr address-parts) from "Unknown sender")))
 
+(defun notmuch-custom--citation-date (time &optional zone)
+  "Return an unambiguous English date and clock time for TIME in ZONE."
+  (let ((system-time-locale "C"))
+    (format-time-string "%a, %b %-d, %Y %H:%M" time zone)))
+
+(defun notmuch-custom--citation-sender-time (time zone)
+  "Return TIME in sender ZONE, omitting date fields shared with local time."
+  (let* ((local (decode-time time))
+         (remote (decode-time time zone))
+         (same-year (= (nth 5 local) (nth 5 remote)))
+         (same-day (and same-year
+                        (= (nth 4 local) (nth 4 remote))
+                        (= (nth 3 local) (nth 3 remote))))
+         (date-format (cond (same-day "%H:%M")
+                            (same-year "%b %-d, %H:%M")
+                            (t "%b %-d, %Y %H:%M")))
+         (system-time-locale "C"))
+    (format "%s %s"
+            (format-time-string date-format time zone)
+            (notmuch-custom--citation-zone-name zone))))
+
 (defun notmuch-custom-insert-citation-line ()
-  "Insert a citation line with local time and optional sender-zone time."
+  "Insert local date/time and only differing sender-zone details."
   (let* ((date (mail-header-date message-reply-headers))
          (time (and date (ignore-errors (date-to-time date))))
          (sender-zone (and date (nth 8 (parse-time-string date))))
          (sender (notmuch-custom--citation-sender-name)))
     (if (not time)
         (insert (format "%s wrote:\n\n" sender))
-      (let* ((local-date (decode-time time nil))
-             (local-offset (car (current-time-zone time)))
+      (let* ((local-offset (car (current-time-zone time)))
              (different-zone
               (and (integerp sender-zone)
-                   (/= sender-zone local-offset)))
-             (sender-date
-              (and different-zone (decode-time time sender-zone))))
+                   (/= sender-zone local-offset))))
         (insert
-         (format "On %d/%d/%02d %02d:%02d %s%s, %s wrote:\n\n"
-                 (nth 4 local-date)
-                 (nth 3 local-date)
-                 (% (nth 5 local-date) 100)
-                 (nth 2 local-date)
-                 (nth 1 local-date)
-                 (notmuch-custom--citation-zone-name local-offset)
-                 (if sender-date
-                     (let ((same-day
-                            (and (= (nth 3 local-date) (nth 3 sender-date))
-                                 (= (nth 4 local-date) (nth 4 sender-date))
-                                 (= (nth 5 local-date) (nth 5 sender-date)))))
-                       (format " (%s%02d:%02d %s)"
-                               (if same-day
-                                   ""
-                                 (format "%d/%d/%02d "
-                                         (nth 4 sender-date)
-                                         (nth 3 sender-date)
-                                         (% (nth 5 sender-date) 100)))
-                               (nth 2 sender-date)
-                               (nth 1 sender-date)
-                               (notmuch-custom--citation-zone-name
-                                sender-zone)))
+         (format "On %s%s, %s wrote:\n\n"
+                 (notmuch-custom--citation-date time)
+                 (if different-zone
+                     (format " (%s)"
+                             (notmuch-custom--citation-sender-time time sender-zone))
                    "")
                  sender))))))
 
@@ -1299,11 +1299,45 @@ Keep only the first marker, including markers inherited from older replies."
         (set-marker start nil)
         (set-marker end nil)))))
 
+(defun notmuch-custom-collapse-cited-blank-lines (&optional start end)
+  "Collapse consecutive blank lines in quoted text to one blank line.
+Operate between START and END, or point and mark when called without
+arguments.  Interactively, operate on the selected region.  Quote-only
+lines count as blank, including spaced quote prefixes and nonbreaking
+spaces from HTML mail.  Preserve the first blank line and leave partial
+lines at the region boundaries untouched."
+  (interactive
+   (if (use-region-p)
+       (list (region-beginning) (region-end))
+     (user-error "Select quoted text to clean")))
+  (let ((start (or start (point)))
+        (end (or end (mark t))))
+    (when end
+      (let ((start-marker (copy-marker (min start end)))
+            (end-marker (copy-marker (max start end))))
+        (unwind-protect
+            (save-excursion
+              (goto-char start-marker)
+              (unless (bolp) (forward-line 1))
+              (let (previous-blank)
+                (while (and (< (point) end-marker)
+                            (<= (line-beginning-position 2) end-marker))
+                  (let ((next (line-beginning-position 2))
+                        (blank (looking-at
+                                "[ \t\u00a0]*\\(?:>[ \t\u00a0]*\\)*\r?$")))
+                    (if (and blank previous-blank)
+                        (delete-region (point) next)
+                      (setq previous-blank blank)
+                      (goto-char next))))))
+          (set-marker start-marker nil)
+          (set-marker end-marker nil))))))
+
 (defun notmuch-custom-message-fill-setup ()
-  "Fill newly inserted Notmuch reply citations to the message width."
+  "Wrap and clean newly inserted Notmuch reply citations."
   (setq-local message-indent-citation-function
               '(message-indent-citation notmuch-custom-fill-cited-text
-                notmuch-custom-truncate-cited-text)))
+                notmuch-custom-truncate-cited-text
+                notmuch-custom-collapse-cited-blank-lines)))
 
 (defun notmuch-custom--forward-message-id (forward-buffer)
   "Return the bare Message-ID from raw FORWARD-BUFFER."

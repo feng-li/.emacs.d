@@ -144,4 +144,78 @@
             (concat "> Recent\n>> Earlier\n>>> Oldest More oldest\n"
                     ">>> [Older quoted text omitted]\n")))))
 
+(defun notmuch-custom-quote-test--collapse (text)
+  "Collapse repeated blank lines in quoted TEXT."
+  (with-temp-buffer
+    (insert text)
+    (notmuch-custom-collapse-cited-blank-lines (point-min) (point-max))
+    (buffer-string)))
+
+(ert-deftest notmuch-custom-quote-collapses-repeated-blank-lines ()
+  (should
+   (equal
+    (notmuch-custom-quote-test--collapse
+     "> First paragraph\n> \n>\n> \n> Second paragraph\n>\n> Third paragraph\n")
+    "> First paragraph\n> \n> Second paragraph\n>\n> Third paragraph\n")))
+
+(ert-deftest notmuch-custom-quote-collapses-mixed-blank-prefixes ()
+  (should
+   (equal
+    (notmuch-custom-quote-test--collapse
+     "> A\r\n> > \r\n>>\n \t\n\u00a0>\u00a0>\u00a0\n\n> B\n")
+    "> A\r\n> > \r\n> B\n")))
+
+(ert-deftest notmuch-custom-quote-blank-cleanup-is-idempotent ()
+  (let* ((text "> A\n>\n>\n> B\n> \n> C\n")
+         (once (notmuch-custom-quote-test--collapse text)))
+    (should (equal (notmuch-custom-quote-test--collapse once) once))))
+
+(ert-deftest notmuch-custom-quote-collapses-blank-final-line ()
+  (should (equal (notmuch-custom-quote-test--collapse "> A\n>\n> ")
+                 "> A\n>\n")))
+
+(ert-deftest notmuch-custom-quote-blank-cleanup-only-changes-region ()
+  (with-temp-buffer
+    (insert "My reply\n\n\n")
+    (let ((start (point)))
+      (insert "> A\n>\n>\n> B\n")
+      (let ((end (point)))
+        (insert "\n\n-- \nMy signature\n\n\n")
+        (goto-char end)
+        (set-mark start)
+        (notmuch-custom-collapse-cited-blank-lines)))
+    (should
+     (equal (buffer-string)
+            "My reply\n\n\n> A\n>\n> B\n\n\n-- \nMy signature\n\n\n"))))
+
+(ert-deftest notmuch-custom-quote-blank-cleanup-preserves-partial-lines ()
+  (with-temp-buffer
+    (insert ">\n>\n>\n>\n> \n> Outside\n")
+    (notmuch-custom-collapse-cited-blank-lines 2 10)
+    (should (equal (buffer-string) ">\n>\n> \n> Outside\n"))))
+
+(ert-deftest notmuch-custom-quote-blank-cleanup-without-mark-is-noop ()
+  (with-temp-buffer
+    (insert ">\n>\n")
+    (notmuch-custom-collapse-cited-blank-lines)
+    (should (equal (buffer-string) ">\n>\n"))))
+
+(ert-deftest notmuch-custom-quote-pipeline-cleans-blank-lines-by-default ()
+  (with-temp-buffer
+    (insert "From: Sender <sender@example.test>\n\nRecent\n\n\n\nAnother paragraph\n> Earlier\n>> Oldest\n> Old signature\n")
+    (goto-char (point-min))
+    (set-mark (point-max))
+    (let ((message-yank-prefix "> ")
+          (message-fill-column 72)
+          (notmuch-custom-reply-quote-depth 3))
+      (notmuch-custom-message-fill-setup)
+      (should (memq #'notmuch-custom-collapse-cited-blank-lines
+                    message-indent-citation-function))
+      (dolist (function message-indent-citation-function)
+        (funcall function)))
+    (should
+     (equal (buffer-string)
+            (concat "> Recent\n> \n> Another paragraph\n>> Earlier\n"
+                    ">>> Oldest\n>>> [Older quoted text omitted]\n")))))
+
 ;;; notmuch-custom-quote-test.el ends here
