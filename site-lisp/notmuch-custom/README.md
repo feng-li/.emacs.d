@@ -35,6 +35,14 @@ show the full nested branch connectors again.
 the default is `4`, `1` shows every subject, and `nil` keeps only the top
 row and the bottom of each subject group. Refresh with **=** after changing it.
 
+## Attach files while composing
+
+Use **`C-c C-a`** or **`M-x mml-attach-file`** and choose the file. Its MIME
+type is detected automatically; description and disposition questions are
+skipped. Files, including PDFs and images, always use **attachment** rather
+than inline disposition. Drag-and-drop also uses these defaults without
+confirmation. This behavior applies only to Notmuch compose buffers.
+
 ## Export attachments from an opened thread
 
 Open a thread, press **`C-c C-e`**, and choose a destination directory once.

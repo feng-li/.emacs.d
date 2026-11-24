@@ -35,6 +35,7 @@
 (require 'company)
 (require 'ivy-pinyin-search)
 (require 'mail-extr)
+(require 'mml)
 (require 'network-stream)
 (require 'nnheader)
 (require 'notmuch)
@@ -750,6 +751,28 @@ stored message is unchanged.  Run before wrapping and blank-line cleanup."
               (replace-match
                (replace-regexp-in-string "\u00a0" " " decoded t t)
                t t))))))))
+
+;;; Compose attachment defaults
+
+(defun notmuch-custom--attach-file-with-defaults
+    (attach file &optional type description disposition)
+  "Call ATTACH for FILE without metadata prompts in Notmuch composition.
+Detect TYPE when absent, keep DESCRIPTION optional, and always use an
+attachment disposition.  Preserve the original command outside Notmuch."
+  (interactive
+   (lambda (spec)
+     (if (derived-mode-p 'notmuch-message-mode)
+         (list (mml-minibuffer-read-file "Attach file: "))
+       (advice-eval-interactive-spec spec))))
+  (if (derived-mode-p 'notmuch-message-mode)
+      (funcall attach file
+               (or type (mm-default-file-type file) "application/octet-stream")
+               description "attachment")
+    (funcall attach file type description disposition)))
+
+(defun notmuch-custom-message-attachment-setup ()
+  "Use attachment defaults without questions for dropped Notmuch files."
+  (setq-local mml-dnd-attach-options nil))
 
 ;;; External attachment opening
 
@@ -2452,6 +2475,12 @@ Queue a different manual star request if a job is running; never overlap jobs."
     (advice-add 'message-forward-make-body :around
                 #'notmuch-custom--message-forward-make-body-decoded))
   (add-hook 'notmuch-message-mode-hook #'notmuch-custom-company-setup)
+  (unless (advice-member-p #'notmuch-custom--attach-file-with-defaults
+                           'mml-attach-file)
+    (advice-add 'mml-attach-file :around
+                #'notmuch-custom--attach-file-with-defaults))
+  (add-hook 'notmuch-message-mode-hook
+            #'notmuch-custom-message-attachment-setup)
   (add-hook 'notmuch-message-mode-hook #'notmuch-custom-message-fill-setup)
   (add-hook 'message-sent-hook
             #'notmuch-custom-imap-update-original-after-send)
