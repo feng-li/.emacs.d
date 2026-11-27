@@ -10,6 +10,11 @@ keeps test libraries off the startup load path.
 - **RET** or a click in a flat folder opens the complete thread with the
   selected message previewed. In ordinary search results it opens only the
   selected thread. Folder/search filters do not hide other replies.
+- The thread list opens on the **left** and the message preview on the
+  **right**, with a vertical divider. Set
+  `notmuch-custom-tree-preview-layout` to `stacked` for the previous layout
+  (thread above message), or `side-by-side` for the default. Changes apply
+  on the next preview; narrow windows fall back to stacked panes.
 - The thread list uses a **reverse reply tree**: replies above their parents,
   with branch grouping retained. Compact markers keep subjects aligned:
   `›` for replies and `•` for original messages, without nested indentation.
@@ -19,8 +24,23 @@ keeps test libraries off the startup load path.
   three abbreviated rows in long threads.
 - **Up/Down** in the thread immediately previews the adjacent email, including
   non-matching replies. Flat folder lists retain ordinary cursor navigation.
+- **Alt+Up / Alt+Down** in the message pane previews the previous/next email
+  in the thread list's displayed order and keeps focus in the message pane.
+  Navigation stops at the thread boundaries. In standalone full-message
+  views, these keys use Notmuch's native previous/next message navigation.
+- **Left** in the thread list returns to the parent folder/search, closing
+  the thread and preview together. It also quits folder/search views,
+  without typing a letter while Rime is active. In the message pane,
+  **Left** retains normal cursor movement.
 - Inside the thread, **RET** keeps Notmuch's normal preview behavior; **q**
-  returns to the previous view. Folder lists remain flat.
+  keeps its existing behavior. Folder lists remain flat.
+
+A compact **key-hint line** appears above thread, folder/search, and message
+views by default. Use **M-x customize-option RET
+notmuch-custom-show-key-hints RET** to hide it or enable it again; open views
+update immediately. Plain arrow keys retain normal movement in message text.
+The hint line uses the `notmuch-custom-key-hint` face, with distinct backgrounds
+for light and dark themes. Change its colors with **M-x customize-face**.
 
 Set `notmuch-custom-tree-reverse-order` to `nil` and refresh with **=** to
 restore the normal parent-first tree. Outline folding groups whole threads;
